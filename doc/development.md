@@ -10,8 +10,8 @@ docs
 Man page and README are maintained as ronn(1) (markdown-like) file.
 To update man page and README:
 
-> cd doc && \
-> ronn alttab.1.ronn && \
+> cd doc  
+> ronn alttab.1.ronn  
 > man -l alttab.1 > alttab.1.txt
 
 This is not included in makefiles to not require everybody 
