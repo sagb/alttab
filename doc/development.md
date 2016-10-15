@@ -1,14 +1,16 @@
 
-repo
-----
+repository, bug reporting
+-------------------------
+
+[On github](https://github.com/sagb/alttab).
 
 docs
 ----
 
-Man page is maintained as ronn(1) (markdown-like) file.
-To produce man page:
+Man page and README are maintained as ronn(1) (markdown-like) file.
+To update man page and README:
 
-ronn -r alttab.1.ronn
+cd doc && ronn alttab.1.ronn
 
 This is not included in makefiles to not require everybody 
 to install ronn.
