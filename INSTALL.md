@@ -11,7 +11,7 @@ In Debian or Ubuntu:
 Installing alttab
 -----------------
 
-`./configure
-make
+`./configure  
+make  
 make install`
 
