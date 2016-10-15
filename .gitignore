@@ -19,3 +19,5 @@ doc/Makefile
 Makefile
 stamp-h1
 
+src/alttab
+
