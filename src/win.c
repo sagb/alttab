@@ -203,7 +203,7 @@ int r;
 switch (g.option_wm) {
   case WM_NO:
     r = ewmh_setFocus (dpy, winNdx); // for WM which isn't identified as EWMH compatible but accepts setting focus (dwm)
-    r = x_setFocus (dpy, winNdx);
+    x_setFocus (dpy, winNdx);
     break;
   case WM_RATPOISON:
     r = rp_setFocus (winNdx);
