@@ -177,12 +177,12 @@ int link[2];
 pid_t pid;
 
 if (pipe(link)==-1) {
-    fprintf (stderr, "pipe\n");
+    perror ("pipe");
     return 0;
 }
 
 if ((pid = fork()) == -1) {
-    fprintf (stderr, "fork\n");
+    perror ("fork");
     return 0;
 }
 
@@ -192,7 +192,7 @@ dup2 (link[1], STDOUT_FILENO);
 close (link[0]);
 close (link[1]);
 execv (exe, args);
-fprintf (stderr, "execv\n");
+perror ("execv");
 return 0;
 
 } else {
@@ -200,6 +200,7 @@ return 0;
 close(link[1]);
 int nbytes = read(link[0], buf, bufsize);
 //printf("Output: (%.*s)\n", nbytes, buf);
+close(link[0]);
 wait(NULL);
 
 }
