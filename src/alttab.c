@@ -256,7 +256,6 @@ if (!startupWintasks (dpy))
 if (!startupGUItasks (dpy, root))
     die("startupGUItasks failed");
 
-setSelectInput (dpy, root, True);
 grabAllKeys (dpy, root, true);
 g.uiShowHasRun = false;
 
@@ -285,16 +284,6 @@ while(true)
             // interested only in "final" release
             if (! ((ev.xkey.state & g.option_modMask) && ev.xkey.keycode == g.option_modCode && g.uiShowHasRun) ) { break; }
             uiHide (dpy, root);
-            break;
-
-        case MapNotify:
-            if (g.debug>1) {fprintf (stderr, "Mapped %x\n", ev.xmap.window);}
-            setSelectInput (dpy, ev.xmap.window, True);
-            break;
-
-        case UnmapNotify:
-            if (g.debug>1) {fprintf (stderr, "Unmapped %x\n", ev.xunmap.window);}
-            setSelectInput (dpy, ev.xunmap.window, False);
             break;
 
         case Expose:
