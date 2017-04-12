@@ -1,4 +1,4 @@
-ALTTAB(1)                                                    ALTTAB(1)
+ALTTAB(1)                                                                ALTTAB(1)
 
 
 
@@ -6,19 +6,19 @@ NAME
        alttab - the task switcher
 
 SYNOPSIS
-       alttab [-w N] [-mm N] [-bm N] [-mk N] [-kk N] [-t NxM] [-i NxM]
-       [-bg color] [-fg color] [-frame color] [-font name] [-v|-vv]
+       alttab [-w N] [-mm N] [-bm N] [-mk N] [-kk N] [-t NxM] [-i NxM] [-bg color]
+       [-fg color] [-frame color] [-font name] [-v|-vv]
 
 DESCRIPTION
-       The task switcher designed for minimalistic window managers  or
-       standalone X11 session.
+       The task switcher designed for minimalistic window managers  or  standalone
+       X11 session.
 
-       Unlike  task  switchers  integrated  in most simple WMs, alttab
-       emulates Microsoft task switcher tactile  behaviour,  switching
-       windows on releasing Alt key.
+       Unlike task switchers integrated in most simple WMs, alttab emulates Micro‐
+       soft task switcher tactile behaviour, switching windows  on  releasing  Alt
+       key.
 
-       Being lightweight and depending only on core X11 libs, it still
-       features customizable look and behaviour.
+       Being  lightweight  and  depending only on core X11 libs, it still features
+       customizable look and behaviour.
 
 OPTIONS
        Most command line options have corresponding X resource.
@@ -27,41 +27,34 @@ OPTIONS
               resource: alttab.windowmanager
               default: autodetect
 
-              Control how to obtain window list and set focus.  NUMBER
-              may be 0, 1 or 2:
+              Control how to obtain window list and set focus. NUMBER may be 0,  1
+              or 2:
 
               0: No WM, raw X.
 
-              Only  "leader"  windows  are  listed,  since Xlib has no
-              other means to recognize main application  window.  List
-              order  is  random. Running -w 0 under WM is discouraged:
-              hidden windows or windows on another desktops  will  not
-              be   listed;   instead,  some  strange  windows  may  be
-              included. Nevertheless, this mode is suitable for dwm(1)
-              and  other  managers  which don´t expose window list via
-              EWMH.
+              Only  "leader"  windows are listed, since Xlib has no other means to
+              recognize main application window. List order is random. Running  -w
+              0  under  WM  is  discouraged:  hidden windows or windows on another
+              desktops will not be listed; instead, some strange  windows  may  be
+              included.  Nevertheless,  this mode is suitable for dwm(1) and other
+              managers which don´t expose window list via EWMH.
 
               1: EWMH compatible.
 
-              Compatible WM list is in [SEE  ALSO]  below.  Tested  in
-              xmonad(1)    (EWMH   must   be   allowed,   details   in
-              doc/xmonad.md), i3(1), evilwm(1).
+              Compatible WM list is in [SEE ALSO] below. Tested in xmonad(1) (EWMH
+              must be allowed, details in doc/xmonad.md), i3(1), evilwm(1).
 
               2: Ratpoison.
 
-              Alttab uses  ratpoison(1)  own  perfect  remote  control
-              capability. Additionally, alttab registers itself in its
-              "unmanaged list" automatically.
-
-       For  the   following   four   options,   see   key   masks   in
-       /usr/include/X11/X.h,          keysym          codes         in
-       /usr/include/X11/keysymdef.h.
+              Alttab  uses  ratpoison(1)  own  perfect  remote control capability.
+              Additionally, alttab registers itself in its "unmanaged list"  auto‐
+              matically.
 
        -mm NUM
               resource: alttab.modifier.mask
               default: 8 (Mod1Mask aka left Alt)
 
-              Main modifier mask.
+              Main modifier mask. See /usr/include/X11/X.h.
 
        -bm NUM
               resource: alttab.backscroll.mask
@@ -71,13 +64,14 @@ OPTIONS
 
        -mk NUM
               resource: alttab.modifier.keysym
-              default: 64 (XK_Alt_L aka left Alt)
+              default: 0xffe9 (XK_Alt_L aka left Alt)
 
-              Keysym of main modifier alone. Keep it in sync with -mm.
+              Keysym  of  main  modifier  alone. See /usr/include/X11/keysymdef.h.
+              Keep in sync with -mm.
 
        -kk NUM
               resource: alttab.key.keysym
-              default: 23 (XK_Tab)
+              default: 0xff09 (XK_Tab)
 
               Keysym of main key.
 
@@ -85,8 +79,8 @@ OPTIONS
               resource: alttab.tile.geometry
               default: 112x128
 
-              Maximum size of a single tile (mini-window). If switcher
-              doesn´t fit the screen, tile may be thinner.
+              Maximum size of a single tile (mini-window). If switcher doesn´t fit
+              the screen, tile may be thinner.
 
        -i NNxMM
               resource: alttab.icon.geometry
@@ -118,13 +112,13 @@ OPTIONS
               resource: alttab.font
               default: xft:sans-10
 
-              Label  font name in format: xft:fontconfig_pattern, like
-              in emacs(1) and rxvt(1). See [SEE ALSO]  for  fontconfig
-              pattern. It´s not GTK font pattern or legacy XLFD.
+              Label  font name in format: xft:fontconfig_pattern, like in emacs(1)
+              and rxvt(1). See [SEE ALSO] for fontconfig  pattern.  It´s  not  GTK
+              font pattern or legacy XLFD.
 
-       Your  Xresources  database  probably  already have *background,
-       *foreground or *font wildcard definitions,  which  alttab  will
-       obey. Precedence order (preferred first):
+       Your  Xresources database probably already have *background, *foreground or
+       *font wildcard definitions, which alttab will obey. Precedence order  (pre‐
+       ferred first):
 
        alttab.font resource,
        -font option,
@@ -145,20 +139,18 @@ AUTHOR
        Written by sa <sa-dev AT rainbow POINT by>.
 
 REPORTING BUGS
-       Please  report  issues  on  github https://github.com/sagb/alt‐
-       tab/issues.
+       Please report issues on github https://github.com/sagb/alttab/issues.
 
 SEE ALSO
        skippy-xd(1)
 
-       EWMH              compatible              WM               list
-       https://en.wikipedia.org/wiki/Extended_Window_Man‐
-       ager_Hints#List_of_window_managers_that_support_Extended_Win‐
-       dow_Manager_Hints.
+       EWMH  compatible WM list https://en.wikipedia.org/wiki/Extended_Window_Man‐
+       ager_Hints#List_of_window_managers_that_support_Extended_Window_Man‐
+       ager_Hints.
 
-       Description   of   fontconfig   pattern   https://www.freedesk‐
-       top.org/software/fontconfig/fontconfig-user.html.
-
+       Description   of   fontconfig   pattern   https://www.freedesktop.org/soft‐
+       ware/fontconfig/fontconfig-user.html.
 
 
-                             October 2016                    ALTTAB(1)
+
+                                    April 2017                           ALTTAB(1)

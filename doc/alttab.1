@@ -1,7 +1,7 @@
 .\" generated with Ronn/v0.7.3
 .\" http://github.com/rtomayko/ronn/tree/0.7.3
 .
-.TH "ALTTAB" "1" "October 2016" "" ""
+.TH "ALTTAB" "1" "April 2017" "" ""
 .
 .SH "NAME"
 \fBalttab\fR \- the task switcher
@@ -49,9 +49,6 @@ Compatible WM list is in [SEE ALSO] below\. Tested in xmonad(1) (EWMH must be al
 .IP
 Alttab uses ratpoison(1) own perfect remote control capability\. Additionally, alttab registers itself in its "unmanaged list" automatically\.
 .
-.P
-For the following four options, see key masks in /usr/include/X11/X\.h, keysym codes in /usr/include/X11/keysymdef\.h\.
-.
 .TP
 \fB\-mm\fR \fINUM\fR
 resource: alttab\.modifier\.mask
@@ -60,7 +57,7 @@ resource: alttab\.modifier\.mask
 default: \fI8\fR (Mod1Mask aka left Alt)
 .
 .IP
-Main modifier mask\.
+Main modifier mask\. See /usr/include/X11/X\.h\.
 .
 .TP
 \fB\-bm\fR \fINUM\fR
@@ -77,17 +74,17 @@ Backward scroll modifier mask\.
 resource: alttab\.modifier\.keysym
 .
 .br
-default: \fI64\fR (XK_Alt_L aka left Alt)
+default: \fI0xffe9\fR (XK_Alt_L aka left Alt)
 .
 .IP
-Keysym of main modifier alone\. Keep it in sync with \fB\-mm\fR\.
+Keysym of main modifier alone\. See /usr/include/X11/keysymdef\.h\. Keep in sync with \fB\-mm\fR\.
 .
 .TP
 \fB\-kk\fR \fINUM\fR
 resource: alttab\.key\.keysym
 .
 .br
-default: \fI23\fR (XK_Tab)
+default: \fI0xff09\fR (XK_Tab)
 .
 .IP
 Keysym of main key\.
