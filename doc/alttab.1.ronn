@@ -52,13 +52,11 @@ Most command line options have corresponding X resource.
 
       Alttab uses ratpoison(1) own perfect remote control capability. Additionally, alttab registers itself in its "unmanaged list" automatically.
 
-For the following four options, see key masks in /usr/include/X11/X.h, keysym codes in /usr/include/X11/keysymdef.h.
-
   * `-mm` <NUM>:
     resource: alttab.modifier.mask  
     default: <8> (Mod1Mask aka left Alt)
 
-    Main modifier mask.
+    Main modifier mask. See /usr/include/X11/X.h.
 
   * `-bm` <NUM>:
     resource: alttab.backscroll.mask  
@@ -68,13 +66,13 @@ For the following four options, see key masks in /usr/include/X11/X.h, keysym co
 
   * `-mk` <NUM>:
     resource: alttab.modifier.keysym  
-    default: <64> (XK\_Alt\_L aka left Alt)
+    default: <0xffe9> (XK\_Alt\_L aka left Alt)
 
-    Keysym of main modifier alone. Keep it in sync with `-mm`.
+    Keysym of main modifier alone. See /usr/include/X11/keysymdef.h. Keep in sync with `-mm`.
 
   * `-kk` <NUM>:
     resource: alttab.key.keysym  
-    default: <23> (XK\_Tab)
+    default: <0xff09> (XK\_Tab)
 
     Keysym of main key.
 

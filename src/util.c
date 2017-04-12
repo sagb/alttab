@@ -373,7 +373,6 @@ return 1;
 // int main() { return drawMultiLine_test() ? 0 : 1; }
 // g++ XftTest.cc -lX11 -lXft `pkg-config --cflags freetype2`
 //
-
 int drawMultiLine_test ()
 {
 Display* dpy = XOpenDisplay(0);;
@@ -409,4 +408,14 @@ XftFontClose (dpy, font);
 return r;
 }
 
+//
+// check procedure for XCheckIfEvent which always returns true
+//
+Bool predproc_true(display, event, arg)
+Display *display;
+XEvent *event;
+char *arg;
+{
+return (True);
+}
 

@@ -259,10 +259,31 @@ if (!startupGUItasks (dpy, root))
 grabAllKeys (dpy, root, true);
 g.uiShowHasRun = false;
 
+struct timespec nanots;
+nanots.tv_sec=0;
+nanots.tv_nsec=10000000;
+char keys_pressed[32];
+int octet = g.option_modCode / 8;
+int kmask = 1 << (g.option_modCode - octet*8);
+
 while(true)
 {
     memset (&(ev.xkey), sizeof(ev.xkey), 0);
-    XNextEvent(dpy, &ev);
+
+    if (g.uiShowHasRun) {
+        // poll: lag and consume cpu, but necessary because of bug #
+        nanosleep (&nanots, NULL);
+        XQueryKeymap (dpy, keys_pressed);
+        if (! (keys_pressed[octet] & kmask)) {  // Alt released
+            uiHide (dpy, root);
+            continue;
+        }
+        if (! XCheckIfEvent (dpy, &ev, *predproc_true, NULL)) continue;
+    } else {
+        // event: immediate, when we don't care about Alt release
+        XNextEvent(dpy, &ev);
+    }
+
     switch(ev.type)
     {
         case KeyPress:
