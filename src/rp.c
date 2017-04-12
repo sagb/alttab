@@ -2,9 +2,11 @@
 Interface with Ratpoison window manager.
 
 This file is part of alttab program.
-alttab is Copyright (C) 2016, by respective author (sa).
-It is free software; you can redistribute it and/or modify it under the terms of either:
-a) the GNU General Public License as published by the Free Software Foundation; either version 1, or (at your option) any later version, or
+alttab is Copyright (C) 2016-2017, by respective author (sa).
+It is free software; you can redistribute it and/or modify it under
+the terms of either:
+a) the GNU General Public License as published by the Free Software
+Foundation; either version 1, or (at your option) any later version, or
 b) the "Artistic License".
 */
 
