@@ -273,7 +273,7 @@ while(true)
     memset (&(ev.xkey), sizeof(ev.xkey), 0);
 
     if (g.uiShowHasRun) {
-        // poll: lag and consume cpu, but necessary because of bug #
+        // poll: lag and consume cpu, but necessary because of bug #1 and #2
         nanosleep (&nanots, NULL);
         XQueryKeymap (dpy, keys_pressed);
         if (! (keys_pressed[octet] & kmask)) {  // Alt released
