@@ -114,7 +114,7 @@ The following three options accept color names or <#rrggbb>.
     resource: alttab.font  
     default: *xft:sans-10*
 
-    Label font name in format: `xft:fontconfig_pattern`, like in emacs(1) and rxvt(1). See [SEE ALSO] for fontconfig pattern. It's not GTK font pattern or legacy XLFD.
+    Label font name in format: `xft:fontconfig_pattern`, like in emacs(1) and rxvt(1). See [SEE ALSO] for fontconfig pattern. It's neigher GTK font pattern nor legacy XLFD.
 
 Your Xresources database probably already have \*background, \*foreground or \*font wildcard definitions, which alttab will obey. Precedence order (preferred first):
 
