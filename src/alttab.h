@@ -16,6 +16,7 @@ b) the "Artistic License".
 #define MAXNAMESZ   256
 #define MAXPATHSZ   8200
 #define MAXRPOUT    8200
+#define MAXWINDOWS  1024
 
 // as there are no files involved, we can die at any time
 // BUT? "it is a good idea to free all the pixmaps that your program created before exiting from the program, pixmaps are stored in the server, if they are not freed they could remain allocated after the program exits"
@@ -58,6 +59,7 @@ typedef struct {
     unsigned int icon_w, icon_h;
     bool icon_allocated;  // we need to free icon, because we created it (placeholder or depth conversion)
     Pixmap tile;  // ready to display. w/h are all equal and defined in gui.c
+    int order;  // in sort stack, kept in sync with g.sortlist
 } WindowInfo;
 
 typedef struct {
@@ -73,7 +75,13 @@ typedef struct {
     bool uiShowHasRun; // means: 1. window is ready to Expose, 2. need to call uiHide to free X stuff
     WindowInfo* winlist;
     int maxNdx; // number of items in list above
-    int selNdx; // current item
+    int selNdx; // current (selected) item
+    int startNdx; // current item at start of uiShow (current window before setFocus)
+    Window sortlist[MAXWINDOWS]; // auxiliary list for sorting
+        // display-wide, for all groups/desktops
+        // unlike g.winlist, survives uiHide
+        // for each uiShow, g.winlist[].order is initialized using this list
+    int sortNdx; // number of elements in list above
     // option_* are initialized from command line arguments or X resources or defaults
     int option_max_reclevel; // max reclevel. -1 is "everything"
 #define WM_MIN          0
@@ -106,6 +114,7 @@ int addWindowInfo (Display* dpy, Window win, int reclevel, int wm_id, char* wm_n
 int initWinlist (Display* dpy, Window root, bool direction);
 void freeWinlist (Display* dpy);
 int setFocus (Display* dpy, int winNdx);
+int pulloutWindowToTop (int winNdx);
 
 /* EWHM */
 Window *ewmh_get_client_list (Display *disp, unsigned long *size);
