@@ -293,7 +293,7 @@ for (i = 0; i < client_list_size / sizeof(Window); i++) {
     if (w == aw) { g.startNdx = i; }
 }
 
-if (g.debug>1) {fprintf(stderr, "ewmh active window: %lu index: %d name: %s\n", aw, awi, g.winlist[awi].name);}
+if (g.debug>1) {fprintf(stderr, "ewmh active window: %lu index: %d name: %s\n", aw, g.startNdx, g.winlist[g.startNdx].name);}
 
 return 1;
 }
