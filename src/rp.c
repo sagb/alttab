@@ -79,7 +79,7 @@ return 1;
 }
 
 //
-// initialize winlist from ratpoison output
+// initialize winlist/startNdx/update sortlist from ratpoison output
 //
 int rp_initWinlist (Display* dpy, bool direction) {
 
@@ -95,7 +95,6 @@ if (!execAndReadStdout (ratpoison_cmd, args, buf, MAXRPOUT)) {
 }
 if (g.debug>1) {fprintf (stderr, "ratpoison reports windows:\n%s", buf);}
 char* rest=buf; char* tok;
-int actWin=-1;
 
 if (strstr (buf, "No managed windows")) {
     // no windows at all.
@@ -114,7 +113,7 @@ if (strstr (buf, "No managed windows")) {
         if (endptr==tok2) die2(rpse, tok2);
         if ( !((tok2=strsep (&rest2, " \t")) && (*tok2)) ) die2(rpse, rest2);
         switch (*tok2) {
-            case '*': actWin=g.maxNdx; break;
+            case '*': g.startNdx=g.maxNdx; break;
             case '+': break; // use?
             case '-': break;
             default: break;
@@ -124,9 +123,6 @@ if (strstr (buf, "No managed windows")) {
     }
 }
 
-g.selNdx = direction ? 
-    ( (actWin<1 || actWin>=g.maxNdx) ? (g.maxNdx-1) : (actWin-1) ) :
-    ( (actWin<0 || actWin>=(g.maxNdx-1)) ? 0 : actWin+1 );
 return 1;
 }
 

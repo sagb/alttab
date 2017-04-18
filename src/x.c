@@ -57,7 +57,7 @@ return leader;
 // PUBLIC
 
 //
-// set winlist,maxNdx,selNdx recursively using raw Xlib
+// set winlist,maxNdx,startNdx recursively using raw Xlib
 // first call should be (win=root, reclevel=0)
 //
 int x_initWindowsInfoRecursive (Display* dpy,Window win,int reclevel) {
@@ -103,7 +103,7 @@ for (i = 0; i < nchildren; ++i) {
 }
 
 if (nchildren>0 && children) {XFree(children);}
-if (reclevel==0) { g.selNdx=0; }
+if (reclevel==0) { g.startNdx=0; }
 return 1;
 }
 

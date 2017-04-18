@@ -22,12 +22,24 @@ b) the "Artistic License".
 #include "alttab.h"
 extern Globals g;
 
+// PRIVATE
+
+//
+// helper for windows' qsort
+//
+static int sort_by_order (const void *p1, const void *p2)
+{
+return (((WindowInfo*)p1)->order > ((WindowInfo*)p2)->order);
+}
+
 // PUBLIC
 
 //
 // early initialization
+// once per execution
 //
 int startupWintasks (Display* dpy) {
+g.sortNdx=0; // init g.sortlist
 switch (g.option_wm) {
   case WM_NO:
     return 1;
@@ -41,7 +53,8 @@ switch (g.option_wm) {
 }
 
 //
-// add single window info into g.winlist (used by x, rp, ...)
+// add single window info into g.winlist and fix g.sortlist
+// used by x, rp, ...
 // only dpy and win are mandatory
 //
 int addWindowInfo (Display* dpy, Window win, int reclevel, int wm_id, char* wm_name) {
@@ -147,7 +160,25 @@ int addWindowInfo (Display* dpy, Window win, int reclevel, int wm_id, char* wm_n
         g.winlist[g.maxNdx].icon_h = 0;
     }
 
-    // 3. other window data
+    // 3. sort
+
+    // search in sortlist, O(n)
+    int si, ord;
+    ord = -1;
+    for (si=0; si<g.sortNdx; si++) {
+        if (win == g.sortlist[si]) {
+            ord = si;
+            break;
+        }
+    }
+    if (ord==-1) { // add window to the tail of sortlist
+        ord = g.sortNdx;
+        g.sortlist[ord] = win;
+        g.sortNdx++;
+    }
+    g.winlist[g.maxNdx].order = ord;
+
+    // 4. other window data
 
     g.winlist[g.maxNdx].reclevel = reclevel;
     g.maxNdx++;
@@ -157,6 +188,7 @@ int addWindowInfo (Display* dpy, Window win, int reclevel, int wm_id, char* wm_n
 
 //
 // sets g.winlist, g.maxNdx, g.selNdx
+// updates g.sortlist, g.sortNdx
 // n.b.: in heavy WM, use _NET_CLIENT_LIST:
 // http://stackoverflow.com/questions/1201179/how-to-identify-top-level-x11-windows-using-xlib
 // direction is direction of first press: with shift or without
@@ -164,6 +196,8 @@ int addWindowInfo (Display* dpy, Window win, int reclevel, int wm_id, char* wm_n
 int initWinlist (Display* dpy, Window root, bool direction)
 {
 int r;
+if (g.debug>1) { fprintf (stderr, "sortlist before initWinlist: "); int sii; for (sii=0; sii<g.sortNdx; sii++) {fprintf (stderr, "%d ", g.sortlist[sii]);} ; fprintf (stderr, "\n"); }
+g.startNdx=-1; // "not set" flag
 switch (g.option_wm) {
   case WM_NO:
     r = x_initWindowsInfoRecursive (dpy, root, 0); // note: direction/current window index aren't used
@@ -178,7 +212,26 @@ switch (g.option_wm) {
     r = 0;
     break;
 }
-if (g.selNdx<0 || g.selNdx>=g.maxNdx) { g.selNdx=0; } // just for case
+pulloutWindowToTop (g.startNdx);
+
+// sort winlist according to .order
+if (g.debug>1) {
+    fprintf (stderr, "startNdx=%d\n", g.startNdx);
+    int ww; fprintf (stderr, "before qsort:\n"); for (ww=0;ww<g.maxNdx;ww++) {fprintf (stderr, "[%d] %s\n", g.winlist[ww].order, g.winlist[ww].name);}
+}
+qsort (g.winlist, g.maxNdx, sizeof(WindowInfo), sort_by_order);
+if (g.debug>1) {
+    fprintf (stderr, "after  qsort:\n");
+    int ww; for (ww=0;ww<g.maxNdx;ww++) {fprintf (stderr, "[%d] %s\n", g.winlist[ww].order, g.winlist[ww].name);}
+}
+
+g.startNdx=0; // former pointer invalidated by qsort, brought to top
+//g.selNdx = direction ? 
+//    ( (g.startNdx<1 || g.startNdx>=g.maxNdx) ? (g.maxNdx-1) : (g.startNdx-1) ) :
+//    ( (g.startNdx<0 || g.startNdx>=(g.maxNdx-1)) ? 0 : g.startNdx+1 );
+g.selNdx = direction ? g.maxNdx-1 : 1;
+//if (g.selNdx<0 || g.selNdx>=g.maxNdx) { g.selNdx=0; } // just for case
+if (g.debug>1) { fprintf (stderr, "selNdx=%d\n", g.selNdx); }
 return r;
 }
 
@@ -189,6 +242,7 @@ return r;
 void freeWinlist (Display* dpy)
 {
 if (g.debug>0) {fprintf (stderr, "destroying icons and winlist\n");}
+if (g.debug>1) {fprintf (stderr, "sortlist before freeWinlist: "); int sii; for (sii=0; sii<g.sortNdx; sii++) {fprintf (stderr, "%d ", g.sortlist[sii]);} ; fprintf (stderr, "\n");}
 int y; for (y=0; y<g.maxNdx; y++) {
     if (g.winlist[y].icon_allocated)
         XFreePixmap (dpy, g.winlist[y].icon_drawable);
@@ -219,6 +273,38 @@ switch (g.option_wm) {
   default:
     return 0;
 }
+pulloutWindowToTop (winNdx);
 return r;
+}
+
+//
+// pull out given window to the top of g.sortlist,
+// fix g.winlist[].order
+// winNdx is an index of g.winlist
+//
+int pulloutWindowToTop (int winNdx)
+{
+int s, w;
+if (g.debug>1) { fprintf (stderr, "pull out g.winlist[%d] to top\n", winNdx); }
+int stop = g.winlist[winNdx].order;  // index of new top window in old sortlist
+if (stop==0) return 1;  // shortcut, already on top
+
+// move down items in sortlist, O(n)
+Window cachedwin = g.sortlist[stop];
+for (s=stop-1; s>=0; s--) {
+    g.sortlist[s+1] = g.sortlist[s];
+}
+g.sortlist[0] = cachedwin;
+
+// fix g.winlist[].order, O(n)
+for (w=0; w<g.maxNdx; w++) {
+    if (g.winlist[w].order < stop) {
+        g.winlist[w].order++;
+    } else if (g.winlist[w].order == stop) {
+        g.winlist[w].order = 0;
+    }
+}
+
+return 1;
 }
 

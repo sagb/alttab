@@ -269,7 +269,7 @@ char* ewmh_wmName (Display *disp, Window root) {/*{{{*/
 //
 
 //
-// initialize winlist/selNdx
+// initialize winlist/startNdx
 // return 1 if ok
 //
 int ewmh_initWinlist (Display* dpy, bool direction)
@@ -280,7 +280,6 @@ unsigned long client_list_size;
 int i;
 
 Window aw = ewmh_get_active_window (dpy);
-int awi=-1; // its index in list
 
 if ((client_list = ewmh_get_client_list (dpy, &client_list_size)) == NULL) {
     return 0;
@@ -291,13 +290,10 @@ for (i = 0; i < client_list_size / sizeof(Window); i++) {
     //char *title_out = get_output_str(title_utf8, true); // TODO: merge this from wmctrl?
     char *title_out = title_utf8;
     addWindowInfo (dpy, w, 0, 0, title_out);
-    if (w == aw) { awi = i; }
+    if (w == aw) { g.startNdx = i; }
 }
 
 if (g.debug>1) {fprintf(stderr, "ewmh active window: %lu index: %d name: %s\n", aw, awi, g.winlist[awi].name);}
-g.selNdx = direction ? 
-    ( (awi<1 || awi>=g.maxNdx) ? (g.maxNdx-1) : (awi-1) ) :
-    ( (awi<0 || awi>=(g.maxNdx-1)) ? 0 : awi+1 );
 
 return 1;
 }
