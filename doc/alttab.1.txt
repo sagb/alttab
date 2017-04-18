@@ -1,4 +1,4 @@
-ALTTAB(1)                                                                      ALTTAB(1)
+ALTTAB(1)                                                                                          ALTTAB(1)
 
 
 
@@ -6,18 +6,17 @@ NAME
        alttab - the task switcher
 
 SYNOPSIS
-       alttab  [-w N] [-mm N] [-bm N] [-mk N] [-kk N] [-t NxM] [-i NxM] [-bg color] [-fg
-       color] [-frame color] [-font name] [-v|-vv]
+       alttab  [-w  N]  [-mm  N]  [-bm  N] [-mk N] [-kk N] [-t NxM] [-i NxM] [-bg color] [-fg color] [-frame
+       color] [-font name] [-v|-vv]
 
 DESCRIPTION
-       The task switcher designed for minimalistic window  managers  or  standalone  X11
-       session.
+       The task switcher designed for minimalistic window managers or standalone X11 session.
 
-       Unlike  task  switchers  integrated in most simple WMs, alttab emulates Microsoft
-       task switcher tactile behaviour, switching windows on releasing Alt key.
+       Unlike task switchers integrated in most simple WMs, alttab emulates Microsoft task switcher  tactile
+       behaviour, switching windows on releasing Alt key.
 
-       Being lightweight and depending only on core X11 libs, it still features  custom‐
-       izable look and behaviour.
+       Being lightweight and depending only on core X11 libs, it still features customizable look and behav‐
+       iour.
 
 OPTIONS
        Most command line options have corresponding X resource.
@@ -30,22 +29,21 @@ OPTIONS
 
               0: No WM, raw X.
 
-              Only  "leader" windows are listed, since Xlib has no other means to recog‐
-              nize main application window. List order is random. Running -w 0 under  WM
-              is  discouraged: hidden windows or windows on another desktops will not be
-              listed; instead, some strange windows may be included. Nevertheless,  this
-              mode  is  suitable for dwm(1) and other managers which don´t expose window
-              list via EWMH.
+              Only "leader" windows are listed, since Xlib has no other means to recognize main  application
+              window.  List order is random. Running -w 0 under WM is discouraged: hidden windows or windows
+              on another desktops will not be listed; instead, some strange windows may be included.  Never‐
+              theless,  this  mode  is suitable for dwm(1) and other managers which don´t expose window list
+              via EWMH.
 
               1: EWMH compatible.
 
-              Compatible WM list is in [SEE ALSO] below. Tested in xmonad(1) (EWMH  must
-              be allowed, details in doc/xmonad.md), i3(1), evilwm(1).
+              Compatible WM list is in [SEE ALSO] below. Tested in xmonad(1) (EWMH must be allowed,  details
+              in doc/xmonad.md), i3(1), evilwm(1).
 
               2: Ratpoison.
 
-              Alttab  uses ratpoison(1) own perfect remote control capability. Addition‐
-              ally, alttab registers itself in its "unmanaged list" automatically.
+              Alttab uses ratpoison(1) own perfect remote control capability. Additionally, alttab registers
+              itself in its "unmanaged list" automatically.
 
        -mm NUM
               resource: alttab.modifier.mask
@@ -63,8 +61,7 @@ OPTIONS
               resource: alttab.modifier.keysym
               default: 0xffe9 (XK_Alt_L aka left Alt)
 
-              Keysym of main modifier alone. See /usr/include/X11/keysymdef.h.  Keep  in
-              sync with -mm.
+              Keysym of main modifier alone. See /usr/include/X11/keysymdef.h. Keep in sync with -mm.
 
        -kk NUM
               resource: alttab.key.keysym
@@ -76,8 +73,8 @@ OPTIONS
               resource: alttab.tile.geometry
               default: 112x128
 
-              Maximum  size  of a single tile (mini-window). If switcher doesn´t fit the
-              screen, tile may be thinner.
+              Maximum size of a single tile (mini-window). If switcher doesn´t fit the screen, tile  may  be
+              thinner.
 
        -i NNxMM
               resource: alttab.icon.geometry
@@ -85,7 +82,8 @@ OPTIONS
 
               Size of icons.
 
-       The following three options accept color names or #rrggbb.
+       The  following  three options accept color names or #rrggbb. Special value _rnd_low or _rnd_high pro‐
+       duce random color from lower or upper RGB space respectively.
 
        -bg color
               resource: alttab.background
@@ -109,12 +107,11 @@ OPTIONS
               resource: alttab.font
               default: xft:sans-10
 
-              Label font name in format: xft:fontconfig_pattern, like  in  emacs(1)  and
-              rxvt(1). See [SEE ALSO] for fontconfig pattern. It´s neigher GTK font pat‐
-              tern nor legacy XLFD.
+              Label font name in format: xft:fontconfig_pattern, like in  emacs(1)  and  rxvt(1).  See  [SEE
+              ALSO] for fontconfig pattern. It´s neigher GTK font pattern nor legacy XLFD.
 
-       Your Xresources database probably already have *background, *foreground or  *font
-       wildcard definitions, which alttab will obey. Precedence order (preferred first):
+       Your  Xresources  database  probably  already have *background, *foreground or *font wildcard defini‐
+       tions, which alttab will obey. Precedence order (preferred first):
 
        alttab.font resource,
        -font option,
@@ -140,12 +137,12 @@ REPORTING BUGS
 SEE ALSO
        skippy-xd(1)
 
-       EWMH   compatible   WM   list  https://en.wikipedia.org/wiki/Extended_Window_Man‐
-       ager_Hints#List_of_window_managers_that_support_Extended_Window_Manager_Hints.
+       EWMH  compatible  WM  list   https://en.wikipedia.org/wiki/Extended_Window_Manager_Hints#List_of_win‐
+       dow_managers_that_support_Extended_Window_Manager_Hints.
 
-       Description of fontconfig  pattern  https://www.freedesktop.org/software/fontcon‐
-       fig/fontconfig-user.html.
+       Description    of    fontconfig    pattern   https://www.freedesktop.org/software/fontconfig/fontcon‐
+       fig-user.html.
 
 
 
-                                       April 2017                              ALTTAB(1)
+                                                 April 2017                                        ALTTAB(1)

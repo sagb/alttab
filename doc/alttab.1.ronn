@@ -90,7 +90,7 @@ Most command line options have corresponding X resource.
 
     Size of icons.
 
-The following three options accept color names or <#rrggbb>.
+The following three options accept color names or <#rrggbb>. Special value <\_rnd_low> or <\_rnd_high> produce random color from lower or upper RGB space respectively.
 
   * `-bg` <color>:
     resource: alttab.background  

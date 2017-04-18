@@ -17,6 +17,7 @@ b) the "Artistic License".
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include "alttab.h"
 #include "util.h"
 extern Globals g;
@@ -126,8 +127,23 @@ scrH = DisplayHeight (dpy, scrNum);
 colormap = DefaultColormap (dpy, scrNum);
 visual = DefaultVisual (dpy, scrNum);
 if (g.debug>0) {fprintf (stderr, "early allocating colors\n");}
+srand(time(NULL));
 int p; for (p=0; p<NCOLORS; p++) {
     if (g.color[p].name[0]) {
+        if (strncmp(g.color[p].name, "_rnd_", 5)==0) {
+            // replace in-place: 8 chars is sufficient for #rrggbb
+            char r[3]; short int rc; for (rc=0; rc<=2; rc++) {
+                r[rc] = rand()/(RAND_MAX/0x80);
+            }
+            if (strncmp(g.color[p].name, "_rnd_low", 8)==0) {
+                (void)snprintf (g.color[p].name, 8, "#%.2hhx%.2hhx%.2hhx", r[0], r[1], r[2]);
+                g.color[p].name[7]='\0';
+            } else if (strncmp(g.color[p].name, "_rnd_high", 9)==0) {
+                (void)snprintf (g.color[p].name, 9, "#%.2hhx%.2hhx%.2hhx", r[0]+0x80, r[0]+0x80, r[1]+0x80);
+                g.color[p].name[7]='\0';
+            }
+            if (g.debug>1) fprintf (stderr, "color generated: %s, RAND_MAX=%d\n", g.color[p].name, RAND_MAX);
+        }
         if (!XAllocNamedColor (dpy, 
                     colormap, 
                     g.color[p].name, 
