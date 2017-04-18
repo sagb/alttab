@@ -251,6 +251,7 @@ Display* dpy = XOpenDisplay (NULL);
 Window root = DefaultRootWindow (dpy);
 
 ee_complain = true;
+/* uncomment when handler will be required */
 /* XErrorHandler hnd = (XErrorHandler)0; */
 /* hnd = XSetErrorHandler (zeroErrorHandler); // forever */
 
