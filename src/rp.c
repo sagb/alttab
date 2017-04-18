@@ -40,7 +40,7 @@ ratpoison_cmd = (char*)malloc(MAXPATHSZ); // we don't free it, hopefully run onl
 FILE *fp;
 // search in PATH on startup only,
 // then execv() for speed
-if (fp = popen("which ratpoison", "r")) {
+if ((fp = popen("which ratpoison", "r"))) {
     fgets(ratpoison_cmd, MAXPATHSZ, fp);
     pclose(fp);
 }

@@ -73,7 +73,7 @@ int addWindowInfo (Display* dpy, Window win, int reclevel, int wm_id, char* wm_n
         if (XGetWindowProperty (dpy, win, prop, 0, MAXNAMESZ, false,
                 AnyPropertyType, &type, &form, &len, &remain, &wn
                 ) == Success && wn) {
-            strncpy (g.winlist[g.maxNdx].name, wn, MAXNAMESZ);
+	    strncpy (g.winlist[g.maxNdx].name, (char *)wn, MAXNAMESZ);
             g.winlist[g.maxNdx].name[MAXNAMESZ-1]='\0';
             XFree (wn); // TODO: free another vars too?
         } else {
@@ -92,10 +92,10 @@ int addWindowInfo (Display* dpy, Window win, int reclevel, int wm_id, char* wm_n
     g.winlist[g.maxNdx].icon_drawable = 
     g.winlist[g.maxNdx].icon_w = 
     g.winlist[g.maxNdx].icon_h = 0;
-    int icon_depth = 0;
+    unsigned int icon_depth = 0;
     g.winlist[g.maxNdx].icon_allocated = false;
-    if (hints = XGetWMHints (dpy, win)) {
-        if (g.debug>1) { fprintf (stderr, "IconPixmapHint: %d, icon_pixmap: %d, IconMaskHint: %d, icon_mask: %d, IconWindowHint: %d, icon_window: %d\n", hints->flags & IconPixmapHint, hints->icon_pixmap, hints->flags & IconMaskHint, hints->icon_mask, hints->flags & IconWindowHint, hints->icon_window); }
+    if ((hints = XGetWMHints (dpy, win))) {
+        if (g.debug>1) { fprintf (stderr, "IconPixmapHint: %ld, icon_pixmap: %lu, IconMaskHint: %ld, icon_mask: %lu, IconWindowHint: %ld, icon_window: %lu\n", hints->flags & IconPixmapHint, hints->icon_pixmap, hints->flags & IconMaskHint, hints->icon_mask, hints->flags & IconWindowHint, hints->icon_window); }
         if ( (hints->flags & IconWindowHint)  & (! (hints->flags & IconPixmapHint)) ) {
             if (g.debug>0) {fprintf (stderr, "attention: icon_window without icon_pixmap in hints, ignoring it assuming it's not usable, like in xterm\n");}
         }
@@ -151,7 +151,7 @@ int addWindowInfo (Display* dpy, Window win, int reclevel, int wm_id, char* wm_n
 
     g.winlist[g.maxNdx].reclevel = reclevel;
     g.maxNdx++;
-    if (g.debug>1) {fprintf (stderr, "window %d, id %x added to list\n", g.maxNdx, win);}
+    if (g.debug>1) {fprintf (stderr, "window %d, id %lx added to list\n", g.maxNdx, win);}
     return 1;
 }
 

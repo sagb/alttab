@@ -16,7 +16,8 @@ b) the "Artistic License".
 #include <X11/Xft/Xft.h>
 #include <stdbool.h>             
 #include <stdio.h>               
-#include <string.h>               
+#include <string.h>
+#include <time.h>
 #include "alttab.h"
 #include "util.h"
 
@@ -136,7 +137,7 @@ if (XGetWindowProperty (dpy, root, nwm_prop, 0, MAXNAMESZ, false,
         AnyPropertyType, &atype, &form, &len, &remain, &nwm
         ) == Success && nwm) {
     if (g.debug>0) {fprintf (stderr, "_NET_WM_NAME root property present: %s\n", nwm);}
-    if (strstr (nwm, "ratpoison")!=NULL) {
+    if (strstr ((char *)nwm, "ratpoison")!=NULL) {
         g.option_wm = WM_RATPOISON;
         XFree (nwm);
         goto wmDone;
@@ -152,7 +153,9 @@ unsigned int defaultModMask = DEFMODMASK;
 unsigned int defaultBackMask = DEFBACKMASK;
 KeySym defaultModSym = DEFMODKS;
 KeySym defaultKeySym = DEFKEYKS;
-char *s; KeySym ksym; unsigned int mask;
+char *s;
+ KeySym ksym = defaultModSym;
+ unsigned int mask = defaultModMask;
 // TODO: thorough validation?
 endptr = s = NULL;
 XRESOURCE_LOAD_STRING(XRMAPPNAME".modifier.mask", s, NULL);
@@ -248,8 +251,8 @@ Display* dpy = XOpenDisplay (NULL);
 Window root = DefaultRootWindow (dpy);
 
 ee_complain = true;
-XErrorHandler hnd = (XErrorHandler)0;
-hnd = XSetErrorHandler (zeroErrorHandler); // forever
+/* XErrorHandler hnd = (XErrorHandler)0; */
+/* hnd = XSetErrorHandler (zeroErrorHandler); // forever */
 
 if (!use_args_and_xrm (dpy, root, argc, argv))
     die("use_args_and_xrm failed");
@@ -270,7 +273,7 @@ int kmask = 1 << (g.option_modCode - octet*8);
 
 while(true)
 {
-    memset (&(ev.xkey), sizeof(ev.xkey), 0);
+    memset (&(ev.xkey), 0, sizeof(ev.xkey));
 
     if (g.uiShowHasRun) {
         // poll: lag and consume cpu, but necessary because of bug #1 and #2
@@ -289,7 +292,7 @@ while(true)
     switch(ev.type)
     {
         case KeyPress:
-            if (g.debug>1) {fprintf (stderr, "Press %x: %d-%d\n", ev.xkey.window, ev.xkey.state, ev.xkey.keycode);}
+            if (g.debug>1) {fprintf (stderr, "Press %lx: %d-%d\n", ev.xkey.window, ev.xkey.state, ev.xkey.keycode);}
             if (! ((ev.xkey.state & g.option_modMask) && ev.xkey.keycode == g.option_keyCode) ) { break; } // safety redundance
             if (!g.uiShowHasRun) {
                 uiShow (dpy, root, (ev.xkey.state & g.option_backMask));
@@ -303,7 +306,7 @@ while(true)
             break;
 
         case KeyRelease:
-            if (g.debug>1) {fprintf (stderr, "Release %x: %d-%d\n", ev.xkey.window, ev.xkey.state, ev.xkey.keycode);}
+            if (g.debug>1) {fprintf (stderr, "Release %lx: %d-%d\n", ev.xkey.window, ev.xkey.state, ev.xkey.keycode);}
             // interested only in "final" release
             if (! ((ev.xkey.state & g.option_modMask) && ev.xkey.keycode == g.option_modCode && g.uiShowHasRun) ) { break; }
             uiHide (dpy, root);

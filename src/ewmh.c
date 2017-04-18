@@ -294,7 +294,7 @@ for (i = 0; i < client_list_size / sizeof(Window); i++) {
     if (w == aw) { awi = i; }
 }
 
-if (g.debug>1) {fprintf(stderr, "ewmh active window: %d index: %d name: %s\n", aw, awi, g.winlist[awi].name);}
+if (g.debug>1) {fprintf(stderr, "ewmh active window: %lu index: %d name: %s\n", aw, awi, g.winlist[awi].name);}
 g.selNdx = direction ? 
     ( (awi<1 || awi>=g.maxNdx) ? (g.maxNdx-1) : (awi-1) ) :
     ( (awi<0 || awi>=(g.maxNdx-1)) ? 0 : awi+1 );

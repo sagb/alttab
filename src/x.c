@@ -64,7 +64,7 @@ int x_initWindowsInfoRecursive (Display* dpy,Window win,int reclevel) {
 
 Window root, parent;
 Window* children;
-int nchildren, i;
+unsigned int nchildren, i;
 //Window leader;
 XWindowAttributes wa;
 
@@ -95,7 +95,7 @@ if (g.option_max_reclevel != -1 && reclevel >= g.option_max_reclevel)
 
 // recursion
 if (XQueryTree (dpy, win, &root, &parent, &children, &nchildren)==0) {
-    if (g.debug>0) {fprintf (stderr, "can't get window tree for %d\n", win);}
+    if (g.debug>0) {fprintf (stderr, "can't get window tree for %lu\n", win);}
     return 0;
 }
 for (i = 0; i < nchildren; ++i) {

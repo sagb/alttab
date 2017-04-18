@@ -95,7 +95,7 @@ typedef struct {
 // gui
 int startupGUItasks (Display* dpy, Window root);
 int uiShow (Display* dpy, Window root, bool direction);
-int uiExpose (Display* dpy, Window root);
+void uiExpose (Display* dpy, Window root);
 int uiHide (Display* dpy, Window root);
 int uiNextWindow (Display* dpy, Window root);
 int uiPrevWindow (Display* dpy, Window root);
@@ -106,6 +106,12 @@ int addWindowInfo (Display* dpy, Window win, int reclevel, int wm_id, char* wm_n
 int initWinlist (Display* dpy, Window root, bool direction);
 void freeWinlist (Display* dpy);
 int setFocus (Display* dpy, int winNdx);
+int rp_startupWintasks();
+int x_initWindowsInfoRecursive (Display* dpy,Window win,int reclevel);
+int rp_initWinlist (Display* dpy, bool direction);
+int x_setFocus (Display* dpy, int wndx);
+int rp_setFocus (int winNdx);
+int execAndReadStdout(char* exe, char* args[], char* buf, int bufsize);
 
 /* EWHM */
 Window *ewmh_get_client_list (Display *disp, unsigned long *size);

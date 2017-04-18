@@ -11,6 +11,8 @@ b) the "Artistic License".
 */
 
 #include "util.h"
+#include <sys/types.h>
+#include <sys/wait.h>
 
 // PUBLIC:
 
@@ -150,7 +152,7 @@ void setSelectInput (Display* dpy, Window win, int reg)
 {                                             
 Window root, parent;                        
 Window* children;                           
-int nchildren, i;                           
+unsigned int nchildren, i;                           
 
 //XErrorHandler hnd = (XErrorHandler) 0;   -- ignored globally
 //hnd = XSetErrorHandler(zeroErrorHandler);
@@ -308,7 +310,7 @@ xftdraw = XftDrawCreate (dpy, d, DefaultVisual(dpy,0), DefaultColormap(dpy,0));
 //XftColorAllocValue (dpy,DefaultVisual(dpy,0),DefaultColormap(dpy,0),xrcolor,&xftcolor);
 
 // once: calculate approx_px_per_sym and line_spacing_px
-XftTextExtentsUtf8 (dpy, font, str, strlen(str), &ext);
+XftTextExtentsUtf8 (dpy, font, (unsigned char *)str, strlen(str), &ext);
 approx_px_per_sym = (float)ext.width / (float)utf8len(str);
 line_spacing_px = (float)ext.height * line_interval;
 
@@ -323,11 +325,11 @@ do {
     strncpy (line, line_from_char, M); line[M-1]='\0';
     line_clen = strlen (line);
     line_ulen = utf8len (line);
-    if (debug>0) {fprintf (stderr, "NEW LINE: \"%s\" ulen=%d clen=%d\n", line, line_ulen, line_clen);}
+    if (debug>0) {fprintf (stderr, "NEW LINE: \"%s\" ulen=%zu clen=%zu\n", line, line_ulen, line_clen);}
     // first approximation for line size
     line_new_ulen = (float)width / approx_px_per_sym;
     if (line_new_ulen >= line_ulen) {  // just draw the end of str and finish
-        XftTextExtentsUtf8 (dpy, font, line, line_clen, &ext);
+        XftTextExtentsUtf8 (dpy, font, (unsigned char *)line, line_clen, &ext);
         finish_after_draw = true;
         goto Draw;
     }
@@ -336,8 +338,8 @@ do {
     line_to_char = utf8index (str,line_to_sym);
     line[line_to_char-line_from_char]='\0';
     line_clen = strlen (line);
-    XftTextExtentsUtf8 (dpy, font, line, line_clen, &ext);
-    if (debug>0) {fprintf (stderr, "first cut approximation: \"%s\" ulen=%d clen=%d width=%d px, x2-x1=%d px\n", line, line_ulen, line_clen, ext.width, width);}
+    XftTextExtentsUtf8 (dpy, font, (unsigned char *)line, line_clen, &ext);
+    if (debug>0) {fprintf (stderr, "first cut approximation: \"%s\" ulen=%zu clen=%zu width=%d px, x2-x1=%d px\n", line, line_ulen, line_clen, ext.width, width);}
     while (ext.width > width) {
         // decrease line by 1 utf symbol
         /* ACTIVE CHANGE: */ line_ulen--;
@@ -345,8 +347,8 @@ do {
         line_to_char = utf8index (str,line_to_sym);
         line[line_to_char-line_from_char]='\0';
         line_clen = strlen (line);
-        XftTextExtentsUtf8 (dpy, font, line, line_clen, &ext);
-        if (debug>0) {fprintf (stderr, "cut correction: \"%s\" ulen=%d clen=%d width=%d px, x2-x1=%d px\n", line, line_ulen, line_clen, ext.width, width);}
+        XftTextExtentsUtf8 (dpy, font, (unsigned char *)line, line_clen, &ext);
+        if (debug>0) {fprintf (stderr, "cut correction: \"%s\" ulen=%zu clen=%zu width=%d px, x2-x1=%d px\n", line, line_ulen, line_clen, ext.width, width);}
     }
     Draw:
     if ((y+ext.height) > (y1+height)) {
@@ -354,7 +356,7 @@ do {
         break;
     }
     x += (width - ext.width) / 2; // center
-    XftDrawStringUtf8 (xftdraw, xftcolor, font, x+ext.x, y+ext.y, line, line_clen);
+    XftDrawStringUtf8 (xftdraw, xftcolor, font, x+ext.x, y+ext.y, (unsigned char *)line, line_clen);
     if (debug>0) {
         GC gc = DefaultGC (dpy,0);
         XSetForeground (dpy, gc, WhitePixel(dpy,0));

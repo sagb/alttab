@@ -85,7 +85,7 @@ GC create_gc (Display* display, int screen_num, Window win, int type)
 //
 // single use helper for function below
 //
-int drawFr (Display *dpy, GC gc, int f)
+void drawFr (Display *dpy, GC gc, int f)
 {
 int d = XDrawRectangle (dpy, uiwin, gc, 
         f*(tileW+FRAME_W)+(FRAME_W/2), 0+(FRAME_W/2), 
@@ -96,7 +96,7 @@ if (!d) { fprintf (stderr, "can't draw frame\n"); }
 //
 // draw selected and unselected frames around tiles
 //
-int framesRedraw (Display* dpy)
+void framesRedraw (Display* dpy)
 {
 int f; for (f=0; f<g.maxNdx; f++) {
     if (f==g.selNdx) continue; // skip
@@ -194,7 +194,7 @@ if (g.maxNdx<1) {
 if (g.debug>0) {
 fprintf (stderr, "got %d windows\n", g.maxNdx);
 int i; for (i=0; i<g.maxNdx; i++) {
-    fprintf (stderr, "%d: %x (lvl %d, icon %d (%dx%d)): %s\n", 
+    fprintf (stderr, "%d: %lx (lvl %d, icon %lu (%dx%d)): %s\n", 
             i, g.winlist[i].id, g.winlist[i].reclevel, 
             g.winlist[i].icon_drawable, 
             g.winlist[i].icon_w, g.winlist[i].icon_h, 
@@ -320,7 +320,7 @@ uiwin = XCreateSimpleWindow (dpy, root,
           0, g.color[COLFRAME].xcolor.pixel,
           g.color[COLBG].xcolor.pixel);
 if (uiwin<=0) die("can't create window");
-if (g.debug>0) {fprintf (stderr, "our window is %d\n", uiwin);}
+if (g.debug>0) {fprintf (stderr, "our window is %lu\n", uiwin);}
 
 // set properties of our window
 XStoreName (dpy, uiwin, XWINNAME);
@@ -343,7 +343,7 @@ return 1;
 // Expose event callback
 // redraw our window
 //
-int uiExpose (Display* dpy, Window root)
+void uiExpose (Display* dpy, Window root)
 {
 if (g.debug>0) {fprintf (stderr, "expose ui\n");}
 // icons
@@ -368,7 +368,7 @@ framesRedraw (dpy);
 int uiHide (Display* dpy, Window root)
 {
 if (g.winlist) {
-    if (g.debug>0) {fprintf (stderr, "changing window focus to %x\n", g.winlist[g.selNdx].id);}
+    if (g.debug>0) {fprintf (stderr, "changing window focus to %lu\n", g.winlist[g.selNdx].id);}
     setFocus (dpy, g.selNdx);  // before winlist destruction!
 }
 if (g.debug>0) {fprintf (stderr, "destroying our window and tiles\n");}
