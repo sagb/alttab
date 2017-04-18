@@ -57,6 +57,20 @@
          style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt"
          transform="matrix(-0.8,0,0,-0.8,-10,0)" />
     </marker>
+    <marker
+       inkscape:stockid="Arrow1Lend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow1Lend-3-1"
+       style="overflow:visible">
+      <path
+         inkscape:connector-curvature="0"
+         id="path3822-5-2"
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt"
+         transform="matrix(-0.8,0,0,-0.8,-10,0)" />
+    </marker>
   </defs>
   <sodipodi:namedview
      id="base"
@@ -66,8 +80,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.98994949"
-     inkscape:cx="326.00812"
-     inkscape:cy="450.02708"
+     inkscape:cx="454.75871"
+     inkscape:cy="349.38836"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -84,7 +98,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -163,14 +177,22 @@
          sodipodi:role="line"
          x="498.55692"
          y="870.98334"
-         id="tspan7200">    tile...</tspan><tspan
+         id="tspan7200">    tile,</tspan><tspan
          sodipodi:role="line"
          x="498.55692"
          y="888.48334"
-         id="tspan7192" /><tspan
+         id="tspan3112">    order,</tspan><tspan
          sodipodi:role="line"
          x="498.55692"
          y="905.98334"
+         id="tspan3114">    ...</tspan><tspan
+         sodipodi:role="line"
+         x="498.55692"
+         y="923.48334"
+         id="tspan7192" /><tspan
+         sodipodi:role="line"
+         x="498.55692"
+         y="940.98334"
          id="tspan7190" /></text>
     <path
        style="fill:none;stroke:#000000;stroke-width:0.94096619;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-end:url(#Arrow1Lend)"
@@ -306,5 +328,45 @@
        id="path6628"
        inkscape:connector-curvature="0"
        transform="translate(0,308.2677)" />
+    <text
+       xml:space="preserve"
+       style="font-size:14px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans"
+       x="731.58832"
+       y="805.4151"
+       id="text3786-7-3"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         x="731.58832"
+         y="805.4151"
+         id="tspan7200-6">Window g.sortlist[g.sortNdx]</tspan><tspan
+         sodipodi:role="line"
+         x="731.58832"
+         y="822.9151"
+         id="tspan3100">0: win X</tspan><tspan
+         sodipodi:role="line"
+         x="731.58832"
+         y="840.4151"
+         id="tspan3102">1: win Y</tspan><tspan
+         sodipodi:role="line"
+         x="731.58832"
+         y="857.9151"
+         id="tspan3104">2 ...</tspan><tspan
+         sodipodi:role="line"
+         x="731.58832"
+         y="875.4151"
+         id="tspan3108">...</tspan><tspan
+         sodipodi:role="line"
+         x="731.58832"
+         y="892.9151"
+         id="tspan7192-2" /><tspan
+         sodipodi:role="line"
+         x="731.58832"
+         y="910.4151"
+         id="tspan7190-9" /></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1.37854826px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Lend-3)"
+       d="m 557.79348,885.49774 170.33724,-48.0875"
+       id="path4657-7"
+       inkscape:connector-curvature="0" />
   </g>
 </svg>
