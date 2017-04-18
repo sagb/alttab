@@ -235,7 +235,7 @@ Window *ewmh_get_client_list (Display *disp, unsigned long *size) {/*{{{*/
 char* ewmh_wmName (Display *disp, Window root) {/*{{{*/
     Window *sup_window = NULL;
     char *wm_name = NULL;
-    bool name_is_utf8 = true;
+    //bool name_is_utf8 = true;
     
     if (! (sup_window = (Window *)ewmh_get_property(disp, root,
                     XA_WINDOW, "_NET_SUPPORTING_WM_CHECK", NULL))) {
@@ -250,7 +250,7 @@ char* ewmh_wmName (Display *disp, Window root) {/*{{{*/
     /* WM_NAME */
     if (! (wm_name = ewmh_get_property(disp, *sup_window,
             XInternAtom(disp, "UTF8_STRING", False), "_NET_WM_NAME", NULL))) {
-        name_is_utf8 = false;
+        //name_is_utf8 = false;
         if (! (wm_name = ewmh_get_property(disp, *sup_window,
                 XA_STRING, "_NET_WM_NAME", NULL))) {
             p_verbose("Cannot get name of the window manager (_NET_WM_NAME).\n");

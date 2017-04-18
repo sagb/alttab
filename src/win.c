@@ -196,7 +196,7 @@ int addWindowInfo (Display* dpy, Window win, int reclevel, int wm_id, char* wm_n
 int initWinlist (Display* dpy, Window root, bool direction)
 {
 int r;
-if (g.debug>1) { fprintf (stderr, "sortlist before initWinlist: "); int sii; for (sii=0; sii<g.sortNdx; sii++) {fprintf (stderr, "%d ", g.sortlist[sii]);} ; fprintf (stderr, "\n"); }
+if (g.debug>1) { fprintf (stderr, "sortlist before initWinlist: "); int sii; for (sii=0; sii<g.sortNdx; sii++) {fprintf (stderr, "%ld ", g.sortlist[sii]);} ; fprintf (stderr, "\n"); }
 g.startNdx=-1; // "not set" flag
 switch (g.option_wm) {
   case WM_NO:
@@ -242,7 +242,7 @@ return r;
 void freeWinlist (Display* dpy)
 {
 if (g.debug>0) {fprintf (stderr, "destroying icons and winlist\n");}
-if (g.debug>1) {fprintf (stderr, "sortlist before freeWinlist: "); int sii; for (sii=0; sii<g.sortNdx; sii++) {fprintf (stderr, "%d ", g.sortlist[sii]);} ; fprintf (stderr, "\n");}
+if (g.debug>1) {fprintf (stderr, "sortlist before freeWinlist: "); int sii; for (sii=0; sii<g.sortNdx; sii++) {fprintf (stderr, "%ld ", g.sortlist[sii]);} ; fprintf (stderr, "\n");}
 int y; for (y=0; y<g.maxNdx; y++) {
     if (g.winlist[y].icon_allocated)
         XFreePixmap (dpy, g.winlist[y].icon_drawable);

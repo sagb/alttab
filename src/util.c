@@ -202,7 +202,7 @@ return 0;
 } else {
 
 close(link[1]);
-int nbytes = read(link[0], buf, bufsize);
+(void)read(link[0], buf, bufsize);
 //printf("Output: (%.*s)\n", nbytes, buf);
 close(link[0]);
 wait(NULL);

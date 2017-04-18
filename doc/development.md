@@ -21,6 +21,7 @@ coding
 ------
 
 Functions return 0 on failure, positive on success.  
+Satisfy `-Wall` compiler option.
 Indent is four spaces:
 
 /* vim:tabstop=4:shiftwidth=4:smarttab:expandtab:smartindent  
