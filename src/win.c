@@ -197,7 +197,7 @@ int initWinlist (Display* dpy, Window root, bool direction)
 {
 int r;
 if (g.debug>1) { fprintf (stderr, "sortlist before initWinlist: "); int sii; for (sii=0; sii<g.sortNdx; sii++) {fprintf (stderr, "%ld ", g.sortlist[sii]);} ; fprintf (stderr, "\n"); }
-g.startNdx=-1; // "not set" flag
+g.startNdx=0; // safe default
 switch (g.option_wm) {
   case WM_NO:
     r = x_initWindowsInfoRecursive (dpy, root, 0); // note: direction/current window index aren't used
