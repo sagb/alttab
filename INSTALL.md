@@ -29,3 +29,11 @@ Installing alttab
 > make  
 > make install
 
+4. Run:
+
+Start alttab after WM, to let it auto-recognize the WM. For examples, add the following to ~/.ratpoisonrc:
+
+exec alttab
+
+If there are no WM at all, then start alttab in ~/.xsession or elsewhere.
+
