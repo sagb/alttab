@@ -212,7 +212,7 @@ switch (g.option_wm) {
     r = 0;
     break;
 }
-pulloutWindowToTop (g.startNdx);
+if (g.maxNdx>1) pulloutWindowToTop (g.startNdx);
 
 // sort winlist according to .order
 if (g.debug>1) {
@@ -226,12 +226,12 @@ if (g.debug>1) {
 }
 
 g.startNdx=0; // former pointer invalidated by qsort, brought to top
-//g.selNdx = direction ? 
-//    ( (g.startNdx<1 || g.startNdx>=g.maxNdx) ? (g.maxNdx-1) : (g.startNdx-1) ) :
-//    ( (g.startNdx<0 || g.startNdx>=(g.maxNdx-1)) ? 0 : g.startNdx+1 );
-g.selNdx = direction ? g.maxNdx-1 : 1;
+g.selNdx = direction ? 
+    ( (g.startNdx<1 || g.startNdx>=g.maxNdx) ? (g.maxNdx-1) : (g.startNdx-1) ) :
+    ( (g.startNdx<0 || g.startNdx>=(g.maxNdx-1)) ? 0 : g.startNdx+1 );
 //if (g.selNdx<0 || g.selNdx>=g.maxNdx) { g.selNdx=0; } // just for case
-if (g.debug>1) { fprintf (stderr, "selNdx=%d\n", g.selNdx); }
+if (g.debug>1) {fprintf (stderr, "initWinlist ret: number of items in winlist: %d, current (selected) item in winlist: %d, current item at start of uiShow (current window before setFocus): %d, number of elements in sortlist: %d\n", g.maxNdx, g.selNdx, g.startNdx, g.sortNdx);}
+
 return r;
 }
 
