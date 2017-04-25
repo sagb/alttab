@@ -4,17 +4,14 @@ repository, bug reporting
 
 [On github](https://github.com/sagb/alttab).
 
-docs
-----
+maintainer script
+-----------------
 
-Man page and README are maintained as ronn(1) (markdown-like) file.
-To update man page and README:
+To rebuild autotools stuff use bootstrap.sh.
 
-> cd doc  
-> ronn alttab.1.ronn  
-> man -l alttab.1 > alttab.1.txt
-
-This is not included in makefiles to not require everybody 
+Also, this script updates man page and README which are maintained 
+as ronn(1) (markdown-like) file.
+This is not included in makefiles to not require casual user 
 to install ronn.
 
 coding
