@@ -154,7 +154,6 @@ return 1;
 //
 // register interest in KeyRelease events for the window
 // and its children recursively
-// https://stackoverflow.com/questions/39087079/detect-modifier-key-release-in-x11-root-window
 //
 void setSelectInput (Display* dpy, Window win, int reg)
 {                                             
@@ -181,7 +180,6 @@ ee_complain = true;
 
 //
 // execv program and read its stdout
-// http://stackoverflow.com/questions/7292642/grabbing-output-from-exec
 //
 int execAndReadStdout(char* exe, char* args[], char* buf, int bufsize)
 {
@@ -269,7 +267,6 @@ return 1;
 
 //
 // Return the number of utf8 code points in the buffer at s
-// https://stackoverflow.com/questions/7298059/how-to-count-characters-in-a-unicode-string-in-c
 //
 size_t utf8len(char *s)
 {

@@ -24,41 +24,32 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 #include <X11/Xatom.h>
 #include <stdbool.h>
 #include <stdio.h>
-//#include <stdlib.h>
-//#include <string.h>
 #include "alttab.h"
+#include "util.h"
 extern Globals g;
 
 // PRIVATE
 
 //
 // get window group leader
-// copied from https://github.com/robx/skippy-xd/blob/master/wm.c
+// to be used later. rewritten, not tested.
 //
-Window wm_get_group_leader(Display *dpy, Window window)
+Window x_get_leader (Display *dpy, Window win)
 {
-unsigned char *data;
-int status, real_format;
-Atom real_type;
-unsigned long items_read, items_left;
+Window* retprop;
+XWMHints* h;
 Window leader = None;
-Atom WM_CLIENT_LEADER;
-WM_CLIENT_LEADER = XInternAtom(dpy, "WM_CLIENT_LEADER", 0);
-status = XGetWindowProperty(dpy, window, WM_CLIENT_LEADER,
-                  0, 1, False, XA_WINDOW, &real_type, &real_format,
-                  &items_read, &items_left, &data);
-if(status != Success)
-{
-    XWMHints *hints = XGetWMHints(dpy, window);
-    if(! hints)
+
+retprop = (Window *)get_x_property (dpy, win, XA_WINDOW, "WM_CLIENT_LEADER", NULL);
+if (retprop!=NULL) {
+    leader = retprop[0];
+    XFree (retprop);
+} else {
+    if (! (h = XGetWMHints (dpy, win)))
         return None;
-    if(hints->flags & WindowGroupHint)
-        leader = hints->window_group;
-    return leader;
+    if (h->flags & WindowGroupHint)
+        leader = h->window_group;
 }
-if(items_read)
-    leader = ((Window*)data)[0];
-XFree(data);
 return leader;
 }
 
@@ -80,7 +71,7 @@ XWindowAttributes wa;
 // caveat: in rp, gvim leader has no file name and icon
 // this doesn't work in raw X: leader may be not viewable.
 /*
-leader = wm_get_group_leader (dpy, win);
+leader = x_get_leader (dpy, win);
 if (g.debug>1) {fprintf (stderr, "win: %x leader: %x\n", win, leader);}
 */
 // add viewable only

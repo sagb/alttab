@@ -80,8 +80,7 @@ int addWindowInfo (Display* dpy, Window win, int reclevel, int wm_id, char* wm_n
 
         unsigned char* wn;
 /*
-        // not sufficient:
-        // http://stackoverflow.com/questions/9364668/xlib-window-name-problems
+        // not sufficient.
         // TODO: moreover, AnyPropertyType is not sufficient too
         if (XFetchName (dpy, win, &wn) && wn) {
         strncpy (g.winlist[g.maxNdx].name, wn, MAXNAMESZ);
@@ -107,7 +106,6 @@ int addWindowInfo (Display* dpy, Window win, int reclevel, int wm_id, char* wm_n
     // WM_HINTS: https://tronche.com/gui/x/xlib/ICC/client-to-window-manager/wm-hints.html
     // TODO by priority: 
     //    option to use full windows as icons. https://www.talisman.org/~erlkonig/misc/x11-composite-tutorial/
-    //    _NET_WM_ICON: http://unix.stackexchange.com/questions/48860/how-to-dump-the-icon-of-a-running-x-program
     //    understand hints->icon_window. for xterm, it seems not usable.
     XWMHints* hints;
     g.winlist[g.maxNdx].icon_drawable = 
@@ -197,8 +195,7 @@ int addWindowInfo (Display* dpy, Window win, int reclevel, int wm_id, char* wm_n
 //
 // sets g.winlist, g.maxNdx, g.selNdx
 // updates g.sortlist, g.sortNdx
-// n.b.: in heavy WM, use _NET_CLIENT_LIST:
-// http://stackoverflow.com/questions/1201179/how-to-identify-top-level-x11-windows-using-xlib
+// n.b.: in heavy WM, use _NET_CLIENT_LIST
 // direction is direction of first press: with shift or without
 //
 int initWinlist (Display* dpy, Window root, bool direction)
