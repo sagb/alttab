@@ -140,7 +140,7 @@ CAVEATS
        Run alttab after WM, or it will fail to detect it.
 
 AUTHOR
-       Written by sa <sa-dev AT rainbow POINT by>.
+       Copyright 2017 Alexander Kulak <sa-dev AT rainbow POINT by>.
 
 REPORTING BUGS
        Please report issues on github https://github.com/sagb/alttab/issues.

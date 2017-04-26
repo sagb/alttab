@@ -137,7 +137,7 @@ Run alttab after WM, or it will fail to detect it.
 
 ##AUTHOR
 
-Written by sa `<sa-dev AT rainbow POINT by>`.
+Copyright 2017 Alexander Kulak `<sa-dev AT rainbow POINT by>`.
 
 ##REPORTING BUGS
 

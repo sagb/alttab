@@ -353,9 +353,10 @@ font = XftFontOpenName(dpy,0,"DejaVu Sans Condensed-50");
 //font = XftFontOpenName(dpy,0,"Arial-24");
 if (!font) return 0;
 
-char* line = "";
+char line[104]; line[0]='\0';
+char* add = "example of drawMultiLine ";
 int sc; for (sc=0; sc<4; sc++)
-    strcat (line, "example of drawMultiLine ");
+    strncat (line, add, 25);
 
 GC gc = DefaultGC (dpy,0);
 XSetForeground (dpy, gc, WhitePixel(dpy,0));

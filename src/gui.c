@@ -266,6 +266,8 @@ if (g.debug>0) {fprintf (stderr, "tile w=%d h=%d win w=%d h=%d\n", tileW, tileH,
 // prepare tiles
 
 int m; for (m=0; m<g.maxNdx; m++) {
+    if (!g.winlist)
+        die ("no winlist in uiShow. this shouldn't happen, please report.");
     g.winlist[m].tile = XCreatePixmap (dpy, root, tileW, tileH, XDEPTH);
     if (! g.winlist[m].tile) die ("can't create tile");
     int fr = XFillRectangle  (dpy, g.winlist[m].tile, g.gcReverse, 0,0, tileW, tileH);
@@ -382,7 +384,7 @@ if (uiwin) {
     uiwin=0;
 }
 int y; for (y=0; y<g.maxNdx; y++) {
-    if (g.winlist[y].tile) {
+    if (g.winlist && g.winlist[y].tile) {
         XFreePixmap (dpy, g.winlist[y].tile);
         g.winlist[y].tile=0;
     }
