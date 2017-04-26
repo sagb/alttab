@@ -1,13 +1,21 @@
 /*
 Interface with foreign windows common for all WMs.
 
+Copyright 2017 Alexander Kulak.
 This file is part of alttab program.
-alttab is Copyright (C) 2016-2017, by respective author (sa).
-It is free software; you can redistribute it and/or modify it under
-the terms of either:
-a) the GNU General Public License as published by the Free Software
-Foundation; either version 1, or (at your option) any later version, or
-b) the "Artistic License".
+
+alttab is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+alttab is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <X11/Xlib.h>
