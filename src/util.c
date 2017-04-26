@@ -61,7 +61,6 @@ unsigned int getOffendingModifiersMask(Display * dpy)
 // for ignoring X errors
 // https://tronche.com/gui/x/xlib/event-handling/protocol-errors/default-handlers.html#XErrorEvent
 // 
-
 int zeroErrorHandler(Display * display, XErrorEvent * theEvent)
 {
 	ee_ignored = theEvent;
@@ -157,29 +156,23 @@ int execAndReadStdout(char *exe, char *args[], char *buf, int bufsize)
 		perror("pipe");
 		return 0;
 	}
-
 	if ((pid = fork()) == -1) {
 		perror("fork");
 		return 0;
 	}
-
 	if (pid == 0) {
-
 		dup2(link[1], STDOUT_FILENO);
 		close(link[0]);
 		close(link[1]);
 		execv(exe, args);
 		perror("execv");
 		return 0;
-
 	} else {
-
 		close(link[1]);
 		(void)read(link[0], buf, bufsize);
 //printf("Output: (%.*s)\n", nbytes, buf);
 		close(link[0]);
 		wait(NULL);
-
 	}
 	return 1;
 }
