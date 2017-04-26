@@ -18,8 +18,12 @@ coding
 ------
 
 Functions return 0 on failure, positive on success.  
-Satisfy `-Wall` compiler option.
-Indent is four spaces:
+No strict requirements are imposed, but for the time present, the code
+adheres to the following:
+
+* Satisfy `-Wall` compiler option
+* Use Linux coding style (indent -linux)
+* Pass Clang Static Analyzer check (scan-build make) without warnings
 
 /* vim:tabstop=4:shiftwidth=4:smarttab:expandtab:smartindent  
 */

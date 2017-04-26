@@ -29,26 +29,32 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 
 #define MAXPROPLEN  4096
 
-XErrorEvent* ee_ignored;
+XErrorEvent *ee_ignored;
 bool ee_complain;
 
-unsigned int getOffendingModifiersMask (Display * dpy);
-int changeKeygrab (Display* dpy, Window win, bool grab, KeyCode keycode, unsigned int modmask, unsigned int ignored_modmask);
-int zeroErrorHandler (Display *display, XErrorEvent *theEvent);
-void setSelectInput (Display* dpy, Window win, int reg);
+unsigned int getOffendingModifiersMask(Display * dpy);
+int changeKeygrab(Display * dpy, Window win, bool grab, KeyCode keycode,
+		  unsigned int modmask, unsigned int ignored_modmask);
+int zeroErrorHandler(Display * display, XErrorEvent * theEvent);
+void setSelectInput(Display * dpy, Window win, int reg);
 
-int execAndReadStdout (char* exe, char* args[], char* buf, int bufsize);
+int execAndReadStdout(char *exe, char *args[], char *buf, int bufsize);
 
-int pixmapScale (Display* dpy, int scrNum, Window win, Drawable src, Drawable dst, unsigned int srcW, unsigned int srcH, unsigned int dstW, unsigned int dstH); 
+int pixmapScale(Display * dpy, int scrNum, Window win, Drawable src,
+		Drawable dst, unsigned int srcW, unsigned int srcH,
+		unsigned int dstW, unsigned int dstH);
 
-size_t utf8len (char* s);
-char* utf8index (char* s, size_t pos);
+size_t utf8len(char *s);
+char *utf8index(char *s, size_t pos);
 
-int drawMultiLine (Display* dpy, Drawable d, XftFont* font, XftColor* xftcolor, char* str, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height);
-int drawMultiLine_test ();
+int drawMultiLine(Display * dpy, Drawable d, XftFont * font,
+		  XftColor * xftcolor, char *str, unsigned int x1,
+		  unsigned int y1, unsigned int width, unsigned int height);
+int drawMultiLine_test();
 
-Bool predproc_true (Display* display, XEvent* event, char* arg);
+Bool predproc_true(Display * display, XEvent * event, char *arg);
 
-char* get_x_property (Display* dpy, Window win, Atom prop_type, char* prop_name, unsigned long* prop_size);
+char *get_x_property(Display * dpy, Window win, Atom prop_type, char *prop_name,
+		     unsigned long *prop_size);
 
 #endif

@@ -51,7 +51,7 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 #define DEFCOLFG    "grey"
 #define DEFCOLFRAME "#a0abab"
 
-#define XDEPTH      24  // TODO: get rid of this
+#define XDEPTH      24		// TODO: get rid of this
 
 #define DEFMODMASK  Mod1Mask
 #define DEFBACKMASK ShiftMask
@@ -59,80 +59,81 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 #define DEFKEYKS    XK_Tab
 
 typedef struct {
-    Window id;
-    int wm_id;  // wm's internal window id, when WM has it (ratpoison)
-    char name[MAXNAMESZ];
-    int reclevel;
-    Pixmap icon_drawable;  // Window or Pixmap
-    unsigned int icon_w, icon_h;
-    bool icon_allocated;  // we need to free icon, because we created it (placeholder or depth conversion)
-    Pixmap tile;  // ready to display. w/h are all equal and defined in gui.c
-    int order;  // in sort stack, kept in sync with g.sortlist
+	Window id;
+	int wm_id;		// wm's internal window id, when WM has it (ratpoison)
+	char name[MAXNAMESZ];
+	int reclevel;
+	Pixmap icon_drawable;	// Window or Pixmap
+	unsigned int icon_w, icon_h;
+	bool icon_allocated;	// we need to free icon, because we created it (placeholder or depth conversion)
+	Pixmap tile;		// ready to display. w/h are all equal and defined in gui.c
+	int order;		// in sort stack, kept in sync with g.sortlist
 } WindowInfo;
 
 typedef struct {
-    //char name[MAXNAMESZ];
-    char* name;
-    XColor xcolor;
-    XftColor xftcolor;
-    //XRenderColor xrendercolor;
+	//char name[MAXNAMESZ];
+	char *name;
+	XColor xcolor;
+	XftColor xftcolor;
+	//XRenderColor xrendercolor;
 } Color;
 
 typedef struct {
-    int debug;
-    bool uiShowHasRun; // means: 1. window is ready to Expose, 2. need to call uiHide to free X stuff
-    WindowInfo* winlist;
-    int maxNdx; // number of items in list above
-    int selNdx; // current (selected) item
-    int startNdx; // current item at start of uiShow (current window before setFocus)
-    Window sortlist[MAXWINDOWS]; // auxiliary list for sorting
-        // display-wide, for all groups/desktops
-        // unlike g.winlist, survives uiHide
-        // for each uiShow, g.winlist[].order is initialized using this list
-    int sortNdx; // number of elements in list above
-    // option_* are initialized from command line arguments or X resources or defaults
-    int option_max_reclevel; // max reclevel. -1 is "everything"
+	int debug;
+	bool uiShowHasRun;	// means: 1. window is ready to Expose, 2. need to call uiHide to free X stuff
+	WindowInfo *winlist;
+	int maxNdx;		// number of items in list above
+	int selNdx;		// current (selected) item
+	int startNdx;		// current item at start of uiShow (current window before setFocus)
+	Window sortlist[MAXWINDOWS];	// auxiliary list for sorting
+	// display-wide, for all groups/desktops
+	// unlike g.winlist, survives uiHide
+	// for each uiShow, g.winlist[].order is initialized using this list
+	int sortNdx;		// number of elements in list above
+	// option_* are initialized from command line arguments or X resources or defaults
+	int option_max_reclevel;	// max reclevel. -1 is "everything"
 #define WM_MIN          0
 #define WM_NO           0
 #define WM_EWMH         1
 #define WM_RATPOISON    2
 #define WM_MAX          2
-    int option_wm;
-    char* option_font;
-    int option_tileW, option_tileH;
-    int option_iconW, option_iconH;
-    unsigned int option_modMask, option_backMask;
-    KeyCode option_modCode, option_keyCode;
-    Color color[NCOLORS];
-    GC gcDirect, gcReverse, gcFrame;  // used in both gui.c and win.c
-    unsigned int ignored_modmask;
+	int option_wm;
+	char *option_font;
+	int option_tileW, option_tileH;
+	int option_iconW, option_iconH;
+	unsigned int option_modMask, option_backMask;
+	KeyCode option_modCode, option_keyCode;
+	Color color[NCOLORS];
+	GC gcDirect, gcReverse, gcFrame;	// used in both gui.c and win.c
+	unsigned int ignored_modmask;
 } Globals;
 
 // gui
-int startupGUItasks (Display* dpy, Window root);
-int uiShow (Display* dpy, Window root, bool direction);
-void uiExpose (Display* dpy, Window root);
-int uiHide (Display* dpy, Window root);
-int uiNextWindow (Display* dpy, Window root);
-int uiPrevWindow (Display* dpy, Window root);
+int startupGUItasks(Display * dpy, Window root);
+int uiShow(Display * dpy, Window root, bool direction);
+void uiExpose(Display * dpy, Window root);
+int uiHide(Display * dpy, Window root);
+int uiNextWindow(Display * dpy, Window root);
+int uiPrevWindow(Display * dpy, Window root);
 
 // windows
-int startupWintasks (Display* dpy);
-int addWindowInfo (Display* dpy, Window win, int reclevel, int wm_id, char* wm_name);
-int initWinlist (Display* dpy, Window root, bool direction);
-void freeWinlist (Display* dpy);
-int setFocus (Display* dpy, int winNdx);
+int startupWintasks(Display * dpy);
+int addWindowInfo(Display * dpy, Window win, int reclevel, int wm_id,
+		  char *wm_name);
+int initWinlist(Display * dpy, Window root, bool direction);
+void freeWinlist(Display * dpy);
+int setFocus(Display * dpy, int winNdx);
 int rp_startupWintasks();
-int x_initWindowsInfoRecursive (Display* dpy,Window win,int reclevel);
-int rp_initWinlist (Display* dpy);
-int x_setFocus (Display* dpy, int wndx);
-int rp_setFocus (int winNdx);
-int execAndReadStdout(char* exe, char* args[], char* buf, int bufsize);
-int pulloutWindowToTop (int winNdx);
+int x_initWindowsInfoRecursive(Display * dpy, Window win, int reclevel);
+int rp_initWinlist(Display * dpy);
+int x_setFocus(Display * dpy, int wndx);
+int rp_setFocus(int winNdx);
+int execAndReadStdout(char *exe, char *args[], char *buf, int bufsize);
+int pulloutWindowToTop(int winNdx);
 
 /* EWHM */
-char* ewmh_getWmName (Display* dpy);
-int ewmh_initWinlist (Display* dpy);
-int ewmh_setFocus (Display* dpy, int winNdx);
+char *ewmh_getWmName(Display * dpy);
+int ewmh_initWinlist(Display * dpy);
+int ewmh_setFocus(Display * dpy, int winNdx);
 
 #endif

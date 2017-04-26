@@ -34,23 +34,25 @@ extern Globals g;
 // get window group leader
 // to be used later. rewritten, not tested.
 //
-Window x_get_leader (Display *dpy, Window win)
+Window x_get_leader(Display * dpy, Window win)
 {
-Window* retprop;
-XWMHints* h;
-Window leader = None;
+	Window *retprop;
+	XWMHints *h;
+	Window leader = None;
 
-retprop = (Window *)get_x_property (dpy, win, XA_WINDOW, "WM_CLIENT_LEADER", NULL);
-if (retprop!=NULL) {
-    leader = retprop[0];
-    XFree (retprop);
-} else {
-    if (! (h = XGetWMHints (dpy, win)))
-        return None;
-    if (h->flags & WindowGroupHint)
-        leader = h->window_group;
-}
-return leader;
+	retprop =
+	    (Window *) get_x_property(dpy, win, XA_WINDOW, "WM_CLIENT_LEADER",
+				      NULL);
+	if (retprop != NULL) {
+		leader = retprop[0];
+		XFree(retprop);
+	} else {
+		if (!(h = XGetWMHints(dpy, win)))
+			return None;
+		if (h->flags & WindowGroupHint)
+			leader = h->window_group;
+	}
+	return leader;
 }
 
 // PUBLIC
@@ -59,13 +61,14 @@ return leader;
 // set winlist,maxNdx,startNdx recursively using raw Xlib
 // first call should be (win=root, reclevel=0)
 //
-int x_initWindowsInfoRecursive (Display* dpy,Window win,int reclevel) {
+int x_initWindowsInfoRecursive(Display * dpy, Window win, int reclevel)
+{
 
-Window root, parent;
-Window* children;
-unsigned int nchildren, i;
+	Window root, parent;
+	Window *children;
+	unsigned int nchildren, i;
 //Window leader;
-XWindowAttributes wa;
+	XWindowAttributes wa;
 
 // check if window is "leader" or no prop, skip otherwise
 // caveat: in rp, gvim leader has no file name and icon
@@ -77,56 +80,58 @@ if (g.debug>1) {fprintf (stderr, "win: %x leader: %x\n", win, leader);}
 // add viewable only
 // caveat: in rp, skips anything except of visible window
 // TODO: add an option for this in WMs too
-XGetWindowAttributes (dpy, win, &wa);
+	XGetWindowAttributes(dpy, win, &wa);
 
 // insert detailed window data in window list
 //if ( ((!leader) || leader==win)  &&
 //if ( (leader==win)  &&
-if (
-        wa.map_state == IsViewable  &&
-        reclevel != 0 ) {
-    addWindowInfo (dpy, win, reclevel, 0, NULL);
-}
-
+	if (wa.map_state == IsViewable && reclevel != 0) {
+		addWindowInfo(dpy, win, reclevel, 0, NULL);
+	}
 // skip children if max recursion level reached
-if (g.option_max_reclevel != -1 && reclevel >= g.option_max_reclevel)
-    return 1;
+	if (g.option_max_reclevel != -1 && reclevel >= g.option_max_reclevel)
+		return 1;
 
 // recursion
-if (XQueryTree (dpy, win, &root, &parent, &children, &nchildren)==0) {
-    if (g.debug>0) {fprintf (stderr, "can't get window tree for %lu\n", win);}
-    return 0;
-}
-for (i = 0; i < nchildren; ++i) {
-    x_initWindowsInfoRecursive (dpy, children[i], reclevel+1);
-}
+	if (XQueryTree(dpy, win, &root, &parent, &children, &nchildren) == 0) {
+		if (g.debug > 0) {
+			fprintf(stderr, "can't get window tree for %lu\n", win);
+		}
+		return 0;
+	}
+	for (i = 0; i < nchildren; ++i) {
+		x_initWindowsInfoRecursive(dpy, children[i], reclevel + 1);
+	}
 
-if (nchildren>0 && children) {XFree(children);}
-if (reclevel==0) { g.startNdx=0; }
-return 1;
+	if (nchildren > 0 && children) {
+		XFree(children);
+	}
+	if (reclevel == 0) {
+		g.startNdx = 0;
+	}
+	return 1;
 }
 
 //
 // set window focus in raw X
 //
-int x_setFocus (Display* dpy, int wndx)
+int x_setFocus(Display * dpy, int wndx)
 {
-Window w = g.winlist[wndx].id;
+	Window w = g.winlist[wndx].id;
 
 // TODO: 1. XWarpPointer
 
 // 2. XRaiseWindow required, but doesn't make window "Viewable"
-XRaiseWindow (dpy, w);
+	XRaiseWindow(dpy, w);
 
 // 3. XSetInputFocus
 // "The specified focus window must be viewable at the time 
 // XSetInputFocus is called, or a BadMatch error results."
 // This check is redundant: non-viewable windows isn't added to winlist in raw X anyway
-XWindowAttributes att;
-XGetWindowAttributes (dpy, w, &att);
-if (att.map_state == IsViewable )
-    XSetInputFocus (dpy, w, RevertToParent, CurrentTime);
+	XWindowAttributes att;
+	XGetWindowAttributes(dpy, w, &att);
+	if (att.map_state == IsViewable)
+		XSetInputFocus(dpy, w, RevertToParent, CurrentTime);
 
-return 1;
+	return 1;
 }
-
