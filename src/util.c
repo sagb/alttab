@@ -26,50 +26,40 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 
 //
 // get all possible modifiers
-// per xbindkeys
 //
 unsigned int getOffendingModifiersMask (Display * dpy)
 {
-  unsigned int numlock_mask = 0;
-  unsigned int scrolllock_mask = 0;
-  unsigned int capslock_mask = 0;
+unsigned int lockmask[3]; // num=0 scroll=1 caps=2
+int i;
+XModifierKeymap* map;
+KeyCode numlock, scrolllock;
+static int masks[8] = {
+    ShiftMask, LockMask, ControlMask, 
+    Mod1Mask, Mod2Mask, Mod3Mask, Mod4Mask, Mod5Mask
+};
 
-  int i;
-  XModifierKeymap *modmap;
-  KeyCode nlock, slock;
-  static int mask_table[8] = {
-    ShiftMask, LockMask, ControlMask, Mod1Mask,
-    Mod2Mask, Mod3Mask, Mod4Mask, Mod5Mask
-  };
-  nlock = XKeysymToKeycode (dpy, XK_Num_Lock);
-  slock = XKeysymToKeycode (dpy, XK_Scroll_Lock);
-  /*
-   * Find out the masks for the NumLock and ScrollLock modifiers,
-   * so that we can bind the grabs for when they are enabled too.
-   */
-  modmap = XGetModifierMapping (dpy);
-  if (modmap != NULL && modmap->max_keypermod > 0)
-    {
-      for (i = 0; i < 8 * modmap->max_keypermod; i++)
-	{
-	  if (modmap->modifiermap[i] == nlock && nlock != 0)
-	    numlock_mask = mask_table[i / modmap->max_keypermod];
-	  else if (modmap->modifiermap[i] == slock && slock != 0)
-	    scrolllock_mask = mask_table[i / modmap->max_keypermod];
-	}
+memset (lockmask, 0, sizeof(unsigned int)*3);
+numlock = XKeysymToKeycode (dpy, XK_Num_Lock);
+scrolllock = XKeysymToKeycode (dpy, XK_Scroll_Lock);
+map = XGetModifierMapping (dpy);
+if (map != NULL && map->max_keypermod > 0) {
+    for (i = 0; i < 8 * map->max_keypermod; i++) {
+        if (numlock != 0 && map->modifiermap[i] == numlock)
+            lockmask[0] = masks[i / map->max_keypermod];
+        else if (scrolllock != 0 && map->modifiermap[i] == scrolllock)
+            lockmask[1] = masks[i / map->max_keypermod];
     }
-  capslock_mask = LockMask;
-  if (modmap)
-    XFreeModifiermap (modmap);
-  return (numlock_mask | scrolllock_mask | capslock_mask);
 }
-
+lockmask[2] = LockMask;
+if (map)
+    XFreeModifiermap (map);
+return (lockmask[0] | lockmask[1] | lockmask[2]);
+}
 
 //
 // for ignoring X errors
-// 
-
 // https://tronche.com/gui/x/xlib/event-handling/protocol-errors/default-handlers.html#XErrorEvent
+// 
 
 int zeroErrorHandler (Display *display, XErrorEvent *theEvent)
 {
@@ -84,72 +74,42 @@ if (ee_complain) {
 return 0;
 }
 
-
 //
 // grab/ungrab including all modifier combinations
-// per metacity
-// returns 1 if sucess, 0 if fail (f.e., BadAccess). Grabs are not restored on failure.
+// returns 1 if sucess, 0 if fail (f.e., BadAccess).
+// Grabs are not restored on failure.
 //
-int changeKeygrab (
-                Display*    dpy,
-                Window      xwindow,
-                bool        grab,
-                KeyCode     keycode,
-                unsigned int  modmask,
-                unsigned int  ignored_modmask)
+int changeKeygrab (Display* dpy, Window win, bool grab, KeyCode keycode, unsigned int modmask, unsigned int ignored_modmask)
 {
 int debug=1;
+unsigned int mask=0;
 
-// XGrabKey can generate BadAccess  -- ignored globally
-//XErrorHandler hnd = (XErrorHandler)0;
-//hnd = XSetErrorHandler (zeroErrorHandler);
-
-unsigned int ignored_mask;
-/* Grab keycode/modmask, together with
-* all combinations of ignored modifiers.
-* X provides no better way to do this.
-*/
-ignored_mask = 0;
-while (ignored_mask <= ignored_modmask)
-{
-    if (ignored_mask & ~(ignored_modmask))
-    {
-        /* Not a combination of ignored modifiers
-         * (it contains some non-ignored modifiers)
-         */
-        ++ignored_mask;
+while (mask <= ignored_modmask) {
+    if (mask & ~(ignored_modmask)) {
+        ++mask;
         continue;
     }
     if (grab) {
-        if (debug>1) {fprintf (stderr, "grabbing %d with mask %d\n", keycode, (modmask | ignored_mask));}
+        if (debug>1) {fprintf (stderr, "grabbing %d with mask %d\n", keycode, (modmask | mask));}
         ee_ignored = NULL; // to detect X error event
         ee_complain = false; // our handler will not croak
-        XGrabKey (dpy, keycode,
-                modmask | ignored_mask,
-                xwindow,
-                True, // ?
-                GrabModeAsync, GrabModeAsync);
+        XGrabKey (dpy, keycode, modmask | mask, win, True, GrabModeAsync, GrabModeAsync);
         XSync (dpy,False); // for error to appear
         if (ee_ignored) {
-            //XSetErrorHandler(hnd);
             ee_complain = true;
             return 0; // signal caller that XGrabKey failed
         }
     }
     else {
-        if (debug>1) {fprintf (stderr, "ungrabbing %d with mask %d\n", keycode, (modmask | ignored_mask));}
-        XUngrabKey (dpy, keycode,
-                modmask | ignored_mask,
-                xwindow);
+        if (debug>1) {fprintf (stderr, "ungrabbing %d with mask %d\n", keycode, (modmask | mask));}
+        XUngrabKey (dpy, keycode, modmask | mask, win);
     }
-    ++ignored_mask;
+    ++mask;
 }
 
 ee_complain = true;
-//XSetErrorHandler(hnd);
 return 1;
 }
-
 
 //
 // register interest in KeyRelease events for the window
@@ -161,22 +121,18 @@ Window root, parent;
 Window* children;                           
 unsigned int nchildren, i;                           
 
-//XErrorHandler hnd = (XErrorHandler) 0;   -- ignored globally
-//hnd = XSetErrorHandler(zeroErrorHandler);
 ee_complain = false;
 
 if (XSelectInput (dpy, win, reg ? KeyReleaseMask|SubstructureNotifyMask : 0) != BadWindow && \
 XQueryTree (dpy, win, &root, &parent, &children, &nchildren) != 0) {
-for (i = 0; i < nchildren; ++i) {
-  setSelectInput (dpy, children[i], reg);
-}
-if (nchildren>0 && children) {XFree(children);}
+    for (i = 0; i < nchildren; ++i)
+        setSelectInput (dpy, children[i], reg);
+    if (nchildren>0 && children)
+        XFree(children);
 }
 
 ee_complain = true;
-//XSetErrorHandler(hnd);
 }                 
-
 
 //
 // execv program and read its stdout
@@ -216,7 +172,6 @@ wait(NULL);
 }
 return 1;
 }
-
 
 //
 // Scale drawable from 0,0
@@ -264,15 +219,16 @@ XFreeGC (dpy, gc);
 return 1;
 }
 
-
 //
 // Return the number of utf8 code points in the buffer at s
 //
 size_t utf8len(char *s)
 {
-    size_t len = 0;
-    for (; *s; ++s) if ((*s & 0xC0) != 0x80) ++len;
-    return len;
+size_t len = 0;
+for (; *s; ++s)
+    if ((*s & 0xC0) != 0x80)
+        ++len;
+return len;
 }
 
 //
@@ -281,12 +237,14 @@ size_t utf8len(char *s)
 //
 char *utf8index(char *s, size_t pos)
 {    
-    ++pos;
-    for (; *s; ++s) {
-        if ((*s & 0xC0) != 0x80) --pos;
-        if (pos == 0) return s;
-    }
-    return NULL;
+++pos;
+for (; *s; ++s) {
+    if ((*s & 0xC0) != 0x80)
+        --pos;
+    if (pos == 0)
+        return s;
+}
+return NULL;
 }
 
 //
@@ -371,8 +329,6 @@ do {
     y += ext.height + line_spacing_px;
 } while (!finish_after_draw);
 
-// this function doesn't allocate it anymore
-//XftColorFree (dpy,DefaultVisual(dpy,0),DefaultColormap(dpy,0),xftcolor);
 XftDrawDestroy (xftdraw);
 return 1;
 }
@@ -381,6 +337,7 @@ return 1;
 // Test for previous function. Use:
 // int main() { return drawMultiLine_test() ? 0 : 1; }
 // g++ XftTest.cc -lX11 -lXft `pkg-config --cflags freetype2`
+// not used in alttab
 //
 int drawMultiLine_test ()
 {
@@ -388,13 +345,6 @@ Display* dpy = XOpenDisplay(0);;
 Window win = XCreateSimpleWindow (dpy,DefaultRootWindow(dpy),0,0,1000,600,0,0,0);
 XMapWindow (dpy, win);
 
-/*
-XRenderColor xrcolor;
-xrcolor.red  =65535;
-xrcolor.green=0;
-xrcolor.blue =0;
-xrcolor.alpha=65535;
-*/
 XftColor xftcolor;
 XftColorAllocName (dpy, DefaultVisual(dpy,0), DefaultColormap(dpy,0), "blue", &xftcolor);
 
@@ -403,7 +353,9 @@ font = XftFontOpenName(dpy,0,"DejaVu Sans Condensed-50");
 //font = XftFontOpenName(dpy,0,"Arial-24");
 if (!font) return 0;
 
-char* line = "Rdfr Пример drawMultiLine ^&*♘#^% лала дофываор ghj 12345698675 56273 hagsdfgh hgfa shgdffg jhHG g 238476 y jlk3(* &^78  8734 76 83756 87 * hgjGHJHG876 i47^ t76 8768i";
+char* line = "";
+int sc; for (sc=0; sc<4; sc++)
+    strcat (line, "example of drawMultiLine ");
 
 GC gc = DefaultGC (dpy,0);
 XSetForeground (dpy, gc, WhitePixel(dpy,0));
@@ -420,10 +372,7 @@ return r;
 //
 // check procedure for XCheckIfEvent which always returns true
 //
-Bool predproc_true(display, event, arg)
-Display *display;
-XEvent *event;
-char *arg;
+Bool predproc_true (Display* display, XEvent* event, char* arg)
 {
 return (True);
 }

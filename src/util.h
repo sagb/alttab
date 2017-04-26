@@ -29,12 +29,11 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 
 #define MAXPROPLEN  4096
 
-// for ignoring X errors (see handler code and notes/xlib)
 XErrorEvent* ee_ignored;
 bool ee_complain;
 
 unsigned int getOffendingModifiersMask (Display * dpy);
-int changeKeygrab ( Display* dpy, Window xwindow, bool grab, KeyCode keycode, unsigned int modmask, unsigned int ignored_modmask);
+int changeKeygrab (Display* dpy, Window win, bool grab, KeyCode keycode, unsigned int modmask, unsigned int ignored_modmask);
 int zeroErrorHandler (Display *display, XErrorEvent *theEvent);
 void setSelectInput (Display* dpy, Window win, int reg);
 

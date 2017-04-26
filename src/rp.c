@@ -38,7 +38,6 @@ char* ratpoison_cmd;
 
 //
 // early initialization in ratpoison
-// 1=success 0=fail
 //
 int rp_startupWintasks()
 {

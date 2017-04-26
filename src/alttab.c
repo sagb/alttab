@@ -237,7 +237,7 @@ int grabAllKeys (Display* dpy, Window root, bool grabUngrab)
 {
 g.ignored_modmask = getOffendingModifiersMask (dpy); // or 0 for g.debug
 char* grabhint = "Error while (un)grabbing key %d with mask %d.\nProbably other program already grabbed this combination.\nCheck: xdotool keydown alt+Tab; xdotool key XF86LogGrabInfo; xdotool keyup Tab; sleep 1; xdotool keyup alt; tail /var/log/Xorg.0.log\nOr try Ctrl-Tab instead of Alt-Tab:  -mm 4 -mk 0xffe3\n";
-// TODO: attempt XF86Ungrab? probably too invasive
+// attempt XF86Ungrab? probably too invasive
 // TODO: error message doesn't count ignored_modmask
 if (!changeKeygrab (dpy, root, grabUngrab, g.option_keyCode, g.option_modMask, g.ignored_modmask)) {
     fprintf (stderr, grabhint, g.option_keyCode, g.option_modMask);

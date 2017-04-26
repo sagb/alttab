@@ -122,8 +122,16 @@ drawFr (dpy, g.gcFrame, g.selNdx);
 // early initialization
 // called once per execution
 // TODO: counterpair for freeing X resources, 
-//   even if called once per execution
-//
+//   even if called once per execution:
+/*
+int p; for (p=0; p<NCOLORS; p++) {
+        XftColorFree (dpy,DefaultVisual(dpy,0),DefaultColormap(dpy,0),g.color[p].xftcolor);
+            // XFreeColors ?
+}
+if (g.gcDirect) XFreeGC (dpy, g.gcDirect);
+if (g.gcReverse) XFreeGC (dpy, g.gcReverse);
+if (g.gcFrame) XFreeGC (dpy, g.gcFrame);
+*/
 int startupGUItasks (Display* dpy, Window root)
 {
 
@@ -231,22 +239,6 @@ int i; for (i=0; i<g.maxNdx; i++) {
 tileW=g.option_tileW, tileH=g.option_tileH;
 iconW=g.option_iconW; iconH=g.option_iconH;
 float rt=1.0;
-/*
-int k; for (k=0; k<g.maxNdx; k++) {
-    if (g.winlist[k].icon_w > tileW) tileW=g.winlist[k].icon_w;
-    if (g.winlist[k].icon_h > tileH) tileH=g.winlist[k].icon_h;
-}
-if (tileW > MAXTILE_W) { 
-    rt = (float)MAXTILE_W / (float)tileW;
-    tileW = MAXTILE_W;
-    tileH = tileH * rt;
-}
-if (tileH > MAXTILE_H) {
-    rt = (float)MAXTILE_H / (float)tileH;
-    tileH = MAXTILE_H;
-    tileW = tileW * rt;
-}
-*/
 // tiles may be smaller if they don't fit screen
 uiwinW = (tileW + FRAME_W) * g.maxNdx + FRAME_W;
 if (uiwinW > scrW) {
@@ -315,11 +307,6 @@ int m; for (m=0; m<g.maxNdx; m++) {
     }
     // draw labels
     if (g.winlist[m].name && fontLabel) {
-        /*
-        int dr = XDrawString (dpy, g.winlist[m].tile, 
-            g.gcDirect, 0,tileH-15, g.winlist[m].name, strlen(g.winlist[m].name));
-        if (g.debug>1) {fprintf (stderr, "tile labelled: \"%s\", XDrawString returned %d\n", g.winlist[m].name, dr);}
-        */
         int dr = drawMultiLine (dpy, g.winlist[m].tile, fontLabel,
                 &(g.color[COLFG].xftcolor),
                 g.winlist[m].name, 
@@ -331,13 +318,6 @@ if (g.debug>0) {fprintf (stderr, "prepared %d tiles\n", m);}
 if (fontLabel) XftFontClose (dpy, fontLabel);
 
 // prepare our window
-/*
-uiwin = XCreateWindow (dpy, root,
-            uiwinX, uiwinY,
-            uiwinW, uiwinH,
-            0, XDEPTH, CopyFromParent, CopyFromParent,
-            0, NULL);
-*/
 uiwin = XCreateSimpleWindow (dpy, root, 
           uiwinX, uiwinY,
           uiwinW, uiwinH,
@@ -408,20 +388,6 @@ int y; for (y=0; y<g.maxNdx; y++) {
     }
 }
 if (g.winlist) { freeWinlist (dpy); }
-/*
-NOW THESE ARE ALLOCATED ONCE AT STARTUP,
-and should not be freed on every disappearing of popup.
-if (g.debug>0) {fprintf (stderr, "destroying colors\n");}
-// required?
-int p; for (p=0; p<NCOLORS; p++) {
-    XftColorFree (dpy,DefaultVisual(dpy,0),DefaultColormap(dpy,0),g.color[p].xftcolor);
-    // XFreeColors ?
-}
-if (g.debug>0) {fprintf (stderr, "destroying GCs\n");}
-if (g.gcDirect) XFreeGC (dpy, g.gcDirect);
-if (g.gcReverse) XFreeGC (dpy, g.gcReverse);
-if (g.gcFrame) XFreeGC (dpy, g.gcFrame);
-*/
 g.uiShowHasRun = false;
 return 1;
 }
