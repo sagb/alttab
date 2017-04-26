@@ -8,8 +8,6 @@ the terms of either:
 a) the GNU General Public License as published by the Free Software
 Foundation; either version 1, or (at your option) any later version, or
 b) the "Artistic License".
-
-Parts are copied from wmctrl (c) Tomas Styblo <tripie@cpan.org>
 */
 
 #include <stdlib.h>
@@ -17,279 +15,91 @@ Parts are copied from wmctrl (c) Tomas Styblo <tripie@cpan.org>
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
-//#include <locale.h>
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
-//#include <X11/cursorfont.h>
-//#include <X11/Xmu/WinUtil.h>
-//#include <glib.h>
 
 #include <X11/Xft/Xft.h>
 #include "alttab.h"
 #include "util.h"
 extern Globals g;
 
-#define MAX_PROPERTY_VALUE_LEN 4096
-//#define SELECT_WINDOW_MAGIC ":SELECT:"
-//#define ACTIVE_WINDOW_MAGIC ":ACTIVE:"
-
-#define p_verbose(...) if (g.debug>1) { \
-    fprintf(stderr, __VA_ARGS__); \
-}
 
 // PUBLIC
-
-int ewmh_client_msg(Display *disp, Window win, char *msg, /* {{{ */
-        unsigned long data0, unsigned long data1, 
-        unsigned long data2, unsigned long data3,
-        unsigned long data4) {
-    XEvent event;
-    long mask = SubstructureRedirectMask | SubstructureNotifyMask;
-
-    event.xclient.type = ClientMessage;
-    event.xclient.serial = 0;
-    event.xclient.send_event = True;
-    event.xclient.message_type = XInternAtom(disp, msg, False);
-    event.xclient.window = win;
-    event.xclient.format = 32;
-    event.xclient.data.l[0] = data0;
-    event.xclient.data.l[1] = data1;
-    event.xclient.data.l[2] = data2;
-    event.xclient.data.l[3] = data3;
-    event.xclient.data.l[4] = data4;
-    
-    if (XSendEvent(disp, DefaultRootWindow(disp), False, mask, &event)) {
-        return EXIT_SUCCESS;
-    }
-    else {
-        fprintf(stderr, "Cannot send %s event.\n", msg);
-        return EXIT_FAILURE;
-    }
-}/*}}}*/
-
-
-char *ewmh_get_property (Display *disp, Window win, /*{{{*/
-        Atom xa_prop_type, char *prop_name, unsigned long *size) {
-    Atom xa_prop_name;
-    Atom xa_ret_type;
-    int ret_format;
-    unsigned long ret_nitems;
-    unsigned long ret_bytes_after;
-    unsigned long tmp_size;
-    unsigned char *ret_prop;
-    char *ret;
-
-    xa_prop_name = XInternAtom(disp, prop_name, False);
-    
-    /* MAX_PROPERTY_VALUE_LEN / 4 explanation (XGetWindowProperty manpage):
-     *
-     * long_length = Specifies the length in 32-bit multiples of the
-     *               data to be retrieved.
-     *
-     * NOTE:  see 
-     * http://mail.gnome.org/archives/wm-spec-list/2003-March/msg00067.html
-     * In particular:
-     *
-     * 	When the X window system was ported to 64-bit architectures, a
-     * rather peculiar design decision was made. 32-bit quantities such
-     * as Window IDs, atoms, etc, were kept as longs in the client side
-     * APIs, even when long was changed to 64 bits.
-     *
-     */
-    ee_complain = false;
-    Status xsw = XGetWindowProperty(disp, win, xa_prop_name, 0, MAX_PROPERTY_VALUE_LEN / 4, False,
-            xa_prop_type, &xa_ret_type, &ret_format,     
-            &ret_nitems, &ret_bytes_after, &ret_prop);
-    XSync (disp, False); // for error to "appear"
-    ee_complain = true;
-
-    if (xsw != Success) {
-        p_verbose("Cannot get %s property.\n", prop_name);
-        return NULL;
-    }
-  
-    if (xa_ret_type != xa_prop_type) {
-        p_verbose("Invalid type of %s property.\n", prop_name);
-        XFree(ret_prop);
-        return NULL;
-    }
-
-    /* null terminate the result to make string handling easier */
-    tmp_size = (ret_format / 8) * ret_nitems;
-    /* Correct 64 Architecture implementation of 32 bit data */
-    if(ret_format==32) tmp_size *= sizeof(long)/4;
-    ret = malloc(tmp_size + 1);
-    memcpy(ret, ret_prop, tmp_size);
-    ret[tmp_size] = '\0';
-
-    if (size) {
-        *size = tmp_size;
-    }
-    
-    XFree(ret_prop);
-    return ret;
-}/*}}}*/
-
-
-char *ewmh_get_window_title (Display *disp, Window win) {/*{{{*/
-    char *title_utf8;
-    char *wm_name;
-    char *net_wm_name;
-
-    wm_name = ewmh_get_property(disp, win, XA_STRING, "WM_NAME", NULL);
-    net_wm_name = ewmh_get_property(disp, win, 
-            XInternAtom(disp, "UTF8_STRING", False), "_NET_WM_NAME", NULL);
-
-    if (net_wm_name) {
-        title_utf8 = strdup(net_wm_name);
-    }
-    else {
-        if (wm_name) {
-            //title_utf8 = locale_to_utf8(wm_name, -1, NULL, NULL, NULL);  // TODO?
-            title_utf8 = strdup (wm_name);
-        }
-        else {
-            title_utf8 = NULL;
-        }
-    }
-
-    free(wm_name);
-    free(net_wm_name);
-    
-    return title_utf8;
-}/*}}}*/
-
-
-Window ewmh_get_active_window(Display *disp) {/*{{{*/
-    char *prop;
-    unsigned long size;
-    Window ret = (Window)0;
-    
-    prop = ewmh_get_property(disp, DefaultRootWindow(disp), XA_WINDOW, 
-                        "_NET_ACTIVE_WINDOW", &size);
-    if (prop) {
-        ret = *((Window*)prop);
-        free(prop);
-    }
-
-    return(ret);
-}/*}}}*/
-
-
-int ewmh_activate_window (Display *disp, Window win, /* {{{ */
-        bool switch_desktop) {
-    unsigned long *desktop;
-
-    /* desktop ID */
-    if ((desktop = (unsigned long *)ewmh_get_property(disp, win,
-            XA_CARDINAL, "_NET_WM_DESKTOP", NULL)) == NULL) {
-        if ((desktop = (unsigned long *)ewmh_get_property(disp, win,
-                XA_CARDINAL, "_WIN_WORKSPACE", NULL)) == NULL) {
-            p_verbose("Cannot find desktop ID of the window.\n");
-        }
-    }
-
-    if (switch_desktop && desktop) {
-        if (ewmh_client_msg(disp, DefaultRootWindow(disp), 
-                    "_NET_CURRENT_DESKTOP", 
-                    *desktop, 0, 0, 0, 0) != EXIT_SUCCESS) {
-            p_verbose("Cannot switch desktop.\n");
-        }
-        free(desktop);
-    }
-
-    ewmh_client_msg(disp, win, "_NET_ACTIVE_WINDOW", 
-            0, 0, 0, 0, 0);
-    XMapRaised(disp, win);
-
-    return EXIT_SUCCESS;
-}/*}}}*/
-
-
-Window *ewmh_get_client_list (Display *disp, unsigned long *size) {/*{{{*/
-    Window *client_list;
-
-    if ((client_list = (Window *)ewmh_get_property(disp, DefaultRootWindow(disp), 
-                    XA_WINDOW, "_NET_CLIENT_LIST", size)) == NULL) {
-        if ((client_list = (Window *)ewmh_get_property(disp, DefaultRootWindow(disp), 
-                        XA_CARDINAL, "_WIN_CLIENT_LIST", size)) == NULL) {
-            fputs("Cannot get client list properties. \n"
-                  "(_NET_CLIENT_LIST or _WIN_CLIENT_LIST)"
-                  "\n", stderr);
-            return NULL;
-        }
-    }
-
-    return client_list;
-}/*}}}*/
-
-
-//
-// ----------- MODIFIED functions from wmctrl --------------
-//
 
 //
 // return the name of EWMH-compatible WM
 // or NULL if not found
 //
-char* ewmh_wmName (Display *disp, Window root) {/*{{{*/
-    Window *sup_window = NULL;
-    char *wm_name = NULL;
-    //bool name_is_utf8 = true;
-    
-    if (! (sup_window = (Window *)ewmh_get_property(disp, root,
-                    XA_WINDOW, "_NET_SUPPORTING_WM_CHECK", NULL))) {
-        if (! (sup_window = (Window *)ewmh_get_property(disp, root,
-                        XA_CARDINAL, "_WIN_SUPPORTING_WM_CHECK", NULL))) {
-            p_verbose("Cannot get window manager info properties.\n"
-                  "(_NET_SUPPORTING_WM_CHECK or _WIN_SUPPORTING_WM_CHECK)\n");
-            return NULL;
-        }
-    }
+char* ewmh_getWmName (Display* dpy) {
 
-    /* WM_NAME */
-    if (! (wm_name = ewmh_get_property(disp, *sup_window,
-            XInternAtom(disp, "UTF8_STRING", False), "_NET_WM_NAME", NULL))) {
-        //name_is_utf8 = false;
-        if (! (wm_name = ewmh_get_property(disp, *sup_window,
-                XA_STRING, "_NET_WM_NAME", NULL))) {
-            p_verbose("Cannot get name of the window manager (_NET_WM_NAME).\n");
-        }
-    }
-    //name_out = get_output_str(wm_name, name_is_utf8); // or provide utf, as wmctrl?
-    
-    free(sup_window);
-    //free(wm_name); // TODO: leak ignored
-    
-    return wm_name;
-}/*}}}*/
+Window* chld_win;
+Window root;
+char* r;
+Atom utf8string;
 
-//
-// ----------------- our own ewmh functions ---------------
-//
+chld_win = (Window*)NULL;
+root = DefaultRootWindow (dpy);
+if (! (chld_win = (Window *)get_x_property (dpy, root, XA_WINDOW, "_NET_SUPPORTING_WM_CHECK", NULL))) {
+    if (! (chld_win = (Window *)get_x_property (dpy, root, XA_CARDINAL, "_WIN_SUPPORTING_WM_CHECK", NULL))) {
+        return (char*)NULL;
+    }
+}
+
+r = (char*)NULL;
+utf8string = XInternAtom (dpy, "UTF8_STRING", False);
+if (! (r = get_x_property (dpy, *chld_win, utf8string, "_NET_WM_NAME", NULL))) {
+    (r = get_x_property (dpy, *chld_win, XA_STRING, "_NET_WM_NAME", NULL));
+}
+
+free (chld_win);
+return r;
+}
 
 //
 // initialize winlist/startNdx
 // return 1 if ok
 //
-int ewmh_initWinlist (Display* dpy, bool direction)
+int ewmh_initWinlist (Display* dpy)
 {
-
 Window *client_list;
 unsigned long client_list_size;
 int i;
+Window aw, root;
+char *awp;
+unsigned long sz;
+char* title;
 
-Window aw = ewmh_get_active_window (dpy);
+aw = (Window)0;
+root = DefaultRootWindow (dpy);
 
-if ((client_list = ewmh_get_client_list (dpy, &client_list_size)) == NULL) {
-    return 0;
+if ((awp = get_x_property (dpy, root, XA_WINDOW, "_NET_ACTIVE_WINDOW", &sz))) {
+    aw = *((Window*)awp);
+    free(awp);
+} else {
+    if (g.debug>0) fprintf (stderr, "can't obtain _NET_ACTIVE_WINDOW\n");
+    // not mandatory
 }
+
+if ((client_list = (Window *)get_x_property (dpy, root, XA_WINDOW, "_NET_CLIENT_LIST", &client_list_size)) == NULL) {
+    if ((client_list = (Window *)get_x_property(dpy, root, XA_CARDINAL, "_WIN_CLIENT_LIST", &client_list_size)) == NULL) {
+        fprintf (stderr, "can't get client list\n");
+        return 0;
+    }
+}
+
 for (i = 0; i < client_list_size / sizeof(Window); i++) {
     Window w = client_list[i];
-    char *title_utf8 = ewmh_get_window_title (dpy, w); /* UTF8 */
-    //char *title_out = get_output_str(title_utf8, true); // TODO: merge this from wmctrl?
-    char *title_out = title_utf8;
-    addWindowInfo (dpy, w, 0, 0, title_out);
+
+    // build title
+    char* wmn1 = get_x_property (dpy, w, XA_STRING, "WM_NAME", NULL);
+    Atom utf8str = XInternAtom (dpy, "UTF8_STRING", False);
+    char* wmn2 = get_x_property (dpy, w, utf8str, "_NET_WM_NAME", NULL);
+    title = wmn2 ? strdup (wmn2) : 
+        (wmn1 ? strdup (wmn1) : NULL);
+    free(wmn1);
+    free(wmn2);
+
+    addWindowInfo (dpy, w, 0, 0, title);
     if (w == aw) { g.startNdx = i; }
 }
 
@@ -303,6 +113,22 @@ return 1;
 //
 int ewmh_setFocus (Display* dpy, int winNdx)
 {
-return (ewmh_activate_window (dpy, g.winlist[winNdx].id, true) == EXIT_SUCCESS) ? 1 : 0;
+Window root = DefaultRootWindow (dpy);
+Window win = g.winlist[winNdx].id;
+XEvent evt;
+long rn_mask = SubstructureRedirectMask | SubstructureNotifyMask;
+
+evt.xclient.window = win;
+evt.xclient.type = ClientMessage;
+evt.xclient.message_type = XInternAtom (dpy, "_NET_ACTIVE_WINDOW", False);
+evt.xclient.serial = 0;
+evt.xclient.send_event = True;
+evt.xclient.format = 32;
+if (!XSendEvent (dpy, root, False, rn_mask, &evt)) {
+    fprintf (stderr, "ewmh_activate_window: can't send xevent\n");
+}
+
+XMapRaised (dpy, win);
+return 1;
 }
 

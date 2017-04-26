@@ -19,6 +19,8 @@ b) the "Artistic License".
 #include <X11/Xutil.h>
 #include <X11/Xft/Xft.h>
 
+#define MAXPROPLEN  4096
+
 // for ignoring X errors (see handler code and notes/xlib)
 XErrorEvent* ee_ignored;
 bool ee_complain;
@@ -39,5 +41,7 @@ int drawMultiLine (Display* dpy, Drawable d, XftFont* font, XftColor* xftcolor, 
 int drawMultiLine_test ();
 
 Bool predproc_true (Display* display, XEvent* event, char* arg);
+
+char* get_x_property (Display* dpy, Window win, Atom prop_type, char* prop_name, unsigned long* prop_size);
 
 #endif

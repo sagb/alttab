@@ -123,7 +123,7 @@ if (wmindex) g.option_wm = strtol (wmindex, &endptr, 0);
 if ((endptr!=NULL) && (*endptr=='\0') && (g.option_wm>=WM_MIN) && (g.option_wm<=WM_MAX)) goto wmDone;
 if (g.debug>0) {fprintf (stderr, "no WM index or unknown, guessing\n");}
 // EWMH?
-char* ewmn = ewmh_wmName (dpy, root);
+char* ewmn = ewmh_getWmName (dpy);
 if (ewmn!=NULL) {
     if (g.debug>0) {fprintf(stderr, "EWMH-compatible WM detected: %s\n", ewmn);}
     g.option_wm = WM_EWMH;

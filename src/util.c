@@ -423,3 +423,52 @@ char *arg;
 return (True);
 }
 
+//
+// obtain X Window property
+//
+char* get_x_property (Display* dpy, Window win, Atom prop_type, char* prop_name, unsigned long* prop_size) {
+
+int prop_ret_fmt;
+unsigned long n_prop_ret_items, ret_bytes_after, size;
+unsigned char* ret_prop;
+char *r;
+Atom prop_name_x, prop_ret_type_x;
+
+int debug = 0;
+
+prop_name_x = XInternAtom (dpy, prop_name, False);
+
+ee_complain = false;
+Status propstatus = XGetWindowProperty (dpy, win, prop_name_x, 0, MAXPROPLEN/4, False, prop_type, &prop_ret_type_x, &prop_ret_fmt, &n_prop_ret_items, &ret_bytes_after, &ret_prop);
+XSync (dpy, False); // for error to "appear"
+ee_complain = true;
+
+if (propstatus != Success) {
+    fprintf (stderr, "get_x_property: XGetWindowProperty failed (win %ld, prop %s)\n", win, prop_name);
+    return (char*)NULL;
+}
+
+if (prop_type != prop_ret_type_x) {
+    // this diagnostic may cause BadAtom
+    if (debug>1) fprintf (stderr, "get_x_property: prop type doesn't match (win %ld, prop %s, requested: %s, obtained: %s)\n", win, prop_name, 
+        (prop_type==0) ? "0" : XGetAtomName(dpy,prop_type),
+        (prop_ret_type_x==0) ? "0" : XGetAtomName(dpy,prop_ret_type_x));
+    XFree (ret_prop);
+    return (char*)NULL;
+}
+
+size = (prop_ret_fmt / 8) * n_prop_ret_items;
+if (prop_ret_fmt==32) {
+    size *= sizeof(long)/4;
+}
+r = malloc (size+1);
+memcpy (r, ret_prop, size);
+r[size] = '\0';
+if (prop_size) {
+    *prop_size = size;
+}
+
+XFree (ret_prop);
+return r;
+}
+

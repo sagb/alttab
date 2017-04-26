@@ -116,27 +116,15 @@ void freeWinlist (Display* dpy);
 int setFocus (Display* dpy, int winNdx);
 int rp_startupWintasks();
 int x_initWindowsInfoRecursive (Display* dpy,Window win,int reclevel);
-int rp_initWinlist (Display* dpy, bool direction);
+int rp_initWinlist (Display* dpy);
 int x_setFocus (Display* dpy, int wndx);
 int rp_setFocus (int winNdx);
 int execAndReadStdout(char* exe, char* args[], char* buf, int bufsize);
 int pulloutWindowToTop (int winNdx);
 
 /* EWHM */
-Window *ewmh_get_client_list (Display *disp, unsigned long *size);
-int ewmh_client_msg(Display *disp, Window win, char *msg, 
-        unsigned long data0, unsigned long data1, 
-        unsigned long data2, unsigned long data3,
-        unsigned long data4);
-int ewmh_activate_window (Display *disp, Window win, 
-        bool switch_desktop);
-char *ewmh_get_window_title (Display *disp, Window win);
-char *ewmh_get_property (Display *disp, Window win, 
-        Atom xa_prop_type, char *prop_name, unsigned long *size);
-Window ewmh_get_active_window(Display *dpy);
-// our
-char* ewmh_wmName (Display *disp, Window root);
-int ewmh_initWinlist (Display* dpy, bool direction);
+char* ewmh_getWmName (Display* dpy);
+int ewmh_initWinlist (Display* dpy);
 int ewmh_setFocus (Display* dpy, int winNdx);
 
 #endif

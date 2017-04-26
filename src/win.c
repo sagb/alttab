@@ -203,10 +203,10 @@ switch (g.option_wm) {
     r = x_initWindowsInfoRecursive (dpy, root, 0); // note: direction/current window index aren't used
     break;
   case WM_RATPOISON:
-    r = rp_initWinlist (dpy, direction);
+    r = rp_initWinlist (dpy);
     break;
   case WM_EWMH:
-    r = ewmh_initWinlist (dpy, direction);
+    r = ewmh_initWinlist (dpy);
     break;
   default:
     r = 0;

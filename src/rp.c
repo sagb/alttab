@@ -81,7 +81,7 @@ return 1;
 //
 // initialize winlist/startNdx/update sortlist from ratpoison output
 //
-int rp_initWinlist (Display* dpy, bool direction) {
+int rp_initWinlist (Display* dpy) {
 
 char* args[] = { "ratpoison", "-c", "windows %n %i %s %t", NULL };
 char buf[MAXRPOUT];
