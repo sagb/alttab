@@ -148,7 +148,7 @@ int addWindowInfo(Display * dpy, Window win, int reclevel, int wm_id,
 						"icon dimensions unknown (%s)\n",
 						g.winlist[g.maxNdx].name);
 				}
-				// TODO: placeholder?
+				// probably draw placeholder?
 				g.winlist[g.maxNdx].icon_drawable = 0;
 			} else {
 				if (g.debug > 1) {

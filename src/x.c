@@ -79,7 +79,7 @@ if (g.debug>1) {fprintf (stderr, "win: %x leader: %x\n", win, leader);}
 */
 // add viewable only
 // caveat: in rp, skips anything except of visible window
-// TODO: add an option for this in WMs too
+// probably add an option for this in WMs too?
 	XGetWindowAttributes(dpy, win, &wa);
 
 // insert detailed window data in window list
@@ -119,7 +119,9 @@ int x_setFocus(Display * dpy, int wndx)
 {
 	Window w = g.winlist[wndx].id;
 
-// TODO: 1. XWarpPointer
+// 1. XWarpPointer
+// If such WMs would be discovered that prevent our focus
+// AND set their own focus via the pointer only.
 
 // 2. XRaiseWindow required, but doesn't make window "Viewable"
 	XRaiseWindow(dpy, w);
