@@ -27,6 +27,5 @@ autoreconf -vi $ac_flag
 cd doc
 if [ alttab.1.ronn -nt alttab.1 -o "$force" \= "yes" ] ; then
     ronn --roff alttab.1.ronn
-    MANWIDTH=80 man -l alttab.1 > alttab.1.txt
 fi
 
