@@ -151,6 +151,7 @@ int execAndReadStdout(char *exe, char *args[], char *buf, int bufsize)
 {
 	int link[2];
 	pid_t pid;
+    ssize_t rb;
 
 	if (pipe(link) == -1) {
 		perror("pipe");
@@ -169,7 +170,9 @@ int execAndReadStdout(char *exe, char *args[], char *buf, int bufsize)
 		return 0;
 	} else {
 		close(link[1]);
-		(void)read(link[0], buf, bufsize);
+		rb = read(link[0], buf, bufsize);
+        if (rb == -1)
+            *buf = '\0';
 //printf("Output: (%.*s)\n", nbytes, buf);
 		close(link[0]);
 		wait(NULL);
