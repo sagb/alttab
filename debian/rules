@@ -1,0 +1,10 @@
+#!/usr/bin/make -f
+
+%:
+	dh $@ --with autotools_dev
+
+# alttab: allow this hook when upstream will prepare something
+# important in bootstrap.sh, besides of autotools and man page.
+#override_dh_autoreconf:
+#	dh_autoreconf ./bootstrap.sh -f
+
