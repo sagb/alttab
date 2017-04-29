@@ -17,8 +17,6 @@ to the usage of lightweight WM.
 Usage
 -----
 
-See INSTALL.md for installation.
-
 Usually it should run fully functional without any argument.
 Start alttab after WM, to let it auto-recognize the WM. For examples, add
 the following to ~/.ratpoisonrc:
