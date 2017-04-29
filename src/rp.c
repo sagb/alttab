@@ -46,19 +46,18 @@ int rp_startupWintasks()
 	ratpoison_cmd = (char *)malloc(MAXPATHSZ);	// we don't free it, hopefully run only once
 	FILE *fp;
     char *fr;
-    char *errpr = "can't find ratpoison executable\n";
 // search in PATH on startup only,
 // then execv() for speed
 	if ((fp = popen("which ratpoison", "r"))) {
 		fr = fgets(ratpoison_cmd, MAXPATHSZ, fp);
         if (fr == NULL) {
-		    fprintf(stderr, errpr);
+		    fprintf(stderr, "can't find ratpoison executable\n");
 		    return 0;
         }
 		pclose(fp);
 	}
 	if (strlen(ratpoison_cmd) < 2) {
-		fprintf(stderr, errpr);
+		fprintf(stderr, "can't find ratpoison executable\n");
 		return 0;
 	} else {
 		ratpoison_cmd[strcspn(ratpoison_cmd, "\r\n")] = 0;
