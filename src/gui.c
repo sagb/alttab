@@ -457,7 +457,7 @@ void uiExpose(Display * dpy, Window root)
 }
 
 //
-// remove ui and switch to choosen window
+// remove ui and switch to chosen window
 //
 int uiHide(Display * dpy, Window root)
 {

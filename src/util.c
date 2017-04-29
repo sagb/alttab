@@ -76,7 +76,7 @@ int zeroErrorHandler(Display * display, XErrorEvent * theEvent)
 
 //
 // grab/ungrab including all modifier combinations
-// returns 1 if sucess, 0 if fail (f.e., BadAccess).
+// returns 1 if success, 0 if fail (f.e., BadAccess).
 // Grabs are not restored on failure.
 //
 int changeKeygrab(Display * dpy, Window win, bool grab, KeyCode keycode,
