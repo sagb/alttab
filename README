@@ -9,8 +9,8 @@ or standalone X11 session.
 
 Unlike task switchers integrated in most simple window managers (WM) or
 dmenu-like switchers, alttab features visual interface and convenient
-tactile behaviour: press modifier (Alt) - switch with key (Tab) -
-release modifier.
+tactile behaviour: press modifier (Alt) - multiple switch with
+a key (Tab) - release modifier.
 Also, it's lightweight and depends only on basic X11 libs, conforming
 to the usage of lightweight WM.
 
