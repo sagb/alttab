@@ -6,5 +6,5 @@ pgpsigurlmangle=s%^.*/v?(\d+\.\d+\.\d+)\.tar\.gz$%https://sagb.github.io/alttab/
 https://github.com/sagb/alttab/tags \
 (?:.*?/)?v?(\d+\.\d+\.\d+)\.tar\.gz \
 debian \
-echo
+uupdate
 
