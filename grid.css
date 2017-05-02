@@ -1,7 +1,14 @@
 
+body {
+    font: 18px/1.8em 'Open Sans', Helvetica, Arial, Helvetica, sans-serif;
+    color: #444;
+    background: #fff;
+    -webkit-font-smoothing: antialiased;
+}
+
 #container-0 {
   margin: 0 auto;
-  width: 80%;
+  width: 800px;
   margin-bottom: 50px;
 }
 
