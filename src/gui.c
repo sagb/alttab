@@ -326,15 +326,30 @@ int uiShow(Display * dpy, Window root, bool direction)
 			if (g.winlist[m].icon_w == iconW &&
 			    g.winlist[m].icon_h == iconH) {
 				// direct copy
-				// TODO: preserve x/y ratio instead of scaling (xcalc)
 				if (g.debug > 1) {
 					fprintf(stderr, "%d: copying icon\n",
 						m);
 				}
+				// prepare special GC to copy icon, with clip mask if icon_mask present
+				unsigned long ic_valuemask = 0;
+				XGCValues ic_values;
+				GC ic_gc =
+				    XCreateGC(dpy, root, ic_valuemask,
+					      &ic_values);
+				if (ic_gc < 0) {
+					fprintf(stderr,
+						"can't create GC to draw icon\n");
+					return 0;
+				}
+				if (g.winlist[m].icon_mask != 0) {
+					XSetClipMask(dpy, ic_gc,
+						     g.winlist[m].icon_mask);
+				}
+
 				int or = XCopyArea(dpy,
 						   g.winlist[m].icon_drawable,
 						   g.winlist[m].tile,
-						   g.gcDirect, 0, 0,
+						   ic_gc, 0, 0,
 						   g.winlist[m].icon_w, g.winlist[m].icon_h,	// src
 						   0, 0);	// dst
 				if (!or) {
@@ -349,6 +364,7 @@ int uiShow(Display * dpy, Window root, bool direction)
 				}
 				int sc = pixmapFit(dpy, scrNum, root,
 						   g.winlist[m].icon_drawable,
+						   g.winlist[m].icon_mask,
 						   g.winlist[m].tile,
 						   g.winlist[m].icon_w,
 						   g.winlist[m].icon_h,

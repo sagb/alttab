@@ -106,6 +106,7 @@ int addWindowInfo(Display * dpy, Window win, int reclevel, int wm_id,
 //    understand hints->icon_window. for xterm, it seems not usable.
 	XWMHints *hints;
 	g.winlist[g.maxNdx].icon_drawable =
+	    g.winlist[g.maxNdx].icon_mask =
 	    g.winlist[g.maxNdx].icon_w = g.winlist[g.maxNdx].icon_h = 0;
 	unsigned int icon_depth = 0;
 	g.winlist[g.maxNdx].icon_allocated = false;
@@ -118,9 +119,8 @@ int addWindowInfo(Display * dpy, Window win, int reclevel, int wm_id,
 				hints->icon_mask, hints->flags & IconWindowHint,
 				hints->icon_window);
 		}
-		if ((hints->
-		     flags & IconWindowHint) & (!(hints->
-						  flags & IconPixmapHint))) {
+		if ((hints->flags & IconWindowHint) &
+		    (!(hints->flags & IconPixmapHint))) {
 			if (g.debug > 0) {
 				fprintf(stderr,
 					"attention: icon_window without icon_pixmap in hints, ignoring it assuming it's not usable, like in xterm\n");
@@ -131,6 +131,8 @@ int addWindowInfo(Display * dpy, Window win, int reclevel, int wm_id,
 //            ((hints->flags & IconPixmapHint) ?  hints->icon_pixmap : (
 //            (hints->flags & IconWindowHint) ?  hints->icon_window : 0
 //            );
+		g.winlist[g.maxNdx].icon_mask =
+		    (hints->flags & IconMaskHint) ? hints->icon_mask : 0;
 		XFree(hints);
 		// extract icon width/height
 		Window root_return;
@@ -287,11 +289,11 @@ int initWinlist(Display * dpy, Window root, bool direction)
 	    ((g.startNdx < 1
 	      || g.startNdx >=
 	      g.maxNdx) ? (g.maxNdx - 1) : (g.startNdx - 1)) : ((g.startNdx < 0
-								 || g.
-								 startNdx >=
+								 || g.startNdx
+								 >=
 								 (g.maxNdx -
-								  1)) ? 0 : g.
-								startNdx + 1);
+								  1)) ? 0 :
+								g.startNdx + 1);
 //if (g.selNdx<0 || g.selNdx>=g.maxNdx) { g.selNdx=0; } // just for case
 	if (g.debug > 1) {
 		fprintf(stderr,

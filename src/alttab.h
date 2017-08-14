@@ -64,6 +64,7 @@ typedef struct {
 	char name[MAXNAMESZ];
 	int reclevel;
 	Pixmap icon_drawable;	// Window or Pixmap
+    Pixmap icon_mask;
 	unsigned int icon_w, icon_h;
 	bool icon_allocated;	// we need to free icon, because we created it (placeholder or depth conversion)
 	Pixmap tile;		// ready to display. w/h are all equal and defined in gui.c

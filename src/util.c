@@ -181,13 +181,13 @@ int execAndReadStdout(char *exe, char *args[], char *buf, int bufsize)
 }
 
 //
-// Fit the src drawable into dst,
+// Fit the src/src_mask drawable into dst,
 // centering and preserving aspect ratio
 // Slow but extension-independent version
 // 1=success 0=fail
 //
 int pixmapFitGeneric(Display * dpy, int scrNum, Window win,
-		     Drawable src, Drawable dst,
+		     Drawable src, Pixmap src_mask, Drawable dst,
 		     unsigned int srcW, unsigned int srcH,
 		     unsigned int dstWscal, unsigned int dstHscal,
 		     unsigned int dstWoff, unsigned int dstHoff)
@@ -206,11 +206,25 @@ int pixmapFitGeneric(Display * dpy, int scrNum, Window win,
 		XFreeGC(dpy, gc);
 		return 0;
 	}
+	XImage *maski;
+	if (src_mask != 0) {
+		maski = XGetImage(dpy, src_mask, 0, 0, srcW, srcH,
+				  0xffffffff, XYPixmap);
+		if (!maski) {
+			fprintf(stderr, "XGetImage failed for the mask\n");
+			XFreeGC(dpy, gc);
+			return 0;
+		}
+	}
 	unsigned long pixel;
 	int x, y;
 	int re = 0;
 	for (x = 0; x < dstWscal; x++) {
 		for (y = 0; y < dstHscal; y++) {
+			if (src_mask != 0
+			    && XGetPixel(maski, x * srcW / dstWscal,
+					 y * srcH / dstHscal) == 0)
+				continue;
 			pixel =
 			    XGetPixel(srci, x * srcW / dstWscal,
 				      y * srcH / dstHscal);
@@ -233,29 +247,40 @@ int pixmapFitGeneric(Display * dpy, int scrNum, Window win,
 }
 
 //
-// Fit the src drawable into dst,
+// Fit the src/src_mask drawable into dst,
 // centering and preserving aspect ratio
 // XRender version
 // 1=success 0=fail
 //
 int pixmapFitXrender(Display * dpy, int scrNum, Window win,
-		     Drawable src, Drawable dst,
+		     Drawable src, Pixmap src_mask, Drawable dst,
 		     unsigned int srcW, unsigned int srcH,
 		     unsigned int dstWscal, unsigned int dstHscal,
 		     unsigned int dstWoff, unsigned int dstHoff)
 {
-	Picture Psrc, Pdst;
-	XRenderPictFormat *format;
+	Picture Psrc, Pmask, Pdst;
+	XRenderPictFormat *format, *format_of_mask;
 	XTransform transform;
 
-	format = XRenderFindStandardFormat(dpy, PictStandardRGB24);
+	format = XRenderFindVisualFormat(dpy, DefaultVisual(dpy, 0));
 	if (!format) {
-		fprintf(stderr, "error, couldnt find valid Xrender format\n");
+		fprintf(stderr, "error, couldn't find valid Xrender format\n");
+		return 0;
+	}
+	format_of_mask = XRenderFindStandardFormat(dpy, PictStandardA1);
+	if (!format_of_mask) {
+		fprintf(stderr,
+			"error, couldn't find valid Xrender format for mask\n");
 		return 0;
 	}
 	Psrc = XRenderCreatePicture(dpy, src, format, 0, NULL);
+	Pmask =
+	    (src_mask != 0) ? XRenderCreatePicture(dpy, src_mask,
+						   format_of_mask, 0, NULL) : 0;
 	Pdst = XRenderCreatePicture(dpy, dst, format, 0, NULL);
 	XRenderSetPictureFilter(dpy, Psrc, FilterBilinear, 0, 0);
+	if (Pmask != 0)
+		XRenderSetPictureFilter(dpy, Pmask, FilterBilinear, 0, 0);
 	transform.matrix[0][0] = (srcW << 16) / dstWscal;
 	transform.matrix[0][1] = 0;
 	transform.matrix[0][2] = 0;
@@ -266,21 +291,25 @@ int pixmapFitXrender(Display * dpy, int scrNum, Window win,
 	transform.matrix[2][1] = 0;
 	transform.matrix[2][2] = XDoubleToFixed(1.0);
 	XRenderSetPictureTransform(dpy, Psrc, &transform);
-	XRenderComposite(dpy, PictOpSrc, Psrc, 0, Pdst, 0, 0, 0, 0, dstWoff,
-			 dstHoff, dstWscal, dstHscal);
+	if (Pmask != 0)
+		XRenderSetPictureTransform(dpy, Pmask, &transform);
+	XRenderComposite(dpy, PictOpOver, Psrc, Pmask, Pdst, 0, 0, 0, 0,
+			 dstWoff, dstHoff, dstWscal, dstHscal);
 	XRenderFreePicture(dpy, Psrc);
 	XRenderFreePicture(dpy, Pdst);
+	if (Pmask != 0)
+		XRenderFreePicture(dpy, Pmask);
 
 	return 1;
 }
 
 //
-// Fit the src drawable into dst,
+// Fit the src/src_mask drawable into dst,
 // centering and preserving aspect ratio
 // 1=success 0=fail
 //
 int pixmapFit(Display * dpy, int scrNum, Window win,
-	      Drawable src, Drawable dst,
+	      Drawable src, Pixmap src_mask, Drawable dst,
 	      unsigned int srcW, unsigned int srcH,
 	      unsigned int dstW, unsigned int dstH)
 {
@@ -307,18 +336,13 @@ int pixmapFit(Display * dpy, int scrNum, Window win,
 	}
 
 	return XRenderQueryExtension(dpy, &event_basep, &error_basep) == True ?
-	    pixmapFitXrender(dpy, scrNum, win, src, dst, srcW, srcH, dstWscal,
-			     dstHscal, dstWoff, dstHoff) : pixmapFitGeneric(dpy,
-									    scrNum,
-									    win,
-									    src,
-									    dst,
-									    srcW,
-									    srcH,
-									    dstWscal,
-									    dstHscal,
-									    dstWoff,
-									    dstHoff);
+	    pixmapFitXrender(dpy, scrNum, win, src, src_mask, dst, srcW, srcH,
+			     dstWscal, dstHscal, dstWoff,
+			     dstHoff) : pixmapFitGeneric(dpy, scrNum, win, src,
+							 src_mask, dst, srcW,
+							 srcH, dstWscal,
+							 dstHscal, dstWoff,
+							 dstHoff);
 }
 
 //
