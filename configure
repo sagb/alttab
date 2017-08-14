@@ -586,6 +586,8 @@ ac_subst_vars='am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
 LIBOBJS
+xrender_LIBS
+xrender_CFLAGS
 xft_LIBS
 xft_CFLAGS
 x11_LIBS
@@ -695,7 +697,9 @@ PKG_CONFIG_LIBDIR
 x11_CFLAGS
 x11_LIBS
 xft_CFLAGS
-xft_LIBS'
+xft_LIBS
+xrender_CFLAGS
+xrender_LIBS'
 
 
 # Initialize some variables set by options.
@@ -1334,6 +1338,10 @@ Some influential environment variables:
   x11_LIBS    linker flags for x11, overriding pkg-config
   xft_CFLAGS  C compiler flags for xft, overriding pkg-config
   xft_LIBS    linker flags for xft, overriding pkg-config
+  xrender_CFLAGS
+              C compiler flags for xrender, overriding pkg-config
+  xrender_LIBS
+              linker flags for xrender, overriding pkg-config
 
 Use these variables to override the choices made by `configure' or to help
 it to find libraries and programs with nonstandard names/locations.
@@ -3752,6 +3760,97 @@ See \`config.log' for more details" "$LINENO" 5; }
 else
 	xft_CFLAGS=$pkg_cv_xft_CFLAGS
 	xft_LIBS=$pkg_cv_xft_LIBS
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+fi
+
+pkg_failed=no
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for xrender" >&5
+$as_echo_n "checking for xrender... " >&6; }
+
+if test -n "$xrender_CFLAGS"; then
+    pkg_cv_xrender_CFLAGS="$xrender_CFLAGS"
+ elif test -n "$PKG_CONFIG"; then
+    if test -n "$PKG_CONFIG" && \
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"xrender\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "xrender") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_xrender_CFLAGS=`$PKG_CONFIG --cflags "xrender" 2>/dev/null`
+		      test "x$?" != "x0" && pkg_failed=yes
+else
+  pkg_failed=yes
+fi
+ else
+    pkg_failed=untried
+fi
+if test -n "$xrender_LIBS"; then
+    pkg_cv_xrender_LIBS="$xrender_LIBS"
+ elif test -n "$PKG_CONFIG"; then
+    if test -n "$PKG_CONFIG" && \
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"xrender\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "xrender") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_xrender_LIBS=`$PKG_CONFIG --libs "xrender" 2>/dev/null`
+		      test "x$?" != "x0" && pkg_failed=yes
+else
+  pkg_failed=yes
+fi
+ else
+    pkg_failed=untried
+fi
+
+
+
+if test $pkg_failed = yes; then
+   	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
+        _pkg_short_errors_supported=yes
+else
+        _pkg_short_errors_supported=no
+fi
+        if test $_pkg_short_errors_supported = yes; then
+	        xrender_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "xrender" 2>&1`
+        else
+	        xrender_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "xrender" 2>&1`
+        fi
+	# Put the nasty error message in config.log where it belongs
+	echo "$xrender_PKG_ERRORS" >&5
+
+	as_fn_error $? "Package requirements (xrender) were not met:
+
+$xrender_PKG_ERRORS
+
+Consider adjusting the PKG_CONFIG_PATH environment variable if you
+installed software in a non-standard prefix.
+
+Alternatively, you may set the environment variables xrender_CFLAGS
+and xrender_LIBS to avoid the need to call pkg-config.
+See the pkg-config man page for more details." "$LINENO" 5
+elif test $pkg_failed = untried; then
+     	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+	{ { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error $? "The pkg-config script could not be found or is too old.  Make sure it
+is in your PATH or set the PKG_CONFIG environment variable to the full
+path to pkg-config.
+
+Alternatively, you may set the environment variables xrender_CFLAGS
+and xrender_LIBS to avoid the need to call pkg-config.
+See the pkg-config man page for more details.
+
+To get pkg-config, see <http://pkg-config.freedesktop.org/>.
+See \`config.log' for more details" "$LINENO" 5; }
+else
+	xrender_CFLAGS=$pkg_cv_xrender_CFLAGS
+	xrender_LIBS=$pkg_cv_xrender_LIBS
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 

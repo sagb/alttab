@@ -151,7 +151,7 @@ int execAndReadStdout(char *exe, char *args[], char *buf, int bufsize)
 {
 	int link[2];
 	pid_t pid;
-    ssize_t rb;
+	ssize_t rb;
 
 	if (pipe(link) == -1) {
 		perror("pipe");
@@ -171,8 +171,8 @@ int execAndReadStdout(char *exe, char *args[], char *buf, int bufsize)
 	} else {
 		close(link[1]);
 		rb = read(link[0], buf, bufsize);
-        if (rb == -1)
-            *buf = '\0';
+		if (rb == -1)
+			*buf = '\0';
 //printf("Output: (%.*s)\n", nbytes, buf);
 		close(link[0]);
 		wait(NULL);
@@ -181,17 +181,14 @@ int execAndReadStdout(char *exe, char *args[], char *buf, int bufsize)
 }
 
 //
-// Scale drawable from 0,0
-// Return 1=success 0=fail
-// TODO: for speed, scale image->image without X11 calls,
-//   then transform to Pixmap
+// Scale the drawable: extension-independent version
+// 1=success 0=fail
 //
-int pixmapScale(Display * dpy, int scrNum, Window win,
-		Drawable src, Drawable dst,
-		unsigned int srcW, unsigned int srcH,
-		unsigned int dstW, unsigned int dstH)
+int pixmapScaleGeneric(Display * dpy, int scrNum, Window win,
+		       Drawable src, Drawable dst,
+		       unsigned int srcW, unsigned int srcH,
+		       unsigned int dstW, unsigned int dstH)
 {
-//if (srcW==dstW && srcH==dstH)  TODO: xcopyarea, though redundant
 	unsigned long valuemask = 0;
 	XGCValues values;
 	GC gc = XCreateGC(dpy, win, valuemask, &values);
@@ -229,6 +226,65 @@ int pixmapScale(Display * dpy, int scrNum, Window win,
 	XDestroyImage(srci);
 	XFreeGC(dpy, gc);
 	return 1;
+}
+
+//
+// Scale the drawable: XRender version
+// 1=success 0=fail
+//
+int pixmapScaleXrender(Display * dpy, int scrNum, Window win,
+		       Drawable src, Drawable dst,
+		       unsigned int srcW, unsigned int srcH,
+		       unsigned int dstW, unsigned int dstH)
+{
+	Picture Psrc, Pdst;
+	XRenderPictFormat *format;
+	XTransform transform;
+	double xScale, yScale;
+
+	format = XRenderFindStandardFormat(dpy, PictStandardRGB24);
+	if (!format) {
+		fprintf(stderr, "error, couldnt find valid Xrender format\n");
+		return 0;
+	}
+	Psrc = XRenderCreatePicture(dpy, src, format, 0, NULL);
+	Pdst = XRenderCreatePicture(dpy, dst, format, 0, NULL);
+	XRenderSetPictureFilter(dpy, Psrc, FilterBilinear, 0, 0);
+	xScale = (double)srcW / (double)dstW;
+	yScale = (double)srcH / (double)dstH;
+	transform.matrix[0][0] = XDoubleToFixed(xScale);
+	transform.matrix[0][1] = XDoubleToFixed(0.0);
+	transform.matrix[0][2] = XDoubleToFixed(0.0);
+	transform.matrix[1][0] = XDoubleToFixed(0.0);
+	transform.matrix[1][1] = XDoubleToFixed(yScale);
+	transform.matrix[1][2] = XDoubleToFixed(0.0);
+	transform.matrix[2][0] = XDoubleToFixed(0.0);
+	transform.matrix[2][1] = XDoubleToFixed(0.0);
+	transform.matrix[2][2] = XDoubleToFixed(1.0);
+	XRenderSetPictureTransform(dpy, Psrc, &transform);
+	XRenderComposite(dpy, PictOpSrc, Psrc, 0, Pdst, 0, 0, 0, 0, 0, 0, dstW,
+			 dstH);
+	XRenderFreePicture(dpy, Psrc);
+	XRenderFreePicture(dpy, Pdst);
+
+	return 1;
+}
+
+//
+// Scale the drawable
+// 1=success 0=fail
+//
+int pixmapScale(Display * dpy, int scrNum, Window win,
+		Drawable src, Drawable dst,
+		unsigned int srcW, unsigned int srcH,
+		unsigned int dstW, unsigned int dstH)
+{
+	int event_basep, error_basep;
+	return XRenderQueryExtension(dpy, &event_basep, &error_basep) == True ?
+	    pixmapScaleXrender(dpy, scrNum, win, src, dst, srcW, srcH, dstW,
+			       dstH) : pixmapScaleGeneric(dpy, scrNum, win, src,
+							  dst, srcW, srcH, dstW,
+							  dstH);
 }
 
 //

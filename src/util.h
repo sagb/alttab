@@ -26,6 +26,7 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/Xft/Xft.h>
+#include <X11/extensions/Xrender.h>
 
 #define MAXPROPLEN  4096
 
@@ -40,6 +41,12 @@ void setSelectInput(Display * dpy, Window win, int reg);
 
 int execAndReadStdout(char *exe, char *args[], char *buf, int bufsize);
 
+int pixmapScaleGeneric(Display * dpy, int scrNum, Window win, Drawable src,
+		Drawable dst, unsigned int srcW, unsigned int srcH,
+		unsigned int dstW, unsigned int dstH);
+int pixmapScaleXrender(Display * dpy, int scrNum, Window win, Drawable src,
+		Drawable dst, unsigned int srcW, unsigned int srcH,
+		unsigned int dstW, unsigned int dstH);
 int pixmapScale(Display * dpy, int scrNum, Window win, Drawable src,
 		Drawable dst, unsigned int srcW, unsigned int srcH,
 		unsigned int dstW, unsigned int dstH);

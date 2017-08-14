@@ -231,6 +231,8 @@ x11_CFLAGS = @x11_CFLAGS@
 x11_LIBS = @x11_LIBS@
 xft_CFLAGS = @xft_CFLAGS@
 xft_LIBS = @xft_LIBS@
+xrender_CFLAGS = @xrender_CFLAGS@
+xrender_LIBS = @xrender_LIBS@
 man_MANS = alttab.1
 dist_doc_DATA = xmonad.md ../README
 all: all-am
