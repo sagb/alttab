@@ -347,12 +347,12 @@ int uiShow(Display * dpy, Window root, bool direction)
 					fprintf(stderr, "%d: scaling icon\n",
 						m);
 				}
-				int sc = pixmapScale(dpy, scrNum, root,
-						     g.winlist[m].icon_drawable,
-						     g.winlist[m].tile,
-						     g.winlist[m].icon_w,
-						     g.winlist[m].icon_h,
-						     iconW, iconH);
+				int sc = pixmapFit(dpy, scrNum, root,
+						   g.winlist[m].icon_drawable,
+						   g.winlist[m].tile,
+						   g.winlist[m].icon_w,
+						   g.winlist[m].icon_h,
+						   iconW, iconH);
 				if (!sc) {
 					fprintf(stderr,
 						"can't scale icon to tile\n");

@@ -181,13 +181,16 @@ int execAndReadStdout(char *exe, char *args[], char *buf, int bufsize)
 }
 
 //
-// Scale the drawable: extension-independent version
+// Fit the src drawable into dst,
+// centering and preserving aspect ratio
+// Slow but extension-independent version
 // 1=success 0=fail
 //
-int pixmapScaleGeneric(Display * dpy, int scrNum, Window win,
-		       Drawable src, Drawable dst,
-		       unsigned int srcW, unsigned int srcH,
-		       unsigned int dstW, unsigned int dstH)
+int pixmapFitGeneric(Display * dpy, int scrNum, Window win,
+		     Drawable src, Drawable dst,
+		     unsigned int srcW, unsigned int srcH,
+		     unsigned int dstWscal, unsigned int dstHscal,
+		     unsigned int dstWoff, unsigned int dstHoff)
 {
 	unsigned long valuemask = 0;
 	XGCValues values;
@@ -206,13 +209,14 @@ int pixmapScaleGeneric(Display * dpy, int scrNum, Window win,
 	unsigned long pixel;
 	int x, y;
 	int re = 0;
-	for (x = 0; x < dstW; x++) {
-		for (y = 0; y < dstH; y++) {
+	for (x = 0; x < dstWscal; x++) {
+		for (y = 0; y < dstHscal; y++) {
 			pixel =
-			    XGetPixel(srci, x * srcW / dstW, y * srcH / dstH);
+			    XGetPixel(srci, x * srcW / dstWscal,
+				      y * srcH / dstHscal);
 			if (!XSetForeground(dpy, gc, pixel))
 				re++;
-			if (!XDrawPoint(dpy, dst, gc, x, y))
+			if (!XDrawPoint(dpy, dst, gc, x + dstWoff, y + dstHoff))
 				re++;
 		}
 	}
@@ -229,18 +233,20 @@ int pixmapScaleGeneric(Display * dpy, int scrNum, Window win,
 }
 
 //
-// Scale the drawable: XRender version
+// Fit the src drawable into dst,
+// centering and preserving aspect ratio
+// XRender version
 // 1=success 0=fail
 //
-int pixmapScaleXrender(Display * dpy, int scrNum, Window win,
-		       Drawable src, Drawable dst,
-		       unsigned int srcW, unsigned int srcH,
-		       unsigned int dstW, unsigned int dstH)
+int pixmapFitXrender(Display * dpy, int scrNum, Window win,
+		     Drawable src, Drawable dst,
+		     unsigned int srcW, unsigned int srcH,
+		     unsigned int dstWscal, unsigned int dstHscal,
+		     unsigned int dstWoff, unsigned int dstHoff)
 {
 	Picture Psrc, Pdst;
 	XRenderPictFormat *format;
 	XTransform transform;
-	double xScale, yScale;
 
 	format = XRenderFindStandardFormat(dpy, PictStandardRGB24);
 	if (!format) {
@@ -250,20 +256,18 @@ int pixmapScaleXrender(Display * dpy, int scrNum, Window win,
 	Psrc = XRenderCreatePicture(dpy, src, format, 0, NULL);
 	Pdst = XRenderCreatePicture(dpy, dst, format, 0, NULL);
 	XRenderSetPictureFilter(dpy, Psrc, FilterBilinear, 0, 0);
-	xScale = (double)srcW / (double)dstW;
-	yScale = (double)srcH / (double)dstH;
-	transform.matrix[0][0] = XDoubleToFixed(xScale);
-	transform.matrix[0][1] = XDoubleToFixed(0.0);
-	transform.matrix[0][2] = XDoubleToFixed(0.0);
-	transform.matrix[1][0] = XDoubleToFixed(0.0);
-	transform.matrix[1][1] = XDoubleToFixed(yScale);
-	transform.matrix[1][2] = XDoubleToFixed(0.0);
-	transform.matrix[2][0] = XDoubleToFixed(0.0);
-	transform.matrix[2][1] = XDoubleToFixed(0.0);
+	transform.matrix[0][0] = (srcW << 16) / dstWscal;
+	transform.matrix[0][1] = 0;
+	transform.matrix[0][2] = 0;
+	transform.matrix[1][0] = 0;
+	transform.matrix[1][1] = (srcH << 16) / dstHscal;
+	transform.matrix[1][2] = 0;
+	transform.matrix[2][0] = 0;
+	transform.matrix[2][1] = 0;
 	transform.matrix[2][2] = XDoubleToFixed(1.0);
 	XRenderSetPictureTransform(dpy, Psrc, &transform);
-	XRenderComposite(dpy, PictOpSrc, Psrc, 0, Pdst, 0, 0, 0, 0, 0, 0, dstW,
-			 dstH);
+	XRenderComposite(dpy, PictOpSrc, Psrc, 0, Pdst, 0, 0, 0, 0, dstWoff,
+			 dstHoff, dstWscal, dstHscal);
 	XRenderFreePicture(dpy, Psrc);
 	XRenderFreePicture(dpy, Pdst);
 
@@ -271,20 +275,50 @@ int pixmapScaleXrender(Display * dpy, int scrNum, Window win,
 }
 
 //
-// Scale the drawable
+// Fit the src drawable into dst,
+// centering and preserving aspect ratio
 // 1=success 0=fail
 //
-int pixmapScale(Display * dpy, int scrNum, Window win,
-		Drawable src, Drawable dst,
-		unsigned int srcW, unsigned int srcH,
-		unsigned int dstW, unsigned int dstH)
+int pixmapFit(Display * dpy, int scrNum, Window win,
+	      Drawable src, Drawable dst,
+	      unsigned int srcW, unsigned int srcH,
+	      unsigned int dstW, unsigned int dstH)
 {
 	int event_basep, error_basep;
+	int32_t fWrat, fHrat;	// ratio * 65536
+	int dstWscal, dstWoff, dstHscal, dstHoff;
+
+	fWrat = (dstW << 16) / srcW;
+	fHrat = (dstH << 16) / srcH;
+	if (fWrat > fHrat) {
+		dstWscal = ((srcW * fHrat) >> 16);
+		if (abs(dstWscal - dstW) <= 1)	// suppress rounding errors
+			dstWscal = dstW;
+		dstWoff = (dstW - dstWscal) / 2;
+		dstHscal = dstH;
+		dstHoff = 0;
+	} else {
+		dstWscal = dstW;
+		dstWoff = 0;
+		dstHscal = ((srcH * fWrat) >> 16);
+		if (abs(dstHscal - dstH) <= 1)
+			dstHscal = dstH;
+		dstHoff = (dstH - dstHscal) / 2;
+	}
+
 	return XRenderQueryExtension(dpy, &event_basep, &error_basep) == True ?
-	    pixmapScaleXrender(dpy, scrNum, win, src, dst, srcW, srcH, dstW,
-			       dstH) : pixmapScaleGeneric(dpy, scrNum, win, src,
-							  dst, srcW, srcH, dstW,
-							  dstH);
+	    pixmapFitXrender(dpy, scrNum, win, src, dst, srcW, srcH, dstWscal,
+			     dstHscal, dstWoff, dstHoff) : pixmapFitGeneric(dpy,
+									    scrNum,
+									    win,
+									    src,
+									    dst,
+									    srcW,
+									    srcH,
+									    dstWscal,
+									    dstHscal,
+									    dstWoff,
+									    dstHoff);
 }
 
 //

@@ -41,15 +41,17 @@ void setSelectInput(Display * dpy, Window win, int reg);
 
 int execAndReadStdout(char *exe, char *args[], char *buf, int bufsize);
 
-int pixmapScaleGeneric(Display * dpy, int scrNum, Window win, Drawable src,
-		Drawable dst, unsigned int srcW, unsigned int srcH,
-		unsigned int dstW, unsigned int dstH);
-int pixmapScaleXrender(Display * dpy, int scrNum, Window win, Drawable src,
-		Drawable dst, unsigned int srcW, unsigned int srcH,
-		unsigned int dstW, unsigned int dstH);
-int pixmapScale(Display * dpy, int scrNum, Window win, Drawable src,
-		Drawable dst, unsigned int srcW, unsigned int srcH,
-		unsigned int dstW, unsigned int dstH);
+int pixmapFitGeneric(Display * dpy, int scrNum, Window win, Drawable src,
+		     Drawable dst, unsigned int srcW, unsigned int srcH,
+		     unsigned int dstWscaled, unsigned int dstHscaled,
+		     unsigned int dstWoffset, unsigned int dstHoffset);
+int pixmapFitXrender(Display * dpy, int scrNum, Window win, Drawable src,
+		     Drawable dst, unsigned int srcW, unsigned int srcH,
+		     unsigned int dstWscaled, unsigned int dstHscaled,
+		     unsigned int dstWoffset, unsigned int dstHoffset);
+int pixmapFit(Display * dpy, int scrNum, Window win, Drawable src,
+	      Drawable dst, unsigned int srcW, unsigned int srcH,
+	      unsigned int dstW, unsigned int dstH);
 
 size_t utf8len(char *s);
 char *utf8index(char *s, size_t pos);
