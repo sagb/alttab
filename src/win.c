@@ -29,6 +29,9 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 #include <string.h>
 #include "alttab.h"
 extern Globals g;
+extern Display* dpy;
+extern int scr;
+extern Window root;
 
 // PRIVATE
 
@@ -46,7 +49,7 @@ static int sort_by_order(const void *p1, const void *p2)
 // early initialization
 // once per execution
 //
-int startupWintasks(Display * dpy)
+int startupWintasks()
 {
 	g.sortNdx = 0;		// init g.sortlist
 	switch (g.option_wm) {
@@ -66,8 +69,7 @@ int startupWintasks(Display * dpy)
 // used by x, rp, ...
 // only dpy and win are mandatory
 //
-int addWindowInfo(Display * dpy, Window win, int reclevel, int wm_id,
-		  char *wm_name)
+int addWindowInfo(Window win, int reclevel, int wm_id, char *wm_name)
 {
 
 	if (!
@@ -101,15 +103,18 @@ int addWindowInfo(Display * dpy, Window win, int reclevel, int wm_id,
 // 2. icon
 
 // WM_HINTS: https://tronche.com/gui/x/xlib/ICC/client-to-window-manager/wm-hints.html
-// TODO by priority: 
-//    option to use full windows as icons. https://www.talisman.org/~erlkonig/misc/x11-composite-tutorial/
-//    understand hints->icon_window. for xterm, it seems not usable.
+// another options: 
+//    A. load icons from files.
+//    B. use full windows as icons. https://www.talisman.org/~erlkonig/misc/x11-composite-tutorial/
+//      it's more sophisticated than icon_drawable=win, because hidden window contents aren't available.
+//    C. understand hints->icon_window. for xterm, it seems not usable.
 	XWMHints *hints;
 	g.winlist[g.maxNdx].icon_drawable =
 	    g.winlist[g.maxNdx].icon_mask =
 	    g.winlist[g.maxNdx].icon_w = g.winlist[g.maxNdx].icon_h = 0;
 	unsigned int icon_depth = 0;
 	g.winlist[g.maxNdx].icon_allocated = false;
+
 	if ((hints = XGetWMHints(dpy, win))) {
 		if (g.debug > 1) {
 			fprintf(stderr,
@@ -127,49 +132,49 @@ int addWindowInfo(Display * dpy, Window win, int reclevel, int wm_id,
 			}
 		}
 		g.winlist[g.maxNdx].icon_drawable =
-		    (hints->flags & IconPixmapHint) ? hints->icon_pixmap : 0;
+            (hints->flags & IconPixmapHint) ? hints->icon_pixmap : 0;
 //            ((hints->flags & IconPixmapHint) ?  hints->icon_pixmap : (
-//            (hints->flags & IconWindowHint) ?  hints->icon_window : 0
-//            );
+//            (hints->flags & IconWindowHint) ?  hints->icon_window : 0));
 		g.winlist[g.maxNdx].icon_mask =
 		    (hints->flags & IconMaskHint) ? hints->icon_mask : 0;
 		XFree(hints);
-		// extract icon width/height
-		Window root_return;
-		int x_return, y_return;
-		unsigned int border_width_return;
-		if (g.winlist[g.maxNdx].icon_drawable) {
-			if (XGetGeometry(dpy, g.winlist[g.maxNdx].icon_drawable,
-					 &root_return, &x_return, &y_return,
-					 &(g.winlist[g.maxNdx].icon_w),
-					 &(g.winlist[g.maxNdx].icon_h),
-					 &border_width_return,
-					 &icon_depth) == 0) {
-				if (g.debug > 0) {
-					fprintf(stderr,
-						"icon dimensions unknown (%s)\n",
-						g.winlist[g.maxNdx].name);
-				}
-				// probably draw placeholder?
-				g.winlist[g.maxNdx].icon_drawable = 0;
-			} else {
-				if (g.debug > 1) {
-					fprintf(stderr, "depth=%d\n",
-						icon_depth);
-				}
-			}
-		} else {
-			if (g.debug > 0) {
+		if (g.winlist[g.maxNdx].icon_drawable && (g.debug > 0)) {
 				fprintf(stderr, "no icon in WM hints (%s)\n",
 					g.winlist[g.maxNdx].name);
-			}
-		}
+        }
 	} else {
 		if (g.debug > 0) {
 			fprintf(stderr, "no WM hints (%s)\n",
 				g.winlist[g.maxNdx].name);
 		}
 	}
+
+    // extract icon width/height/depth
+    Window root_return;
+    int x_return, y_return;
+    unsigned int border_width_return;
+    if (g.winlist[g.maxNdx].icon_drawable) {
+        if (XGetGeometry(dpy, g.winlist[g.maxNdx].icon_drawable,
+                    &root_return, &x_return, &y_return,
+                    &(g.winlist[g.maxNdx].icon_w),
+                    &(g.winlist[g.maxNdx].icon_h),
+                    &border_width_return,
+                    &icon_depth) == 0) {
+            if (g.debug > 0) {
+                fprintf(stderr,
+                        "icon dimensions unknown (%s)\n",
+                        g.winlist[g.maxNdx].name);
+            }
+            // probably draw placeholder?
+            g.winlist[g.maxNdx].icon_drawable = 0;
+        } else {
+            if (g.debug > 1) {
+                fprintf(stderr, "depth=%d\n",
+                        icon_depth);
+            }
+        }
+    }
+
 // convert icon with different depth (currently 1 only) into default depth
 	if (g.winlist[g.maxNdx].icon_drawable && icon_depth == 1) {
 		if (g.debug > 0) {
@@ -235,7 +240,7 @@ int addWindowInfo(Display * dpy, Window win, int reclevel, int wm_id,
 // n.b.: in heavy WM, use _NET_CLIENT_LIST
 // direction is direction of first press: with shift or without
 //
-int initWinlist(Display * dpy, Window root, bool direction)
+int initWinlist(bool direction)
 {
 	int r;
 	if (g.debug > 1) {
@@ -249,13 +254,13 @@ int initWinlist(Display * dpy, Window root, bool direction)
 	g.startNdx = 0;		// safe default
 	switch (g.option_wm) {
 	case WM_NO:
-		r = x_initWindowsInfoRecursive(dpy, root, 0);	// note: direction/current window index aren't used
+		r = x_initWindowsInfoRecursive(root, 0);	// note: direction/current window index aren't used
 		break;
 	case WM_RATPOISON:
-		r = rp_initWinlist(dpy);
+		r = rp_initWinlist();
 		break;
 	case WM_EWMH:
-		r = ewmh_initWinlist(dpy);
+		r = ewmh_initWinlist();
 		break;
 	default:
 		r = 0;
@@ -308,7 +313,7 @@ int initWinlist(Display * dpy, Window root, bool direction)
 // counterpair for initWinlist
 // frees icons and winlist, but not tiles, as they are allocated in gui.c
 //
-void freeWinlist(Display * dpy)
+void freeWinlist()
 {
 	if (g.debug > 0) {
 		fprintf(stderr, "destroying icons and winlist\n");
@@ -332,19 +337,19 @@ void freeWinlist(Display * dpy)
 //
 // popup/focus this X window
 //
-int setFocus(Display * dpy, int winNdx)
+int setFocus(int winNdx)
 {
 	int r;
 	switch (g.option_wm) {
 	case WM_NO:
-		r = ewmh_setFocus(dpy, winNdx);	// for WM which isn't identified as EWMH compatible but accepts setting focus (dwm)
-		x_setFocus(dpy, winNdx);
+		r = ewmh_setFocus(winNdx);	// for WM which isn't identified as EWMH compatible but accepts setting focus (dwm)
+		x_setFocus(winNdx);
 		break;
 	case WM_RATPOISON:
 		r = rp_setFocus(winNdx);
 		break;
 	case WM_EWMH:
-		r = ewmh_setFocus(dpy, winNdx);
+		r = ewmh_setFocus(winNdx);
 		// skippy-xd does this and notes that "order is important"
 		// allow in trouble
 		//XSetInputFocus (dpy, g.winlist[winNdx].id, RevertToParent, CurrentTime);

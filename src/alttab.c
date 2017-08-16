@@ -32,6 +32,10 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 // PUBLIC
 
 Globals g;
+// globals common for alttab, util and icon
+Display* dpy;
+int scr;
+Window root;
 
 // PRIVATE
 
@@ -63,7 +67,7 @@ See man alttab for details.\n");
 // initialize globals based on executable agruments and Xresources
 // return 1 if success, 0 otherwise
 //
-int use_args_and_xrm(Display * dpy, Window root, int argc, char **argv)
+int use_args_and_xrm(int argc, char **argv)
 {
 // set debug level early
 	g.debug = 0;
@@ -294,7 +298,7 @@ int use_args_and_xrm(Display * dpy, Window root, int argc, char **argv)
 // grab Alt-Tab and Alt
 // note: exit() on failure
 //
-int grabAllKeys(Display * dpy, Window root, bool grabUngrab)
+int grabAllKeys(bool grabUngrab)
 {
 	g.ignored_modmask = getOffendingModifiersMask(dpy);	// or 0 for g.debug
 	char *grabhint =
@@ -302,13 +306,13 @@ int grabAllKeys(Display * dpy, Window root, bool grabUngrab)
 // attempt XF86Ungrab? probably too invasive
 // TODO: error message doesn't count ignored_modmask
 	if (!changeKeygrab
-	    (dpy, root, grabUngrab, g.option_keyCode, g.option_modMask,
+	    (root, grabUngrab, g.option_keyCode, g.option_modMask,
 	     g.ignored_modmask)) {
 		fprintf(stderr, grabhint, g.option_keyCode, g.option_modMask);
 		exit(1);
 	}
 	if (!changeKeygrab
-	    (dpy, root, grabUngrab, g.option_keyCode,
+	    (root, grabUngrab, g.option_keyCode,
 	     g.option_modMask | g.option_backMask, g.ignored_modmask)) {
 		fprintf(stderr, grabhint, g.option_keyCode,
 			g.option_modMask | g.option_backMask);
@@ -321,22 +325,23 @@ int main(int argc, char **argv)
 {
 
 	XEvent ev;
-	Display *dpy = XOpenDisplay(NULL);
-	Window root = DefaultRootWindow(dpy);
+	dpy = XOpenDisplay(NULL);
+    scr = DefaultScreen(dpy);
+	root = DefaultRootWindow(dpy);
 
 	ee_complain = true;
 /* uncomment when handler will be required */
 /* XErrorHandler hnd = (XErrorHandler)0; */
 /* hnd = XSetErrorHandler (zeroErrorHandler); // forever */
 
-	if (!use_args_and_xrm(dpy, root, argc, argv))
+	if (!use_args_and_xrm(argc, argv))
 		die("use_args_and_xrm failed");
-	if (!startupWintasks(dpy))
+	if (!startupWintasks())
 		die("startupWintasks failed");
-	if (!startupGUItasks(dpy, root))
+	if (!startupGUItasks())
 		die("startupGUItasks failed");
 
-	grabAllKeys(dpy, root, true);
+	grabAllKeys(true);
 	g.uiShowHasRun = false;
 
 	struct timespec nanots;
@@ -354,7 +359,7 @@ int main(int argc, char **argv)
 			nanosleep(&nanots, NULL);
 			XQueryKeymap(dpy, keys_pressed);
 			if (!(keys_pressed[octet] & kmask)) {	// Alt released
-				uiHide(dpy, root);
+				uiHide();
 				continue;
 			}
 			if (!XCheckIfEvent(dpy, &ev, *predproc_true, NULL))
@@ -377,13 +382,12 @@ int main(int argc, char **argv)
 				break;
 			}	// safety redundance
 			if (!g.uiShowHasRun) {
-				uiShow(dpy, root,
-				       (ev.xkey.state & g.option_backMask));
+				uiShow((ev.xkey.state & g.option_backMask));
 			} else {
 				if (ev.xkey.state & g.option_backMask) {
-					uiPrevWindow(dpy, root);
+					uiPrevWindow();
 				} else {
-					uiNextWindow(dpy, root);
+					uiNextWindow();
 				}
 			}
 			break;
@@ -401,12 +405,12 @@ int main(int argc, char **argv)
 			     && g.uiShowHasRun)) {
 				break;
 			}
-			uiHide(dpy, root);
+			uiHide();
 			break;
 
 		case Expose:
 			if (g.uiShowHasRun) {
-				uiExpose(dpy, root);
+				uiExpose();
 			}
 			break;
 
@@ -420,7 +424,7 @@ int main(int argc, char **argv)
 	}
 
 // this is probably never reached
-	grabAllKeys(dpy, root, false);
+	grabAllKeys(false);
 // not restoring error handler
 	XCloseDisplay(dpy);
 	return 0;

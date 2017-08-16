@@ -21,13 +21,16 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 #include "util.h"
 #include <sys/types.h>
 #include <sys/wait.h>
+extern Display* dpy;
+extern int scr;
+extern Window root;
 
 // PUBLIC:
 
 //
 // get all possible modifiers
 //
-unsigned int getOffendingModifiersMask(Display * dpy)
+unsigned int getOffendingModifiersMask()
 {
 	unsigned int lockmask[3];	// num=0 scroll=1 caps=2
 	int i;
@@ -61,14 +64,14 @@ unsigned int getOffendingModifiersMask(Display * dpy)
 // for ignoring X errors
 // https://tronche.com/gui/x/xlib/event-handling/protocol-errors/default-handlers.html#XErrorEvent
 // 
-int zeroErrorHandler(Display * display, XErrorEvent * theEvent)
+int zeroErrorHandler(XErrorEvent * theEvent)
 {
 	ee_ignored = theEvent;
 #define EM 512
 	char etext[EM];
 	if (ee_complain) {
 		memset(etext, '\0', EM);
-		XGetErrorText(display, theEvent->error_code, etext, EM);
+		XGetErrorText(dpy, theEvent->error_code, etext, EM);
 		fprintf(stderr, "Unexpected X Error: %s\n", etext);
 	}
 	return 0;
@@ -79,7 +82,7 @@ int zeroErrorHandler(Display * display, XErrorEvent * theEvent)
 // returns 1 if success, 0 if fail (f.e., BadAccess).
 // Grabs are not restored on failure.
 //
-int changeKeygrab(Display * dpy, Window win, bool grab, KeyCode keycode,
+int changeKeygrab(Window win, bool grab, KeyCode keycode,
 		  unsigned int modmask, unsigned int ignored_modmask)
 {
 	int debug = 1;
@@ -122,7 +125,7 @@ int changeKeygrab(Display * dpy, Window win, bool grab, KeyCode keycode,
 // register interest in KeyRelease events for the window
 // and its children recursively
 //
-void setSelectInput(Display * dpy, Window win, int reg)
+void setSelectInput(Window win, int reg)
 {
 	Window root, parent;
 	Window *children;
@@ -136,7 +139,7 @@ void setSelectInput(Display * dpy, Window win, int reg)
 	    && XQueryTree(dpy, win, &root, &parent, &children,
 			  &nchildren) != 0) {
 		for (i = 0; i < nchildren; ++i)
-			setSelectInput(dpy, children[i], reg);
+			setSelectInput(children[i], reg);
 		if (nchildren > 0 && children)
 			XFree(children);
 	}
@@ -186,15 +189,14 @@ int execAndReadStdout(char *exe, char *args[], char *buf, int bufsize)
 // Slow but extension-independent version
 // 1=success 0=fail
 //
-int pixmapFitGeneric(Display * dpy, int scrNum, Window win,
-		     Drawable src, Pixmap src_mask, Drawable dst,
+int pixmapFitGeneric( Drawable src, Pixmap src_mask, Drawable dst,
 		     unsigned int srcW, unsigned int srcH,
 		     unsigned int dstWscal, unsigned int dstHscal,
 		     unsigned int dstWoff, unsigned int dstHoff)
 {
 	unsigned long valuemask = 0;
 	XGCValues values;
-	GC gc = XCreateGC(dpy, win, valuemask, &values);
+	GC gc = XCreateGC(dpy, root, valuemask, &values);
 	if (!gc) {
 		fprintf(stderr, "pixmapScale: can't create GC\n");
 		return 0;
@@ -251,9 +253,10 @@ int pixmapFitGeneric(Display * dpy, int scrNum, Window win,
 // centering and preserving aspect ratio
 // XRender version
 // 1=success 0=fail
+// /usr/share/doc/libxrender-dev/libXrender.txt.gz
+// https://cgit.freedesktop.org/xorg/proto/renderproto/plain/renderproto.txt
 //
-int pixmapFitXrender(Display * dpy, int scrNum, Window win,
-		     Drawable src, Pixmap src_mask, Drawable dst,
+int pixmapFitXrender( Drawable src, Pixmap src_mask, Drawable dst,
 		     unsigned int srcW, unsigned int srcH,
 		     unsigned int dstWscal, unsigned int dstHscal,
 		     unsigned int dstWoff, unsigned int dstHoff)
@@ -262,7 +265,7 @@ int pixmapFitXrender(Display * dpy, int scrNum, Window win,
 	XRenderPictFormat *format, *format_of_mask;
 	XTransform transform;
 
-	format = XRenderFindVisualFormat(dpy, DefaultVisual(dpy, 0));
+	format = XRenderFindVisualFormat(dpy, DefaultVisual(dpy, scr));
 	if (!format) {
 		fprintf(stderr, "error, couldn't find valid Xrender format\n");
 		return 0;
@@ -308,8 +311,7 @@ int pixmapFitXrender(Display * dpy, int scrNum, Window win,
 // centering and preserving aspect ratio
 // 1=success 0=fail
 //
-int pixmapFit(Display * dpy, int scrNum, Window win,
-	      Drawable src, Pixmap src_mask, Drawable dst,
+int pixmapFit( Drawable src, Pixmap src_mask, Drawable dst,
 	      unsigned int srcW, unsigned int srcH,
 	      unsigned int dstW, unsigned int dstH)
 {
@@ -336,10 +338,9 @@ int pixmapFit(Display * dpy, int scrNum, Window win,
 	}
 
 	return XRenderQueryExtension(dpy, &event_basep, &error_basep) == True ?
-	    pixmapFitXrender(dpy, scrNum, win, src, src_mask, dst, srcW, srcH,
+	    pixmapFitXrender(src, src_mask, dst, srcW, srcH,
 			     dstWscal, dstHscal, dstWoff,
-			     dstHoff) : pixmapFitGeneric(dpy, scrNum, win, src,
-							 src_mask, dst, srcW,
+			     dstHoff) : pixmapFitGeneric(src, src_mask, dst, srcW,
 							 srcH, dstWscal,
 							 dstHscal, dstWoff,
 							 dstHoff);
@@ -379,7 +380,7 @@ char *utf8index(char *s, size_t pos)
 // splitting and cropping it to fit (x1,y1 - x1+width,y1+height) rectangle.
 // Return 1 if ok.
 //
-int drawMultiLine(Display * dpy, Drawable d, XftFont * font,
+int drawMultiLine(Drawable d, XftFont * font,
 		  XftColor * xftcolor, char *str, unsigned int x1,
 		  unsigned int y1, unsigned int width, unsigned int height)
 {
@@ -403,8 +404,8 @@ int drawMultiLine(Display * dpy, Drawable d, XftFont * font,
 
 	xftdraw =
 	    XftDrawCreate(dpy, d, DefaultVisual(dpy, 0),
-			  DefaultColormap(dpy, 0));
-//XftColorAllocValue (dpy,DefaultVisual(dpy,0),DefaultColormap(dpy,0),xrcolor,&xftcolor);
+			  DefaultColormap(dpy, scr));
+//XftColorAllocValue (dpy,DefaultVisual(dpy,scr),DefaultColormap(dpy,scr),xrcolor,&xftcolor);
 
 // once: calculate approx_px_per_sym and line_spacing_px
 	XftTextExtentsUtf8(dpy, font, (unsigned char *)str, strlen(str), &ext);
@@ -478,8 +479,8 @@ int drawMultiLine(Display * dpy, Drawable d, XftFont * font,
 		XftDrawStringUtf8(xftdraw, xftcolor, font, x + ext.x, y + ext.y,
 				  (unsigned char *)line, line_clen);
 		if (debug > 0) {
-			GC gc = DefaultGC(dpy, 0);
-			XSetForeground(dpy, gc, WhitePixel(dpy, 0));
+			GC gc = DefaultGC(dpy, scr);
+			XSetForeground(dpy, gc, WhitePixel(dpy, scr));
 			XDrawRectangle(dpy, d, gc, x, y, ext.width, ext.height);
 		}
 		x = x1;
@@ -525,7 +526,7 @@ int drawMultiLine_test()
 	XSetForeground(dpy, gc, WhitePixel(dpy, 0));
 	XDrawRectangle(dpy, win, gc, 100, 100, 500, 400);
 	int r =
-	    drawMultiLine(dpy, win, font, &xftcolor, line, 100, 100, 500, 400);
+	    drawMultiLine(win, font, &xftcolor, line, 100, 100, 500, 400);
 
 	XFlush(dpy);
 	sleep(2);
@@ -545,7 +546,7 @@ Bool predproc_true(Display * display, XEvent * event, char *arg)
 //
 // obtain X Window property
 //
-char *get_x_property(Display * dpy, Window win, Atom prop_type, char *prop_name,
+char *get_x_property(Window win, Atom prop_type, char *prop_name,
 		     unsigned long *prop_size)
 {
 

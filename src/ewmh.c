@@ -30,6 +30,9 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 #include "alttab.h"
 #include "util.h"
 extern Globals g;
+extern Display* dpy;
+extern int scr;
+extern Window root;
 
 // PUBLIC
 
@@ -37,25 +40,16 @@ extern Globals g;
 // return the name of EWMH-compatible WM
 // or NULL if not found
 //
-char *ewmh_getWmName(Display * dpy)
+char *ewmh_getWmName()
 {
 
 	Window *chld_win;
-	Window root;
 	char *r;
 	Atom utf8string;
 
 	chld_win = (Window *) NULL;
-	root = DefaultRootWindow(dpy);
-	if (!
-	    (chld_win =
-	     (Window *) get_x_property(dpy, root, XA_WINDOW,
-				       "_NET_SUPPORTING_WM_CHECK", NULL))) {
-		if (!
-		    (chld_win =
-		     (Window *) get_x_property(dpy, root, XA_CARDINAL,
-					       "_WIN_SUPPORTING_WM_CHECK",
-					       NULL))) {
+	if (!  (chld_win = (Window *) get_x_property(root, XA_WINDOW, "_NET_SUPPORTING_WM_CHECK", NULL))) {
+		if (!  (chld_win = (Window *) get_x_property(root, XA_CARDINAL, "_WIN_SUPPORTING_WM_CHECK", NULL))) {
 			return (char *)NULL;
 		}
 	}
@@ -64,10 +58,10 @@ char *ewmh_getWmName(Display * dpy)
 	utf8string = XInternAtom(dpy, "UTF8_STRING", False);
 	if (!
 	    (r =
-	     get_x_property(dpy, *chld_win, utf8string, "_NET_WM_NAME",
+	     get_x_property(*chld_win, utf8string, "_NET_WM_NAME",
 			    NULL))) {
 		(r =
-		 get_x_property(dpy, *chld_win, XA_STRING, "_NET_WM_NAME",
+		 get_x_property(*chld_win, XA_STRING, "_NET_WM_NAME",
 				NULL));
 	}
 
@@ -79,21 +73,19 @@ char *ewmh_getWmName(Display * dpy)
 // initialize winlist/startNdx
 // return 1 if ok
 //
-int ewmh_initWinlist(Display * dpy)
+int ewmh_initWinlist()
 {
 	Window *client_list;
 	unsigned long client_list_size;
 	int i;
-	Window aw, root;
+	Window aw;
 	char *awp;
 	unsigned long sz;
 	char *title;
 
 	aw = (Window) 0;
-	root = DefaultRootWindow(dpy);
 
-	if ((awp =
-	     get_x_property(dpy, root, XA_WINDOW, "_NET_ACTIVE_WINDOW", &sz))) {
+	if ((awp = get_x_property(root, XA_WINDOW, "_NET_ACTIVE_WINDOW", &sz))) {
 		aw = *((Window *) awp);
 		free(awp);
 	} else {
@@ -103,10 +95,10 @@ int ewmh_initWinlist(Display * dpy)
 	}
 
 	if ((client_list =
-	     (Window *) get_x_property(dpy, root, XA_WINDOW, "_NET_CLIENT_LIST",
+	     (Window *) get_x_property(root, XA_WINDOW, "_NET_CLIENT_LIST",
 				       &client_list_size)) == NULL) {
 		if ((client_list =
-		     (Window *) get_x_property(dpy, root, XA_CARDINAL,
+		     (Window *) get_x_property(root, XA_CARDINAL,
 					       "_WIN_CLIENT_LIST",
 					       &client_list_size)) == NULL) {
 			fprintf(stderr, "can't get client list\n");
@@ -118,15 +110,15 @@ int ewmh_initWinlist(Display * dpy)
 		Window w = client_list[i];
 
 		// build title
-		char *wmn1 = get_x_property(dpy, w, XA_STRING, "WM_NAME", NULL);
+		char *wmn1 = get_x_property(w, XA_STRING, "WM_NAME", NULL);
 		Atom utf8str = XInternAtom(dpy, "UTF8_STRING", False);
 		char *wmn2 =
-		    get_x_property(dpy, w, utf8str, "_NET_WM_NAME", NULL);
+		    get_x_property(w, utf8str, "_NET_WM_NAME", NULL);
 		title = wmn2 ? strdup(wmn2) : (wmn1 ? strdup(wmn1) : NULL);
 		free(wmn1);
 		free(wmn2);
 
-		addWindowInfo(dpy, w, 0, 0, title);
+		addWindowInfo(w, 0, 0, title);
 		if (w == aw) {
 			g.startNdx = i;
 		}
@@ -143,9 +135,8 @@ int ewmh_initWinlist(Display * dpy)
 //
 // focus window in EWMH WM
 //
-int ewmh_setFocus(Display * dpy, int winNdx)
+int ewmh_setFocus(int winNdx)
 {
-	Window root = DefaultRootWindow(dpy);
 	Window win = g.winlist[winNdx].id;
 	XEvent evt;
 	long rn_mask = SubstructureRedirectMask | SubstructureNotifyMask;

@@ -91,7 +91,8 @@ CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am_alttab_OBJECTS = alttab.$(OBJEXT) gui.$(OBJEXT) win.$(OBJEXT) \
-	x.$(OBJEXT) rp.$(OBJEXT) util.$(OBJEXT) ewmh.$(OBJEXT)
+	x.$(OBJEXT) rp.$(OBJEXT) util.$(OBJEXT) ewmh.$(OBJEXT) \
+	icon.$(OBJEXT)
 alttab_OBJECTS = $(am_alttab_OBJECTS)
 alttab_LDADD = $(LDADD)
 AM_V_P = $(am__v_P_@AM_V@)
@@ -242,7 +243,7 @@ xft_CFLAGS = @xft_CFLAGS@
 xft_LIBS = @xft_LIBS@
 xrender_CFLAGS = @xrender_CFLAGS@
 xrender_LIBS = @xrender_LIBS@
-alttab_SOURCES = alttab.c gui.c win.c x.c rp.c util.c ewmh.c
+alttab_SOURCES = alttab.c gui.c win.c x.c rp.c util.c ewmh.c icon.c
 AM_CFLAGS = $(x11_CFLAGS) $(xft_CFLAGS) $(xrender_CFLAGS) -Wall
 all: all-am
 
@@ -334,6 +335,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/alttab.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ewmh.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gui.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/icon.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/util.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/win.Po@am__quote@

@@ -66,7 +66,7 @@ typedef struct {
 	Pixmap icon_drawable;	// Window or Pixmap
     Pixmap icon_mask;
 	unsigned int icon_w, icon_h;
-	bool icon_allocated;	// we need to free icon, because we created it (placeholder or depth conversion)
+	bool icon_allocated;	// we must free icon, because we created it (placeholder or depth conversion)
 	Pixmap tile;		// ready to display. w/h are all equal and defined in gui.c
 	int order;		// in sort stack, kept in sync with g.sortlist
 } WindowInfo;
@@ -110,31 +110,30 @@ typedef struct {
 } Globals;
 
 // gui
-int startupGUItasks(Display * dpy, Window root);
-int uiShow(Display * dpy, Window root, bool direction);
-void uiExpose(Display * dpy, Window root);
-int uiHide(Display * dpy, Window root);
-int uiNextWindow(Display * dpy, Window root);
-int uiPrevWindow(Display * dpy, Window root);
+int startupGUItasks();
+int uiShow(bool direction);
+void uiExpose();
+int uiHide();
+int uiNextWindow();
+int uiPrevWindow();
 
 // windows
-int startupWintasks(Display * dpy);
-int addWindowInfo(Display * dpy, Window win, int reclevel, int wm_id,
-		  char *wm_name);
-int initWinlist(Display * dpy, Window root, bool direction);
-void freeWinlist(Display * dpy);
-int setFocus(Display * dpy, int winNdx);
+int startupWintasks();
+int addWindowInfo(Window win, int reclevel, int wm_id, char *wm_name);
+int initWinlist(bool direction);
+void freeWinlist();
+int setFocus(int winNdx);
 int rp_startupWintasks();
-int x_initWindowsInfoRecursive(Display * dpy, Window win, int reclevel);
-int rp_initWinlist(Display * dpy);
-int x_setFocus(Display * dpy, int wndx);
+int x_initWindowsInfoRecursive(Window win, int reclevel);
+int rp_initWinlist();
+int x_setFocus(int wndx);
 int rp_setFocus(int winNdx);
 int execAndReadStdout(char *exe, char *args[], char *buf, int bufsize);
 int pulloutWindowToTop(int winNdx);
 
 /* EWHM */
-char *ewmh_getWmName(Display * dpy);
-int ewmh_initWinlist(Display * dpy);
-int ewmh_setFocus(Display * dpy, int winNdx);
+char *ewmh_getWmName();
+int ewmh_initWinlist();
+int ewmh_setFocus(int winNdx);
 
 #endif

@@ -33,39 +33,35 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 XErrorEvent *ee_ignored;
 bool ee_complain;
 
-unsigned int getOffendingModifiersMask(Display * dpy);
-int changeKeygrab(Display * dpy, Window win, bool grab, KeyCode keycode,
+unsigned int getOffendingModifiersMask();
+int changeKeygrab(Window win, bool grab, KeyCode keycode,
 		  unsigned int modmask, unsigned int ignored_modmask);
-int zeroErrorHandler(Display * display, XErrorEvent * theEvent);
-void setSelectInput(Display * dpy, Window win, int reg);
+int zeroErrorHandler(XErrorEvent * theEvent);
+void setSelectInput(Window win, int reg);
 
 int execAndReadStdout(char *exe, char *args[], char *buf, int bufsize);
 
-int pixmapFitGeneric(Display * dpy, int scrNum, Window win, Drawable src,
-		     Pixmap src_mask, Drawable dst, unsigned int srcW,
+int pixmapFitGeneric(Drawable src, Pixmap src_mask, Drawable dst, unsigned int srcW,
 		     unsigned int srcH, unsigned int dstWscaled,
 		     unsigned int dstHscaled, unsigned int dstWoffset,
 		     unsigned int dstHoffset);
-int pixmapFitXrender(Display * dpy, int scrNum, Window win, Drawable src,
-		     Pixmap src_mask, Drawable dst, unsigned int srcW,
+int pixmapFitXrender(Drawable src, Pixmap src_mask, Drawable dst, unsigned int srcW,
 		     unsigned int srcH, unsigned int dstWscaled,
 		     unsigned int dstHscaled, unsigned int dstWoffset,
 		     unsigned int dstHoffset);
-int pixmapFit(Display * dpy, int scrNum, Window win, Drawable src,
-	      Pixmap src_mask, Drawable dst, unsigned int srcW,
+int pixmapFit(Drawable src, Pixmap src_mask, Drawable dst, unsigned int srcW,
 	      unsigned int srcH, unsigned int dstW, unsigned int dstH);
 
 size_t utf8len(char *s);
 char *utf8index(char *s, size_t pos);
 
-int drawMultiLine(Display * dpy, Drawable d, XftFont * font,
-		  XftColor * xftcolor, char *str, unsigned int x1,
+int drawMultiLine(Drawable d, XftFont * font, XftColor * xftcolor, char *str, unsigned int x1,
 		  unsigned int y1, unsigned int width, unsigned int height);
 int drawMultiLine_test();
 
 Bool predproc_true(Display * display, XEvent * event, char *arg);
 
-char *get_x_property(Display * dpy, Window win, Atom prop_type, char *prop_name,
+char *get_x_property(Window win, Atom prop_type, char *prop_name,
 		     unsigned long *prop_size);
 
 #endif
