@@ -25,32 +25,36 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 #include <unistd.h>
 #include <stdlib.h>
 #include <X11/Xlib.h>
-//#include <X11/Xutil.h>
-//#include <X11/Xft/Xft.h>
-//#include <X11/extensions/Xrender.h>
+#include <X11/Xft/Xft.h>
+#include <uthash.h>
 
-//#define MAXPROPLEN  4096
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <err.h>
+#include <fts.h>
+#include <stdio.h>
 
-//XErrorEvent *ee_ignored;
-//bool ee_complain;
+#define MAXAPPLEN       64
+#define MAXICONPATHLEN  1024
 
 typedef struct {
-    char *src_file; // NULL if not initialized or loaded from X window properties
+    char app[MAXAPPLEN]; // application name; uthash key
+    char src_path[MAXICONPATHLEN]; // \0 -if not initialized or loaded from X window properties
     unsigned int src_w, src_h; // width/height of source (not resized) icon
     Pixmap drawable; // resized (ready to use)
     Pixmap mask;
     bool drawable_allocated; // we must free drawable (but not mask), because we created it
+    UT_hash_handle hh;
 } icon_t;
-
-typedef struct {
-    char *app; // uthash key
-    icon_t *icon;
-} iconlist_t;
 
 
 icon_t* initIcon();
 void deleteIcon(icon_t* ic);
+int initIconHash(icon_t** ihash);
+int updateIconsFromFile(icon_t** ihash); // load all icons into hash (no pixmaps, just path and dimension)
+int inspectIconFile(FTSENT* pe); // check if file pe has better icon than we have in g.ic
+int loadIconContent(icon_t* ic); // update drawable
+icon_t* lookupIcon(char* app); // search app icon in hash, load pixmap if necessary, return ready to use icon
 
-int addIconToList(iconlist_t* il, icon_t* ic);
 
 #endif

@@ -58,6 +58,8 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 #define DEFMODKS    XK_Alt_L
 #define DEFKEYKS    XK_Tab
 
+#include "icon.h"
+
 typedef struct {
 	Window id;
 	int wm_id;		// wm's internal window id, when WM has it (ratpoison)
@@ -107,6 +109,7 @@ typedef struct {
 	Color color[NCOLORS];
 	GC gcDirect, gcReverse, gcFrame;	// used in both gui.c and win.c
 	unsigned int ignored_modmask;
+    icon_t *ic;  // cache of all icons
 } Globals;
 
 // gui

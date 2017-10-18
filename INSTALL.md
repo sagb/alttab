@@ -2,10 +2,10 @@
 Dependencies
 ------------
 
-Basic Xlib, Xft and Xrender libraries are required.
+Basic Xlib, Xft, Xrender and libpng libraries are required.
 In Debian or Ubuntu:
 
-> apt-get install libx11-dev libxmu-dev libxft-dev libxrender-dev
+> apt-get install libx11-dev libxmu-dev libxft-dev libxrender-dev libpng-dev
 
 As maintainer or packager, also install autotools and ronn:
 

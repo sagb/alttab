@@ -499,9 +499,13 @@ int drawMultiLine(Drawable d, XftFont * font,
 //
 int drawMultiLine_test()
 {
-	Display *dpy = XOpenDisplay(0);;
+    // define these as globals in caller
+    dpy = XOpenDisplay(NULL);
+    scr = DefaultScreen(dpy);
+    root = RootWindow(dpy, scr);
+
 	Window win =
-	    XCreateSimpleWindow(dpy, DefaultRootWindow(dpy), 0, 0, 1000, 600, 0,
+	    XCreateSimpleWindow(dpy, root, 0, 0, 1000, 600, 0,
 				0, 0);
 	XMapWindow(dpy, win);
 

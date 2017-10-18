@@ -28,6 +28,7 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 #include <unistd.h>
 #include <string.h>
 #include "alttab.h"
+#include "util.h"
 extern Globals g;
 extern Display* dpy;
 extern int scr;
@@ -52,6 +53,8 @@ static int sort_by_order(const void *p1, const void *p2)
 int startupWintasks()
 {
 	g.sortNdx = 0;		// init g.sortlist
+    g.ic = initIcon();
+    initIconHash(&(g.ic));
 	switch (g.option_wm) {
 	case WM_NO:
 		return 1;
@@ -71,6 +74,9 @@ int startupWintasks()
 //
 int addWindowInfo(Window win, int reclevel, int wm_id, char *wm_name)
 {
+    char *appclass, *tryclass;
+    long unsigned int class_size;
+    icon_t* ic;
 
 	if (!
 	    (g.winlist =
@@ -107,7 +113,7 @@ int addWindowInfo(Window win, int reclevel, int wm_id, char *wm_name)
 //    A. load icons from files.
 //    B. use full windows as icons. https://www.talisman.org/~erlkonig/misc/x11-composite-tutorial/
 //      it's more sophisticated than icon_drawable=win, because hidden window contents aren't available.
-//    C. understand hints->icon_window. for xterm, it seems not usable.
+//    C. understand hints->icon_window (twm concept). for xterm, it seems not usable.
 	XWMHints *hints;
 	g.winlist[g.maxNdx].icon_drawable =
 	    g.winlist[g.maxNdx].icon_mask =
@@ -148,6 +154,29 @@ int addWindowInfo(Window win, int reclevel, int wm_id, char *wm_name)
 				g.winlist[g.maxNdx].name);
 		}
 	}
+
+    // if not found in X props, lookup in png hash
+    if (! g.winlist[g.maxNdx].icon_drawable) {
+        appclass = get_x_property (win, XA_STRING, "WM_CLASS", &class_size);
+        if (appclass) {
+            tryclass = appclass;
+            for (tryclass=appclass; tryclass-appclass < class_size; tryclass += (strlen(tryclass)+1))  {
+                ic = lookupIcon(tryclass);
+                if (ic) {
+                    if (g.debug>0)
+                        fprintf (stderr, "using png icon for %s\n", tryclass);
+                    g.winlist[g.maxNdx].icon_drawable = ic->drawable;
+                    // updated below anyway
+                    //g.winlist[g.maxNdx].icon_w = ic->src_w;
+                    //g.winlist[g.maxNdx].icon_h = ic->src_h;
+                    break;
+                }
+            }
+        } else {
+            if (g.debug>0)
+                fprintf (stderr, "can't find WM_CLASS for \"%s\"\n", g.winlist[g.maxNdx].name);
+        }
+    }
 
     // extract icon width/height/depth
     Window root_return;

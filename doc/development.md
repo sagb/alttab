@@ -25,6 +25,8 @@ adheres to the following:
 * Use Linux coding style (indent -linux)
 * Pass Clang Static Analyzer check (scan-build make) without warnings
 
+The only global variables are: g, dpy, scr, root.
+
 /* vim:tabstop=4:shiftwidth=4:smarttab:expandtab:smartindent  
 */
 
