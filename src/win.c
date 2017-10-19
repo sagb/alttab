@@ -68,16 +68,106 @@ int startupWintasks()
 }
 
 //
+// search for icon in WM hints of "wi".
+// if found, then
+//   fill in "wi->icon_pixmap" and "wi->icon_mask"
+//   and return 1,
+// 0 otherwise.
+//
+int addIconFromHints (WindowInfo* wi)
+{
+	XWMHints *hints;
+    Pixmap hicon, hmask;
+
+    hicon = hmask = 0;
+	if ((hints = XGetWMHints(dpy, wi->id))) {
+		if (g.debug > 1) {
+			fprintf(stderr,
+				"IconPixmapHint: %ld, icon_pixmap: %lu, IconMaskHint: %ld, icon_mask: %lu, IconWindowHint: %ld, icon_window: %lu\n",
+				hints->flags & IconPixmapHint,
+				hints->icon_pixmap, hints->flags & IconMaskHint,
+				hints->icon_mask, hints->flags & IconWindowHint,
+				hints->icon_window);
+		}
+		if ((hints->flags & IconWindowHint) &
+		    (!(hints->flags & IconPixmapHint))) {
+			if (g.debug > 0)
+				fprintf(stderr, "icon_window without icon_pixmap in hints, ignoring\n"); // not usable in xterm?
+		}
+		hicon = (hints->flags & IconPixmapHint) ? hints->icon_pixmap : 0;
+//            ((hints->flags & IconPixmapHint) ?  hints->icon_pixmap : (
+//            (hints->flags & IconWindowHint) ?  hints->icon_window : 0));
+		hmask = (hints->flags & IconMaskHint) ? hints->icon_mask : 0;
+		XFree(hints);
+		if (hicon && (g.debug > 0))
+		    fprintf(stderr, "no icon in WM hints (%s)\n", wi->name);
+	} else {
+		if (g.debug > 0) {
+			fprintf(stderr, "no WM hints (%s)\n", wi->name);
+        }
+	}
+    if (hmask != 0)
+        wi->icon_mask = hmask;
+    if (hicon != 0) {
+        wi->icon_drawable = hicon;
+        return 1;
+    }
+    return 0;
+}
+
+//
+// search for "wi" application class in PNG hash.
+// if found, then
+//   if program options don't request size comparison 
+//   OR png size match better, then
+//     fill in "wi->icon_pixmap" and "wi->icon_mask"
+//     and return 1
+// return 0 otherwise.
+// slow disk operations possible.
+//
+int addIconFromFiles (WindowInfo* wi)
+{
+    char *appclass, *tryclass;
+    long unsigned int class_size;
+    icon_t* ic;
+
+    appclass = get_x_property (wi->id, XA_STRING, "WM_CLASS", &class_size);
+    if (appclass) {
+        tryclass = appclass;
+        for (tryclass=appclass; tryclass-appclass < class_size; tryclass += (strlen(tryclass)+1))  {
+            ic = lookupIcon(tryclass);
+            if (ic &&
+                (g.option_iconSrc != ISRC_SIZE || iconMatchBetter(ic->src_w, ic->src_h, wi->icon_w, wi->icon_h))
+               ) {
+                if (g.debug>0)
+                    fprintf (stderr, "using png icon for %s\n", tryclass);
+                if (ic->drawable == None) {
+                    if (g.debug>1)
+                        fprintf (stderr, "loading content for %s\n", ic->app);
+                    if (loadIconContent (ic) == 0) {
+                        fprintf (stderr, "can't load png icon content\n");
+                        continue;
+                    }
+                }
+                wi->icon_drawable = ic->drawable;
+                wi->icon_mask = 0;
+                return 1;
+            }
+        }
+    } else {
+        if (g.debug>0)
+            fprintf (stderr, "can't find WM_CLASS for \"%s\"\n", wi->name);
+    }
+    return 0;
+}
+
+//
 // add single window info into g.winlist and fix g.sortlist
 // used by x, rp, ...
 // only dpy and win are mandatory
 //
 int addWindowInfo(Window win, int reclevel, int wm_id, char *wm_name)
 {
-    char *appclass, *tryclass;
-    long unsigned int class_size;
-    icon_t* ic;
-
 	if (!
 	    (g.winlist =
 	     realloc(g.winlist, (g.maxNdx + 1) * sizeof(WindowInfo))))
@@ -108,75 +198,27 @@ int addWindowInfo(Window win, int reclevel, int wm_id, char *wm_name)
 
 // 2. icon
 
-// WM_HINTS: https://tronche.com/gui/x/xlib/ICC/client-to-window-manager/wm-hints.html
-// another options: 
-//    A. load icons from files.
-//    B. use full windows as icons. https://www.talisman.org/~erlkonig/misc/x11-composite-tutorial/
+// options:
+// * WM_HINTS: https://tronche.com/gui/x/xlib/ICC/client-to-window-manager/wm-hints.html
+// * load icons from files.
+// * use full windows as icons. https://www.talisman.org/~erlkonig/misc/x11-composite-tutorial/
 //      it's more sophisticated than icon_drawable=win, because hidden window contents aren't available.
-//    C. understand hints->icon_window (twm concept). for xterm, it seems not usable.
-	XWMHints *hints;
+// * understand hints->icon_window (twm concept, xterm).
+
 	g.winlist[g.maxNdx].icon_drawable =
 	    g.winlist[g.maxNdx].icon_mask =
 	    g.winlist[g.maxNdx].icon_w = g.winlist[g.maxNdx].icon_h = 0;
 	unsigned int icon_depth = 0;
 	g.winlist[g.maxNdx].icon_allocated = false;
 
-	if ((hints = XGetWMHints(dpy, win))) {
-		if (g.debug > 1) {
-			fprintf(stderr,
-				"IconPixmapHint: %ld, icon_pixmap: %lu, IconMaskHint: %ld, icon_mask: %lu, IconWindowHint: %ld, icon_window: %lu\n",
-				hints->flags & IconPixmapHint,
-				hints->icon_pixmap, hints->flags & IconMaskHint,
-				hints->icon_mask, hints->flags & IconWindowHint,
-				hints->icon_window);
-		}
-		if ((hints->flags & IconWindowHint) &
-		    (!(hints->flags & IconPixmapHint))) {
-			if (g.debug > 0) {
-				fprintf(stderr,
-					"attention: icon_window without icon_pixmap in hints, ignoring it assuming it's not usable, like in xterm\n");
-			}
-		}
-		g.winlist[g.maxNdx].icon_drawable =
-            (hints->flags & IconPixmapHint) ? hints->icon_pixmap : 0;
-//            ((hints->flags & IconPixmapHint) ?  hints->icon_pixmap : (
-//            (hints->flags & IconWindowHint) ?  hints->icon_window : 0));
-		g.winlist[g.maxNdx].icon_mask =
-		    (hints->flags & IconMaskHint) ? hints->icon_mask : 0;
-		XFree(hints);
-		if (g.winlist[g.maxNdx].icon_drawable && (g.debug > 0)) {
-				fprintf(stderr, "no icon in WM hints (%s)\n",
-					g.winlist[g.maxNdx].name);
-        }
-	} else {
-		if (g.debug > 0) {
-			fprintf(stderr, "no WM hints (%s)\n",
-				g.winlist[g.maxNdx].name);
-		}
-	}
-
-    // if not found in X props, lookup in png hash
-    if (! g.winlist[g.maxNdx].icon_drawable) {
-        appclass = get_x_property (win, XA_STRING, "WM_CLASS", &class_size);
-        if (appclass) {
-            tryclass = appclass;
-            for (tryclass=appclass; tryclass-appclass < class_size; tryclass += (strlen(tryclass)+1))  {
-                ic = lookupIcon(tryclass);
-                if (ic) {
-                    if (g.debug>0)
-                        fprintf (stderr, "using png icon for %s\n", tryclass);
-                    g.winlist[g.maxNdx].icon_drawable = ic->drawable;
-                    // updated below anyway
-                    //g.winlist[g.maxNdx].icon_w = ic->src_w;
-                    //g.winlist[g.maxNdx].icon_h = ic->src_h;
-                    break;
-                }
-            }
-        } else {
-            if (g.debug>0)
-                fprintf (stderr, "can't find WM_CLASS for \"%s\"\n", g.winlist[g.maxNdx].name);
-        }
-    }
+    // search for icon in hints or file hash
+    int icon_in_hints=0;
+    int opt = g.option_iconSrc;
+    if (opt != ISRC_FILES)
+        icon_in_hints = addIconFromHints (&(g.winlist[g.maxNdx]));
+    if ( (opt == ISRC_FALLBACK && ! icon_in_hints) || 
+            opt == ISRC_SIZE || opt == ISRC_FILES )
+        addIconFromFiles (&(g.winlist[g.maxNdx]));
 
     // extract icon width/height/depth
     Window root_return;

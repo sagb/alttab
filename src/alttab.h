@@ -39,6 +39,7 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 #define DEFICONW    16
 #define DEFICONH    16
 #define DEFICON     "16x16"
+#define DEFTHEME    "hicolor"
 #define FRAME_W     8
 //#define DEFFONT   "xft:DejaVu Sans Condensed-10"
 #define DEFFONT     "xft:sans-10"
@@ -104,6 +105,15 @@ typedef struct {
 	char *option_font;
 	int option_tileW, option_tileH;
 	int option_iconW, option_iconH;
+#define ISRC_MIN        0
+#define ISRC_RAM        0
+#define ISRC_FALLBACK   1
+#define ISRC_SIZE       2
+#define ISRC_FILES      3
+#define ISRC_MAX        3
+#define ISRC_DEFAULT    0
+    int option_iconSrc;
+    char *option_theme;
 	unsigned int option_modMask, option_backMask;
 	KeyCode option_modCode, option_keyCode;
 	Color color[NCOLORS];
@@ -122,6 +132,8 @@ int uiPrevWindow();
 
 // windows
 int startupWintasks();
+int addIconFromHints (WindowInfo* wi);
+int addIconFromFiles (WindowInfo* wi);
 int addWindowInfo(Window win, int reclevel, int wm_id, char *wm_name);
 int initWinlist(bool direction);
 void freeWinlist();

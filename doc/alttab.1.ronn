@@ -16,7 +16,7 @@ alttab(1) -- the task switcher
 
 ## SYNOPSIS
 
-`alttab` [`-w` <N>] [`-mm` <N>] [`-bm` <N>] [`-mk` <N>] [`-kk` <N>] [`-t` <NxM>] [`-i` <NxM>] [`-bg` <color>] [`-fg` <color>] [`-frame` <color>] [`-font` <name>] [`-v`|`-vv`]
+`alttab` [`-w` <N>] [`-mm` <N>] [`-bm` <N>] [`-mk` <N>] [`-kk` <N>] [`-t` <NxM>] [`-i` <NxM>] [`-s` <N>] [`-theme` <name>] [`-bg` <color>] [`-fg` <color>] [`-frame` <color>] [`-font` <name>] [`-v`|`-vv`]
 
 ## DESCRIPTION
 
@@ -89,6 +89,35 @@ Most command line options have corresponding X resource.
     default: <16x16>
 
     Size of icons.
+
+  * `-s` <NUMBER>:
+    resource: alttab.icon.source  
+    default: 0
+
+    Source of icons. <NUMBER> must be between 0 and 3:
+
+      <0>: Use icons from X11 window attributes only.
+      
+      <1>: Load icon from file if not found in window attributes.
+
+      Alttab searches for PNG icons under:  
+  
+      /usr/share/icons  
+      /usr/local/share/icons  
+      ~/.icons  
+      ~/.local/share/icons  
+  
+      Directory structure should obey freedesktop standard, but desktop files are ignored, instead file name is expected to be equal to application class. 
+
+      <2>: Prefer icon from file when it better match requested size (see `-i` option).
+
+      <3>: Use icons from files only.
+
+  * `-theme` <name>:
+    resource: alttab.theme  
+    default: <hicolor>
+
+    Desktop theme for application icons. Used when `-s` is 1, 2 or 3.
 
 The following three options accept color names or <#rrggbb>. Special value <\_rnd_low> or <\_rnd_high> produce random color from lower or upper RGB space respectively.
 

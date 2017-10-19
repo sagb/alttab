@@ -53,6 +53,8 @@ Options:\n\
    -mk N      keysym of main key\n\
     -t NxM    tile geometry\n\
     -i NxM    icon geometry\n\
+    -s N      icon source: 0=X11 only, 1=fallback to files, 2=best size, 3=files only\n\
+-theme name   icon theme\n\
    -bg color  background color\n\
    -fg color  foreground color\n\
 -frame color  active frame color\n\
@@ -87,28 +89,19 @@ int use_args_and_xrm(int argc, char **argv)
 	}
 
 	XrmOptionDescRec xrmTable[] = {
-		{"-w", "*windowmanager", XrmoptionSepArg, NULL}
-		,
-		{"-mm", "*modifier.mask", XrmoptionSepArg, NULL}
-		,
-		{"-bm", "*backscroll.mask", XrmoptionSepArg, NULL}
-		,
-		{"-mk", "*modifier.keysym", XrmoptionSepArg, NULL}
-		,
-		{"-kk", "*key.keysym", XrmoptionSepArg, NULL}
-		,
-		{"-t", "*tile.geometry", XrmoptionSepArg, NULL}
-		,
-		{"-i", "*icon.geometry", XrmoptionSepArg, NULL}
-		,
-		{"-bg", "*background", XrmoptionSepArg, NULL}
-		,
-		{"-fg", "*foreground", XrmoptionSepArg, NULL}
-		,
-		{"-frame", "*framecolor", XrmoptionSepArg, NULL}
-		,
-		{"-font", "*font", XrmoptionSepArg, NULL}
-		,
+		{"-w", "*windowmanager", XrmoptionSepArg, NULL} ,
+		{"-mm", "*modifier.mask", XrmoptionSepArg, NULL} ,
+		{"-bm", "*backscroll.mask", XrmoptionSepArg, NULL} ,
+		{"-mk", "*modifier.keysym", XrmoptionSepArg, NULL} ,
+		{"-kk", "*key.keysym", XrmoptionSepArg, NULL} ,
+		{"-t", "*tile.geometry", XrmoptionSepArg, NULL} ,
+		{"-i", "*icon.geometry", XrmoptionSepArg, NULL} ,
+		{"-s", "*icon.source", XrmoptionSepArg, NULL} ,
+		{"-theme", "*theme", XrmoptionSepArg, NULL} ,
+		{"-bg", "*background", XrmoptionSepArg, NULL} ,
+		{"-fg", "*foreground", XrmoptionSepArg, NULL} ,
+		{"-frame", "*framecolor", XrmoptionSepArg, NULL} ,
+		{"-font", "*font", XrmoptionSepArg, NULL} ,
 	};
 	XrmDatabase db;
 	XrmInitialize();
@@ -260,6 +253,26 @@ int use_args_and_xrm(int argc, char **argv)
 			g.option_tileW, g.option_tileH, g.option_iconW,
 			g.option_iconH);
 	}
+
+	endptr = NULL;
+	char *isrcindex = NULL;
+	XRESOURCE_LOAD_STRING(XRMAPPNAME ".icon.source", isrcindex, NULL);
+	if (isrcindex)
+		g.option_iconSrc = strtol(isrcindex, &endptr, 0);
+	if (! ((endptr != NULL) && (*endptr == '\0') && (g.option_iconSrc >= ISRC_MIN)
+	    && (g.option_iconSrc <= ISRC_MAX)) ) {
+        g.option_iconSrc = ISRC_DEFAULT;
+    }
+	if (g.debug > 0)
+		fprintf(stderr, "icon source: %d\n", g.option_iconSrc);
+
+	char *defaultTheme = DEFTHEME;
+    g.option_theme = NULL;
+	XRESOURCE_LOAD_STRING(XRMAPPNAME ".theme", g.option_theme, defaultTheme);
+    if (!g.option_theme)
+		g.option_theme = defaultTheme;
+	if (g.debug > 0)
+		fprintf(stderr, "icon theme: %s\n", g.option_theme);
 
 	char *defaultColorBG = DEFCOLBG;
 	XRESOURCE_LOAD_STRING(XRMAPPNAME ".background", g.color[COLBG].name,

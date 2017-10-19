@@ -99,8 +99,7 @@ int updateIconsFromFile(icon_t** ihash)
         "~/.local/share/icons",
         NULL };
     int idndx = 0;
-    const char* theme = "hicolor";
-    int theme_len = strlen(theme);
+    int theme_len = strlen(g.option_theme);
 
     for (hd=0; icondir_masks[hd]!=NULL; hd++) {
         wordexp (icondir_masks[hd], &we, 0);
@@ -111,7 +110,7 @@ int updateIconsFromFile(icon_t** ihash)
             if (!id2) return 0;
             strncpy (id2, w[id], id2len);
             strcat (id2, "/");
-            strncat (id2, theme, theme_len);
+            strncat (id2, g.option_theme, theme_len);
             id2[id2len] = '\0';
             icon_dirs[idndx] = id2;
             idndx++;
@@ -162,7 +161,7 @@ int updateIconsFromFile(icon_t** ihash)
 } // updateIconsFromFile
 
 //
-// check if the file has better icon for given app than we have in g.ic
+// check if the file has better icon for given app than in g.ic
 // return 1 if this icon is used, 0 otherwise
 //
 int inspectIconFile (FTSENT* pe)
@@ -170,8 +169,7 @@ int inspectIconFile (FTSENT* pe)
     char* point; char* fname; char app[MAXAPPLEN]; int applen;
     char* xchar; char* dim; int dimlen; char sx[5]; char sy[5]; int ix, iy;
     icon_t *ic;
-    int hasdiff, newdiff, replace;
-    char* generic_suffixes[] = { "-color", "-esr", "-im6", NULL };
+    char* generic_suffixes[] = { "-color", "-im6", NULL };
     char* suff; int sfxn;
     int tl;
 
@@ -231,20 +229,7 @@ int inspectIconFile (FTSENT* pe)
         // new candidate: ix, iy
         // best value: g.option_iconW, H
         // should we replace the icon?
-        // assuming square icons
-        hasdiff = ic->src_h - g.option_iconH;
-        newdiff = iy - g.option_iconH;
-        replace = 
-            (hasdiff >= 0) ? (
-                (newdiff < 0) ? 0 : (
-                    (newdiff < hasdiff) ? 1 : 0
-                )
-            ) : (
-                (newdiff >= 0) ? 1 : (
-                    (newdiff > hasdiff) ? 1 : 0
-                )
-            );
-        if (replace==1) {
+        if (iconMatchBetter (ix, iy, ic->src_w, ic->src_h)) {
             strncpy (ic->src_path, pe->fts_path, MAXICONPATHLEN);
             ic->src_w = ix;
             ic->src_h = iy;
@@ -274,13 +259,11 @@ int loadIconContent(icon_t* ic) {
     }
 
     return 1;
-} // loadIconContent
-
+}
 
 //
 // search app icon in hash,
-// load pixmap if necessary,
-// return ready to use icon or NULL if not found
+// return icon or NULL if not found
 //
 icon_t* lookupIcon(char* app)
 {
@@ -293,18 +276,28 @@ icon_t* lookupIcon(char* app)
     appl[l] = '\0';
 
     HASH_FIND_STR (g.ic, appl, ic);
-    if (ic != NULL) {
-        // app is in hash
-        if (ic->drawable == None) {
-            if (g.debug>1)
-                fprintf (stderr, "lookupIcon: loading content for %s\n", ic->app);
-            if (loadIconContent (ic) == 0) {
-                fprintf (stderr, "can't load png icon content\n");
-                return NULL;
-            }
-        }
-    }
     return ic;
-} // lookupIcon
+}
 
+//
+// check if new width/height better match icon size option
+// assuming square icons
+//
+bool iconMatchBetter (int new_w, int new_h, int old_w, int old_h)
+{
+    int hasdiff, newdiff;
+
+    hasdiff = old_h - g.option_iconH;
+    newdiff = new_h - g.option_iconH;
+    return
+        (hasdiff >= 0) ? (
+            (newdiff < 0) ? false : (
+                (newdiff < hasdiff) ? true : false
+            )
+        ) : (
+            (newdiff >= 0) ? true : (
+                (newdiff > hasdiff) ? true : false
+            )
+        );
+}
 

@@ -56,7 +56,8 @@ int initIconHash(icon_t** ihash);
 int updateIconsFromFile(icon_t** ihash); // load all icons into hash (no pixmaps, just path and dimension)
 int inspectIconFile(FTSENT* pe); // check if file pe has better icon than we have in g.ic
 int loadIconContent(icon_t* ic); // update drawable
-icon_t* lookupIcon(char* app); // search app icon in hash, load pixmap if necessary, return ready to use icon
+icon_t* lookupIcon(char* app); // search app icon in hash
+bool iconMatchBetter(int new_w, int new_h, int old_w, int old_h);
 
 
 #endif
