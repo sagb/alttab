@@ -155,6 +155,7 @@ int inspectIconFile (FTSENT* pe)
     int hasdiff, newdiff, replace;
     char* generic_suffixes[] = { "-color", "-esr", "-im6", NULL };
     char* suff; int sfxn;
+    int tl;
 
     // skip non-apps icons
     if (strcmp (pe->fts_parent->fts_name, "apps") != 0)
@@ -170,6 +171,8 @@ int inspectIconFile (FTSENT* pe)
     applen = point-fname > (MAXAPPLEN-1) ? (MAXAPPLEN-1) : point-fname;
     strncpy (app, fname, applen);
     app[applen]='\0';
+    for (tl=0; app[tl]!='\0'; tl++) 
+        app[tl] = tolower (app[tl]);
 
     // sort of generalization
     point = index (app, '.');
@@ -264,8 +267,14 @@ int loadIconContent(icon_t* ic) {
 icon_t* lookupIcon(char* app)
 {
     icon_t* ic;
+    char appl[MAXAPPLEN];
+    int l;
 
-    HASH_FIND_STR (g.ic, app, ic);
+    for (l=0; (*(app+l))!='\0' && l<MAXAPPLEN; l++)
+        appl[l] = tolower (*(app+l));
+    appl[l] = '\0';
+
+    HASH_FIND_STR (g.ic, appl, ic);
     if (ic != NULL) {
         // app is in hash
         if (ic->drawable == None) {

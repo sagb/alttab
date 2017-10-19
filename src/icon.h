@@ -27,12 +27,12 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 #include <X11/Xlib.h>
 #include <X11/Xft/Xft.h>
 #include <uthash.h>
-
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <err.h>
 #include <fts.h>
 #include <stdio.h>
+#include <ctype.h>
 
 #define MAXAPPLEN       64
 #define MAXICONPATHLEN  1024
