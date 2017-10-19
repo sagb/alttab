@@ -33,7 +33,9 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 #include <fts.h>
 #include <stdio.h>
 #include <ctype.h>
+#include <wordexp.h>
 
+#define MAXICONDIRS     64
 #define MAXAPPLEN       64
 #define MAXICONPATHLEN  1024
 

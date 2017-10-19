@@ -79,30 +79,49 @@ int initIconHash(icon_t** ihash)
 //
 int updateIconsFromFile(icon_t** ihash)
 {
-    const char* sysbase = "/usr/share/icons";
-    char* home; const char* userbase = "/.icons";
-    const char* theme = "/hicolor";
-    char* icon_dirs[3];
-    int ib, d_c, f_c;
+    wordexp_t we;
+    char **w;
+    int hd, id;
+    char* id2; int id2len;
+    char* icon_dirs[MAXICONDIRS];
+    int d_c, f_c;
     FTS *ftsp;
     FTSENT *p, *chp;
-    int fts_options = FTS_COMFOLLOW | FTS_LOGICAL | FTS_NOCHDIR;
-    //int rval = 0;
     icon_t *iiter, *tmp;
 
-    icon_dirs[0] = (char*)malloc (strlen(sysbase) + strlen(theme) + 1);
-    strcpy (icon_dirs[0], sysbase);
-    strcat (icon_dirs[0], theme);
-    home = getenv("HOME");
-    icon_dirs[1] = (char*)malloc (strlen(home) + strlen(userbase) + strlen(theme) + 1);
-    strcpy (icon_dirs[1], home);
-    strcat (icon_dirs[1], userbase);
-    strcat (icon_dirs[1], theme);
-    icon_dirs[2] = NULL;
-    if (g.debug>1) {
-        for (ib=0; icon_dirs[ib]; ib++) {
-            fprintf (stderr, "icon dir: %s\n", icon_dirs[ib]);
+    int fts_options = FTS_COMFOLLOW | FTS_LOGICAL | FTS_NOCHDIR;
+    // subject to shell name expansion
+    // XDG_DATA_DIRS ignored
+    const char* icondir_masks[] = {
+        "/usr/share/icons",
+        "/usr/local/share/icons",
+        "~/.icons",
+        "~/.local/share/icons",
+        NULL };
+    int idndx = 0;
+    const char* theme = "hicolor";
+    int theme_len = strlen(theme);
+
+    for (hd=0; icondir_masks[hd]!=NULL; hd++) {
+        wordexp (icondir_masks[hd], &we, 0);
+        w = we.we_wordv;
+        for (id = 0; id < we.we_wordc; id++) {
+            id2len = strlen(w[id])+1+theme_len+1;
+            id2 = malloc (id2len);
+            if (!id2) return 0;
+            strncpy (id2, w[id], id2len);
+            strcat (id2, "/");
+            strncat (id2, theme, theme_len);
+            id2[id2len] = '\0';
+            icon_dirs[idndx] = id2;
+            idndx++;
         }
+        wordfree (&we);
+    }
+    icon_dirs[idndx] = NULL;
+    if (g.debug>1) {
+        for (idndx=0; icon_dirs[idndx]!=NULL; idndx++)
+            fprintf (stderr, "icon dir: %s\n", icon_dirs[idndx]);
     }
 
     if ((ftsp = fts_open(icon_dirs, fts_options, NULL)) == NULL) {
