@@ -111,7 +111,7 @@ int updateIconsFromFile(icon_t** ihash)
             strncpy (id2, w[id], id2len);
             strcat (id2, "/");
             strncat (id2, g.option_theme, theme_len);
-            id2[id2len] = '\0';
+            id2[id2len-1] = '\0';
             icon_dirs[idndx] = id2;
             idndx++;
         }
