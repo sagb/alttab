@@ -138,7 +138,6 @@ int updateIconsFromFile(icon_t** ihash)
                 fprintf (stderr, "app \"%s\" [%s] (%dx%d)\n", iiter->app, iiter->src_path, iiter->src_w, iiter->src_h);
             }
         }
-        // TODO: seems less than find -type f ?
     }
     return 1;
 } // updateIconsFromFile

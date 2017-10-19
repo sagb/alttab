@@ -7,5 +7,9 @@ PKG_CHECK_MODULES([x11], [x11])
 PKG_CHECK_MODULES([xft], [xft])
 PKG_CHECK_MODULES([xrender], [xrender])
 PKG_CHECK_MODULES([libpng], [libpng])
+AC_CHECK_HEADERS([uthash.h],
+  [],
+  [AC_MSG_ERROR([Cannot find uthash.h, please install uthash])]
+  )
 AC_CONFIG_FILES([Makefile src/Makefile doc/Makefile])
 AC_OUTPUT
