@@ -134,10 +134,10 @@ int convert_msb(uint32_t in)
 }
 
 //
-// draws img onto d
-// using: intermediate ximage, visual
+// combines img onto d
+// using: intermediate ximage, visual, background
 //
-int pngDraw(TImage * img, Drawable d, XImage * ximage, Visual * visual)
+int pngDraw(TImage * img, Drawable d, XImage * ximage, Visual * visual,  uint8_t bg_red, uint8_t bg_green, uint8_t bg_blue)
 {
 	uint8_t *src;
 	char *dest;
@@ -150,7 +150,6 @@ int pngDraw(TImage * img, Drawable d, XImage * ximage, Visual * visual)
 	int xrowbytes = ximage->bytes_per_line;
 	uint32_t i, row, lastrow = 0;
 	GC gc = DefaultGC(dpy, scr);
-	static uint8_t bg_red = 0, bg_green = 0, bg_blue = 0;
 
 	RMask = visual->red_mask;
 	GMask = visual->green_mask;
@@ -222,7 +221,7 @@ int pngDraw(TImage * img, Drawable d, XImage * ximage, Visual * visual)
 //
 // draw file on d
 //
-int pngReadToDrawable(char *pngpath, Drawable d)
+int pngReadToDrawable(char *pngpath, Drawable d,  uint8_t bg_red, uint8_t bg_green, uint8_t bg_blue)
 {
     int debug = 0;
 
@@ -277,7 +276,7 @@ int pngReadToDrawable(char *pngpath, Drawable d)
 	}
 	ximage->byte_order = MSBFirst;
 
-	return pngDraw(&img, d, ximage, visual);
+	return pngDraw(&img, d, ximage, visual,  bg_red, bg_green, bg_blue);
 }
 
 //
@@ -306,7 +305,7 @@ int pngReadToDrawable_test(char* pngfile)
 	while (e.type != Expose || e.xexpose.count);
 	XFlush(dpy);
 
-	if (pngReadToDrawable (pngfile, p) != 1) {
+	if (pngReadToDrawable (pngfile, p, 255, 255, 255) != 1) {
 		fprintf(stderr, "can't read png to drawadle\n");
 		return 0;
 	}

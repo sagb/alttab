@@ -268,7 +268,7 @@ int loadIconContent(icon_t* ic) {
         ic->drawable_allocated=true;
     }
 
-    if (pngReadToDrawable(ic->src_path, ic->drawable)==0) {
+    if (pngReadToDrawable(ic->src_path, ic->drawable,  g.color[COLBG].xcolor.red, g.color[COLBG].xcolor.green, g.color[COLBG].xcolor.blue)==0) {
         fprintf (stderr, "can't read png to drawable\n");
         return 0;
     }
