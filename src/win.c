@@ -53,8 +53,11 @@ static int sort_by_order(const void *p1, const void *p2)
 int startupWintasks()
 {
 	g.sortNdx = 0;		// init g.sortlist
-    g.ic = initIcon();
-    initIconHash(&(g.ic));
+    g.ic = NULL;
+    if (g.option_iconSrc != ISRC_RAM) {
+        g.ic = initIcon();
+        initIconHash(&(g.ic));
+    }
 	switch (g.option_wm) {
 	case WM_NO:
 		return 1;
