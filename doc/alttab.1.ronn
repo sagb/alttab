@@ -86,7 +86,7 @@ Most command line options have corresponding X resource.
 
   * `-i` <NNxMM>:
     resource: alttab.icon.geometry  
-    default: <16x16>
+    default: <32x32>
 
     Size of icons.
 

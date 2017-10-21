@@ -36,9 +36,9 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 #define DEFTILEW    112
 #define DEFTILEH    128
 #define DEFTILE     "112x128"
-#define DEFICONW    16
-#define DEFICONH    16
-#define DEFICON     "16x16"
+#define DEFICONW    32
+#define DEFICONH    32
+#define DEFICON     "32x32"
 #define DEFTHEME    "hicolor"
 #define FRAME_W     8
 //#define DEFFONT   "xft:DejaVu Sans Condensed-10"
