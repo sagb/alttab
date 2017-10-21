@@ -4,6 +4,7 @@ Screenshots of alttab
 ![Default options, raw X11](alttab-default-rawx.png?raw=true)
 
 Default options, raw X11 session.
+  
 
 ![Low DPI](alttab-high.png?raw=true)
 
