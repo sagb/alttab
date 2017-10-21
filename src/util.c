@@ -64,14 +64,14 @@ unsigned int getOffendingModifiersMask()
 // for ignoring X errors
 // https://tronche.com/gui/x/xlib/event-handling/protocol-errors/default-handlers.html#XErrorEvent
 // 
-int zeroErrorHandler(XErrorEvent * theEvent)
+int zeroErrorHandler(Display* dpy_our, XErrorEvent * theEvent)
 {
 	ee_ignored = theEvent;
 #define EM 512
 	char etext[EM];
 	if (ee_complain) {
 		memset(etext, '\0', EM);
-		XGetErrorText(dpy, theEvent->error_code, etext, EM);
+		XGetErrorText(dpy_our, theEvent->error_code, etext, EM);
 		fprintf(stderr, "Unexpected X Error: %s\n", etext);
 	}
 	return 0;

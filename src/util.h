@@ -36,7 +36,7 @@ bool ee_complain;
 unsigned int getOffendingModifiersMask();
 int changeKeygrab(Window win, bool grab, KeyCode keycode,
 		  unsigned int modmask, unsigned int ignored_modmask);
-int zeroErrorHandler(XErrorEvent * theEvent);
+int zeroErrorHandler(Display * dpy_our, XErrorEvent * theEvent);
 void setSelectInput(Window win, int reg);
 
 int execAndReadStdout(char *exe, char *args[], char *buf, int bufsize);
