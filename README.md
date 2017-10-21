@@ -1,12 +1,10 @@
-alttab
-======
-
-
 ![Default options, raw X11](doc/screenshots/alttab-default-rawx.png?raw=true)
 
 ![Low DPI](doc/screenshots/alttab-high.png?raw=true)
 
 [screenshot options](doc/screenshots/screenshots.md)
+
+[![chat on freenode](https://img.shields.io/badge/chat-on%20freenode-brightgreen.svg)](?channels=%23alttab)
 
 ```
 alttab is X11 window switcher designed for minimalistic window managers
