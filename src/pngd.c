@@ -254,7 +254,7 @@ int pngReadToDrawable(char *pngpath, Drawable d,  uint8_t bg_red, uint8_t bg_gre
 	}
 	img.data = pngLoadData(&img);
 	fclose(infile);
-	if (!img.data) {
+	if (!img.data || img.width==0 || img.height==0) {
 		fprintf(stderr, "error loading png data\n");
 		return 0;
 	}

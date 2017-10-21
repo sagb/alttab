@@ -23,7 +23,7 @@ adheres to the following:
 
 * Satisfy `-Wall` compiler option
 * Use Linux coding style (indent -linux)
-* Pass Clang Static Analyzer check (scan-build make) without warnings
+* Pass Clang Static Analyzer check (scan-build make) without warnings, except of those about uthash internals and obvious false-positives
 
 The only global variables are: g, dpy, scr, root.
 
