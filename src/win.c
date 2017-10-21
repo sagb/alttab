@@ -136,8 +136,7 @@ int addIconFromFiles (WindowInfo* wi)
 
     appclass = get_x_property (wi->id, XA_STRING, "WM_CLASS", &class_size);
     if (appclass) {
-        tryclass = appclass;
-        for (tryclass=appclass; tryclass-appclass < class_size; tryclass += (strlen(tryclass)+1))  {
+        for (tryclass = appclass; tryclass-appclass < class_size; tryclass += (strlen(tryclass)+1))  {
             ic = lookupIcon(tryclass);
             if (ic &&
                 (g.option_iconSrc != ISRC_SIZE || iconMatchBetter(ic->src_w, ic->src_h, wi->icon_w, wi->icon_h))

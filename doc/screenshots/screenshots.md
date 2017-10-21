@@ -5,7 +5,7 @@ Screenshots of alttab
 
 Default options, raw X11 session.
   
-
+   
 ![Low DPI](alttab-high.png?raw=true)
 
 ```
