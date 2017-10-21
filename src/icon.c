@@ -169,7 +169,7 @@ int inspectIconFile (FTSENT* pe)
     char* point; char* fname; char app[MAXAPPLEN]; int applen;
     char* xchar; char* dim; int dimlen; char sx[5]; char sy[5]; int ix, iy;
     icon_t *ic;
-    char* generic_suffixes[] = { "-color", "-im6", NULL };
+    char* generic_suffixes[] = { "-color", NULL };
     char* suff; int sfxn;
     int tl;
 
@@ -191,9 +191,6 @@ int inspectIconFile (FTSENT* pe)
         app[tl] = tolower (app[tl]);
 
     // sort of generalization
-    point = index (app, '.');
-    if (point!=NULL)
-        *point = '\0';
     sfxn=0; while (generic_suffixes[sfxn] != NULL) {
         suff = strcasestr (app, generic_suffixes[sfxn]);
         if (suff!=NULL) {
