@@ -1,11 +1,3 @@
----
-title: alttab
-description: X11 window switcher designed for minimalistic window managers or standalone X11 session
-author: Alexander Kulak
-tags: x11, xlib, task, switcher
-
----
-
 alttab
 ======
 
