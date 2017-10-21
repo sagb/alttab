@@ -4,7 +4,7 @@
 
 [screenshot options](doc/screenshots/screenshots.md)
 
-[![chat on freenode](https://img.shields.io/badge/chat-on%20freenode-brightgreen.svg)](?channels=%23alttab)
+[![chat on freenode](https://img.shields.io/badge/chat-on%20freenode-brightgreen.svg)](https://webchat.freenode.net/?channels=%23alttab)
 
 ```
 alttab is X11 window switcher designed for minimalistic window managers
