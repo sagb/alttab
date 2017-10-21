@@ -260,7 +260,7 @@ xft_LIBS = @xft_LIBS@
 xrender_CFLAGS = @xrender_CFLAGS@
 xrender_LIBS = @xrender_LIBS@
 alttab_SOURCES = alttab.c gui.c win.c x.c rp.c util.c ewmh.c icon.c pngd.c
-AM_CFLAGS = $(x11_CFLAGS) $(xft_CFLAGS) $(xrender_CFLAGS) $(libpng_CFLAGS) -Wall -O0
+AM_CFLAGS = $(x11_CFLAGS) $(xft_CFLAGS) $(xrender_CFLAGS) $(libpng_CFLAGS) -Wall
 all: all-am
 
 .SUFFIXES:
