@@ -137,7 +137,8 @@ int convert_msb(uint32_t in)
 // combines img onto d
 // using: intermediate ximage, visual, background
 //
-int pngDraw(TImage * img, Drawable d, XImage * ximage, Visual * visual,  uint8_t bg_red, uint8_t bg_green, uint8_t bg_blue)
+int pngDraw(TImage * img, Drawable d, XImage * ximage, Visual * visual,
+	    uint8_t bg_red, uint8_t bg_green, uint8_t bg_blue)
 {
 	uint8_t *src;
 	char *dest;
@@ -221,9 +222,10 @@ int pngDraw(TImage * img, Drawable d, XImage * ximage, Visual * visual,  uint8_t
 //
 // draw file on d
 //
-int pngReadToDrawable(char *pngpath, Drawable d,  uint8_t bg_red, uint8_t bg_green, uint8_t bg_blue)
+int pngReadToDrawable(char *pngpath, Drawable d, uint8_t bg_red,
+		      uint8_t bg_green, uint8_t bg_blue)
 {
-    int debug = 0;
+	int debug = 0;
 
 	FILE *infile;
 	Visual *visual;
@@ -254,12 +256,13 @@ int pngReadToDrawable(char *pngpath, Drawable d,  uint8_t bg_red, uint8_t bg_gre
 	}
 	img.data = pngLoadData(&img);
 	fclose(infile);
-	if (!img.data || img.width==0 || img.height==0) {
+	if (!img.data || img.width == 0 || img.height == 0) {
 		fprintf(stderr, "error loading png data\n");
 		return 0;
 	}
-	if (debug>0)
-        fprintf(stderr, "read %dx%d png, %d channels\n", img.width, img.height, img.channels);
+	if (debug > 0)
+		fprintf(stderr, "read %dx%d png, %d channels\n", img.width,
+			img.height, img.channels);
 	xdata = (uint8_t *) malloc(4 * img.width * img.height);
 	pad = 32;
 	if (!xdata) {
@@ -276,13 +279,13 @@ int pngReadToDrawable(char *pngpath, Drawable d,  uint8_t bg_red, uint8_t bg_gre
 	}
 	ximage->byte_order = MSBFirst;
 
-	return pngDraw(&img, d, ximage, visual,  bg_red, bg_green, bg_blue);
+	return pngDraw(&img, d, ximage, visual, bg_red, bg_green, bg_blue);
 }
 
 //
 // standalone test for pngReadToDrawable (see test/)
 //
-int pngReadToDrawable_test(char* pngfile)
+int pngReadToDrawable_test(char *pngfile)
 {
 	Window p;
 	XEvent e;
@@ -305,7 +308,7 @@ int pngReadToDrawable_test(char* pngfile)
 	while (e.type != Expose || e.xexpose.count);
 	XFlush(dpy);
 
-	if (pngReadToDrawable (pngfile, p, 255, 255, 255) != 1) {
+	if (pngReadToDrawable(pngfile, p, 255, 255, 255) != 1) {
 		fprintf(stderr, "can't read png to drawadle\n");
 		return 0;
 	}

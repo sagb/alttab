@@ -40,24 +40,22 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 #define MAXICONPATHLEN  1024
 
 typedef struct {
-    char app[MAXAPPLEN]; // application name; uthash key
-    char src_path[MAXICONPATHLEN]; // \0 -if not initialized or loaded from X window properties
-    unsigned int src_w, src_h; // width/height of source (not resized) icon
-    Pixmap drawable; // resized (ready to use)
-    Pixmap mask;
-    bool drawable_allocated; // we must free drawable (but not mask), because we created it
-    UT_hash_handle hh;
+	char app[MAXAPPLEN];	// application name; uthash key
+	char src_path[MAXICONPATHLEN];	// \0 -if not initialized or loaded from X window properties
+	unsigned int src_w, src_h;	// width/height of source (not resized) icon
+	Pixmap drawable;	// resized (ready to use)
+	Pixmap mask;
+	bool drawable_allocated;	// we must free drawable (but not mask), because we created it
+	UT_hash_handle hh;
 } icon_t;
 
-
-icon_t* initIcon();
-void deleteIcon(icon_t* ic);
-int initIconHash(icon_t** ihash);
-int updateIconsFromFile(icon_t** ihash); // load all icons into hash (no pixmaps, just path and dimension)
-int inspectIconFile(FTSENT* pe); // check if file pe has better icon than we have in g.ic
-int loadIconContent(icon_t* ic); // update drawable
-icon_t* lookupIcon(char* app); // search app icon in hash
+icon_t *initIcon();
+void deleteIcon(icon_t * ic);
+int initIconHash(icon_t ** ihash);
+int updateIconsFromFile(icon_t ** ihash);	// load all icons into hash (no pixmaps, just path and dimension)
+int inspectIconFile(FTSENT * pe);	// check if file pe has better icon than we have in g.ic
+int loadIconContent(icon_t * ic);	// update drawable
+icon_t *lookupIcon(char *app);	// search app icon in hash
 bool iconMatchBetter(int new_w, int new_h, int old_w, int old_h);
-
 
 #endif

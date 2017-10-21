@@ -30,7 +30,7 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 #include "alttab.h"
 #include "util.h"
 extern Globals g;
-extern Display* dpy;
+extern Display *dpy;
 extern int scr;
 extern Window root;
 
@@ -53,11 +53,11 @@ static int sort_by_order(const void *p1, const void *p2)
 int startupWintasks()
 {
 	g.sortNdx = 0;		// init g.sortlist
-    g.ic = NULL;
-    if (g.option_iconSrc != ISRC_RAM) {
-        g.ic = initIcon();
-        initIconHash(&(g.ic));
-    }
+	g.ic = NULL;
+	if (g.option_iconSrc != ISRC_RAM) {
+		g.ic = initIcon();
+		initIconHash(&(g.ic));
+	}
 	switch (g.option_wm) {
 	case WM_NO:
 		return 1;
@@ -77,12 +77,12 @@ int startupWintasks()
 //   and return 1,
 // 0 otherwise.
 //
-int addIconFromHints (WindowInfo* wi)
+int addIconFromHints(WindowInfo * wi)
 {
 	XWMHints *hints;
-    Pixmap hicon, hmask;
+	Pixmap hicon, hmask;
 
-    hicon = hmask = 0;
+	hicon = hmask = 0;
 	if ((hints = XGetWMHints(dpy, wi->id))) {
 		if (g.debug > 1) {
 			fprintf(stderr,
@@ -95,27 +95,28 @@ int addIconFromHints (WindowInfo* wi)
 		if ((hints->flags & IconWindowHint) &
 		    (!(hints->flags & IconPixmapHint))) {
 			if (g.debug > 0)
-				fprintf(stderr, "icon_window without icon_pixmap in hints, ignoring\n"); // not usable in xterm?
+				fprintf(stderr, "icon_window without icon_pixmap in hints, ignoring\n");	// not usable in xterm?
 		}
-		hicon = (hints->flags & IconPixmapHint) ? hints->icon_pixmap : 0;
+		hicon =
+		    (hints->flags & IconPixmapHint) ? hints->icon_pixmap : 0;
 //            ((hints->flags & IconPixmapHint) ?  hints->icon_pixmap : (
 //            (hints->flags & IconWindowHint) ?  hints->icon_window : 0));
 		hmask = (hints->flags & IconMaskHint) ? hints->icon_mask : 0;
 		XFree(hints);
 		if (hicon && (g.debug > 0))
-		    fprintf(stderr, "no icon in WM hints (%s)\n", wi->name);
+			fprintf(stderr, "no icon in WM hints (%s)\n", wi->name);
 	} else {
 		if (g.debug > 0) {
 			fprintf(stderr, "no WM hints (%s)\n", wi->name);
-        }
+		}
 	}
-    if (hmask != 0)
-        wi->icon_mask = hmask;
-    if (hicon != 0) {
-        wi->icon_drawable = hicon;
-        return 1;
-    }
-    return 0;
+	if (hmask != 0)
+		wi->icon_mask = hmask;
+	if (hicon != 0) {
+		wi->icon_drawable = hicon;
+		return 1;
+	}
+	return 0;
 }
 
 //
@@ -128,39 +129,48 @@ int addIconFromHints (WindowInfo* wi)
 // return 0 otherwise.
 // slow disk operations possible.
 //
-int addIconFromFiles (WindowInfo* wi)
+int addIconFromFiles(WindowInfo * wi)
 {
-    char *appclass, *tryclass;
-    long unsigned int class_size;
-    icon_t* ic;
+	char *appclass, *tryclass;
+	long unsigned int class_size;
+	icon_t *ic;
 
-    appclass = get_x_property (wi->id, XA_STRING, "WM_CLASS", &class_size);
-    if (appclass) {
-        for (tryclass = appclass; tryclass-appclass < class_size; tryclass += (strlen(tryclass)+1))  {
-            ic = lookupIcon(tryclass);
-            if (ic &&
-                (g.option_iconSrc != ISRC_SIZE || iconMatchBetter(ic->src_w, ic->src_h, wi->icon_w, wi->icon_h))
-               ) {
-                if (g.debug>0)
-                    fprintf (stderr, "using png icon for %s\n", tryclass);
-                if (ic->drawable == None) {
-                    if (g.debug>1)
-                        fprintf (stderr, "loading content for %s\n", ic->app);
-                    if (loadIconContent (ic) == 0) {
-                        fprintf (stderr, "can't load png icon content\n");
-                        continue;
-                    }
-                }
-                wi->icon_drawable = ic->drawable;
-                wi->icon_mask = 0;
-                return 1;
-            }
-        }
-    } else {
-        if (g.debug>0)
-            fprintf (stderr, "can't find WM_CLASS for \"%s\"\n", wi->name);
-    }
-    return 0;
+	appclass = get_x_property(wi->id, XA_STRING, "WM_CLASS", &class_size);
+	if (appclass) {
+		for (tryclass = appclass; tryclass - appclass < class_size;
+		     tryclass += (strlen(tryclass) + 1)) {
+			ic = lookupIcon(tryclass);
+			if (ic &&
+			    (g.option_iconSrc != ISRC_SIZE
+			     || iconMatchBetter(ic->src_w, ic->src_h,
+						wi->icon_w, wi->icon_h))
+			    ) {
+				if (g.debug > 0)
+					fprintf(stderr,
+						"using png icon for %s\n",
+						tryclass);
+				if (ic->drawable == None) {
+					if (g.debug > 1)
+						fprintf(stderr,
+							"loading content for %s\n",
+							ic->app);
+					if (loadIconContent(ic) == 0) {
+						fprintf(stderr,
+							"can't load png icon content\n");
+						continue;
+					}
+				}
+				wi->icon_drawable = ic->drawable;
+				wi->icon_mask = 0;
+				return 1;
+			}
+		}
+	} else {
+		if (g.debug > 0)
+			fprintf(stderr, "can't find WM_CLASS for \"%s\"\n",
+				wi->name);
+	}
+	return 0;
 }
 
 //
@@ -213,41 +223,38 @@ int addWindowInfo(Window win, int reclevel, int wm_id, char *wm_name)
 	unsigned int icon_depth = 0;
 	g.winlist[g.maxNdx].icon_allocated = false;
 
-    // search for icon in hints or file hash
-    int icon_in_hints=0;
-    int opt = g.option_iconSrc;
-    if (opt != ISRC_FILES)
-        icon_in_hints = addIconFromHints (&(g.winlist[g.maxNdx]));
-    if ( (opt == ISRC_FALLBACK && ! icon_in_hints) || 
-            opt == ISRC_SIZE || opt == ISRC_FILES )
-        addIconFromFiles (&(g.winlist[g.maxNdx]));
+	// search for icon in hints or file hash
+	int icon_in_hints = 0;
+	int opt = g.option_iconSrc;
+	if (opt != ISRC_FILES)
+		icon_in_hints = addIconFromHints(&(g.winlist[g.maxNdx]));
+	if ((opt == ISRC_FALLBACK && !icon_in_hints) ||
+	    opt == ISRC_SIZE || opt == ISRC_FILES)
+		addIconFromFiles(&(g.winlist[g.maxNdx]));
 
-    // extract icon width/height/depth
-    Window root_return;
-    int x_return, y_return;
-    unsigned int border_width_return;
-    if (g.winlist[g.maxNdx].icon_drawable) {
-        if (XGetGeometry(dpy, g.winlist[g.maxNdx].icon_drawable,
-                    &root_return, &x_return, &y_return,
-                    &(g.winlist[g.maxNdx].icon_w),
-                    &(g.winlist[g.maxNdx].icon_h),
-                    &border_width_return,
-                    &icon_depth) == 0) {
-            if (g.debug > 0) {
-                fprintf(stderr,
-                        "icon dimensions unknown (%s)\n",
-                        g.winlist[g.maxNdx].name);
-            }
-            // probably draw placeholder?
-            g.winlist[g.maxNdx].icon_drawable = 0;
-        } else {
-            if (g.debug > 1) {
-                fprintf(stderr, "depth=%d\n",
-                        icon_depth);
-            }
-        }
-    }
-
+	// extract icon width/height/depth
+	Window root_return;
+	int x_return, y_return;
+	unsigned int border_width_return;
+	if (g.winlist[g.maxNdx].icon_drawable) {
+		if (XGetGeometry(dpy, g.winlist[g.maxNdx].icon_drawable,
+				 &root_return, &x_return, &y_return,
+				 &(g.winlist[g.maxNdx].icon_w),
+				 &(g.winlist[g.maxNdx].icon_h),
+				 &border_width_return, &icon_depth) == 0) {
+			if (g.debug > 0) {
+				fprintf(stderr,
+					"icon dimensions unknown (%s)\n",
+					g.winlist[g.maxNdx].name);
+			}
+			// probably draw placeholder?
+			g.winlist[g.maxNdx].icon_drawable = 0;
+		} else {
+			if (g.debug > 1) {
+				fprintf(stderr, "depth=%d\n", icon_depth);
+			}
+		}
+	}
 // convert icon with different depth (currently 1 only) into default depth
 	if (g.winlist[g.maxNdx].icon_drawable && icon_depth == 1) {
 		if (g.debug > 0) {
