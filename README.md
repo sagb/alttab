@@ -2,7 +2,7 @@
 
 ![Low DPI](doc/screenshots/alttab-high.png?raw=true)
 
-[options for screenshots](doc/screenshots/screenshots.txt)
+[screenshot options](doc/screenshots/screenshots.md)
 
 ```
 alttab is X11 window switcher designed for minimalistic window managers
