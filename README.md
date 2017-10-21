@@ -1,3 +1,10 @@
+![Default options, raw X11](doc/screenshots/alttab-default-rawx.png?raw=true)
+
+![Low DPI](doc/screenshots/alttab-high.png?raw=true)
+```alttab -font "xft:DejaVu Sans Condensed-10" -bg '#c3c6b7' -frame darkblue -t 100x100 -i 16x16 -s 2
+```
+  
+  
 ```
 alttab is X11 window switcher designed for minimalistic window managers
 or standalone X11 session.
@@ -35,12 +42,5 @@ Repository: https://github.com/sagb/alttab
 
 
  -- Alexander Kulak <sa-dev@rainbow.by>  Fri, 28 Apr 2017 13:19:28 +0300
-```
-  
-  
-![Default options, raw X11](doc/screenshots/alttab-default-rawx.png?raw=true)
-
-![Low DPI](doc/screenshots/alttab-high.png?raw=true)
-```alttab -font "xft:DejaVu Sans Condensed-10" -bg '#c3c6b7' -frame darkblue -t 100x100 -i 16x16 -s 2
 ```
 
