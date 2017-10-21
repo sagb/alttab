@@ -38,9 +38,9 @@ Repository: https://github.com/sagb/alttab
 ```
   
   
-![Default options, raw X11](file:///sa/alttab/doc/screenshots/alttab-default-rawx.png?raw=true)
+![Default options, raw X11](doc/screenshots/alttab-default-rawx.png?raw=true)
 
-![High dimensions](file:///sa/alttab/doc/screenshots/alttab-high.png?raw=true)
+![Low DPI](doc/screenshots/alttab-high.png?raw=true)
 ```alttab -font "xft:DejaVu Sans Condensed-10" -bg '#c3c6b7' -frame darkblue -t 100x100 -i 16x16 -s 2
 ```
 
