@@ -66,27 +66,47 @@ See man alttab for details.\n");
 }
 
 //
+// removes argument from argv
+//
+void remove_arg(int *argc, char **argv, int argn)
+{
+    int i;
+    for(i = argn; i < (*argc); ++i)
+    argv[i] = argv[i+1];
+    --(*argc);
+}
+
+//
 // initialize globals based on executable agruments and Xresources
 // return 1 if success, 0 otherwise
 //
-int use_args_and_xrm(int argc, char **argv)
+int use_args_and_xrm(int *argc, char **argv)
 {
 // set debug level early
 	g.debug = 0;
 	char *endptr;
 // not using getopt() because of need for "-v" before Xrm
 	int arg;
-	for (arg = 0; arg < argc; arg++) {
-		if ((strcmp(argv[arg], "-v") == 0))
+	for (arg = 0; arg < (*argc); arg++) {
+		if ((strcmp(argv[arg], "-v") == 0)) {
 			g.debug = 1;
-		else if ((strcmp(argv[arg], "-vv") == 0))
+            remove_arg(argc, argv, arg);
+        }
+        else if ((strcmp(argv[arg], "-vv") == 0)) {
 			g.debug = 2;
-		else if ((strcmp(argv[arg], "-h") == 0))
+            remove_arg(argc, argv, arg);
+        }
+        else if ((strcmp(argv[arg], "-h") == 0)) {
 			helpexit();
+            remove_arg(argc, argv, arg);
+        }
 	}
 	if (g.debug > 0) {
 		fprintf(stderr, "debug level %d\n", g.debug);
 	}
+
+    const char* inv = "invalid %s specified, using default\n";
+    const char* nosym = "the specified %s keysym is not defined for any keycode, using default\n";
 
 	XrmOptionDescRec xrmTable[] = {
 		{"-w", "*windowmanager", XrmoptionSepArg, NULL} ,
@@ -125,7 +145,14 @@ int use_args_and_xrm(int argc, char **argv)
 		return 0;
 	}
 	XrmParseCommand(&db, xrmTable, sizeof(xrmTable) / sizeof(xrmTable[0]),
-			XRMAPPNAME, &argc, argv);
+			XRMAPPNAME, argc, argv);
+    if ((*argc) > 1) {
+        fprintf (stderr, "unknown options or wrong arguments:");
+        int uo; for (uo = 1; uo < (*argc); uo++) {
+            fprintf (stderr, " \"%s\"", argv[uo]);
+        }
+        fprintf (stderr, ", use -h for help\n");
+    }
 
 	XrmValue v;
 	char *type;
@@ -197,33 +224,61 @@ int use_args_and_xrm(int argc, char **argv)
 	char *s;
 	KeySym ksym = defaultModSym;
 	unsigned int mask = defaultModMask;
-// TODO: thorough validation?
+
+    g.option_modMask = defaultModMask;
 	endptr = s = NULL;
 	XRESOURCE_LOAD_STRING(XRMAPPNAME ".modifier.mask", s, NULL);
-	if (s)
+	if (s) {
 		mask = strtol(s, &endptr, 0);
-	g.option_modMask = ((endptr == NULL)
-			    || (*endptr != '\0')) ? defaultModMask : mask;
+        if (*s != '\0' && *endptr == '\0')
+            g.option_modMask = mask;
+        else
+            fprintf (stderr, inv, "modifier mask");
+    }
+
+    g.option_backMask = defaultBackMask;
 	endptr = s = NULL;
 	XRESOURCE_LOAD_STRING(XRMAPPNAME ".backscroll.mask", s, NULL);
-	if (s)
+	if (s) {
 		mask = strtol(s, &endptr, 0);
-	g.option_backMask = ((endptr == NULL)
-			     || (*endptr != '\0')) ? defaultBackMask : mask;
+        if (*s != '\0' && *endptr == '\0')
+            g.option_backMask = mask;
+        else
+            fprintf (stderr, inv, "backscroll mask");
+    }
+
+    g.option_modCode = XKeysymToKeycode(dpy, defaultModSym);
 	endptr = s = NULL;
 	XRESOURCE_LOAD_STRING(XRMAPPNAME ".modifier.keysym", s, NULL);
-	if (s)
+	if (s) {
 		ksym = strtol(s, &endptr, 0);
-	if ((endptr == NULL) || (*endptr != '\0'))
-		ksym = defaultModSym;
-	g.option_modCode = XKeysymToKeycode(dpy, ksym);
+        if (*s != '\0' && *endptr == '\0') {
+            g.option_modCode = XKeysymToKeycode(dpy, ksym);
+            if (g.option_modCode == 0) {
+                fprintf (stderr, nosym, "modifier");
+                g.option_modCode = XKeysymToKeycode(dpy, defaultModSym);
+            }
+        } else {
+            fprintf (stderr, inv, "modifier keysym");
+        }
+    }
+
+    g.option_keyCode = XKeysymToKeycode(dpy, defaultKeySym);
 	endptr = s = NULL;
 	XRESOURCE_LOAD_STRING(XRMAPPNAME ".key.keysym", s, NULL);
-	if (s)
+	if (s) {
 		ksym = strtol(s, &endptr, 0);
-	if ((endptr == NULL) || (*endptr != '\0'))
-		ksym = defaultKeySym;
-	g.option_keyCode = XKeysymToKeycode(dpy, ksym);
+        if (*s != '\0' && *endptr == '\0') {
+            g.option_keyCode = XKeysymToKeycode(dpy, ksym);
+            if (g.option_keyCode == 0) {
+                fprintf (stderr, nosym, "main key");
+                g.option_keyCode = XKeysymToKeycode(dpy, defaultKeySym);
+            }
+        } else {
+            fprintf (stderr, inv, "main key keysym");
+        }
+    }
+
 	if (g.debug > 0) {
 		fprintf(stderr,
 			"modMask %d, backMask %d, modCode %d, keyCode %d\n",
@@ -231,23 +286,45 @@ int use_args_and_xrm(int argc, char **argv)
 			g.option_keyCode);
 	}
 
-	char *defaultTileGeo = DEFTILE;
 	char *gtile, *gicon;
 	int x, y;
 	unsigned int w, h;
 	int xpg;
+
+    g.option_tileW = DEFTILEW;
+    g.option_tileH = DEFTILEH;
+	char *defaultTileGeo = DEFTILE;
 	XRESOURCE_LOAD_STRING(XRMAPPNAME ".tile.geometry", gtile,
 			      defaultTileGeo);
-	xpg = XParseGeometry(gtile, &x, &y, &w, &h);
-	g.option_tileW = (xpg & WidthValue) ? w : DEFTILEW;
-	g.option_tileH = (xpg & HeightValue) ? h : DEFTILEH;
+    if (gtile) {
+    	xpg = XParseGeometry(gtile, &x, &y, &w, &h);
+        if (xpg & WidthValue)
+        	g.option_tileW = w;
+        else
+            fprintf (stderr, inv, "tile width");
+        if (xpg & HeightValue)
+        	g.option_tileH = h;
+        else
+            fprintf (stderr, inv, "tile height");
+    }
 
+    g.option_iconW = DEFICONW;
+    g.option_iconH = DEFICONH;
 	char *defaultIconGeo = DEFICON;
 	XRESOURCE_LOAD_STRING(XRMAPPNAME ".icon.geometry", gicon,
 			      defaultIconGeo);
-	xpg = XParseGeometry(gicon, &x, &y, &w, &h);
-	g.option_iconW = (xpg & WidthValue) ? w : DEFICONW;
-	g.option_iconH = (xpg & HeightValue) ? h : DEFICONH;
+    if (gicon) {
+    	xpg = XParseGeometry(gicon, &x, &y, &w, &h);
+        if (xpg & WidthValue)
+        	g.option_iconW = w;
+        else
+            fprintf (stderr, inv, "icon width");
+        if (xpg & HeightValue)
+        	g.option_iconH = h;
+        else
+            fprintf (stderr, inv, "icon height");
+    }
+
 	if (g.debug > 0) {
 		fprintf(stderr, "%dx%d tile, %dx%d icon\n",
 			g.option_tileW, g.option_tileH, g.option_iconW,
@@ -256,12 +333,19 @@ int use_args_and_xrm(int argc, char **argv)
 
 	endptr = NULL;
 	char *isrcindex = NULL;
+    int isrc = ISRC_DEFAULT;
+    g.option_iconSrc = ISRC_DEFAULT;
 	XRESOURCE_LOAD_STRING(XRMAPPNAME ".icon.source", isrcindex, NULL);
-	if (isrcindex)
-		g.option_iconSrc = strtol(isrcindex, &endptr, 0);
-	if (! ((endptr != NULL) && (*endptr == '\0') && (g.option_iconSrc >= ISRC_MIN)
-	    && (g.option_iconSrc <= ISRC_MAX)) ) {
-        g.option_iconSrc = ISRC_DEFAULT;
+	if (isrcindex) {
+        isrc = strtol(isrcindex, &endptr, 0);
+        if (*isrcindex != '\0' && *endptr == '\0') {
+            if (isrc >= ISRC_MIN && isrc <= ISRC_MAX)
+                g.option_iconSrc = isrc;
+            else
+                fprintf (stderr, "icon source argument must be from %d to %d, using default\n", ISRC_MIN, ISRC_MAX);
+        } else {
+            fprintf (stderr, inv, "icon source");
+        }
     }
 	if (g.debug > 0)
 		fprintf(stderr, "icon source: %d\n", g.option_iconSrc);
@@ -290,11 +374,9 @@ int use_args_and_xrm(int argc, char **argv)
 	    && (*(g.option_font + 4) != '\0')) {
 		g.option_font += 4;
 	} else {
-		if (g.debug > 0) {
-			fprintf(stderr,
-				"invalid font: \"%s\", using default: %s\n",
-				g.option_font, defaultFont);
-		}
+        fprintf(stderr,
+                "invalid font: \"%s\", using default: %s\n",
+                g.option_font, defaultFont);
 		g.option_font = defaultFont + 4;
 	}
 
@@ -347,7 +429,7 @@ int main(int argc, char **argv)
     XErrorHandler hnd = XSetErrorHandler (zeroErrorHandler); // for entire program
     if (hnd) ;; // make -Wunused happy
 
-	if (!use_args_and_xrm(argc, argv))
+	if (!use_args_and_xrm(&argc, argv))
 		die("use_args_and_xrm failed");
 	if (!startupWintasks())
 		die("startupWintasks failed");
