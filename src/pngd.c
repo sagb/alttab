@@ -35,7 +35,8 @@ int pngInit(FILE * infile, TImage * img)
 	png_uint_32 width, height;
 	uint8_t sig[8];
 
-	fread(sig, 1, 8, infile);
+	if (fread(sig, 1, 8, infile) == 0)
+        return 0;
 	if (!png_check_sig(sig, 8))
 		return 0;
 	png_ptr =
