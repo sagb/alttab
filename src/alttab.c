@@ -421,6 +421,8 @@ int main(int argc, char **argv)
 
 	XEvent ev;
 	dpy = XOpenDisplay(NULL);
+    if (!dpy)
+        die("can't open display");
     scr = DefaultScreen(dpy);
 	root = DefaultRootWindow(dpy);
 
