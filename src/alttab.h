@@ -111,7 +111,7 @@ typedef struct {
 #define ISRC_SIZE       2
 #define ISRC_FILES      3
 #define ISRC_MAX        3
-#define ISRC_DEFAULT    0
+#define ISRC_DEFAULT    2
     int option_iconSrc;
     char *option_theme;
 	unsigned int option_modMask, option_backMask;

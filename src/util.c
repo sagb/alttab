@@ -572,7 +572,7 @@ char *get_x_property(Window win, Atom prop_type, char *prop_name,
 	XSync(dpy, False);	// for error to "appear"
 	ee_complain = true;
 
-	if (propstatus != Success) {
+	if (propstatus != Success && debug > 0) {
 		fprintf(stderr,
 			"get_x_property: XGetWindowProperty failed (win %ld, prop %s)\n",
 			win, prop_name);

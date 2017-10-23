@@ -23,8 +23,8 @@ alttab(1) -- the task switcher
 The task switcher designed for minimalistic window managers or standalone X11 session.
 
 Unlike task switchers integrated in most simple WMs,
-`alttab` emulates Microsoft task switcher tactile behaviour,
-switching windows on releasing Alt key.
+`alttab` features visual interface and convenient
+tactile behaviour, switching windows on releasing Alt key.
 
 Being lightweight and depending only on core X11 libs, 
 it still features customizable look and behaviour.
