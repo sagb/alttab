@@ -1,9 +1,15 @@
-AC_INIT([alttab], [1.0.2])
+AC_INIT([alttab], [1.1.0])
 AM_INIT_AUTOMAKE([foreign subdir-objects])
 AC_CONFIG_SRCDIR([configure.ac])
 AC_CONFIG_HEADERS([config.h])
 AC_PROG_CC
 PKG_CHECK_MODULES([x11], [x11])
 PKG_CHECK_MODULES([xft], [xft])
+PKG_CHECK_MODULES([xrender], [xrender])
+PKG_CHECK_MODULES([libpng], [libpng])
+AC_CHECK_HEADERS([uthash.h],
+  [],
+  [AC_MSG_ERROR([Cannot find uthash.h, please install uthash])]
+  )
 AC_CONFIG_FILES([Makefile src/Makefile doc/Makefile])
 AC_OUTPUT

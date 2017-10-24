@@ -2,10 +2,10 @@
 Dependencies
 ------------
 
-Basic Xlib and Xft libraries are required.
+Basic Xlib, Xft, Xrender, libpng libraries and uthash macros are required.
 In Debian or Ubuntu:
 
-> apt-get install libx11-dev libxmu-dev libxft-dev
+> apt-get install libx11-dev libxmu-dev libxft-dev libxrender-dev libpng-dev uthash-dev
 
 As maintainer or packager, also install autotools and ronn:
 
@@ -29,14 +29,5 @@ Installing alttab
 > make  
 > make install
 
-4. Run:
-
-> alttab
-
-Usually it should be fully functional without any argument.
-Start alttab after WM, to let it auto-recognize the WM. For examples, add the following to ~/.ratpoisonrc:
-
-exec alttab
-
-If there are no WM at all, then start alttab in ~/.xsession or elsewhere.
+See README for usage notes.
 
