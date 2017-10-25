@@ -2,8 +2,16 @@ Source: alttab
 Section: x11
 Priority: optional
 Maintainer: Alexander Kulak <sa-dev@rainbow.by>
-Build-Depends: debhelper (>= 10), libx11-dev, libxmu-dev, libxft-dev, libxrender-dev, libpng-dev, uthash-dev, autoconf, automake
-Standards-Version: 4.1.1
+Build-Depends: debhelper (>= 10~),
+               libx11-dev,
+               libxmu-dev,
+               libxft-dev,
+               libxrender-dev,
+               libpng-dev,
+               uthash-dev,
+               autoconf,
+               automake
+Standards-Version: 4.1.1.0
 Vcs-Git: https://github.com/sagb/alttab.git -b debian/unstable
 Vcs-Browser: https://github.com/sagb/alttab/tree/debian/unstable
 Homepage: https://sagb.github.io/alttab
