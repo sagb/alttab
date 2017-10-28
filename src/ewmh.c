@@ -82,8 +82,10 @@ int ewmh_initWinlist()
 	char *awp;
 	unsigned long sz;
 	char *title;
+    unsigned long current_desktop;
 
 	aw = (Window) 0;
+    current_desktop = ewmh_getCurrentDesktop();
 
 	if ((awp = get_x_property(root, XA_WINDOW, "_NET_ACTIVE_WINDOW", &sz))) {
 		aw = *((Window *) awp);
@@ -108,6 +110,9 @@ int ewmh_initWinlist()
 
 	for (i = 0; i < client_list_size / sizeof(Window); i++) {
 		Window w = client_list[i];
+
+        if (current_desktop != ewmh_getDesktopOfWindow(w))
+            continue;
 
 		// build title
 		char *wmn1 = get_x_property(w, XA_STRING, "WM_NAME", NULL);
@@ -155,3 +160,32 @@ int ewmh_setFocus(int winNdx)
 	XMapRaised(dpy, win);
 	return 1;
 }
+
+//
+// get current desktop in EWMH WM
+//
+unsigned long ewmh_getCurrentDesktop()
+{
+    unsigned long *cd;
+    cd = (unsigned long*)get_x_property (root, XA_CARDINAL,
+            "_NET_CURRENT_DESKTOP", NULL);
+    if (!cd)
+        cd = (unsigned long*)get_x_property (root, XA_CARDINAL,
+                "_WIN_WORKSPACE", NULL);
+    return *cd;
+}
+
+//
+// get desktop of window w in EWMH WM
+//
+unsigned long ewmh_getDesktopOfWindow(Window w)
+{
+    unsigned long *d;
+    d = (unsigned long*)get_x_property (w, XA_CARDINAL,
+            "_NET_WM_DESKTOP", NULL);
+    if (!d)
+        d = (unsigned long*)get_x_property (w, XA_CARDINAL,
+                "_WIN_WORKSPACE", NULL);
+    return *d;
+}
+

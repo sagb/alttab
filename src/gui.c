@@ -424,8 +424,9 @@ int uiShow(bool direction)
 	if (g.debug > 0) {
 		fprintf(stderr, "our window is %lu\n", uiwin);
 	}
+
 // set properties of our window
-	XStoreName(dpy, uiwin, XWINNAME);
+    XStoreName(dpy, uiwin, XWINNAME);
 	XSelectInput(dpy, uiwin, ExposureMask | KeyPressMask | KeyReleaseMask);
 // set window type so that WM will hopefully not resize it
 // before mapping: https://specifications.freedesktop.org/wm-spec/1.3/ar01s05.html
@@ -434,9 +435,30 @@ int uiShow(bool direction)
 	Atom td = XInternAtom(dpy, "_NET_WM_WINDOW_TYPE_DIALOG", False);
 	if (at && wt && td)
 		XChangeProperty(dpy, uiwin, wt, at, 32, PropModeReplace,
-				(unsigned char *)(&td), 1);
+            (unsigned char *)(&td), 1);
+// disable appearance in taskbar
+    Atom st = XInternAtom(dpy, "_NET_WM_STATE", True);
+    Atom sk = XInternAtom(dpy, "_NET_WM_STATE_SKIP_TASKBAR", True); // there is also PAGER
+    if (at && st && sk)
+        XChangeProperty(dpy, uiwin, st, at, 32, PropModeReplace,
+            (unsigned char *)(&sk), 1);
 // xmonad ignores _NET_WM_WINDOW_TYPE_DIALOG but obeys WM_TRANSIENT_FOR
 	XSetTransientForHint(dpy, uiwin, uiwin);
+// disable window title and borders. works in xfwm4.
+#define PROP_MOTIF_WM_HINTS_ELEMENTS 5
+#define MWM_HINTS_DECORATIONS (1L << 1)
+    struct {
+        unsigned long flags;
+        unsigned long functions;
+        unsigned long decorations;
+        long inputMode;
+        unsigned long status;
+    } hints = { MWM_HINTS_DECORATIONS, 0, 0, };
+    Atom ma = XInternAtom(dpy, "_MOTIF_WM_HINTS", False);
+    if (ma) {
+        XChangeProperty(dpy, uiwin, ma, ma, 32, PropModeReplace,
+            (unsigned char *)&hints, PROP_MOTIF_WM_HINTS_ELEMENTS);
+    }
 
 	XMapWindow(dpy, uiwin);
 	return 1;
