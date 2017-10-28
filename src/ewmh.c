@@ -125,7 +125,7 @@ int ewmh_initWinlist()
 
 		addWindowInfo(w, 0, 0, title);
 		if (w == aw) {
-			g.startNdx = i;
+			g.startNdx = g.maxNdx-1;
 		}
 	}
 
