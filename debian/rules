@@ -5,7 +5,7 @@ PKG  = $(word 2,$(shell dpkg-parsechangelog -l$(PKD)/changelog --show-field=Sour
 VER ?= $(shell dpkg-parsechangelog -l$(PKD)/changelog | perl -ne 'print $$1 if m{^Version:\s+(?:\d+:)?(\d.*)(?:\-\d+.*)};')
 
 %:
-	dh $@ --with autotools_dev
+	dh $@
 
 # alttab: allow this hook when upstream will prepare something
 # important in bootstrap.sh, besides of autotools and man page.

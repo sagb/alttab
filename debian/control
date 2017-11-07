@@ -2,7 +2,15 @@ Source: alttab
 Section: x11
 Priority: optional
 Maintainer: Alexander Kulak <sa-dev@rainbow.by>
-Build-Depends: debhelper (>= 9), libx11-dev, libxmu-dev, libxft-dev, autoconf, automake, autotools-dev
+Build-Depends: debhelper (>= 9),
+               libx11-dev,
+               libxmu-dev,
+               libxft-dev,
+               libxrender-dev,
+               libpng-dev,
+               uthash-dev,
+               autoconf,
+               automake
 Standards-Version: 3.9.8
 Vcs-Git: https://github.com/sagb/alttab.git -b debian/unstable
 Vcs-Browser: https://github.com/sagb/alttab/tree/debian/unstable
@@ -12,6 +20,7 @@ Package: alttab
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Suggests: fonts-dejavu-core
+Enhances: ratpoison, dwm, xmonad
 Description: task switcher for minimalistic WMs or standalone X session
  alttab provides convenient visual interface and switching on releasing
  Alt, not on pressing Tab key. Being lightweight and depending only on
