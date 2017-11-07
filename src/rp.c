@@ -105,7 +105,7 @@ int rp_startupWintasks()
 //
 // initialize winlist/startNdx/update sortlist from ratpoison output
 //
-int rp_initWinlist(Display * dpy)
+int rp_initWinlist()
 {
 
 	char *args[] = { "ratpoison", "-c", "windows %n %i %s %t", NULL };
@@ -160,7 +160,7 @@ int rp_initWinlist(Display * dpy)
 				break;
 			}
 			// the rest of string is name
-			addWindowInfo(dpy, win, 0, wm_id, rest2);
+			addWindowInfo(win, 0, wm_id, rest2);
 		}
 	}
 
