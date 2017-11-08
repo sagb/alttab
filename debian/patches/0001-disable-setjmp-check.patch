@@ -1,0 +1,21 @@
+From: Alexander Kulak <sa-dev@rainbow.by>
+Date: Wed, 8 Nov 2017 10:01:12 +0300
+Subject: disable setjmp check
+
+workaround for ancient libpng
+---
+ src/pngd.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/pngd.h b/src/pngd.h
+index ef2ecdb..35f6d94 100644
+--- a/src/pngd.h
++++ b/src/pngd.h
+@@ -25,6 +25,7 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
+ #include <stdlib.h>
+ #include <stdint.h>
+ #include <X11/Xlib.h>
++#define PNG_SKIP_SETJMP_CHECK
+ #include <png.h>
+ 
+ // PUBLIC
