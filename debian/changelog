@@ -1,3 +1,11 @@
+alttab (1.1.0-2) jessie; urgency=medium
+
+  [ Alexander Kulak ]
+  * debhelper 9 for jessie
+  * disable setjmp check in jessie
+
+ -- Alexander Kulak <sa-dev@rainbow.by>  Wed, 08 Nov 2017 15:04:41 +0300
+
 alttab (1.1.0-1) unstable; urgency=medium
 
   * Initial release (Closes: #861533)
