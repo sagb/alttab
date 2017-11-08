@@ -25,7 +25,6 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdlib.h>
 #include <stdint.h>
 #include <X11/Xlib.h>
-#define PNG_SKIP_SETJMP_CHECK
 #include <png.h>
 
 // PUBLIC
