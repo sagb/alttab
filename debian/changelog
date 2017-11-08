@@ -1,5 +1,13 @@
+alttab (1.1.0-2) stretch; urgency=medium
+
+  [ Alexander Kulak ]
+  * control for stretch
+
+ -- Alexander Kulak <sa-dev@rainbow.by>  Wed, 08 Nov 2017 18:33:08 +0300
+
 alttab (1.1.0-1) unstable; urgency=medium
 
+  [ Alexander Kulak ]
   * Initial release (Closes: #861533)
 
- -- Alexander Kulak <sa-dev@rainbow.by>  Wed, 25 Oct 2017 11:15:28 +0300
+ -- Alexander Kulak <sa-dev@rainbow.by>  Wed, 08 Nov 2017 18:32:46 +0300
