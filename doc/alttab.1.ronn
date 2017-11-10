@@ -82,7 +82,7 @@ Most command line options have corresponding X resource.
     resource: alttab.tile.geometry  
     default: <112x128>
 
-    Maximum size of a single tile (mini-window). If switcher doesn't fit the screen, tile may be thinner.
+    Size of a single tile (mini-window). If switcher doesn't fit the screen, tile may be thinner.
 
   * `-i` <NNxMM>:
     resource: alttab.icon.geometry  
