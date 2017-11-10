@@ -109,7 +109,7 @@ Most command line options have corresponding X resource.
   
       Directory structure should obey freedesktop standard, but desktop files are ignored, instead file name is expected to be equal to application class. 
 
-      <2>: Prefer icon from file when it better match requested size (see `-i` option).
+      <2>: Prefer icon from file when it matches requested size better (see `-i` option).
 
       <3>: Use icons from files only.
 
