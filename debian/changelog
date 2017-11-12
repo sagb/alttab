@@ -1,4 +1,6 @@
-alttab (1.1.0-2) unstable; urgency=medium
+alttab (1.1.0-2~1.gbpd0980c) unstable; urgency=medium
+
+  ** SNAPSHOT build @d0980cfb3f8d4435eefd2225e1315616b9410a85 **
 
   [ Alexander Kulak ]
   * uniform behaviour in EWMH-compatible WM
@@ -6,7 +8,7 @@ alttab (1.1.0-2) unstable; urgency=medium
   * fixed segfault due to wrong array index
   * binary installation documented
 
- -- Alexander Kulak <sa-dev@rainbow.by>  Sun, 12 Nov 2017 14:35:30 +0300
+ -- Alexander Kulak <sa-dev@rainbow.by>  Sun, 12 Nov 2017 14:49:09 +0300
 
 alttab (1.1.0-1) unstable; urgency=medium
 
