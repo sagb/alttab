@@ -1,1 +1,1 @@
-extend-diff-ignore = '^\.gitreview$'
+extend-diff-ignore = '.'
