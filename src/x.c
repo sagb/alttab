@@ -27,6 +27,9 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 #include "alttab.h"
 #include "util.h"
 extern Globals g;
+extern Display* dpy;
+extern int scr;
+extern Window root;
 
 // PRIVATE
 
@@ -34,14 +37,14 @@ extern Globals g;
 // get window group leader
 // to be used later. rewritten, not tested.
 //
-Window x_get_leader(Display * dpy, Window win)
+Window x_get_leader(Window win)
 {
 	Window *retprop;
 	XWMHints *h;
 	Window leader = None;
 
 	retprop =
-	    (Window *) get_x_property(dpy, win, XA_WINDOW, "WM_CLIENT_LEADER",
+	    (Window *) get_x_property(win, XA_WINDOW, "WM_CLIENT_LEADER",
 				      NULL);
 	if (retprop != NULL) {
 		leader = retprop[0];
@@ -61,7 +64,7 @@ Window x_get_leader(Display * dpy, Window win)
 // set winlist,maxNdx,startNdx recursively using raw Xlib
 // first call should be (win=root, reclevel=0)
 //
-int x_initWindowsInfoRecursive(Display * dpy, Window win, int reclevel)
+int x_initWindowsInfoRecursive(Window win, int reclevel)
 {
 
 	Window root, parent;
@@ -74,7 +77,7 @@ int x_initWindowsInfoRecursive(Display * dpy, Window win, int reclevel)
 // caveat: in rp, gvim leader has no file name and icon
 // this doesn't work in raw X: leader may be not viewable.
 /*
-leader = x_get_leader (dpy, win);
+leader = x_get_leader (win);
 if (g.debug>1) {fprintf (stderr, "win: %x leader: %x\n", win, leader);}
 */
 // add viewable only
@@ -86,7 +89,7 @@ if (g.debug>1) {fprintf (stderr, "win: %x leader: %x\n", win, leader);}
 //if ( ((!leader) || leader==win)  &&
 //if ( (leader==win)  &&
 	if (wa.map_state == IsViewable && reclevel != 0) {
-		addWindowInfo(dpy, win, reclevel, 0, NULL);
+		addWindowInfo(win, reclevel, 0, NULL);
 	}
 // skip children if max recursion level reached
 	if (g.option_max_reclevel != -1 && reclevel >= g.option_max_reclevel)
@@ -100,7 +103,7 @@ if (g.debug>1) {fprintf (stderr, "win: %x leader: %x\n", win, leader);}
 		return 0;
 	}
 	for (i = 0; i < nchildren; ++i) {
-		x_initWindowsInfoRecursive(dpy, children[i], reclevel + 1);
+		x_initWindowsInfoRecursive(children[i], reclevel + 1);
 	}
 
 	if (nchildren > 0 && children) {
@@ -115,7 +118,7 @@ if (g.debug>1) {fprintf (stderr, "win: %x leader: %x\n", win, leader);}
 //
 // set window focus in raw X
 //
-int x_setFocus(Display * dpy, int wndx)
+int x_setFocus(int wndx)
 {
 	Window w = g.winlist[wndx].id;
 

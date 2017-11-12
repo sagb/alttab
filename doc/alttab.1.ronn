@@ -16,15 +16,15 @@ alttab(1) -- the task switcher
 
 ## SYNOPSIS
 
-`alttab` [`-w` <N>] [`-mm` <N>] [`-bm` <N>] [`-mk` <N>] [`-kk` <N>] [`-t` <NxM>] [`-i` <NxM>] [`-bg` <color>] [`-fg` <color>] [`-frame` <color>] [`-font` <name>] [`-v`|`-vv`]
+`alttab` [`-w` <N>] [`-mm` <N>] [`-bm` <N>] [`-mk` <N>] [`-kk` <N>] [`-t` <NxM>] [`-i` <NxM>] [`-s` <N>] [`-theme` <name>] [`-bg` <color>] [`-fg` <color>] [`-frame` <color>] [`-font` <name>] [`-v`|`-vv`]
 
 ## DESCRIPTION
 
 The task switcher designed for minimalistic window managers or standalone X11 session.
 
 Unlike task switchers integrated in most simple WMs,
-`alttab` emulates Microsoft task switcher tactile behaviour,
-switching windows on releasing Alt key.
+`alttab` features visual interface and convenient
+tactile behaviour, switching windows on releasing Alt key.
 
 Being lightweight and depending only on core X11 libs, 
 it still features customizable look and behaviour.
@@ -48,7 +48,7 @@ Most command line options have corresponding X resource.
 
       <1>: EWMH compatible.
 
-      Compatible WM list is in [SEE ALSO] below. Tested in xmonad(1) (EWMH must be allowed, details in doc/xmonad.md), i3(1), evilwm(1).
+      Compatible WM list is in [SEE ALSO] below. Tested in xmonad(1) (EWMH must be allowed, details in doc/xmonad.md), i3(1), evilwm(1), xfwm4(1).
 
       <2>: Ratpoison.
 
@@ -82,13 +82,42 @@ Most command line options have corresponding X resource.
     resource: alttab.tile.geometry  
     default: <112x128>
 
-    Maximum size of a single tile (mini-window). If switcher doesn't fit the screen, tile may be thinner.
+    Size of a single tile (mini-window). If switcher doesn't fit the screen, tile may be thinner.
 
   * `-i` <NNxMM>:
     resource: alttab.icon.geometry  
-    default: <16x16>
+    default: <32x32>
 
     Size of icons.
+
+  * `-s` <NUMBER>:
+    resource: alttab.icon.source  
+    default: 2
+
+    Source of icons. <NUMBER> must be between 0 and 3:
+
+      <0>: Use icons from X11 window attributes only.
+      
+      <1>: Load icon from file if not found in window attributes.
+
+      Alttab searches for PNG icons under:  
+  
+      /usr/share/icons  
+      /usr/local/share/icons  
+      ~/.icons  
+      ~/.local/share/icons  
+  
+      Directory structure should obey freedesktop standard, but desktop files are ignored, instead file name is expected to be equal to application class. 
+
+      <2>: Prefer icon from file when it matches requested size better (see `-i` option).
+
+      <3>: Use icons from files only.
+
+  * `-theme` <name>:
+    resource: alttab.theme  
+    default: <hicolor>
+
+    Desktop theme for application icons. Used when `-s` is 1, 2 or 3.
 
 The following three options accept color names or <#rrggbb>. Special value <\_rnd_low> or <\_rnd_high> produce random color from lower or upper RGB space respectively.
 
@@ -114,9 +143,9 @@ The following three options accept color names or <#rrggbb>. Special value <\_rn
     resource: alttab.font  
     default: *xft:sans-10*
 
-    Label font name in format: `xft:fontconfig_pattern`, like in emacs(1) and rxvt(1). See [SEE ALSO] for fontconfig pattern. It's neigher GTK font pattern nor legacy XLFD.
+    Label font name in format: `xft:fontconfig_pattern`, like in emacs(1) and rxvt(1). See [SEE ALSO] for fontconfig pattern. It's neither GTK font pattern nor legacy XLFD.
 
-Your Xresources database probably already have \*background, \*foreground or \*font wildcard definitions, which alttab will obey. Precedence order (preferred first):
+Your Xresources database probably already has \*background, \*foreground or \*font wildcard definitions, which alttab will obey. Precedence order (preferred first):
 
    alttab.font resource,  
    `-font` option,  

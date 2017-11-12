@@ -29,6 +29,9 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 #include "alttab.h"
 #include "util.h"
 extern Globals g;
+extern Display* dpy;
+extern int scr;
+extern Window root;
 
 // PRIVATE
 
@@ -49,7 +52,7 @@ XftFont *fontLabel;
 //   1: for bg fill
 //   2: for drawing frame
 //
-GC create_gc(Display * display, int screen_num, Window win, int type)
+GC create_gc(int type)
 {
 	GC gc;			/* handle of newly created GC.  */
 	unsigned long valuemask = 0;	/* which values in 'values' to  */
@@ -59,7 +62,7 @@ GC create_gc(Display * display, int screen_num, Window win, int type)
 	int cap_style = CapButt;
 	int join_style = JoinMiter;
 
-	gc = XCreateGC(display, win, valuemask, &values);
+	gc = XCreateGC(dpy, root, valuemask, &values);
 	if (gc < 0) {
 		fprintf(stderr, "can't create GC\n");
 		return 0;
@@ -67,21 +70,21 @@ GC create_gc(Display * display, int screen_num, Window win, int type)
 	/* allocate foreground and background colors for this GC. */
 	switch (type) {
 	case 1:
-		XSetForeground(display, gc, g.color[COLBG].xcolor.pixel);
-		XSetBackground(display, gc, g.color[COLFG].xcolor.pixel);
-		XSetLineAttributes(display, gc, FRAME_W, line_style, cap_style,
+		XSetForeground(dpy, gc, g.color[COLBG].xcolor.pixel);
+		XSetBackground(dpy, gc, g.color[COLFG].xcolor.pixel);
+		XSetLineAttributes(dpy, gc, FRAME_W, line_style, cap_style,
 				   join_style);
 		break;
 	case 0:
-		XSetForeground(display, gc, g.color[COLFG].xcolor.pixel);
-		XSetBackground(display, gc, g.color[COLBG].xcolor.pixel);
-		XSetLineAttributes(display, gc, 1, line_style, cap_style,
+		XSetForeground(dpy, gc, g.color[COLFG].xcolor.pixel);
+		XSetBackground(dpy, gc, g.color[COLBG].xcolor.pixel);
+		XSetLineAttributes(dpy, gc, 1, line_style, cap_style,
 				   join_style);
 		break;
 	case 2:
-		XSetForeground(display, gc, g.color[COLFRAME].xcolor.pixel);
-		XSetBackground(display, gc, g.color[COLBG].xcolor.pixel);
-		XSetLineAttributes(display, gc, FRAME_W, line_style, cap_style,
+		XSetForeground(dpy, gc, g.color[COLFRAME].xcolor.pixel);
+		XSetBackground(dpy, gc, g.color[COLBG].xcolor.pixel);
+		XSetLineAttributes(dpy, gc, FRAME_W, line_style, cap_style,
 				   join_style);
 		break;
 	default:
@@ -89,14 +92,14 @@ GC create_gc(Display * display, int screen_num, Window win, int type)
 		break;
 	}
 	/* define the fill style for the GC. to be 'solid filling'. */
-	XSetFillStyle(display, gc, FillSolid);
+	XSetFillStyle(dpy, gc, FillSolid);
 	return gc;
 }
 
 //
 // single use helper for function below
 //
-void drawFr(Display * dpy, GC gc, int f)
+void drawFr(GC gc, int f)
 {
 	int d = XDrawRectangle(dpy, uiwin, gc,
 			       f * (tileW + FRAME_W) + (FRAME_W / 2),
@@ -110,17 +113,17 @@ void drawFr(Display * dpy, GC gc, int f)
 //
 // draw selected and unselected frames around tiles
 //
-void framesRedraw(Display * dpy)
+void framesRedraw()
 {
 	int f;
 	for (f = 0; f < g.maxNdx; f++) {
 		if (f == g.selNdx)
 			continue;	// skip
-		drawFr(dpy, g.gcReverse, f);	// thick bg
-		drawFr(dpy, g.gcDirect, f);	// thin frame
+		drawFr(g.gcReverse, f);	// thick bg
+		drawFr(g.gcDirect, f);	// thin frame
 	}
 // _after_ unselected draw selected, because they may overlap
-	drawFr(dpy, g.gcFrame, g.selNdx);
+	drawFr(g.gcFrame, g.selNdx);
 }
 
 // PUBLIC
@@ -139,16 +142,15 @@ if (g.gcDirect) XFreeGC (dpy, g.gcDirect);
 if (g.gcReverse) XFreeGC (dpy, g.gcReverse);
 if (g.gcFrame) XFreeGC (dpy, g.gcFrame);
 */
-int startupGUItasks(Display * dpy, Window root)
+int startupGUItasks()
 {
 
-	scrNum = DefaultScreen(dpy);
-	scrW = DisplayWidth(dpy, scrNum);
-	scrH = DisplayHeight(dpy, scrNum);
+	scrW = DisplayWidth(dpy, scr);
+	scrH = DisplayHeight(dpy, scr);
 
 // colors
-	colormap = DefaultColormap(dpy, scrNum);
-	visual = DefaultVisual(dpy, scrNum);
+	colormap = DefaultColormap(dpy, scr);
+	visual = DefaultVisual(dpy, scr);
 	if (g.debug > 0) {
 		fprintf(stderr, "early allocating colors\n");
 	}
@@ -211,9 +213,9 @@ int startupGUItasks(Display * dpy, Window root)
 	if (g.debug > 0) {
 		fprintf(stderr, "early building GCs\n");
 	}
-	g.gcDirect = create_gc(dpy, scrNum, root, 0);
-	g.gcReverse = create_gc(dpy, scrNum, root, 1);
-	g.gcFrame = create_gc(dpy, scrNum, root, 2);
+	g.gcDirect = create_gc(0);
+	g.gcReverse = create_gc(1);
+	g.gcFrame = create_gc(2);
 
 	return 1;
 }
@@ -226,7 +228,7 @@ int startupGUItasks(Display * dpy, Window root)
 // returns 1 if our window is ready to Expose, 0 otherwise
 // direction is direction of first press: with shift or without
 //
-int uiShow(Display * dpy, Window root, bool direction)
+int uiShow(bool direction)
 {
 	if (g.debug > 0) {
 		fprintf(stderr, "preparing ui\n");
@@ -239,7 +241,7 @@ int uiShow(Display * dpy, Window root, bool direction)
 
 	g.winlist = NULL;
 	g.maxNdx = 0;
-	if (!initWinlist(dpy, root, direction)) {
+	if (!initWinlist(direction)) {
 		if (g.debug > 0) {
 			fprintf(stderr,
 				"initWinlist failed, skipping ui initialization\n");
@@ -326,15 +328,30 @@ int uiShow(Display * dpy, Window root, bool direction)
 			if (g.winlist[m].icon_w == iconW &&
 			    g.winlist[m].icon_h == iconH) {
 				// direct copy
-				// TODO: preserve x/y ratio instead of scaling (xcalc)
 				if (g.debug > 1) {
 					fprintf(stderr, "%d: copying icon\n",
 						m);
 				}
+				// prepare special GC to copy icon, with clip mask if icon_mask present
+				unsigned long ic_valuemask = 0;
+				XGCValues ic_values;
+				GC ic_gc =
+				    XCreateGC(dpy, root, ic_valuemask,
+					      &ic_values);
+				if (ic_gc < 0) {
+					fprintf(stderr,
+						"can't create GC to draw icon\n");
+					return 0;
+				}
+				if (g.winlist[m].icon_mask != 0) {
+					XSetClipMask(dpy, ic_gc,
+						     g.winlist[m].icon_mask);
+				}
+
 				int or = XCopyArea(dpy,
 						   g.winlist[m].icon_drawable,
 						   g.winlist[m].tile,
-						   g.gcDirect, 0, 0,
+						   ic_gc, 0, 0,
 						   g.winlist[m].icon_w, g.winlist[m].icon_h,	// src
 						   0, 0);	// dst
 				if (!or) {
@@ -347,12 +364,12 @@ int uiShow(Display * dpy, Window root, bool direction)
 					fprintf(stderr, "%d: scaling icon\n",
 						m);
 				}
-				int sc = pixmapScale(dpy, scrNum, root,
-						     g.winlist[m].icon_drawable,
-						     g.winlist[m].tile,
-						     g.winlist[m].icon_w,
-						     g.winlist[m].icon_h,
-						     iconW, iconH);
+				int sc = pixmapFit(g.winlist[m].icon_drawable,
+						   g.winlist[m].icon_mask,
+						   g.winlist[m].tile,
+						   g.winlist[m].icon_w,
+						   g.winlist[m].icon_h,
+						   iconW, iconH);
 				if (!sc) {
 					fprintf(stderr,
 						"can't scale icon to tile\n");
@@ -360,7 +377,7 @@ int uiShow(Display * dpy, Window root, bool direction)
 			}
 		} else {
 			// draw placeholder or standalone icons from some WM
-			GC gcL = create_gc(dpy, scrNum, root, 0);	// GC for thin line
+			GC gcL = create_gc(0);	// GC for thin line
 			if (!gcL) {
 				fprintf(stderr, "can't create gcL\n");
 			} else {
@@ -380,7 +397,7 @@ int uiShow(Display * dpy, Window root, bool direction)
 		// draw labels
 		if (g.winlist[m].name && fontLabel) {
 			int dr =
-			    drawMultiLine(dpy, g.winlist[m].tile, fontLabel,
+			    drawMultiLine(g.winlist[m].tile, fontLabel,
 					  &(g.color[COLFG].xftcolor),
 					  g.winlist[m].name,
 					  0, (iconH + 5), tileW,
@@ -407,8 +424,9 @@ int uiShow(Display * dpy, Window root, bool direction)
 	if (g.debug > 0) {
 		fprintf(stderr, "our window is %lu\n", uiwin);
 	}
+
 // set properties of our window
-	XStoreName(dpy, uiwin, XWINNAME);
+    XStoreName(dpy, uiwin, XWINNAME);
 	XSelectInput(dpy, uiwin, ExposureMask | KeyPressMask | KeyReleaseMask);
 // set window type so that WM will hopefully not resize it
 // before mapping: https://specifications.freedesktop.org/wm-spec/1.3/ar01s05.html
@@ -417,9 +435,30 @@ int uiShow(Display * dpy, Window root, bool direction)
 	Atom td = XInternAtom(dpy, "_NET_WM_WINDOW_TYPE_DIALOG", False);
 	if (at && wt && td)
 		XChangeProperty(dpy, uiwin, wt, at, 32, PropModeReplace,
-				(unsigned char *)(&td), 1);
+            (unsigned char *)(&td), 1);
+// disable appearance in taskbar
+    Atom st = XInternAtom(dpy, "_NET_WM_STATE", True);
+    Atom sk = XInternAtom(dpy, "_NET_WM_STATE_SKIP_TASKBAR", True); // there is also PAGER
+    if (at && st && sk)
+        XChangeProperty(dpy, uiwin, st, at, 32, PropModeReplace,
+            (unsigned char *)(&sk), 1);
 // xmonad ignores _NET_WM_WINDOW_TYPE_DIALOG but obeys WM_TRANSIENT_FOR
 	XSetTransientForHint(dpy, uiwin, uiwin);
+// disable window title and borders. works in xfwm4.
+#define PROP_MOTIF_WM_HINTS_ELEMENTS 5
+#define MWM_HINTS_DECORATIONS (1L << 1)
+    struct {
+        unsigned long flags;
+        unsigned long functions;
+        unsigned long decorations;
+        long inputMode;
+        unsigned long status;
+    } hints = { MWM_HINTS_DECORATIONS, 0, 0, };
+    Atom ma = XInternAtom(dpy, "_MOTIF_WM_HINTS", False);
+    if (ma) {
+        XChangeProperty(dpy, uiwin, ma, ma, 32, PropModeReplace,
+            (unsigned char *)&hints, PROP_MOTIF_WM_HINTS_ELEMENTS);
+    }
 
 	XMapWindow(dpy, uiwin);
 	return 1;
@@ -429,7 +468,7 @@ int uiShow(Display * dpy, Window root, bool direction)
 // Expose event callback
 // redraw our window
 //
-void uiExpose(Display * dpy, Window root)
+void uiExpose()
 {
 	if (g.debug > 0) {
 		fprintf(stderr, "expose ui\n");
@@ -453,20 +492,20 @@ void uiExpose(Display * dpy, Window root)
 		}
 	}
 // frame
-	framesRedraw(dpy);
+	framesRedraw();
 }
 
 //
 // remove ui and switch to chosen window
 //
-int uiHide(Display * dpy, Window root)
+int uiHide()
 {
 	if (g.winlist) {
 		if (g.debug > 0) {
 			fprintf(stderr, "changing window focus to %lu\n",
 				g.winlist[g.selNdx].id);
 		}
-		setFocus(dpy, g.selNdx);	// before winlist destruction!
+		setFocus(g.selNdx);	// before winlist destruction!
 	}
 	if (g.debug > 0) {
 		fprintf(stderr, "destroying our window and tiles\n");
@@ -484,7 +523,7 @@ int uiHide(Display * dpy, Window root)
 		}
 	}
 	if (g.winlist) {
-		freeWinlist(dpy);
+		freeWinlist();
 	}
 	g.uiShowHasRun = false;
 	return 1;
@@ -493,7 +532,7 @@ int uiHide(Display * dpy, Window root)
 //
 // select next item in g.winlist
 //
-int uiNextWindow(Display * dpy, Window root)
+int uiNextWindow()
 {
 	if (!uiwin)
 		return 0;	// kb events may trigger it even when no window drawn yet
@@ -503,14 +542,14 @@ int uiNextWindow(Display * dpy, Window root)
 	if (g.debug > 0) {
 		fprintf(stderr, "item %d\n", g.selNdx);
 	}
-	framesRedraw(dpy);
+	framesRedraw();
 	return 1;
 }
 
 //
 // select previous item in g.winlist
 //
-int uiPrevWindow(Display * dpy, Window root)
+int uiPrevWindow()
 {
 	if (!uiwin)
 		return 0;	// kb events may trigger it even when no window drawn yet
@@ -520,6 +559,6 @@ int uiPrevWindow(Display * dpy, Window root)
 	if (g.debug > 0) {
 		fprintf(stderr, "item %d\n", g.selNdx);
 	}
-	framesRedraw(dpy);
+	framesRedraw();
 	return 1;
 }
