@@ -1,5 +1,13 @@
+<<<<<<< HEAD
 alttab (1.0.3-1) unstable; urgency=medium
 
   * Initial release (Closes: #861533)
 
  -- Alexander Kulak <sa-dev@rainbow.by>  Sun, 30 Apr 2017 15:15:28 +0300
+=======
+alttab (1.1.0-1) unstable; urgency=medium
+
+  * Initial release (Closes: #861533)
+
+ -- Alexander Kulak <sa-dev@rainbow.by>  Wed, 25 Oct 2017 11:15:28 +0300
+>>>>>>> debian/unstable
