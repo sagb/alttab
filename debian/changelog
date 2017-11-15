@@ -1,4 +1,4 @@
-alttab (v1.1.0-7-g01e21ef-2~1.gbpd0980c) unstable; urgency=medium
+alttab (1.1.0.20171110.7.g01e21ef-2~1.gbpd0980c) unstable; urgency=medium
 
   ** SNAPSHOT build @d0980cfb3f8d4435eefd2225e1315616b9410a85 **
 
@@ -8,7 +8,7 @@ alttab (v1.1.0-7-g01e21ef-2~1.gbpd0980c) unstable; urgency=medium
   * fixed segfault due to wrong array index
   * binary installation documented
 
- -- Alexander Kulak <sa-dev@rainbow.by>  Sun, 12 Nov 2017 14:49:09 +0300
+ -- Alexander Kulak <sa-dev@rainbow.by>  Sun, 13 Nov 2017 14:49:09 +0300
 
 alttab (1.1.0-1) unstable; urgency=medium
 
