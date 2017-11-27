@@ -79,9 +79,7 @@ int initIconHash(icon_t ** ihash)
 //
 int updateIconsFromFile(icon_t ** ihash)
 {
-	wordexp_t we;
-	char **w;
-	int hd, id;
+	int hd;
 	char *id2;
 	int id2len;
 	char *icon_dirs[MAXICONDIRS];
@@ -91,9 +89,8 @@ int updateIconsFromFile(icon_t ** ihash)
 	icon_t *iiter, *tmp;
 
 	int fts_options = FTS_COMFOLLOW | FTS_LOGICAL | FTS_NOCHDIR;
-	// subject to shell name expansion
 	// XDG_DATA_DIRS ignored
-	const char *icondir_masks[] = {
+	const char *icondir[] = {
 		"/usr/share/icons",
 		"/usr/local/share/icons",
 		"~/.icons",
@@ -102,23 +99,25 @@ int updateIconsFromFile(icon_t ** ihash)
 	};
 	int idndx = 0;
 	int theme_len = strlen(g.option_theme);
+    char* home = getenv("HOME");
 
-	for (hd = 0; icondir_masks[hd] != NULL; hd++) {
-		wordexp(icondir_masks[hd], &we, 0);
-		w = we.we_wordv;
-		for (id = 0; id < we.we_wordc; id++) {
-			id2len = strlen(w[id]) + 1 + theme_len + 1;
-			id2 = malloc(id2len);
-			if (!id2)
-				return 0;
-			strncpy(id2, w[id], id2len);
-			strcat(id2, "/");
-			strncat(id2, g.option_theme, theme_len);
-			id2[id2len - 1] = '\0';
-			icon_dirs[idndx] = id2;
-			idndx++;
-		}
-		wordfree(&we);
+	for (hd = 0; icondir[hd] != NULL; hd++) {
+        id2len = strlen(icondir[hd]) + 1 + theme_len + 1;
+        if (icondir[hd][0] == '~') {
+            if (home == NULL)
+                continue;
+            id2len += strlen(home);
+        }
+        id2 = malloc(id2len);
+        if (!id2)
+            return 0;
+        if (icondir[hd][0] == '~')
+            snprintf (id2, id2len, "%s%s/%s", home, icondir[hd]+1, g.option_theme);
+        else
+            snprintf (id2, id2len, "%s/%s", icondir[hd], g.option_theme);
+        id2[id2len - 1] = '\0';
+        icon_dirs[idndx] = id2;
+        idndx++;
 	}
 	icon_dirs[idndx] = NULL;
 	if (g.debug > 1) {
