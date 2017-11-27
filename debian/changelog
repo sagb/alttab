@@ -1,3 +1,13 @@
+alttab (1.1.0.20171127.9.g9de555a-2~2.gbpf5f86f) unstable; urgency=medium
+
+  ** SNAPSHOT build @f5f86f2776ac0cfd37eeb3d7b5402873badaaee8 **
+
+  [ Alexander Kulak ]
+  * get rid of shell name expansion in icon path
+  * more clean and safe string work
+
+ -- Alexander Kulak <sa-dev@rainbow.by>  Mon, 27 Nov 2017 18:56:25 +0300
+
 alttab (1.1.0.20171110.7.g01e21ef-2~1.gbpd0980c) unstable; urgency=medium
 
   ** SNAPSHOT build @d0980cfb3f8d4435eefd2225e1315616b9410a85 **
