@@ -422,7 +422,7 @@ int uiShow(bool direction)
 	if (uiwin <= 0)
 		die("can't create window");
 	if (g.debug > 0) {
-		fprintf(stderr, "our window is %lu\n", uiwin);
+        fprintf(stderr, "our window is %lx\n", uiwin);
 	}
 
 // set properties of our window
@@ -460,7 +460,11 @@ int uiShow(bool direction)
             (unsigned char *)&hints, PROP_MOTIF_WM_HINTS_ELEMENTS);
     }
 
-	XMapWindow(dpy, uiwin);
+    XMapWindow(dpy, uiwin);
+    if (g.option_wm == WM_EWMH) {
+        // required in Metacity
+        ewmh_setFocus(0, uiwin);
+    }
 	return 1;
 }
 
@@ -500,20 +504,25 @@ void uiExpose()
 //
 int uiHide()
 {
+    // order is important: to set focus in Metacity,
+    // our window must be destroyed first
+	if (uiwin) {
+	    if (g.debug > 0) {
+            fprintf(stderr, "destroying our window\n");
+        }
+		XUnmapWindow(dpy, uiwin);
+		XDestroyWindow(dpy, uiwin);
+		uiwin = 0;
+	}
 	if (g.winlist) {
 		if (g.debug > 0) {
-			fprintf(stderr, "changing window focus to %lu\n",
+            fprintf(stderr, "changing focus to %lx\n",
 				g.winlist[g.selNdx].id);
 		}
 		setFocus(g.selNdx);	// before winlist destruction!
 	}
 	if (g.debug > 0) {
-		fprintf(stderr, "destroying our window and tiles\n");
-	}
-	if (uiwin) {
-		XUnmapWindow(dpy, uiwin);
-		XDestroyWindow(dpy, uiwin);
-		uiwin = 0;
+        fprintf(stderr, "destroying tiles\n");
 	}
 	int y;
 	for (y = 0; y < g.maxNdx; y++) {

@@ -139,10 +139,14 @@ int ewmh_initWinlist()
 
 //
 // focus window in EWMH WM
+// fwin used if non-zero, winNdx otherwise
 //
-int ewmh_setFocus(int winNdx)
+int ewmh_setFocus(int winNdx, Window fwin)
 {
-	Window win = g.winlist[winNdx].id;
+    Window win = (fwin != 0) ? fwin : g.winlist[winNdx].id;
+    if (g.debug>1) {
+        fprintf(stderr, "ewmh_setFocus %lx\n", win);
+    }
 	XEvent evt;
 	long rn_mask = SubstructureRedirectMask | SubstructureNotifyMask;
 
@@ -153,6 +157,7 @@ int ewmh_setFocus(int winNdx)
 	evt.xclient.serial = 0;
 	evt.xclient.send_event = True;
 	evt.xclient.format = 32;
+    memset (&(evt.xclient.data.l[0]), 0, 5*sizeof(evt.xclient.data.l[0]));
 	if (!XSendEvent(dpy, root, False, rn_mask, &evt)) {
 		fprintf(stderr, "ewmh_activate_window: can't send xevent\n");
 	}

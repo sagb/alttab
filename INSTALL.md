@@ -15,7 +15,8 @@ Building from source
 --------------------
 
 1. Install build dependencies.
-Basic Xlib, Xft, Xrender, libpng libraries and uthash macros are required.
+Basic Xlib, Xft, Xrender, libpng libraries
+and [uthash macros](http://troydhanson.github.io/uthash/) are required.
 In Debian or Ubuntu:
 
 > apt-get install libx11-dev libxmu-dev libxft-dev libxrender-dev libpng-dev uthash-dev
