@@ -1,3 +1,12 @@
+alttab (1.1.0.20171128.11.g830c66e-2~3.gbp85aeeb) unstable; urgency=medium
+
+  ** SNAPSHOT build @85aeeb0337e5043a8f3e969fee4c4fac37f978ae **
+
+  [ Alexander Kulak ]
+  * windows focus in metacity
+
+ -- Alexander Kulak <sa-dev@rainbow.by>  Tue, 28 Nov 2017 23:11:10 +0300
+
 alttab (1.1.0.20171127.9.g9de555a-2~2.gbpf5f86f) unstable; urgency=medium
 
   ** SNAPSHOT build @f5f86f2776ac0cfd37eeb3d7b5402873badaaee8 **
