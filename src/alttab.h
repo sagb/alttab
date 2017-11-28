@@ -149,7 +149,7 @@ int pulloutWindowToTop(int winNdx);
 /* EWHM */
 char *ewmh_getWmName();
 int ewmh_initWinlist();
-int ewmh_setFocus(int winNdx);
+int ewmh_setFocus(int winNdx, Window fwin); // fwin used if non-zero
 unsigned long ewmh_getCurrentDesktop();
 unsigned long ewmh_getDesktopOfWindow(Window w);
 
