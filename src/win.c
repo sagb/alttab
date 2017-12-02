@@ -430,9 +430,9 @@ int setFocus(int winNdx)
 		break;
 	case WM_EWMH:
         r = ewmh_setFocus(winNdx, 0);
-		// skippy-xd does this and notes that "order is important"
-		// allow in trouble
-		//XSetInputFocus (dpy, g.winlist[winNdx].id, RevertToParent, CurrentTime);
+        // skippy-xd does this and notes that "order is important"
+        // fixes #28
+        XSetInputFocus (dpy, g.winlist[winNdx].id, RevertToParent, CurrentTime);
 		break;
 	default:
 		return 0;
