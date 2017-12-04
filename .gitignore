@@ -18,7 +18,7 @@ src/Makefile
 doc/Makefile
 Makefile
 stamp-h1
-aclocal.m4
+missing
 
 src/alttab
 
