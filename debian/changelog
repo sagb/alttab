@@ -1,14 +1,10 @@
-alttab (1.1.0.20171204.14.g0cd5927-2~7.gbpb0fe10) UNRELEASED; urgency=medium
+alttab (1.1.0.20171204.14.g0cd5927-2~5.gbpf0ec60) stretch; urgency=medium
 
-  ** SNAPSHOT build @b0fe1014079a125101107511c96ab50e86297680 **
+  ** SNAPSHOT build @f0ec60fb55406f56fed63ef00fe545b3c68b21a5 **
 
-  * control for stretch
-  * chlog for stretch
-  * snapshot
-  * prevent missing aclocal error from autotools
-  * try 2
+  * backport to stretch
 
- -- Alexander Kulak <sa-dev@rainbow.by>  Mon, 04 Dec 2017 16:44:38 +0300
+ -- Alexander Kulak <sa-dev@rainbow.by>  Mon, 04 Dec 2017 17:03:26 +0300
 
 alttab (1.1.0.20171204.14.g0cd5927-2~4.gbp36f247) unstable; urgency=medium
 
