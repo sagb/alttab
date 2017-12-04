@@ -1,3 +1,13 @@
+alttab (1.1.0.20171204.14.g0cd5927-2~4.gbp36f247) unstable; urgency=medium
+
+  ** SNAPSHOT build @36f2471dce24b1cc4b5ae293dc77df684a337d93 **
+
+  [ Alexander Kulak ]
+  * allow setfocus trick from skippy-xd
+  * clarify usage in specific window managers
+
+ -- Alexander Kulak <sa-dev@rainbow.by>  Mon, 04 Dec 2017 15:35:32 +0300
+
 alttab (1.1.0.20171128.11.g830c66e-2~3.gbp85aeeb) unstable; urgency=medium
 
   ** SNAPSHOT build @85aeeb0337e5043a8f3e969fee4c4fac37f978ae **
