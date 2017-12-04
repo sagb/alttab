@@ -12,8 +12,8 @@ Build-Depends: debhelper (>= 10~),
                autoconf,
                automake
 Standards-Version: 4.1.1.0
-Vcs-Git: https://github.com/sagb/alttab.git -b debian/experimental
-Vcs-Browser: https://github.com/sagb/alttab/tree/debian/experimental
+Vcs-Git: https://github.com/sagb/alttab.git -b debian/stretch
+Vcs-Browser: https://github.com/sagb/alttab/tree/debian/stretch
 Homepage: https://sagb.github.io/alttab
 
 Package: alttab
