@@ -1,3 +1,12 @@
+alttab (1.1.0.20171205.16.g72585c8~1.gbpb60420) unstable; urgency=medium
+
+  ** SNAPSHOT build @b604209fe215912bba3f2c45e3a8062025005d94 **
+
+  * prevent missing aclocal error from autotools
+  * correct syntax in INSTALL.md
+
+ -- Alexander Kulak <sa-dev@rainbow.by>  Tue, 05 Dec 2017 11:29:11 +0300
+
 alttab (1.1.0.20171204.14.g0cd5927-2~4.gbp36f247) unstable; urgency=medium
 
   ** SNAPSHOT build @36f2471dce24b1cc4b5ae293dc77df684a337d93 **
