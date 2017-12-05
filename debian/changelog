@@ -1,3 +1,11 @@
+alttab (1.1.0.20171205.16.g72585c8-1~1.gbp1b89ee) testing; urgency=medium
+
+  ** SNAPSHOT build @1b89eec50fd4ff3b89a3fbf40203a50920eb8f4d **
+
+  * build for buster
+
+ -- Alexander Kulak <sa-dev@rainbow.by>  Tue, 05 Dec 2017 12:16:31 +0300
+
 alttab (1.1.0.20171205.16.g72585c8-1~1.gbp3d13cc) unstable; urgency=medium
 
   ** SNAPSHOT build @3d13cc7e8384e0abfcb7170f458c7575cb3be257 **
