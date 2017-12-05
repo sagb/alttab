@@ -1,10 +1,11 @@
-alttab (1.1.0.20171205.16.g72585c8-1~1.gbp60f2fa) stretch; urgency=medium
+alttab (1.1.0.20171205.18.g4c4b0b6-1~1.gbp8ef90e) unstable; urgency=medium
 
-  ** SNAPSHOT build @60f2fa8da699f97d03a01943d832dd4bf68665e3 **
+  ** SNAPSHOT build @8ef90ec0be300203cfa22958e472c4322e4c10b4 **
 
-  * backport to stretch
+  * doc makefile fix
+  * xmonad mentioned in correct file
 
- -- Alexander Kulak <sa-dev@rainbow.by>  Tue, 05 Dec 2017 12:33:54 +0300
+ -- Alexander Kulak <sa-dev@rainbow.by>  Tue, 05 Dec 2017 16:54:24 +0300
 
 alttab (1.1.0.20171205.16.g72585c8-1~1.gbp3d13cc) unstable; urgency=medium
 
