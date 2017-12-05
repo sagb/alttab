@@ -1,10 +1,11 @@
-alttab (1.1.0.20171205.16.g72585c8-1~1.gbp607b6a) testing; urgency=medium
+alttab (1.1.0.20171205.18.g4c4b0b6-1~1.gbp8ef90e) unstable; urgency=medium
 
-  ** SNAPSHOT build @607b6a321b574adef2cd8833c65e1c2a8fca59c0 **
+  ** SNAPSHOT build @8ef90ec0be300203cfa22958e472c4322e4c10b4 **
 
-  * backport to buster
+  * doc makefile fix
+  * xmonad mentioned in correct file
 
- -- Alexander Kulak <sa-dev@rainbow.by>  Tue, 05 Dec 2017 12:31:30 +0300
+ -- Alexander Kulak <sa-dev@rainbow.by>  Tue, 05 Dec 2017 16:54:24 +0300
 
 alttab (1.1.0.20171205.16.g72585c8-1~1.gbp3d13cc) unstable; urgency=medium
 
