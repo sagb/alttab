@@ -251,7 +251,7 @@ xft_LIBS = @xft_LIBS@
 xrender_CFLAGS = @xrender_CFLAGS@
 xrender_LIBS = @xrender_LIBS@
 man_MANS = alttab.1
-dist_doc_DATA = xmonad.md README
+dist_doc_DATA = wm-setup.md README
 all: all-am
 
 .SUFFIXES:
