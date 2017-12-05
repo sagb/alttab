@@ -422,17 +422,17 @@ int setFocus(int winNdx)
 	int r;
 	switch (g.option_wm) {
 	case WM_NO:
-		r = ewmh_setFocus(winNdx);	// for WM which isn't identified as EWMH compatible but accepts setting focus (dwm)
+        r = ewmh_setFocus(winNdx, 0);  // for WM which isn't identified as EWMH compatible but accepts setting focus (dwm)
 		x_setFocus(winNdx);
 		break;
 	case WM_RATPOISON:
 		r = rp_setFocus(winNdx);
 		break;
 	case WM_EWMH:
-		r = ewmh_setFocus(winNdx);
-		// skippy-xd does this and notes that "order is important"
-		// allow in trouble
-		//XSetInputFocus (dpy, g.winlist[winNdx].id, RevertToParent, CurrentTime);
+        r = ewmh_setFocus(winNdx, 0);
+        // skippy-xd does this and notes that "order is important"
+        // fixes #28
+        XSetInputFocus (dpy, g.winlist[winNdx].id, RevertToParent, CurrentTime);
 		break;
 	default:
 		return 0;

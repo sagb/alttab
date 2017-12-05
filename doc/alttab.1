@@ -1,7 +1,7 @@
 .\" generated with Ronn/v0.7.3
 .\" http://github.com/rtomayko/ronn/tree/0.7.3
 .
-.TH "ALTTAB" "1" "October 2017" "" ""
+.TH "ALTTAB" "1" "November 2017" "" ""
 .
 .SH "NAME"
 \fBalttab\fR \- the task switcher
@@ -41,7 +41,7 @@ Only "leader" windows are listed, since Xlib has no other means to recognize mai
 \fI1\fR: EWMH compatible\.
 .
 .IP
-Compatible WM list is in [SEE ALSO] below\. Tested in xmonad(1) (EWMH must be allowed, details in doc/xmonad\.md), i3(1), evilwm(1)\.
+Compatible WM list is in [SEE ALSO] below\. Tested in xmonad(1) (EWMH must be allowed, details in doc/xmonad\.md), i3(1), evilwm(1), xfwm4(1), metacity(1)\.
 .
 .IP
 \fI2\fR: Ratpoison\.
@@ -97,7 +97,7 @@ resource: alttab\.tile\.geometry
 default: \fI112x128\fR
 .
 .IP
-Maximum size of a single tile (mini\-window)\. If switcher doesn\'t fit the screen, tile may be thinner\.
+Size of a single tile (mini\-window)\. If switcher doesn\'t fit the screen, tile may be thinner\.
 .
 .TP
 \fB\-i\fR \fINNxMM\fR
@@ -114,7 +114,7 @@ Size of icons\.
 resource: alttab\.icon\.source
 .
 .br
-default: 0
+default: 2
 .
 .IP
 Source of icons\. \fINUMBER\fR must be between 0 and 3:
@@ -144,7 +144,7 @@ Alttab searches for PNG icons under:
 Directory structure should obey freedesktop standard, but desktop files are ignored, instead file name is expected to be equal to application class\.
 .
 .IP
-\fI2\fR: Prefer icon from file when it better match requested size (see \fB\-i\fR option)\.
+\fI2\fR: Prefer icon from file when it matches requested size better (see \fB\-i\fR option)\.
 .
 .IP
 \fI3\fR: Use icons from files only\.
@@ -200,10 +200,10 @@ resource: alttab\.font
 default: \fIxft:sans\-10\fR
 .
 .IP
-Label font name in format: \fBxft:fontconfig_pattern\fR, like in emacs(1) and rxvt(1)\. See [SEE ALSO] for fontconfig pattern\. It\'s neigher GTK font pattern nor legacy XLFD\.
+Label font name in format: \fBxft:fontconfig_pattern\fR, like in emacs(1) and rxvt(1)\. See [SEE ALSO] for fontconfig pattern\. It\'s neither GTK font pattern nor legacy XLFD\.
 .
 .P
-Your Xresources database probably already have *background, *foreground or *font wildcard definitions, which alttab will obey\. Precedence order (preferred first):
+Your Xresources database probably already has *background, *foreground or *font wildcard definitions, which alttab will obey\. Precedence order (preferred first):
 .
 .P
 alttab\.font resource,

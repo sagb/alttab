@@ -23,6 +23,7 @@ the following to ~/.ratpoisonrc:
 
   exec alttab
 
+For details about window manager configuration, see doc/wm-setup.md.
 If there are no WM at all, then start alttab in ~/.xsession or elsewhere.
 
 Source
