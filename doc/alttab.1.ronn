@@ -48,7 +48,7 @@ Most command line options have corresponding X resource.
 
       <1>: EWMH compatible.
 
-      Compatible WM list is in [SEE ALSO] below. Tested in xmonad(1) (EWMH must be allowed, details in doc/xmonad.md), i3(1), evilwm(1), xfwm4(1), metacity(1).
+      Compatible WM list is in [SEE ALSO] below. Tested in xmonad(1) (EWMH must be allowed, details in doc/wm-setup.md), i3(1), evilwm(1), xfwm4(1), metacity(1).
 
       <2>: Ratpoison.
 
