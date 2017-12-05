@@ -48,7 +48,7 @@ Most command line options have corresponding X resource.
 
       <1>: EWMH compatible.
 
-      Compatible WM list is in [SEE ALSO] below. Tested in xmonad(1) (EWMH must be allowed, details in doc/xmonad.md), i3(1), evilwm(1).
+      Compatible WM list is in [SEE ALSO] below. Tested in xmonad(1) (EWMH must be allowed, details in doc/xmonad.md), i3(1), evilwm(1), xfwm4(1), metacity(1).
 
       <2>: Ratpoison.
 
@@ -82,7 +82,7 @@ Most command line options have corresponding X resource.
     resource: alttab.tile.geometry  
     default: <112x128>
 
-    Maximum size of a single tile (mini-window). If switcher doesn't fit the screen, tile may be thinner.
+    Size of a single tile (mini-window). If switcher doesn't fit the screen, tile may be thinner.
 
   * `-i` <NNxMM>:
     resource: alttab.icon.geometry  
@@ -92,7 +92,7 @@ Most command line options have corresponding X resource.
 
   * `-s` <NUMBER>:
     resource: alttab.icon.source  
-    default: 0
+    default: 2
 
     Source of icons. <NUMBER> must be between 0 and 3:
 
@@ -109,7 +109,7 @@ Most command line options have corresponding X resource.
   
       Directory structure should obey freedesktop standard, but desktop files are ignored, instead file name is expected to be equal to application class. 
 
-      <2>: Prefer icon from file when it better match requested size (see `-i` option).
+      <2>: Prefer icon from file when it matches requested size better (see `-i` option).
 
       <3>: Use icons from files only.
 
@@ -143,9 +143,9 @@ The following three options accept color names or <#rrggbb>. Special value <\_rn
     resource: alttab.font  
     default: *xft:sans-10*
 
-    Label font name in format: `xft:fontconfig_pattern`, like in emacs(1) and rxvt(1). See [SEE ALSO] for fontconfig pattern. It's neigher GTK font pattern nor legacy XLFD.
+    Label font name in format: `xft:fontconfig_pattern`, like in emacs(1) and rxvt(1). See [SEE ALSO] for fontconfig pattern. It's neither GTK font pattern nor legacy XLFD.
 
-Your Xresources database probably already have \*background, \*foreground or \*font wildcard definitions, which alttab will obey. Precedence order (preferred first):
+Your Xresources database probably already has \*background, \*foreground or \*font wildcard definitions, which alttab will obey. Precedence order (preferred first):
 
    alttab.font resource,  
    `-font` option,  

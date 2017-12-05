@@ -1,33 +1,44 @@
 
-Dependencies
-------------
+Binaries
+--------
 
-Basic Xlib, Xft, Xrender, libpng libraries and uthash macros are required.
+* Unofficial packages for Debian are available.
+Follow setup instructions [there](https://odd.systems/debian/).
+Pin their repository to low priority to prefer official packages in the future.
+
+* In FreeBSD, install [the port](https://www.freshports.org/x11/alttab/):
+
+`pkg install alttab`
+
+
+Building from source
+--------------------
+
+1. Install build dependencies.
+Basic Xlib, Xft, Xrender, libpng libraries
+and [uthash macros](http://troydhanson.github.io/uthash/) are required.
 In Debian or Ubuntu:
 
-> apt-get install libx11-dev libxmu-dev libxft-dev libxrender-dev libpng-dev uthash-dev
+`apt-get install libx11-dev libxmu-dev libxft-dev libxrender-dev libpng-dev uthash-dev`
 
-As maintainer or packager, also install autotools and ronn:
+Maintainer or packager may also install autotools and ronn:
 
-> apt-get install autoconf automake ruby-ronn
+`apt-get install autoconf automake ruby-ronn`
 
+2. Download:
 
-Installing alttab
------------------
+`git clone https://github.com/sagb/alttab.git`
 
-1. Download:
+3. Maintainer or packager may want to update autotools stuff and refresh documentation with ronn:
 
-> git clone https://github.com/sagb/alttab.git
+`./bootstrap.sh`
 
-2. Maintainer or packager may want to update autotools stuff and refresh documentation with ronn:
+4. Build:
 
-> ./bootstrap.sh
-
-3. Build:
-
-> ./configure  
-> make  
-> make install
-
+```
+./configure  
+make  
+make install
+```
 See README for usage notes.
 

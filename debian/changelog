@@ -1,13 +1,56 @@
-alttab (1.1.0-2) jessie; urgency=medium
+alttab (1.1.0.20171205.16.g72585c8-1~1.gbp3d13cc) unstable; urgency=medium
+
+  ** SNAPSHOT build @3d13cc7e8384e0abfcb7170f458c7575cb3be257 **
+
+  * prevent missing aclocal error from autotools
+  * correct syntax in INSTALL.md
+
+ -- Alexander Kulak <sa-dev@rainbow.by>  Tue, 05 Dec 2017 11:48:45 +0300
+
+alttab (1.1.0.20171204.14.g0cd5927-2~4.gbp36f247) unstable; urgency=medium
+
+  ** SNAPSHOT build @36f2471dce24b1cc4b5ae293dc77df684a337d93 **
 
   [ Alexander Kulak ]
-  * debhelper 9 for jessie
-  * disable setjmp check in jessie
+  * allow setfocus trick from skippy-xd
+  * clarify usage in specific window managers
 
- -- Alexander Kulak <sa-dev@rainbow.by>  Wed, 08 Nov 2017 15:04:41 +0300
+ -- Alexander Kulak <sa-dev@rainbow.by>  Mon, 04 Dec 2017 15:35:32 +0300
+
+alttab (1.1.0.20171128.11.g830c66e-2~3.gbp85aeeb) unstable; urgency=medium
+
+  ** SNAPSHOT build @85aeeb0337e5043a8f3e969fee4c4fac37f978ae **
+
+  [ Alexander Kulak ]
+  * windows focus in metacity
+
+ -- Alexander Kulak <sa-dev@rainbow.by>  Tue, 28 Nov 2017 23:11:10 +0300
+
+alttab (1.1.0.20171127.9.g9de555a-2~2.gbpf5f86f) unstable; urgency=medium
+
+  ** SNAPSHOT build @f5f86f2776ac0cfd37eeb3d7b5402873badaaee8 **
+
+  [ Alexander Kulak ]
+  * get rid of shell name expansion in icon path
+  * more clean and safe string work
+
+ -- Alexander Kulak <sa-dev@rainbow.by>  Mon, 27 Nov 2017 18:56:25 +0300
+
+alttab (1.1.0.20171110.7.g01e21ef-2~1.gbpd0980c) unstable; urgency=medium
+
+  ** SNAPSHOT build @d0980cfb3f8d4435eefd2225e1315616b9410a85 **
+
+  [ Alexander Kulak ]
+  * uniform behaviour in EWMH-compatible WM
+  * tested in xfwm4
+  * fixed segfault due to wrong array index
+  * binary installation documented
+
+ -- Alexander Kulak <sa-dev@rainbow.by>  Sun, 13 Nov 2017 14:49:09 +0300
 
 alttab (1.1.0-1) unstable; urgency=medium
 
   * Initial release (Closes: #861533)
 
  -- Alexander Kulak <sa-dev@rainbow.by>  Wed, 25 Oct 2017 11:15:28 +0300
+
