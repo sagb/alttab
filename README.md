@@ -35,6 +35,7 @@ for window manager settings.
 
 Usually it should run fully functional without any argument: `alttab`.  
   
-  
-(C) Alexander Kulak <sa-dev AT rainbow POINT by> 2016, 2017
+    
+      
+(C) Alexander Kulak &lt;sa-dev AT rainbow POINT by&gt; 2016, 2017
 
