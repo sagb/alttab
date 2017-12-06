@@ -209,9 +209,9 @@ int use_args_and_xrm(int *argc, char **argv)
 		XFree(nwm);
 	}
 	if (g.debug > 0) {
-		fprintf(stderr, "unknown WM, using raw X\n");
+		fprintf(stderr, "unknown WM, using WM_TWM\n");
 	}
-	g.option_wm = WM_NO;
+	g.option_wm = WM_TWM;
  wmDone:
 	if (g.debug > 0) {
 		fprintf(stderr, "WM: %d\n", g.option_wm);

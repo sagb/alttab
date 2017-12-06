@@ -35,24 +35,33 @@ Most command line options have corresponding X resource.
 
   * `-w` <NUMBER>:
     resource: alttab.windowmanager  
-    default: autodetect
+    default: autodetect, fallback to <3>
 
     Control how to obtain window list and set focus. <NUMBER> may be 0, 1 or 2:
 
       <0>: No WM, raw X.
 
-      Only "leader" windows are listed, since Xlib has no other means to recognize main application window. 
+      Please select this option manually, as it's not autodetected. 
+      Only top-level viewable children of root window are listed,
+      since Xlib has no other means to recognize main application window. 
       List order is random. 
       Running **-w 0** under WM is discouraged: hidden windows or windows on another desktops will not be listed; instead, some strange windows may be included. 
-      Nevertheless, this mode is suitable for dwm(1) and other managers which don't expose window list via EWMH.
 
       <1>: EWMH compatible.
 
-      Compatible WM list is in [SEE ALSO] below. Tested in xmonad(1) (EWMH must be allowed, details in doc/wm-setup.md), i3(1), evilwm(1), xfwm4(1), metacity(1).
+      Compatible WM list is in [SEE ALSO] below. Tested in xmonad(1) (EWMH must be allowed, details in doc/wm-setup.md), i3(1), evilwm(1), xfwm4(1), metacity(1), dwm(1) (not autodetected in dwm, select manually).
 
       <2>: Ratpoison.
 
       Alttab uses ratpoison(1) own perfect remote control capability. Additionally, alttab registers itself in its "unmanaged list" automatically.
+
+      <3>: Ancient WM.
+
+      Fallback, worse than <0>.
+      Search for application windows at random nodes of window tree and select only those with a name.
+      May cause lag.
+      List order is random.
+      Tested in twm(1).
 
   * `-mm` <NUM>:
     resource: alttab.modifier.mask  
