@@ -8,7 +8,7 @@
 
 [![chat on freenode](https://img.shields.io/badge/chat-on%20freenode-brightgreen.svg)](https://webchat.freenode.net/?channels=%23alttab)
 
-_alttab_ is X11 window switcher designed for minimalistic window managers
+**alttab** is X11 window switcher designed for minimalistic window managers
 or standalone X11 session.
 ```
   alttab  [-w N] [-mm N] [-bm N] [-mk N] [-kk N] [-t NxM] [-i NxM]
