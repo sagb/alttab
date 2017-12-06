@@ -30,11 +30,11 @@ git clone https://github.com/sagb/alttab.git
 cd alttab
 ./configure && sudo make install
 ```
-See INSTALL.md for dependencies and doc/wm-setup.md for window manager settings.
+See [INSTALL.md](INSTALL.md) for dependencies and [doc/wm-setup.md](doc/wm-setup.md)
+for window manager settings.
 
-Usually it should run fully functional without any argument: `alttab`.
-
+Usually it should run fully functional without any argument: `alttab`.  
   
-
-*(C) Alexander Kulak <sa-dev@rainbow.by> 2016, 2017*
+  
+(C) Alexander Kulak <sa-dev AT rainbow POINT by> 2016, 2017
 
