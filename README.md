@@ -8,14 +8,13 @@
 
 [![chat on freenode](https://img.shields.io/badge/chat-on%20freenode-brightgreen.svg)](https://webchat.freenode.net/?channels=%23alttab)
 
-```
-alttab is X11 window switcher designed for minimalistic window managers
+*alttab* is X11 window switcher designed for minimalistic window managers
 or standalone X11 session.
-
+```
   alttab  [-w N] [-mm N] [-bm N] [-mk N] [-kk N] [-t NxM] [-i NxM]
   [-s N] [-theme name] [-bg color] [-fg color] [-frame color]
   [-font name] [-v|-vv]
-
+```
 (see man page for details)
 
 Unlike task switchers integrated in most simple window managers (WM) or
@@ -25,27 +24,17 @@ a key (Tab) - release modifier.
 Also, it's lightweight and depends only on basic X11 libs, conforming
 to the usage of lightweight WM.
 
-Usage
------
-
-Usually it should run fully functional without any argument.
-Start alttab after WM, to let it auto-recognize the WM. For examples, add
-the following to ~/.ratpoisonrc:
-
-  exec alttab
-
-For details about window manager configuration, see [doc/wm-setup.md](doc/wm-setup.md).
-If there are no WM at all, then start alttab in ~/.xsession or elsewhere.
-
-Source
-------
-
-Copyright 2017 Alexander Kulak <sa-dev AT rainbow POINT by>.
-License: GPLv3 (see COPYING).
-Repository: https://github.com/sagb/alttab
-Chat: #alttab on Freenode
-
-
- -- Alexander Kulak <sa-dev@rainbow.by>  Fri, 28 Apr 2017 13:19:28 +0300
+# Installation
 ```
+git clone https://github.com/sagb/alttab.git
+cd alttab
+./configure && sudo make install
+```
+See INSTALL.md for dependencies and doc/wm-setup.md for window manager settings.
+
+Usually it should run fully functional without any argument: `alttab`.
+
+
+ -- Alexander Kulak <sa-dev@rainbow.by>  Wed, 06 Dec 2017 10:35:54 +0300
+
 
