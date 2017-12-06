@@ -34,6 +34,7 @@ See INSTALL.md for dependencies and doc/wm-setup.md for window manager settings.
 
 Usually it should run fully functional without any argument: `alttab`.
 
+  
 
 *(C) Alexander Kulak <sa-dev@rainbow.by> 2016, 2017*
 
