@@ -1,5 +1,6 @@
 /*
 Interface with EWMH-compatible window managers.
+Note: _WIN fallbacks are not part of EWMH or ICCCM, but kept here anyway.
 
 Copyright 2017 Alexander Kulak.
 This file is part of alttab program.
@@ -34,6 +35,29 @@ extern Display* dpy;
 extern int scr;
 extern Window root;
 
+// PRIVATE
+
+//
+// returns ptr to EWMH client list and client_list_size
+// or NULL
+//
+Window *ewmh_get_client_list(unsigned long *client_list_size)
+{
+    Window *client_list;
+
+	if ((client_list =
+	     (Window *) get_x_property(root, XA_WINDOW, "_NET_CLIENT_LIST",
+				       client_list_size)) == NULL) {
+		if ((client_list =
+		     (Window *) get_x_property(root, XA_CARDINAL,
+					       "_WIN_CLIENT_LIST",
+					       client_list_size)) == NULL) {
+			return 0;
+		}
+    }
+    return client_list;
+}
+
 // PUBLIC
 
 //
@@ -46,14 +70,28 @@ char *ewmh_getWmName()
 	Window *chld_win;
 	char *r;
 	Atom utf8string;
+    char *default_wm_name = "unknown_ewmh_compatible";
+    unsigned long client_list_size;
 
+    // This function is used in alttab for detection of EWMH compatibility.
+    // But there are WM (dwm) that support EWMH subset required for alttab
+    // except of _NET_SUPPORTING_WM_CHECK/_WIN_SUPPORTING_WM_CHECK detection.
+    // We detect those WM as EWMH-compatible and return their name
+    // as "unknown_ewmh_compatible".
+
+    // first, detect necessary feature: client list
+    if (ewmh_get_client_list(&client_list_size) == NULL) {
+        // WM is not usable in EWMH mode
+        return (char *)NULL;
+    }
+
+    // then, guess/devise WM name
 	chld_win = (Window *) NULL;
 	if (!  (chld_win = (Window *) get_x_property(root, XA_WINDOW, "_NET_SUPPORTING_WM_CHECK", NULL))) {
 		if (!  (chld_win = (Window *) get_x_property(root, XA_CARDINAL, "_WIN_SUPPORTING_WM_CHECK", NULL))) {
-			return (char *)NULL;
+			return default_wm_name;
 		}
 	}
-
 	r = (char *)NULL;
 	utf8string = XInternAtom(dpy, "UTF8_STRING", False);
 	if (!
@@ -64,9 +102,10 @@ char *ewmh_getWmName()
 		 get_x_property(*chld_win, XA_STRING, "_NET_WM_NAME",
 				NULL));
 	}
+	if (chld_win!=NULL)
+        free(chld_win);
 
-	free(chld_win);
-	return r;
+    return (r!=NULL) ? r : default_wm_name;
 }
 
 //
@@ -96,17 +135,10 @@ int ewmh_initWinlist()
 		// not mandatory
 	}
 
-	if ((client_list =
-	     (Window *) get_x_property(root, XA_WINDOW, "_NET_CLIENT_LIST",
-				       &client_list_size)) == NULL) {
-		if ((client_list =
-		     (Window *) get_x_property(root, XA_CARDINAL,
-					       "_WIN_CLIENT_LIST",
-					       &client_list_size)) == NULL) {
-			fprintf(stderr, "can't get client list\n");
-			return 0;
-		}
-	}
+    if ((client_list = ewmh_get_client_list(&client_list_size)) == NULL) {
+        fprintf(stderr, "can't get client list\n");
+        return 0;
+    }
 
 	for (i = 0; i < client_list_size / sizeof(Window); i++) {
 		Window w = client_list[i];
@@ -177,7 +209,7 @@ unsigned long ewmh_getCurrentDesktop()
     if (!cd)
         cd = (unsigned long*)get_x_property (root, XA_CARDINAL,
                 "_WIN_WORKSPACE", NULL);
-    return *cd;
+    return cd ? *cd : 0;
 }
 
 //
@@ -191,6 +223,6 @@ unsigned long ewmh_getDesktopOfWindow(Window w)
     if (!d)
         d = (unsigned long*)get_x_property (w, XA_CARDINAL,
                 "_WIN_WORKSPACE", NULL);
-    return *d;
+    return d ? *d : 0;
 }
 

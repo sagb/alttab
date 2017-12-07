@@ -46,7 +46,7 @@ void helpexit()
 {
 	fprintf(stderr, "alttab, the task switcher.\n\
 Options:\n\
-    -w N      window manager: 0=no, 1=ewmh-compatible, 2=ratpoison\n\
+    -w N      window manager: 0=no, 1=ewmh-compatible, 2=ratpoison, 3=old fashion\n\
    -mm N      main modifier mask\n\
    -bm N      backward scroll modifier mask\n\
    -kk N      keysym of main modifier\n\
@@ -209,9 +209,9 @@ int use_args_and_xrm(int *argc, char **argv)
 		XFree(nwm);
 	}
 	if (g.debug > 0) {
-		fprintf(stderr, "unknown WM, using raw X\n");
+		fprintf(stderr, "unknown WM, using WM_TWM\n");
 	}
-	g.option_wm = WM_NO;
+	g.option_wm = WM_TWM;
  wmDone:
 	if (g.debug > 0) {
 		fprintf(stderr, "WM: %d\n", g.option_wm);
@@ -397,7 +397,7 @@ int grabAllKeys(bool grabUngrab)
 {
 	g.ignored_modmask = getOffendingModifiersMask(dpy);	// or 0 for g.debug
 	char *grabhint =
-	    "Error while (un)grabbing key 0x%x with mask 0x%x/0x%x.\nProbably other program already grabbed this combination.\nCheck: xdotool keydown alt+Tab; xdotool key XF86LogGrabInfo; xdotool keyup Tab; sleep 1; xdotool keyup alt; tail /var/log/Xorg.0.log\nOr try Ctrl-Tab instead of Alt-Tab:  -mm 4 -mk 0xffe3\n";
+	    "Error while (un)grabbing key 0x%x with mask 0x%x/0x%x.\nProbably other program already grabbed this combination.\nCheck: xdotool keydown alt+Tab; xdotool key XF86LogGrabInfo; xdotool keyup Tab; sleep 1; xdotool keyup alt; tail /var/log/Xorg.0.log\nOr try Ctrl-Tab instead of Alt-Tab:  alttab -mm 4 -mk 0xffe3\n";
 // attempt XF86Ungrab? probably too invasive
 	if (!changeKeygrab
 	    (root, grabUngrab, g.option_keyCode, g.option_modMask,
