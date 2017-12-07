@@ -35,13 +35,13 @@ Control how to obtain window list and set focus\. \fINUMBER\fR may be 0, 1 or 2:
 \fI0\fR: No WM, raw X\.
 .
 .IP
-Please select this option manually, as it\'s not autodetected\. Only top\-level viewable children of root window are listed, since Xlib has no other means to recognize main application window\. List order is random\. Running \fB\-w 0\fR under WM is discouraged: hidden windows or windows on another desktops will not be listed; instead, some strange windows may be included\.
+Please select this option manually, as it\'s not autodetected\. Only top\-level viewable children of root window are listed\. List order is random\. Running \fB\-w 0\fR under WM is discouraged: hidden windows or windows on another desktops will not be listed; instead, some strange windows may be included\.
 .
 .IP
 \fI1\fR: EWMH compatible\.
 .
 .IP
-Compatible WM list is in [SEE ALSO] below\. Tested in xmonad(1) (EWMH must be allowed, details in doc/wm\-setup\.md), i3(1), evilwm(1), xfwm4(1), metacity(1), dwm(1) (not autodetected in dwm, select manually)\.
+Compatible WM list is in [SEE ALSO] below\. Tested in xmonad(1) (EWMH must be allowed, details in doc/wm\-setup\.md), i3(1), evilwm(1), xfwm4(1), metacity(1), dwm(1)\.
 .
 .IP
 \fI2\fR: Ratpoison\.
@@ -53,7 +53,7 @@ Alttab uses ratpoison(1) own perfect remote control capability\. Additionally, a
 \fI3\fR: Ancient WM\.
 .
 .IP
-Fallback, worse than \fI0\fR\. Search for application windows at random nodes of window tree and select only those with a name\. May cause lag\. List order is random\. Tested in twm(1)\.
+Fallback, worse than \fI0\fR\. Search for application windows at random nodes of window tree (WM is probably reparenting) and select only those with a name, including non\-viewable (WM is probably iconifying)\. May cause lag\. List order is random\. Tested in twm(1)\.
 .
 .TP
 \fB\-mm\fR \fINUM\fR

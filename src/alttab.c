@@ -46,7 +46,7 @@ void helpexit()
 {
 	fprintf(stderr, "alttab, the task switcher.\n\
 Options:\n\
-    -w N      window manager: 0=no, 1=ewmh-compatible, 2=ratpoison\n\
+    -w N      window manager: 0=no, 1=ewmh-compatible, 2=ratpoison, 3=old fashion\n\
    -mm N      main modifier mask\n\
    -bm N      backward scroll modifier mask\n\
    -kk N      keysym of main modifier\n\
