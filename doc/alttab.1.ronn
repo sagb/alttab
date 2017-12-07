@@ -48,12 +48,12 @@ Most command line options have corresponding X resource.
 
       <1>: EWMH compatible.
 
-      Compatible WM list is in [SEE ALSO] below. Tested in xmonad(1) (EWMH must be allowed,
-      details in doc/wm-setup.md), i3(1), evilwm(1), xfwm4(1), metacity(1), dwm(1).
+      Compatible WM list is in [SEE ALSO] below. Tested in xmonad (EWMH must be allowed,
+      details in doc/wm-setup.md), i3, evilwm, xfwm4, metacity, dwm (partially compatible).
 
       <2>: Ratpoison.
 
-      Alttab uses ratpoison(1) own perfect remote control capability. Additionally, alttab registers itself in its "unmanaged list" automatically.
+      Alttab uses ratpoison own perfect remote control capability. Additionally, alttab registers itself in its "unmanaged list" automatically.
 
       <3>: Ancient WM.
 
@@ -62,7 +62,7 @@ Most command line options have corresponding X resource.
       and select only those with a name, including non-viewable (WM is probably iconifying).
       May cause lag.
       List order is random.
-      Tested in twm(1).
+      Tested in twm.
 
   * `-mm` <NUM>:
     resource: alttab.modifier.mask  
@@ -153,7 +153,7 @@ The following three options accept color names or <#rrggbb>. Special value <\_rn
     resource: alttab.font  
     default: *xft:sans-10*
 
-    Label font name in format: `xft:fontconfig_pattern`, like in emacs(1) and rxvt(1). See [SEE ALSO] for fontconfig pattern. It's neither GTK font pattern nor legacy XLFD.
+    Label font name in format: `xft:fontconfig_pattern`, like in emacs and rxvt. See [SEE ALSO] for fontconfig pattern. It's neither GTK font pattern nor legacy XLFD.
 
 Your Xresources database probably already has \*background, \*foreground or \*font wildcard definitions, which alttab will obey. Precedence order (preferred first):
 
