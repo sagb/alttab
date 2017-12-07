@@ -31,7 +31,7 @@ metacity/MATE| 1 (auto)                    | see "MATE" section below       |
 
 
 xmonad
-------
+======
 
 ### keyboard shortcut
 Xmonad is hungry for *Alt* key.
@@ -47,7 +47,7 @@ Use `startupHook` in xmonad.hs.
 
 
 xfce
-----
+====
 
 ### keyboard shortcut
 Applications -> Settings -> Settings Editor (not Manager) -> Channel: xfce4-keyboard-shortcuts -> in rigth pane disable all entries of `cycle_windows_key` or `cycle_reverse_windows_key`.
@@ -57,7 +57,7 @@ Applications -> Settings -> Session and Startup -> Application Autostart -> Add
 
 
 MATE
-----
+====
 
 ### keyboard shortcut
 System -> Preferences -> Hardware -> Keyboard Shortcuts -> disable Alt-Tab entries
