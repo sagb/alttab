@@ -65,6 +65,8 @@ int startupWintasks()
 		return rp_startupWintasks();
 	case WM_EWMH:
 		return 1;
+    case WM_TWM:
+        return 1;
 	default:
 		return 0;
 	}
@@ -342,6 +344,9 @@ int initWinlist(bool direction)
 	case WM_EWMH:
 		r = ewmh_initWinlist();
 		break;
+    case WM_TWM:
+        r = x_initWindowsInfoRecursive(root, 0);
+        break;
 	default:
 		r = 0;
 		break;
@@ -434,6 +439,10 @@ int setFocus(int winNdx)
         // fixes #28
         XSetInputFocus (dpy, g.winlist[winNdx].id, RevertToParent, CurrentTime);
 		break;
+    case WM_TWM:
+        r = ewmh_setFocus(winNdx, 0);
+        x_setFocus(winNdx);
+        break;
 	default:
 		return 0;
 	}
