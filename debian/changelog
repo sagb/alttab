@@ -1,10 +1,10 @@
-alttab (1.1.0.20171207.30.g5ce0794-1~1.gbp4fdb0c) stretch; urgency=medium
+alttab (1.1.0.20171207.32.gf6f3bfd-1~1.gbp27ea1a) unstable; urgency=medium
 
-  ** SNAPSHOT build @4fdb0c76efd8d8ee5ab2290d06bbbbce54a0afac **
+  ** SNAPSHOT build @27ea1af430a8bc12c13eaa7a0c8bdddcbaeded6f **
 
-  * backport to stretch
+  * document behaviour of specific window managers
 
- -- Alexander Kulak <sa-dev@rainbow.by>  Thu, 07 Dec 2017 12:21:44 +0300
+ -- Alexander Kulak <sa-dev@rainbow.by>  Thu, 07 Dec 2017 18:11:11 +0300
 
 alttab (1.1.0.20171207.30.g5ce0794-1~1.gbp592a45) unstable; urgency=medium
 
