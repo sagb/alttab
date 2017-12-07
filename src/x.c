@@ -70,35 +70,50 @@ int x_initWindowsInfoRecursive(Window win, int reclevel)
 	Window root, parent;
 	Window *children;
 	unsigned int nchildren, i;
-//Window leader;
+//    Window leader;
 	XWindowAttributes wa;
+    char* winname;
 
 // check if window is "leader" or no prop, skip otherwise
 // caveat: in rp, gvim leader has no file name and icon
 // this doesn't work in raw X: leader may be not viewable.
+// doesn't work in twm either: qutebrowser has meaningless leader.
 /*
-leader = x_get_leader (win);
-if (g.debug>1) {fprintf (stderr, "win: %x leader: %x\n", win, leader);}
+    leader = 0;
+    if (g.option_wm == WM_TWM) {
+        leader = x_get_leader (win);
+        if (g.debug>1) {fprintf (stderr, "win: 0x%lx leader: 0x%lx\n", win, leader);}
+    }
 */
-// add viewable only
+// in non-twm, add viewable only
 // caveat: in rp, skips anything except of visible window
 // probably add an option for this in WMs too?
-	XGetWindowAttributes(dpy, win, &wa);
+    wa.map_state = 0;
+    if (g.option_wm != WM_TWM)
+    	XGetWindowAttributes(dpy, win, &wa);
+
+// in twm-like, add only windows with a name
+    winname = NULL;
+    if (g.option_wm == WM_TWM) {
+        winname = get_x_property(win, XA_STRING, "WM_NAME", NULL);
+    }
 
 // insert detailed window data in window list
-//if ( ((!leader) || leader==win)  &&
-//if ( (leader==win)  &&
-	if (wa.map_state == IsViewable && reclevel != 0) {
-		addWindowInfo(win, reclevel, 0, NULL);
+    if ( (g.option_wm == WM_TWM || wa.map_state == IsViewable) 
+            && reclevel != 0 
+            && (g.option_wm != WM_TWM || winname != NULL)
+//            && (g.option_wm != WM_TWM || leader == win)
+            ) {
+        addWindowInfo(win, reclevel, 0, winname);
 	}
 // skip children if max recursion level reached
-	if (g.option_max_reclevel != -1 && reclevel >= g.option_max_reclevel)
-		return 1;
+    if (g.option_max_reclevel != -1 && reclevel >= g.option_max_reclevel)
+        return 1;
 
 // recursion
 	if (XQueryTree(dpy, win, &root, &parent, &children, &nchildren) == 0) {
 		if (g.debug > 0) {
-			fprintf(stderr, "can't get window tree for %lu\n", win);
+            fprintf(stderr, "can't get window tree for 0x%lx\n", win);
 		}
 		return 0;
 	}

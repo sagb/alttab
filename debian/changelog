@@ -1,10 +1,11 @@
-alttab (1.1.0.20171205.18.g4c4b0b6-1~1.gbpfcb787) stretch; urgency=medium
+alttab (1.1.0.20171207.30.g5ce0794-1~1.gbp592a45) unstable; urgency=medium
 
-  ** SNAPSHOT build @fcb7878a58e549eff9eb5df692520eb826c46cbf **
+  ** SNAPSHOT build @592a45b6d3bb510894338b46c53965ca539a0129 **
 
-  * backport to stretch
+  * add -w 3 option for ancient WMs
+  * autodetect partially ewmh-compatible wm (dwm)
 
- -- Alexander Kulak <sa-dev@rainbow.by>  Tue, 05 Dec 2017 17:02:19 +0300
+ -- Alexander Kulak <sa-dev@rainbow.by>  Thu, 07 Dec 2017 12:15:04 +0300
 
 alttab (1.1.0.20171205.18.g4c4b0b6-1~1.gbp8ef90e) unstable; urgency=medium
 
