@@ -34,7 +34,11 @@ See [INSTALL.md](INSTALL.md) for details and [doc/wm-setup.md](doc/wm-setup.md)
 for window manager settings.
 
 Usually it should run fully functional without any argument: `alttab`.  
+
+# See also
+
+[no-wm](https://github.com/patrickhaller/no-wm): use X11 without a window manager  
    
    
-(C) Alexander Kulak &lt;sa-dev AT rainbow POINT by&gt; 2016, 2017
+alttab (C) Alexander Kulak &lt;sa-dev AT rainbow POINT by&gt; 2016, 2017
 
