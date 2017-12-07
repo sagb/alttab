@@ -100,7 +100,8 @@ typedef struct {
 #define WM_NO           0
 #define WM_EWMH         1
 #define WM_RATPOISON    2
-#define WM_MAX          2
+#define WM_TWM          3
+#define WM_MAX          3
 	int option_wm;
 	char *option_font;
 	int option_tileW, option_tileH;

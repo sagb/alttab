@@ -14,16 +14,16 @@ Below are examples of these two steps for some window managers.
 ratpoison
 ---------
 
-1. Add to ~/.ratpoisonrc: exec alttab
+1. Add to ~/.ratpoisonrc: `exec alttab`
 2. Ratpoison doesn't grab Alt-Tab exclusively, so no additional configuration required.
 
 xmonad
 ------
 
-1. Use startupHook in xmonad.hs.
+1. Use `startupHook` in xmonad.hs.
 2. Xmonad is hungry for *Alt* key.
-[Disable keybindings](http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Doc-Extending.html#g:11) (modMask,xK\_Tab) and (modMask.|.shiftMask,xK\_Tab)
-or [rebind modifier](https://wiki.haskell.org/Xmonad/Frequently_asked_questions#Rebinding_the_mod_key_.28Alt_conflicts_with_other_apps.3B_I_want_the_key.21.29) (both workarounds are not tested, please report).
+[Disable keybindings](http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Doc-Extending.html#g:11) `(modMask,xK_Tab)` and `(modMask.|.shiftMask,xK_Tab)`
+or [rebind modifier](https://wiki.haskell.org/Xmonad/Frequently_asked_questions#Rebinding_the_mod_key_.28Alt_conflicts_with_other_apps.3B_I_want_the_key.21.29) (neither method is tested, please report).
 
 Also, for setting window focus, [EWMH extension](http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Hooks-EwmhDesktops.html) in xmonad is required (libghc-xmonad-contrib-dev), or xmonad will insist on its own focus (`alttab -w 0` will not work).
 Also, there is no sane way to detect xmonad reliably without EWMH.
