@@ -37,7 +37,7 @@ Most command line options have corresponding X resource.
     resource: alttab.windowmanager  
     default: autodetect, fallback to <3>
 
-    Control how to obtain window list and set focus. <NUMBER> may be 0, 1 or 2:
+    Control how to obtain window list and set focus. <NUMBER> must be between 0 and 3:
 
       <0>: No WM, raw X.
 
