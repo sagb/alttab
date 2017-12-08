@@ -41,7 +41,7 @@ Most command line options have corresponding X resource.
 
       <0>: No WM, raw X.
 
-      Please select this option manually, as it's not autodetected. 
+      Set this value manually, as it's not autodetected. 
       Only top-level viewable children of root window are listed.
       List order is random. 
       Running **-w 0** under WM is discouraged: hidden windows or windows on another desktops will not be listed; instead, some strange windows may be included. 
