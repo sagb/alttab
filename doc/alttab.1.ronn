@@ -31,7 +31,7 @@ it still features customizable look and behaviour.
 
 ## OPTIONS
 
-Most command line options have corresponding X resource.
+Most command line options have corresponding X resource, see doc/alttab.ad for example.
 
   * `-w` <NUMBER>:
     resource: alttab.windowmanager  
