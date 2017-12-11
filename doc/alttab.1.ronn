@@ -31,17 +31,17 @@ it still features customizable look and behaviour.
 
 ## OPTIONS
 
-Most command line options have corresponding X resource.
+Most command line options have corresponding X resource, see doc/alttab.ad for example.
 
   * `-w` <NUMBER>:
     resource: alttab.windowmanager  
     default: autodetect, fallback to <3>
 
-    Control how to obtain window list and set focus. <NUMBER> may be 0, 1 or 2:
+    Control how to obtain window list and set focus. <NUMBER> must be between 0 and 3:
 
       <0>: No WM, raw X.
 
-      Please select this option manually, as it's not autodetected. 
+      Set this value manually, as it's not autodetected. 
       Only top-level viewable children of root window are listed.
       List order is random. 
       Running **-w 0** under WM is discouraged: hidden windows or windows on another desktops will not be listed; instead, some strange windows may be included. 
@@ -49,7 +49,7 @@ Most command line options have corresponding X resource.
       <1>: EWMH compatible.
 
       Compatible WM list is in [SEE ALSO] below. Tested in xmonad (EWMH must be allowed,
-      details in doc/wm-setup.md), i3, evilwm, xfwm4, metacity, dwm (partially compatible).
+      details in doc/wm-setup.md), i3, evilwm, xfwm4, metacity, dwm (partially compatible), jwm.
 
       <2>: Ratpoison.
 

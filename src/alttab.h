@@ -33,6 +33,8 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 
 #define XWINNAME    "alttab"
 #define XRMAPPNAME  XWINNAME
+#define XCLASSNAME  XWINNAME
+#define XCLASS      "AltTab"
 #define DEFTILEW    112
 #define DEFTILEH    128
 #define DEFTILE     "112x128"

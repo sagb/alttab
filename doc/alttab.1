@@ -19,7 +19,7 @@ Unlike task switchers integrated in most simple WMs, \fBalttab\fR features visua
 Being lightweight and depending only on core X11 libs, it still features customizable look and behaviour\.
 .
 .SH "OPTIONS"
-Most command line options have corresponding X resource\.
+Most command line options have corresponding X resource, see doc/alttab\.ad for example\.
 .
 .TP
 \fB\-w\fR \fINUMBER\fR
@@ -29,19 +29,19 @@ resource: alttab\.windowmanager
 default: autodetect, fallback to \fI3\fR
 .
 .IP
-Control how to obtain window list and set focus\. \fINUMBER\fR may be 0, 1 or 2:
+Control how to obtain window list and set focus\. \fINUMBER\fR must be between 0 and 3:
 .
 .IP
 \fI0\fR: No WM, raw X\.
 .
 .IP
-Please select this option manually, as it\'s not autodetected\. Only top\-level viewable children of root window are listed\. List order is random\. Running \fB\-w 0\fR under WM is discouraged: hidden windows or windows on another desktops will not be listed; instead, some strange windows may be included\.
+Set this value manually, as it\'s not autodetected\. Only top\-level viewable children of root window are listed\. List order is random\. Running \fB\-w 0\fR under WM is discouraged: hidden windows or windows on another desktops will not be listed; instead, some strange windows may be included\.
 .
 .IP
 \fI1\fR: EWMH compatible\.
 .
 .IP
-Compatible WM list is in [SEE ALSO] below\. Tested in xmonad (EWMH must be allowed, details in doc/wm\-setup\.md), i3, evilwm, xfwm4, metacity, dwm (partially compatible)\.
+Compatible WM list is in [SEE ALSO] below\. Tested in xmonad (EWMH must be allowed, details in doc/wm\-setup\.md), i3, evilwm, xfwm4, metacity, dwm (partially compatible), jwm\.
 .
 .IP
 \fI2\fR: Ratpoison\.
