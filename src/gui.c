@@ -463,7 +463,19 @@ int uiShow(bool direction)
     }
 
     XMapWindow(dpy, uiwin);
+
     if (g.option_wm == WM_EWMH) {
+        // required in JWM: centering
+        XSizeHints uiwinSizeHints = { USPosition|USSize|PPosition|PSize|PMinSize|PMaxSize|PBaseSize|PWinGravity,
+            uiwinX, uiwinY,
+            uiwinW, uiwinH,
+            uiwinW, uiwinH,
+            uiwinW, uiwinH,
+            0, 0,
+            {0,0}, {0,0},
+            uiwinW, uiwinH,
+            5 };
+        XSetWMNormalHints(dpy, uiwin, &uiwinSizeHints);
         // required in Metacity
         ewmh_setFocus(0, uiwin);
     }
