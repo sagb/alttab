@@ -28,6 +28,7 @@ evilwm       | 1 (auto)                    | ?                              | ?
 twm          | 3 (default)                 | doesn't grab                   | ?
 xfwm4/xfce   | 1 (auto)                    | see "xfce" section below       | 
 metacity/MATE| 1 (auto)                    | see "MATE" section below       | 
+jwm          | 1 (auto)                    | comment A-Tab entry in .jwmrc  | see "jwm" section below
 
 
 xmonad
@@ -64,4 +65,21 @@ System -> Preferences -> Hardware -> Keyboard Shortcuts -> disable Alt-Tab entri
 
 ### startup
 System -> Control Center -> Startup Applications -> Add
+
+
+jwm
+===
+
+Edit /etc/jwm/system.jwmrc or ~/.jwmrc:
+
+### keyboard shortcut
+Comment A-Tab entry.
+
+### startup
+Add/edit:
+
+<StartupCommand>
+    ...something else...
+    alttab &
+</StartupCommand>
 
