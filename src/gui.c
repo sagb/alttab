@@ -230,9 +230,10 @@ int startupGUItasks()
 //
 int uiShow(bool direction)
 {
-	if (g.debug > 0) {
+    if (g.debug > 0) {
 		fprintf(stderr, "preparing ui\n");
 	}
+    XClassHint class_h = { XCLASSNAME, XCLASS };
 // init X junk early, because depth conversion in addWindow requires GC
 
 	g.uiShowHasRun = true;	// begin allocations
@@ -427,6 +428,7 @@ int uiShow(bool direction)
 
 // set properties of our window
     XStoreName(dpy, uiwin, XWINNAME);
+    XSetClassHint(dpy, uiwin, &class_h);
 	XSelectInput(dpy, uiwin, ExposureMask | KeyPressMask | KeyReleaseMask);
 // set window type so that WM will hopefully not resize it
 // before mapping: https://specifications.freedesktop.org/wm-spec/1.3/ar01s05.html
