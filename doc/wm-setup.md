@@ -70,16 +70,17 @@ System -> Control Center -> Startup Applications -> Add
 jwm
 ===
 
-Edit /etc/jwm/system.jwmrc or ~/.jwmrc:
+Edit `/etc/jwm/system.jwmrc` or `~/.jwmrc`:
 
 ### keyboard shortcut
 Comment A-Tab entry.
 
 ### startup
 Add/edit:
-
+```
 <StartupCommand>
     ...something else...
     alttab &
 </StartupCommand>
+```
 
