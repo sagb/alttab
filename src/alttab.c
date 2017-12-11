@@ -158,7 +158,7 @@ int use_args_and_xrm(int *argc, char **argv)
 	char *type;
 
 #define XRESOURCE_LOAD_STRING(NAME, DST, DEFAULT)           \
-	XrmGetResource (db, NAME, "String", &type, &v);         \
+	XrmGetResource (db, XRMAPPNAME NAME, XCLASS NAME, &type, &v);         \
 	if (v.addr != NULL && !strncmp ("String", type, 64))    \
 		DST = v.addr;                                       \
     else                                                    \
@@ -227,7 +227,7 @@ int use_args_and_xrm(int *argc, char **argv)
 
     g.option_modMask = defaultModMask;
 	endptr = s = NULL;
-	XRESOURCE_LOAD_STRING(XRMAPPNAME ".modifier.mask", s, NULL);
+	XRESOURCE_LOAD_STRING(".modifier.mask", s, NULL);
 	if (s) {
 		mask = strtol(s, &endptr, 0);
         if (*s != '\0' && *endptr == '\0')
@@ -238,7 +238,7 @@ int use_args_and_xrm(int *argc, char **argv)
 
     g.option_backMask = defaultBackMask;
 	endptr = s = NULL;
-	XRESOURCE_LOAD_STRING(XRMAPPNAME ".backscroll.mask", s, NULL);
+	XRESOURCE_LOAD_STRING(".backscroll.mask", s, NULL);
 	if (s) {
 		mask = strtol(s, &endptr, 0);
         if (*s != '\0' && *endptr == '\0')
@@ -249,7 +249,7 @@ int use_args_and_xrm(int *argc, char **argv)
 
     g.option_modCode = XKeysymToKeycode(dpy, defaultModSym);
 	endptr = s = NULL;
-	XRESOURCE_LOAD_STRING(XRMAPPNAME ".modifier.keysym", s, NULL);
+	XRESOURCE_LOAD_STRING(".modifier.keysym", s, NULL);
 	if (s) {
 		ksym = strtol(s, &endptr, 0);
         if (*s != '\0' && *endptr == '\0') {
@@ -265,7 +265,7 @@ int use_args_and_xrm(int *argc, char **argv)
 
     g.option_keyCode = XKeysymToKeycode(dpy, defaultKeySym);
 	endptr = s = NULL;
-	XRESOURCE_LOAD_STRING(XRMAPPNAME ".key.keysym", s, NULL);
+	XRESOURCE_LOAD_STRING(".key.keysym", s, NULL);
 	if (s) {
 		ksym = strtol(s, &endptr, 0);
         if (*s != '\0' && *endptr == '\0') {
@@ -294,7 +294,7 @@ int use_args_and_xrm(int *argc, char **argv)
     g.option_tileW = DEFTILEW;
     g.option_tileH = DEFTILEH;
 	char *defaultTileGeo = DEFTILE;
-	XRESOURCE_LOAD_STRING(XRMAPPNAME ".tile.geometry", gtile,
+	XRESOURCE_LOAD_STRING(".tile.geometry", gtile,
 			      defaultTileGeo);
     if (gtile) {
     	xpg = XParseGeometry(gtile, &x, &y, &w, &h);
@@ -311,7 +311,7 @@ int use_args_and_xrm(int *argc, char **argv)
     g.option_iconW = DEFICONW;
     g.option_iconH = DEFICONH;
 	char *defaultIconGeo = DEFICON;
-	XRESOURCE_LOAD_STRING(XRMAPPNAME ".icon.geometry", gicon,
+	XRESOURCE_LOAD_STRING(".icon.geometry", gicon,
 			      defaultIconGeo);
     if (gicon) {
     	xpg = XParseGeometry(gicon, &x, &y, &w, &h);
@@ -335,7 +335,7 @@ int use_args_and_xrm(int *argc, char **argv)
 	char *isrcindex = NULL;
     int isrc = ISRC_DEFAULT;
     g.option_iconSrc = ISRC_DEFAULT;
-	XRESOURCE_LOAD_STRING(XRMAPPNAME ".icon.source", isrcindex, NULL);
+	XRESOURCE_LOAD_STRING(".icon.source", isrcindex, NULL);
 	if (isrcindex) {
         isrc = strtol(isrcindex, &endptr, 0);
         if (*isrcindex != '\0' && *endptr == '\0') {
@@ -352,24 +352,24 @@ int use_args_and_xrm(int *argc, char **argv)
 
 	char *defaultTheme = DEFTHEME;
     g.option_theme = NULL;
-	XRESOURCE_LOAD_STRING(XRMAPPNAME ".theme", g.option_theme, defaultTheme);
+	XRESOURCE_LOAD_STRING(".theme", g.option_theme, defaultTheme);
     if (!g.option_theme)
 		g.option_theme = defaultTheme;
 	if (g.debug > 0)
 		fprintf(stderr, "icon theme: %s\n", g.option_theme);
 
 	char *defaultColorBG = DEFCOLBG;
-	XRESOURCE_LOAD_STRING(XRMAPPNAME ".background", g.color[COLBG].name,
+	XRESOURCE_LOAD_STRING(".background", g.color[COLBG].name,
 			      defaultColorBG);
 	char *defaultColorFG = DEFCOLFG;
-	XRESOURCE_LOAD_STRING(XRMAPPNAME ".foreground", g.color[COLFG].name,
+	XRESOURCE_LOAD_STRING(".foreground", g.color[COLFG].name,
 			      defaultColorFG);
 	char *defaultColorFrame = DEFCOLFRAME;
-	XRESOURCE_LOAD_STRING(XRMAPPNAME ".framecolor", g.color[COLFRAME].name,
+	XRESOURCE_LOAD_STRING(".framecolor", g.color[COLFRAME].name,
 			      defaultColorFrame);
 
 	char *defaultFont = DEFFONT;
-	XRESOURCE_LOAD_STRING(XRMAPPNAME ".font", g.option_font, defaultFont);
+	XRESOURCE_LOAD_STRING(".font", g.option_font, defaultFont);
 	if ((strncmp(g.option_font, "xft:", 4) == 0)
 	    && (*(g.option_font + 4) != '\0')) {
 		g.option_font += 4;
