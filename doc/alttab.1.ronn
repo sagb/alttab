@@ -49,7 +49,7 @@ Most command line options have corresponding X resource, see doc/alttab.ad for e
       <1>: EWMH compatible.
 
       Compatible WM list is in [SEE ALSO] below. Tested in xmonad (EWMH must be allowed,
-      details in doc/wm-setup.md), i3, evilwm, xfwm4, metacity, dwm (partially compatible).
+      details in doc/wm-setup.md), i3, evilwm, xfwm4, metacity, dwm (partially compatible), jwm.
 
       <2>: Ratpoison.
 
