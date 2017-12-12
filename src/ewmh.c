@@ -214,7 +214,7 @@ unsigned long ewmh_getCurrentDesktop()
     if (!cd)
         cd = (unsigned long*)get_x_property (root, XA_CARDINAL,
                 "_WIN_WORKSPACE", &propsize);
-    return (cd && (propsize>0)) ? *cd : 1;
+    return (cd && (propsize>0) && ((signed long)(*cd)>0)) ? *cd : 1;
 }
 
 //
@@ -228,6 +228,6 @@ unsigned long ewmh_getDesktopOfWindow(Window w)
     if (!d)
         d = (unsigned long*)get_x_property (w, XA_CARDINAL,
                 "_WIN_WORKSPACE", NULL);
-    return d ? *d : 1;
+    return (d && ((signed long)(*d) > 0)) ? *d : 1;
 }
 
