@@ -17,6 +17,10 @@ the issue on github.
 Tested window managers
 ----------------------
 
+See [here](https://github.com/sagb/alttab/issues/33) how much alttab enhances 
+each WM.
+
+
  WM/DE       | best value for `-w` option  | how to release grabbed Alt-Tab | autostart
 ------------ | --------------------------- | ------------------------------ | ---------
 no WM        | 0 (set manually)            | doesn't grab                   | `alttab &` in ~/.xsession
@@ -33,6 +37,11 @@ openbox      | 1 (auto)                    | see "openbox" section below    |
 fluxbox      | 1 (auto)                    | ?                              | ?
 icewm        | 1 (auto)                    | ?                              | ?
 matchbox     | 1 (auto, partial support)   | doesn't grab                   | ?
+enlightenment| 1 (auto)                    | ?                              | ?
+blackbox     | 1 (auto)                    | doesn't grab                   | ?
+window maker | 1 (auto, partial support)   | doesn't grab                   | ?
+flwm         | 3 (auto)                    | ?                              | ?
+xpra (non-wm)| 1 (auto, partial support)   | doesn't grab                   | ?
 
 
 xmonad
