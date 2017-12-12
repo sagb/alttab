@@ -48,8 +48,13 @@ Most command line options have corresponding X resource, see doc/alttab.ad for e
 
       <1>: EWMH compatible.
 
-      Compatible WM list is in [SEE ALSO] below. Tested in xmonad (EWMH must be allowed,
-      details in doc/wm-setup.md), i3, evilwm, xfwm4, metacity, dwm (partially compatible), jwm.
+      Compatible WM list is in [SEE ALSO] below. alttab functions in xmonad (EWMH must be
+      allowed, details in doc/wm-setup.md), i3, evilwm, xfwm4, metacity, jwm, openbox, fluxbox,
+      icewm, enlightenment, blackbox, aewm, fvwm, sawfish.
+      The following WMs support EWMH partially but work in **-w 1** mode too:
+      dwm (issue #9), matchbox (issue #34), windowmaker (issue #9),
+      xpra (issue #37), cwm (issue #35), ctwm (issue #39), lwm (issue #40),
+      awesome (issue #41).
 
       <2>: Ratpoison.
 
@@ -62,7 +67,7 @@ Most command line options have corresponding X resource, see doc/alttab.ad for e
       and select only those with a name, including non-viewable (WM is probably iconifying).
       May cause lag.
       List order is random.
-      Tested in twm.
+      Tested in twm, flwm, wm2.
 
   * `-mm` <NUM>:
     resource: alttab.modifier.mask  
