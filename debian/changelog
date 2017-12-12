@@ -1,10 +1,18 @@
-alttab (1.1.0.20171211.41.g2f0f649-1~1.gbp924b8a) stretch; urgency=medium
+alttab (1.1.0.20171212.53.gda853cd-1~1.gbp6a2fc7) unstable; urgency=medium
 
-  ** SNAPSHOT build @924b8aaf3c54255943cbe9173a05f5d6249a7e9d **
+  ** SNAPSHOT build @6a2fc74c0c795e5f07d6e29328b0cdcf4dc6198c **
 
-  * backport to stretch
+  * tested in openbox, fluxbox, icewm, matchbox, enlightenment, blackbox,
+  * tested in window maker, flwm, cwm, wm2, aewm, fvwm, ctwm, lwm, sawfish,
+  * tested in awesome
+  * multiple workarounds for incomplete EWMH support
+  * prevent segfault when -vv in badly behaving WM
+  * -w fixed
+  * listed WMs which are really enhanced by alttab
 
- -- Alexander Kulak <sa-dev@rainbow.by>  Mon, 11 Dec 2017 20:40:56 +0300
+  Closes: #34, #35, #36, #39, #40
+
+ -- Alexander Kulak <sa-dev@rainbow.by>  Tue, 12 Dec 2017 20:32:42 +0300
 
 alttab (1.1.0.20171211.41.g2f0f649-1~1.gbpdcedc2) unstable; urgency=medium
 
