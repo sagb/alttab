@@ -49,6 +49,8 @@ afterstep    | 3 (manually, issue #38)     | doesn't grab                   | ?
 fvwm         | 1 (auto)                    | ?                              | ?
 ctwm         | 1 (auto, see issue #39)     | doesn't grab                   | ?
 lwm          | 1 (auto, issue #40)         | doesn't grab                   | ?
+sawfish      | 1 (auto)                    | doesn't grab                   | ?
+awesome      | 1 (auto)                    | doesn't grab                   | ?
 
 
 xmonad
