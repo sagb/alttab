@@ -42,6 +42,7 @@ blackbox     | 1 (auto)                    | doesn't grab                   | ?
 window maker | 1 (auto, partial support)   | doesn't grab                   | ?
 flwm         | 3 (auto)                    | ?                              | ?
 xpra (non-wm)| 1 (auto, partial support)   | doesn't grab                   | ?
+cwm          | 1 (auto) (issue #35)        | ?                              | ?
 
 
 xmonad

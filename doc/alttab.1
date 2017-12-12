@@ -41,7 +41,7 @@ Set this value manually, as it\'s not autodetected\. Only top\-level viewable ch
 \fI1\fR: EWMH compatible\.
 .
 .IP
-Compatible WM list is in [SEE ALSO] below\. Tested in xmonad (EWMH must be allowed, details in doc/wm\-setup\.md), i3, evilwm, xfwm4, metacity, dwm (partially compatible), jwm, openbox, fluxbox, icewm, matchbox (ignores centering), enlightenment\.
+Compatible WM list is in [SEE ALSO] below\. Tested in xmonad (EWMH must be allowed, details in doc/wm\-setup\.md), i3, evilwm, xfwm4, metacity, jwm, openbox, fluxbox, icewm, enlightenment, blackbox\. The following WMs support EWMH partially but work in \fB\-w 1\fR mode too: dwm (issue #9), matchbox (issue #34), windowmaker (issue #9), xpra (issue #37), cwm (issue #35)\.
 .
 .IP
 \fI2\fR: Ratpoison\.
@@ -53,7 +53,7 @@ Alttab uses ratpoison own perfect remote control capability\. Additionally, altt
 \fI3\fR: Ancient WM\.
 .
 .IP
-Fallback, worse than \fI0\fR\. Search for application windows at random nodes of window tree (WM is probably reparenting) and select only those with a name, including non\-viewable (WM is probably iconifying)\. May cause lag\. List order is random\. Tested in twm\.
+Fallback, worse than \fI0\fR\. Search for application windows at random nodes of window tree (WM is probably reparenting) and select only those with a name, including non\-viewable (WM is probably iconifying)\. May cause lag\. List order is random\. Tested in twm, flwm\.
 .
 .TP
 \fB\-mm\fR \fINUM\fR

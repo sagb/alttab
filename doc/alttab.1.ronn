@@ -52,8 +52,8 @@ Most command line options have corresponding X resource, see doc/alttab.ad for e
       details in doc/wm-setup.md), i3, evilwm, xfwm4, metacity, jwm, openbox, fluxbox,
       icewm, enlightenment, blackbox.
       The following WMs support EWMH partially but work in **-w 1** mode too:
-      dwm ("unknown"), matchbox (ignores centering), windowmaker ("unknown"),
-      xpra (non-wm, no _NET_ACTIVE_WINDOW).
+      dwm (issue #9), matchbox (issue #34), windowmaker (issue #9),
+      xpra (issue #37), cwm (issue #35).
 
       <2>: Ratpoison.
 
