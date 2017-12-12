@@ -6,7 +6,7 @@ Setting up window manager for alttab
 exclusively. Alternatively, let alttab use another shortcut, f.e. Left Ctrl
 instead of Alt: `alttab -mm 4 -mk 0xffe3`.
 
-2. Start alttab and see if it's usable at all: are windows recognized,
+2. Start alttab and check is it usable at all: are windows recognized,
 does alttab change focus? If no, then try to set `-w` option to the
 following values: 1, 0, 3. If none works, then please report
 the issue on github.
@@ -16,6 +16,10 @@ the issue on github.
 
 Tested window managers
 ----------------------
+
+See [here](https://github.com/sagb/alttab/issues/33) how much alttab enhances 
+each WM.
+
 
  WM/DE       | best value for `-w` option  | how to release grabbed Alt-Tab | autostart
 ------------ | --------------------------- | ------------------------------ | ---------
@@ -29,6 +33,24 @@ twm          | 3 (default)                 | doesn't grab                   | ?
 xfwm4/xfce   | 1 (auto)                    | see "xfce" section below       | 
 metacity/MATE| 1 (auto)                    | see "MATE" section below       | 
 jwm          | 1 (auto)                    | comment A-Tab entry in .jwmrc  | see "jwm" section below
+openbox      | 1 (auto)                    | see "openbox" section below    |
+fluxbox      | 1 (auto)                    | ?                              | ?
+icewm        | 1 (auto)                    | ?                              | ?
+matchbox     | 1 (auto, partial support)   | doesn't grab                   | ?
+enlightenment| 1 (auto)                    | ?                              | ?
+blackbox     | 1 (auto)                    | doesn't grab                   | ?
+window maker | 1 (auto, partial support)   | doesn't grab                   | ?
+flwm         | 3 (default)                 | ?                              | ?
+xpra (non-wm)| 1 (auto, partial support)   | doesn't grab                   | ?
+cwm          | 1 (auto) (issue #35)        | ?                              | ?
+wm2          | 3 (default)                 | doesn't grab                   | ?
+aewm         | 1 (auto)                    | doesn't grab                   | ?
+afterstep    | 3 (manually, issue #38)     | doesn't grab                   | ?
+fvwm         | 1 (auto)                    | ?                              | ?
+ctwm         | 1 (auto, see issue #39)     | doesn't grab                   | ?
+lwm          | 1 (auto, issue #40)         | doesn't grab                   | ?
+sawfish      | 1 (auto)                    | doesn't grab                   | ?
+awesome      | 1 (auto)                    | doesn't grab                   | ?
 
 
 xmonad
@@ -70,16 +92,26 @@ System -> Control Center -> Startup Applications -> Add
 jwm
 ===
 
-Edit /etc/jwm/system.jwmrc or ~/.jwmrc:
+Edit `/etc/jwm/system.jwmrc` or `~/.jwmrc`:
 
 ### keyboard shortcut
 Comment A-Tab entry.
 
 ### startup
 Add/edit:
-
+```
 <StartupCommand>
     ...something else...
     alttab &
 </StartupCommand>
+```
+
+openbox
+=======
+
+### keyboard shortcut
+Disable `A-Tab` and `A-S-Tab` keybinds in `/etc/xdg/openbox/rc.xml`
+
+### startup
+Add `alltab &` to `/etc/xdg/openbox/autostart`
 
