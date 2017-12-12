@@ -169,7 +169,7 @@ int use_args_and_xrm(int *argc, char **argv)
 
 	endptr = NULL;
 	char *wmindex = NULL;
-	XRESOURCE_LOAD_STRING(XRMAPPNAME ".windowmanager", wmindex, NULL);
+    XRESOURCE_LOAD_STRING(".windowmanager", wmindex, NULL);
 	if (wmindex)
 		g.option_wm = strtol(wmindex, &endptr, 0);
 	if ((endptr != NULL) && (*endptr == '\0') && (g.option_wm >= WM_MIN)
