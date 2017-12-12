@@ -6,7 +6,7 @@ Setting up window manager for alttab
 exclusively. Alternatively, let alttab use another shortcut, f.e. Left Ctrl
 instead of Alt: `alttab -mm 4 -mk 0xffe3`.
 
-2. Start alttab and see if it's usable at all: are windows recognized,
+2. Start alttab and check is it usable at all: are windows recognized,
 does alttab change focus? If no, then try to set `-w` option to the
 following values: 1, 0, 3. If none works, then please report
 the issue on github.
@@ -30,6 +30,9 @@ xfwm4/xfce   | 1 (auto)                    | see "xfce" section below       |
 metacity/MATE| 1 (auto)                    | see "MATE" section below       | 
 jwm          | 1 (auto)                    | comment A-Tab entry in .jwmrc  | see "jwm" section below
 openbox      | 1 (auto)                    | see "openbox" section below    |
+fluxbox      | 1 (auto)                    | ?                              | ?
+icewm        | 1 (auto)                    | ?                              | ?
+matchbox     | 1 (auto, partial support)   | doesn't grab                   | ?
 
 
 xmonad

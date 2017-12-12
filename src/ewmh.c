@@ -143,8 +143,12 @@ int ewmh_initWinlist()
 	for (i = 0; i < client_list_size / sizeof(Window); i++) {
 		Window w = client_list[i];
 
-        if (current_desktop != ewmh_getDesktopOfWindow(w))
+        if (current_desktop != ewmh_getDesktopOfWindow(w)) {
+	        if (g.debug > 1) {
+                fprintf (stderr, "window not on active desktop, skipped (window's %ld, current %ld)\n", ewmh_getDesktopOfWindow(w), current_desktop);
+            }
             continue;
+        }
 
 		// build title
 		char *wmn1 = get_x_property(w, XA_STRING, "WM_NAME", NULL);
@@ -204,12 +208,13 @@ int ewmh_setFocus(int winNdx, Window fwin)
 unsigned long ewmh_getCurrentDesktop()
 {
     unsigned long *cd;
+    unsigned long propsize;
     cd = (unsigned long*)get_x_property (root, XA_CARDINAL,
-            "_NET_CURRENT_DESKTOP", NULL);
+            "_NET_CURRENT_DESKTOP", &propsize);
     if (!cd)
         cd = (unsigned long*)get_x_property (root, XA_CARDINAL,
-                "_WIN_WORKSPACE", NULL);
-    return cd ? *cd : 0;
+                "_WIN_WORKSPACE", &propsize);
+    return (cd && (propsize>0)) ? *cd : 1;
 }
 
 //
@@ -223,6 +228,6 @@ unsigned long ewmh_getDesktopOfWindow(Window w)
     if (!d)
         d = (unsigned long*)get_x_property (w, XA_CARDINAL,
                 "_WIN_WORKSPACE", NULL);
-    return d ? *d : 0;
+    return d ? *d : 1;
 }
 

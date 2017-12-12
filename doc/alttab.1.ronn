@@ -50,7 +50,7 @@ Most command line options have corresponding X resource, see doc/alttab.ad for e
 
       Compatible WM list is in [SEE ALSO] below. Tested in xmonad (EWMH must be allowed,
       details in doc/wm-setup.md), i3, evilwm, xfwm4, metacity, dwm (partially compatible),
-      jwm, openbox.
+      jwm, openbox, fluxbox, icewm, matchbox (ignores centering).
 
       <2>: Ratpoison.
 
