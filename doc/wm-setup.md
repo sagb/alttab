@@ -29,6 +29,7 @@ twm          | 3 (default)                 | doesn't grab                   | ?
 xfwm4/xfce   | 1 (auto)                    | see "xfce" section below       | 
 metacity/MATE| 1 (auto)                    | see "MATE" section below       | 
 jwm          | 1 (auto)                    | comment A-Tab entry in .jwmrc  | see "jwm" section below
+openbox      | 1 (auto)                    | see "openbox" section below    |
 
 
 xmonad
@@ -83,4 +84,13 @@ Add/edit:
     alttab &
 </StartupCommand>
 ```
+
+openbox
+=======
+
+### keyboard shortcut
+Disable `A-Tab` and `A-S-Tab` keybinds in `/etc/xdg/openbox/rc.xml`
+
+### startup
+Add `alltab &` to `/etc/xdg/openbox/autostart`
 
