@@ -167,7 +167,7 @@ int ewmh_initWinlist()
 
 	if (g.debug > 1) {
 		fprintf(stderr, "ewmh active window: %lu index: %d name: %s\n",
-			aw, g.startNdx, g.winlist[g.startNdx].name);
+			aw, g.startNdx, (g.winlist ? g.winlist[g.startNdx].name : "null"));
 	}
 
 	return 1;
