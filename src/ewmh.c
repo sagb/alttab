@@ -37,6 +37,9 @@ extern Window root;
 
 // PRIVATE
 
+// this constant can't be 0, 1, -1, because WMs set it to these values incoherently
+#define DESKTOP_UNKNOWN 666
+
 //
 // returns ptr to EWMH client list and client_list_size
 // or NULL
@@ -121,7 +124,7 @@ int ewmh_initWinlist()
 	char *awp;
 	unsigned long sz;
 	char *title;
-    unsigned long current_desktop;
+    unsigned long current_desktop, window_desktop;
 
 	aw = (Window) 0;
     current_desktop = ewmh_getCurrentDesktop();
@@ -143,9 +146,12 @@ int ewmh_initWinlist()
 	for (i = 0; i < client_list_size / sizeof(Window); i++) {
 		Window w = client_list[i];
 
-        if (current_desktop != ewmh_getDesktopOfWindow(w)) {
+        window_desktop = ewmh_getDesktopOfWindow(w);
+        if (current_desktop != window_desktop 
+                && current_desktop != DESKTOP_UNKNOWN 
+                && window_desktop != DESKTOP_UNKNOWN) {
 	        if (g.debug > 1) {
-                fprintf (stderr, "window not on active desktop, skipped (window's %ld, current %ld)\n", ewmh_getDesktopOfWindow(w), current_desktop);
+                fprintf (stderr, "window not on active desktop, skipped (window's %ld, current %ld)\n", window_desktop, current_desktop);
             }
             continue;
         }
@@ -214,7 +220,7 @@ unsigned long ewmh_getCurrentDesktop()
     if (!cd)
         cd = (unsigned long*)get_x_property (root, XA_CARDINAL,
                 "_WIN_WORKSPACE", &propsize);
-    return (cd && (propsize>0) && ((signed long)(*cd) >=0 )) ? *cd : 1;
+    return (cd && (propsize>0) && ((signed long)(*cd) >=0 )) ? *cd : DESKTOP_UNKNOWN;
 }
 
 //
@@ -228,6 +234,6 @@ unsigned long ewmh_getDesktopOfWindow(Window w)
     if (!d)
         d = (unsigned long*)get_x_property (w, XA_CARDINAL,
                 "_WIN_WORKSPACE", NULL);
-    return (d && ((signed long)(*d) >= 0)) ? *d : 1;
+    return (d && ((signed long)(*d) >= 0)) ? *d : DESKTOP_UNKNOWN;
 }
 
