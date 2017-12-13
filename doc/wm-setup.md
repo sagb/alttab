@@ -106,6 +106,10 @@ Add/edit:
 </StartupCommand>
 ```
 
+Also, "nomove" option may be added to the alttab group in .jwmrc to prevent
+moving of alttab window (issue #31).
+
+
 openbox
 =======
 
