@@ -34,7 +34,7 @@ xfwm4/xfce   | 1 (auto)                    | see "xfce" section below       |
 metacity/MATE| 1 (auto)                    | see "MATE" section below       | 
 jwm          | 1 (auto)                    | comment A-Tab entry in .jwmrc  | see "jwm" section below
 openbox      | 1 (auto)                    | see "openbox" section below    |
-fluxbox      | 1 (auto)                    | ?                              | ?
+fluxbox      | 1 (auto)                    | see "fluxbox" section below    | `alttab &` in ~/.fluxbox/startup
 icewm        | 1 (auto)                    | ?                              | ?
 matchbox     | 1 (auto, partial support)   | doesn't grab                   | ?
 enlightenment| 1 (auto)                    | ?                              | ?
@@ -99,12 +99,11 @@ Comment A-Tab entry.
 
 ### startup
 Add/edit:
-```
-<StartupCommand>
-    ...something else...
-    alttab &
-</StartupCommand>
-```
+
+    <StartupCommand>
+        ...something else...
+        alttab &
+    </StartupCommand>
 
 Also, "nomove" option may be added to the alttab group in .jwmrc to prevent
 moving of alttab window (issue #31).
@@ -118,4 +117,21 @@ Disable `A-Tab` and `A-S-Tab` keybinds in `/etc/xdg/openbox/rc.xml`
 
 ### startup
 Add `alltab &` to `/etc/xdg/openbox/autostart`
+
+
+fluxbox
+=======
+
+### keyboard shortcut
+Disable/comment built-in non-GUI Alt-Tab in /etc/X11/fluxbox/keys or ~/.fluxbox/keys:
+
+    #Mod1 Tab :NextWindow {groups} (workspace=[current])
+    #Mod1 Shift Tab :PrevWindow {groups} (workspace=[current])
+
+### startup
+In ~/.fluxbox/startup:
+
+    ...other apps...
+    alttab &
+    exec fluxbox
 
