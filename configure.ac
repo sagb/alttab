@@ -7,6 +7,23 @@ PKG_CHECK_MODULES([x11], [x11])
 PKG_CHECK_MODULES([xft], [xft])
 PKG_CHECK_MODULES([xrender], [xrender])
 PKG_CHECK_MODULES([libpng], [libpng])
+
+AC_MSG_CHECKING(for standalone fts library)
+if pkg-config --exists libfts ; then
+    AC_MSG_RESULT(libfts)
+    AC_SUBST([fts_CFLAGS], [`pkg-config --cflags libfts`])
+    AC_SUBST([fts_LIBS], [`pkg-config --libs libfts`])
+else
+    if pkg-config --exists musl-fts ; then
+        AC_MSG_RESULT(musl-fts)
+        AC_SUBST([fts_CFLAGS], [`pkg-config --cflags musl-fts`])
+        AC_SUBST([fts_LIBS], [`pkg-config --libs musl-fts`])
+    else
+        AC_MSG_RESULT(no)
+        AC_MSG_NOTICE(libfts or musl-fts not found. Assuming that fts functions are included in libc.)
+    fi
+fi
+
 AC_CHECK_HEADERS([uthash.h],
   [],
   [AC_MSG_ERROR([Cannot find uthash.h, please install uthash])]
