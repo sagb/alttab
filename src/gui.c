@@ -206,7 +206,7 @@ int startupGUItasks()
 //fontLabel = XLoadFont (dpy, LABELFONT);  // using Xft instead
 	fontLabel = XftFontOpenName(dpy, scrNum, g.option_font);
 	if (!fontLabel) {
-		fprintf(stderr, "can't allocate font: %s", g.option_font);
+		fprintf(stderr, "can't allocate font: %s\ncheck installed fontconfig fonts: fc-list\n", g.option_font);
 	}
 // having colors, GC may be built
 // they are required early for addWindow when transforming icon depth

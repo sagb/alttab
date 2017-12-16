@@ -1,10 +1,13 @@
-alttab (1.1.0.20171212.53.gda853cd-1~1.gbpdcd65e) testing; urgency=medium
+alttab (1.1.0.20171216.59.g8f35402-1~1.gbp16fc52) unstable; urgency=medium
 
-  ** SNAPSHOT build @dcd65ebe63bd6ce4de8d23d35602332170e3033e **
+  ** SNAPSHOT build @16fc524adeaf837a2ced98497bb209011fb500f5 **
 
-  * backport to buster
+  * jwm config detailed
+  * provide a way to build with musl libc
+  * fluxbox setup detailed
+  * in ewmh, avoid "panel" and other auxiliary windows
 
- -- Alexander Kulak <sa-dev@rainbow.by>  Tue, 12 Dec 2017 20:36:24 +0300
+ -- Alexander Kulak <sa-dev@rainbow.by>  Sat, 16 Dec 2017 16:19:24 +0300
 
 alttab (1.1.0.20171212.53.gda853cd-1~1.gbp6a2fc7) unstable; urgency=medium
 
