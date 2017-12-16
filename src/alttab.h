@@ -155,5 +155,6 @@ int ewmh_initWinlist();
 int ewmh_setFocus(int winNdx, Window fwin); // fwin used if non-zero
 unsigned long ewmh_getCurrentDesktop();
 unsigned long ewmh_getDesktopOfWindow(Window w);
+bool ewmh_skipWindowInTaskbar(Window w);
 
 #endif

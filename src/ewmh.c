@@ -38,7 +38,7 @@ extern Window root;
 // PRIVATE
 
 // this constant can't be 0, 1, -1, because WMs set it to these values incoherently
-#define DESKTOP_UNKNOWN 666
+#define DESKTOP_UNKNOWN 0xdead
 
 //
 // returns ptr to EWMH client list and client_list_size
@@ -146,6 +146,13 @@ int ewmh_initWinlist()
 	for (i = 0; i < client_list_size / sizeof(Window); i++) {
 		Window w = client_list[i];
 
+        if (ewmh_skipWindowInTaskbar(w)) {
+	        if (g.debug > 1) {
+                fprintf (stderr, "window %lx has \"skip on taskbar\" property, skipped\n", w);
+            }
+            continue;
+        }
+
         window_desktop = ewmh_getDesktopOfWindow(w);
         if (current_desktop != window_desktop 
                 && current_desktop != DESKTOP_UNKNOWN 
@@ -235,5 +242,34 @@ unsigned long ewmh_getDesktopOfWindow(Window w)
         d = (unsigned long*)get_x_property (w, XA_CARDINAL,
                 "_WIN_WORKSPACE", NULL);
     return (d && ((signed long)(*d) >= 0)) ? *d : DESKTOP_UNKNOWN;
+}
+
+//
+// does window have _NET_WM_STATE_SKIP_TASKBAR
+//
+bool ewmh_skipWindowInTaskbar(Window w)
+{
+    Atom *state;
+    long unsigned int state_propsize;
+    Atom a_skip_tb;
+    int i;
+
+    state = (Atom*)get_x_property(w, XA_ATOM, "_NET_WM_STATE", &state_propsize);
+    if (state == NULL || state_propsize == 0) {
+        if (g.debug>1) {
+            fprintf (stderr, "%lx: no _NET_WM_STATE property\n", w);
+        }
+        return false;
+    }
+    a_skip_tb = XInternAtom(dpy, "_NET_WM_STATE_SKIP_TASKBAR", True);
+	for (i = 0; i < state_propsize / sizeof(Atom); i++) {
+        if (state[i] == a_skip_tb) {
+            if (g.debug>1) {
+                fprintf (stderr, "%lx: _NET_WM_STATE_SKIP_TASKBAR found\n", w);
+            }
+            return true;
+        }
+    }
+    return false;
 }
 
