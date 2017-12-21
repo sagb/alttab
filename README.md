@@ -15,7 +15,7 @@ or standalone X11 session.
   [-s N] [-theme name] [-bg color] [-fg color] [-frame color]
   [-font name] [-v|-vv]
 ```
-(see man page for details)
+(see [man page](doc/alttab.1.ronn) for details)
 
 Unlike task switchers integrated in most simple window managers (WM) or
 dmenu-like switchers, alttab features visual interface and convenient
