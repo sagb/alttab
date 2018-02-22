@@ -105,6 +105,12 @@ Most command line options have corresponding X resource, see doc/alttab.ad for e
 
     Size of icons.
 
+  * `-p` <str>:
+    resource: alttab.position  
+    default: center
+
+    Position of switcher: "center", "none" or specific position relative to upper left screen corner, in the form <+X+Y>.
+
   * `-s` <NUMBER>:
     resource: alttab.icon.source  
     default: 2

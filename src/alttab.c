@@ -53,6 +53,7 @@ Options:\n\
    -mk N      keysym of main key\n\
     -t NxM    tile geometry\n\
     -i NxM    icon geometry\n\
+    -p str    switcher position: center, none, +X+Y\n\
     -s N      icon source: 0=X11 only, 1=fallback to files, 2=best size, 3=files only\n\
 -theme name   icon theme\n\
    -bg color  background color\n\
@@ -116,6 +117,7 @@ int use_args_and_xrm(int *argc, char **argv)
 		{"-kk", "*key.keysym", XrmoptionSepArg, NULL} ,
 		{"-t", "*tile.geometry", XrmoptionSepArg, NULL} ,
 		{"-i", "*icon.geometry", XrmoptionSepArg, NULL} ,
+		{"-p", "*position", XrmoptionSepArg, NULL} ,
 		{"-s", "*icon.source", XrmoptionSepArg, NULL} ,
 		{"-theme", "*theme", XrmoptionSepArg, NULL} ,
 		{"-bg", "*background", XrmoptionSepArg, NULL} ,
@@ -286,7 +288,7 @@ int use_args_and_xrm(int *argc, char **argv)
 			g.option_keyCode);
 	}
 
-	char *gtile, *gicon;
+	char *gtile, *gicon, *gpos;
 	int x, y;
 	unsigned int w, h;
 	int xpg;
@@ -329,6 +331,40 @@ int use_args_and_xrm(int *argc, char **argv)
 		fprintf(stderr, "%dx%d tile, %dx%d icon\n",
 			g.option_tileW, g.option_tileH, g.option_iconW,
 			g.option_iconH);
+	}
+
+	if (g.debug > 0) {
+		fprintf(stderr, "%dx%d tile, %dx%d icon\n",
+			g.option_tileW, g.option_tileH, g.option_iconW,
+			g.option_iconH);
+	}
+
+    g.option_positioning = 1;
+    g.option_posX = 0;
+    g.option_posY = 0;
+	char *defaultPosStr = DEFPOS;
+	XRESOURCE_LOAD_STRING(".position", gpos,
+			      defaultPosStr);
+    if (gpos) {
+        if (strncmp(gpos, "center", 7) == 0) {
+            g.option_positioning = POS_CENTER;
+        } else if (strncmp(gpos, "none", 5) == 0) {
+            g.option_positioning = POS_NONE;
+        } else {
+            g.option_positioning = POS_SPECIFIC;
+        	xpg = XParseGeometry(gpos, &x, &y, &w, &h);
+            if (xpg & (XValue | YValue)) {
+            	g.option_posX = x;
+            	g.option_posY = y;
+            } else {
+                fprintf (stderr, inv, "position");
+                g.option_positioning = POS_CENTER;
+            }
+        }
+    }
+	if (g.debug > 0) {
+		fprintf(stderr, "positioning policy: %d, position: +%d+%d\n",
+			g.option_positioning, g.option_posX, g.option_posY);
 	}
 
 	endptr = NULL;

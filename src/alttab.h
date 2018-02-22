@@ -41,6 +41,7 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 #define DEFICONW    32
 #define DEFICONH    32
 #define DEFICON     "32x32"
+#define DEFPOS      "center"
 #define DEFTHEME    "hicolor"
 #define FRAME_W     8
 //#define DEFFONT   "xft:DejaVu Sans Condensed-10"
@@ -108,6 +109,11 @@ typedef struct {
 	char *option_font;
 	int option_tileW, option_tileH;
 	int option_iconW, option_iconH;
+#define POS_CENTER      0
+#define POS_NONE        1
+#define POS_SPECIFIC    2
+    int option_positioning;
+    int option_posX, option_posY;
 #define ISRC_MIN        0
 #define ISRC_RAM        0
 #define ISRC_FALLBACK   1

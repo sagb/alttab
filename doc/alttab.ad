@@ -20,6 +20,11 @@
 ! grave (back apostrophe) instead of Tab
 !alttab.key.keysym:      0x60
 
+! try to not interfere with WM's window positioning
+!alttab.position:        none
+! or specify the switcher position explicitly
+!alttab.position:        +100+100
+
 ! Big tiles
 alttab.tile.geometry:   260x300
 
