@@ -333,12 +333,6 @@ int use_args_and_xrm(int *argc, char **argv)
 			g.option_iconH);
 	}
 
-	if (g.debug > 0) {
-		fprintf(stderr, "%dx%d tile, %dx%d icon\n",
-			g.option_tileW, g.option_tileH, g.option_iconW,
-			g.option_iconH);
-	}
-
     g.option_positioning = 1;
     g.option_posX = 0;
     g.option_posY = 0;
