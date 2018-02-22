@@ -305,8 +305,11 @@ int uiShow(bool direction)
 	uiwinX = (scrW - uiwinW) / 2;
 	uiwinY = (scrH - uiwinH) / 2;
 	if (g.debug > 0) {
-		fprintf(stderr, "tile w=%d h=%d win w=%d h=%d\n", tileW, tileH,
-			uiwinW, uiwinH);
+		fprintf(stderr, "tile w=%d h=%d\n", tileW, tileH);
+        fprintf(stderr, "uiwin w=%d h=%d, x=%d y=%d, scr w=%d h=%d, default was %d now %d\n",
+               uiwinW, uiwinH, uiwinX, uiwinY,
+               scrW, scrH,
+               scr, DefaultScreen(dpy));
 	}
 // prepare tiles
 
