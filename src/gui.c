@@ -306,10 +306,18 @@ int uiShow(bool direction)
 	uiwinY = (scrH - uiwinH) / 2;
 	if (g.debug > 0) {
 		fprintf(stderr, "tile w=%d h=%d\n", tileW, tileH);
-        fprintf(stderr, "uiwin w=%d h=%d, x=%d y=%d, scr w=%d h=%d, default was %d now %d\n",
-               uiwinW, uiwinH, uiwinX, uiwinY,
-               scrW, scrH,
-               scr, DefaultScreen(dpy));
+        fprintf(stderr, "uiwin %dx%d +%d+%d", uiwinW, uiwinH, uiwinX, uiwinY);
+        if (g.debug > 1) {
+            int nscr, si;
+            Screen *s;
+            nscr = ScreenCount(dpy);
+            fprintf(stderr, ", %d screen(s): ", nscr);
+            for (si = 0; si < nscr; ++si) {
+                s = ScreenOfDisplay(dpy, si);
+                fprintf(stderr, "[%dx%d] ", s->width, s->height);
+            }
+        }
+        fprintf(stderr, "\n");
 	}
 // prepare tiles
 
