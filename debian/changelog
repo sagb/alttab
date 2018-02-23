@@ -1,10 +1,11 @@
-alttab (1.1.0.20180223.70.gc0d8af3-1~1.gbp461c2b) testing; urgency=medium
+alttab (1.1.0.20180223.72.gc5bb567-1~1.gbp08de8b) unstable; urgency=medium
 
-  ** SNAPSHOT build @461c2b5aaf0505d4d6d86e3b08a0956580dfd86b **
+  ** SNAPSHOT build @08de8bbf64bc63155790841d1ce5b56961b66d7b **
 
-  * backport to buster
+  * update distributions in documentation (Closes: #44)
+  * focus window in multidesktop configuration (-d 1)
 
- -- Alexander Kulak <sa-dev@rainbow.by>  Fri, 23 Feb 2018 12:46:31 +0300
+ -- Alexander Kulak <sa-dev@rainbow.by>  Fri, 23 Feb 2018 17:28:55 +0300
 
 alttab (1.1.0.20180223.70.gc0d8af3-1~1.gbp64c082) unstable; urgency=medium
 
