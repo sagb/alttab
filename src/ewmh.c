@@ -37,7 +37,8 @@ extern Window root;
 
 // PRIVATE
 
-// this constant can't be 0, 1, -1, because WMs set it to these values incoherently
+// this constant can't be 0, 1, -1, MAXINT, 
+// because WMs set it to these values incoherently
 #define DESKTOP_UNKNOWN 0xdead
 
 //
@@ -155,6 +156,7 @@ int ewmh_initWinlist()
 
         window_desktop = ewmh_getDesktopOfWindow(w);
         if (current_desktop != window_desktop 
+                && g.option_desktop == DESK_CURRENT
                 && current_desktop != DESKTOP_UNKNOWN 
                 && window_desktop != DESKTOP_UNKNOWN) {
 	        if (g.debug > 1) {
@@ -227,7 +229,7 @@ unsigned long ewmh_getCurrentDesktop()
     if (!cd)
         cd = (unsigned long*)get_x_property (root, XA_CARDINAL,
                 "_WIN_WORKSPACE", &propsize);
-    return (cd && (propsize>0) && ((signed long)(*cd) >=0 )) ? *cd : DESKTOP_UNKNOWN;
+    return (cd && (propsize>0)) ? *cd : DESKTOP_UNKNOWN;
 }
 
 //
@@ -236,12 +238,13 @@ unsigned long ewmh_getCurrentDesktop()
 unsigned long ewmh_getDesktopOfWindow(Window w)
 {
     unsigned long *d;
+    unsigned long propsize;
     d = (unsigned long*)get_x_property (w, XA_CARDINAL,
-            "_NET_WM_DESKTOP", NULL);
+            "_NET_WM_DESKTOP", &propsize);
     if (!d)
         d = (unsigned long*)get_x_property (w, XA_CARDINAL,
-                "_WIN_WORKSPACE", NULL);
-    return (d && ((signed long)(*d) >= 0)) ? *d : DESKTOP_UNKNOWN;
+                "_WIN_WORKSPACE", &propsize);
+    return (d && (propsize>0)) ? *d : DESKTOP_UNKNOWN;
 }
 
 //
