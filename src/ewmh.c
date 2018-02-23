@@ -37,10 +37,6 @@ extern Window root;
 
 // PRIVATE
 
-// this constant can't be 0, 1, -1, MAXINT, 
-// because WMs set it to these values incoherently
-#define DESKTOP_UNKNOWN 0xdead
-
 //
 // returns ptr to EWMH client list and client_list_size
 // or NULL
@@ -60,6 +56,47 @@ Window *ewmh_get_client_list(unsigned long *client_list_size)
 		}
     }
     return client_list;
+}
+
+int ewmh_send_wm_evt(Window w, char *atom, unsigned long edata[])
+{
+    XEvent evt;
+    long rn_mask = SubstructureRedirectMask | SubstructureNotifyMask;
+    evt.xclient.window = w;
+    evt.xclient.type = ClientMessage;
+    evt.xclient.message_type =
+        XInternAtom(dpy, atom, False);
+    evt.xclient.serial = 0;
+    evt.xclient.send_event = True;
+    evt.xclient.format = 32;
+    //memset (&(evt.xclient.data.l[1]), 0, 4*sizeof(evt.xclient.data.l[1]));
+    int ei; for (ei = 0; ei < 5; ei++)
+        evt.xclient.data.l[ei] = edata[ei];
+    if (!XSendEvent(dpy, root, False, rn_mask, &evt)) {
+        fprintf(stderr, "can't send %s xevent\n", atom);
+        return 0;
+    }
+    return 1;
+}
+
+int ewmh_switch_desktop(unsigned long desktop)
+{
+	unsigned long edata[] = {desktop, CurrentTime, 0,0,0};
+    if (g.debug>1) {
+        fprintf(stderr, "ewmh switching desktop to %ld\n", desktop);
+    }
+    return
+        ewmh_send_wm_evt(root, "_NET_CURRENT_DESKTOP", edata);
+}
+
+int ewmh_switch_window(unsigned long window)
+{
+    unsigned long edata[] = {2, CurrentTime, 0,0,0};
+    if (g.debug>1) {
+        fprintf(stderr, "ewmh switching window to %ld\n", window);
+    }
+    return
+        ewmh_send_wm_evt(window, "_NET_ACTIVE_WINDOW", edata);
 }
 
 // PUBLIC
@@ -174,7 +211,7 @@ int ewmh_initWinlist()
 		free(wmn1);
 		free(wmn2);
 
-		addWindowInfo(w, 0, 0, title);
+		addWindowInfo(w, 0, 0, window_desktop, title);
 		if (w == aw) {
 			g.startNdx = g.maxNdx-1;
 		}
@@ -198,21 +235,14 @@ int ewmh_setFocus(int winNdx, Window fwin)
     if (g.debug>1) {
         fprintf(stderr, "ewmh_setFocus %lx\n", win);
     }
-	XEvent evt;
-	long rn_mask = SubstructureRedirectMask | SubstructureNotifyMask;
-
-	evt.xclient.window = win;
-	evt.xclient.type = ClientMessage;
-	evt.xclient.message_type =
-	    XInternAtom(dpy, "_NET_ACTIVE_WINDOW", False);
-	evt.xclient.serial = 0;
-	evt.xclient.send_event = True;
-	evt.xclient.format = 32;
-    memset (&(evt.xclient.data.l[0]), 0, 5*sizeof(evt.xclient.data.l[0]));
-	if (!XSendEvent(dpy, root, False, rn_mask, &evt)) {
-		fprintf(stderr, "ewmh_activate_window: can't send xevent\n");
-	}
-
+    if (fwin == 0 && g.option_desktop != DESK_CURRENT) {
+        unsigned long wdesk = g.winlist[winNdx].desktop;
+        unsigned long cdesk = ewmh_getCurrentDesktop();
+        if (cdesk != wdesk && wdesk != DESKTOP_UNKNOWN) {
+            ewmh_switch_desktop(wdesk);
+        }
+    }
+	ewmh_switch_window(win);
 	XMapRaised(dpy, win);
 	return 1;
 }

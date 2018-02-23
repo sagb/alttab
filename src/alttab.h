@@ -75,6 +75,10 @@ typedef struct {
 	bool icon_allocated;	// we must free icon, because we created it (placeholder or depth conversion)
 	Pixmap tile;		// ready to display. w/h are all equal and defined in gui.c
 	int order;		// in sort stack, kept in sync with g.sortlist
+// this constant can't be 0, 1, -1, MAXINT, 
+// because WMs set it to these values incoherently
+#define DESKTOP_UNKNOWN 0xdead
+    unsigned long desktop;
 } WindowInfo;
 
 typedef struct {
@@ -149,7 +153,7 @@ int uiPrevWindow();
 int startupWintasks();
 int addIconFromHints (WindowInfo* wi);
 int addIconFromFiles (WindowInfo* wi);
-int addWindowInfo(Window win, int reclevel, int wm_id, char *wm_name);
+int addWindowInfo(Window win, int reclevel, int wm_id, unsigned long desktop, char *wm_name);
 int initWinlist(bool direction);
 void freeWinlist();
 int setFocus(int winNdx);

@@ -73,6 +73,7 @@ int zeroErrorHandler(Display* dpy_our, XErrorEvent * theEvent)
 		memset(etext, '\0', EM);
 		XGetErrorText(dpy_our, theEvent->error_code, etext, EM);
 		fprintf(stderr, "Unexpected X Error: %s\n", etext);
+        fprintf(stderr, "Error details: request_code=%hhu minor_code=%hhu resourceid=%lu\n", theEvent->request_code, theEvent->minor_code, theEvent->resourceid);
 	}
 	return 0;
 }

@@ -2,13 +2,21 @@
 Binaries
 --------
 
-* Unofficial packages for Debian are available.
+* In Debian unstable, install alttab from the official repository:
+
+`apt install alttab`
+
+Also, unofficial backports are available.
 Follow setup instructions [there](https://odd.systems/debian/).
 Pin their repository to low priority to prefer official packages in the future.
 
 * In FreeBSD, install [the port](https://www.freshports.org/x11/alttab/):
 
 `pkg install alttab`
+
+* In Arch Linux, alttab is available in [AUR](https://aur.archlinux.org/packages/?O=0&K=alttab).
+
+* In Alpine Linux, alttab is in aports/testing repository.
 
 
 Building from source
