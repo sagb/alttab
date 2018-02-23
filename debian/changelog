@@ -1,10 +1,16 @@
-alttab (1.1.0.20171216.59.g8f35402-1~1.gbp84a519) testing; urgency=medium
+alttab (1.1.0.20180223.70.gc0d8af3-1~1.gbp64c082) unstable; urgency=medium
 
-  ** SNAPSHOT build @84a5197d2398314c1ab5256a2339dc92cce78b12 **
+  ** SNAPSHOT build @64c082babcc9ae7e301645be45d700ad62700c0b **
 
-  * backport to buster
+  [ Alexander Kulak ]
+  * allow negative desktop index
+  * -p option for positioning specification (multimonitor, #47)
+  * -d option for all desktops
 
- -- Alexander Kulak <sa-dev@rainbow.by>  Sat, 16 Dec 2017 16:21:49 +0300
+  [ eater ]
+  * add autostart instruction for i3
+
+ -- Alexander Kulak <sa-dev@rainbow.by>  Fri, 23 Feb 2018 12:15:02 +0300
 
 alttab (1.1.0.20171216.59.g8f35402-1~1.gbp16fc52) unstable; urgency=medium
 

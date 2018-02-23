@@ -16,7 +16,7 @@ alttab(1) -- the task switcher
 
 ## SYNOPSIS
 
-`alttab` [`-w` <N>] [`-mm` <N>] [`-bm` <N>] [`-mk` <N>] [`-kk` <N>] [`-t` <NxM>] [`-i` <NxM>] [`-s` <N>] [`-theme` <name>] [`-bg` <color>] [`-fg` <color>] [`-frame` <color>] [`-font` <name>] [`-v`|`-vv`]
+`alttab` [`-w` <N>] [`-d` <N>] [`-mm` <N>] [`-bm` <N>] [`-mk` <N>] [`-kk` <N>] [`-t` <NxM>] [`-i` <NxM>] [`-p` <str>] [`-s` <N>] [`-theme` <name>] [`-bg` <color>] [`-fg` <color>] [`-frame` <color>] [`-font` <name>] [`-v`|`-vv`]
 
 ## DESCRIPTION
 
@@ -69,6 +69,18 @@ Most command line options have corresponding X resource, see doc/alttab.ad for e
       List order is random.
       Tested in twm, flwm, wm2.
 
+  * `-d` <NUMBER>:
+    resource: alttab.desktops  
+    default: <0>
+
+    Show windows belonging to desktops (workspaces, groups). <NUMBER> must be 0 or 1:
+
+      <0>: Current desktop.
+
+      This is default, but implemented for EWMH only (`-w 1`). 
+
+      <1>: All desktops.
+
   * `-mm` <NUM>:
     resource: alttab.modifier.mask  
     default: <8> (Mod1Mask aka left Alt)
@@ -104,6 +116,12 @@ Most command line options have corresponding X resource, see doc/alttab.ad for e
     default: <32x32>
 
     Size of icons.
+
+  * `-p` <str>:
+    resource: alttab.position  
+    default: center
+
+    Position of switcher: "center", "none" or specific position relative to upper left screen corner, in the form <+X+Y>.
 
   * `-s` <NUMBER>:
     resource: alttab.icon.source  

@@ -47,12 +47,14 @@ void helpexit()
 	fprintf(stderr, "alttab, the task switcher.\n\
 Options:\n\
     -w N      window manager: 0=no, 1=ewmh-compatible, 2=ratpoison, 3=old fashion\n\
+    -d N      desktop: 0=current 1=all\n\
    -mm N      main modifier mask\n\
    -bm N      backward scroll modifier mask\n\
    -kk N      keysym of main modifier\n\
    -mk N      keysym of main key\n\
     -t NxM    tile geometry\n\
     -i NxM    icon geometry\n\
+    -p str    switcher position: center, none, +X+Y\n\
     -s N      icon source: 0=X11 only, 1=fallback to files, 2=best size, 3=files only\n\
 -theme name   icon theme\n\
    -bg color  background color\n\
@@ -110,12 +112,14 @@ int use_args_and_xrm(int *argc, char **argv)
 
 	XrmOptionDescRec xrmTable[] = {
 		{"-w", "*windowmanager", XrmoptionSepArg, NULL} ,
+		{"-d", "*desktops", XrmoptionSepArg, NULL} ,
 		{"-mm", "*modifier.mask", XrmoptionSepArg, NULL} ,
 		{"-bm", "*backscroll.mask", XrmoptionSepArg, NULL} ,
 		{"-mk", "*modifier.keysym", XrmoptionSepArg, NULL} ,
 		{"-kk", "*key.keysym", XrmoptionSepArg, NULL} ,
 		{"-t", "*tile.geometry", XrmoptionSepArg, NULL} ,
 		{"-i", "*icon.geometry", XrmoptionSepArg, NULL} ,
+		{"-p", "*position", XrmoptionSepArg, NULL} ,
 		{"-s", "*icon.source", XrmoptionSepArg, NULL} ,
 		{"-theme", "*theme", XrmoptionSepArg, NULL} ,
 		{"-bg", "*background", XrmoptionSepArg, NULL} ,
@@ -217,6 +221,25 @@ int use_args_and_xrm(int *argc, char **argv)
 		fprintf(stderr, "WM: %d\n", g.option_wm);
 	}
 
+	endptr = NULL;
+	char *dsindex = NULL;
+    int ds = DESK_DEFAULT;
+    g.option_desktop = DESK_DEFAULT;
+	XRESOURCE_LOAD_STRING(".desktops", dsindex, NULL);
+	if (dsindex) {
+        ds = strtol(dsindex, &endptr, 0);
+        if (*dsindex != '\0' && *endptr == '\0') {
+            if (ds >= DESK_MIN && ds <= DESK_MAX)
+                g.option_desktop = ds;
+            else
+                fprintf (stderr, "desktops argument must be from %d to %d, using default\n", DESK_MIN, DESK_MAX);
+        } else {
+            fprintf (stderr, inv, "desktops");
+        }
+    }
+	if (g.debug > 0)
+		fprintf(stderr, "desktops: %d\n", g.option_desktop);
+
 	unsigned int defaultModMask = DEFMODMASK;
 	unsigned int defaultBackMask = DEFBACKMASK;
 	KeySym defaultModSym = DEFMODKS;
@@ -286,7 +309,7 @@ int use_args_and_xrm(int *argc, char **argv)
 			g.option_keyCode);
 	}
 
-	char *gtile, *gicon;
+	char *gtile, *gicon, *gpos;
 	int x, y;
 	unsigned int w, h;
 	int xpg;
@@ -329,6 +352,34 @@ int use_args_and_xrm(int *argc, char **argv)
 		fprintf(stderr, "%dx%d tile, %dx%d icon\n",
 			g.option_tileW, g.option_tileH, g.option_iconW,
 			g.option_iconH);
+	}
+
+    g.option_positioning = 1;
+    g.option_posX = 0;
+    g.option_posY = 0;
+	char *defaultPosStr = DEFPOS;
+	XRESOURCE_LOAD_STRING(".position", gpos,
+			      defaultPosStr);
+    if (gpos) {
+        if (strncmp(gpos, "center", 7) == 0) {
+            g.option_positioning = POS_CENTER;
+        } else if (strncmp(gpos, "none", 5) == 0) {
+            g.option_positioning = POS_NONE;
+        } else {
+            g.option_positioning = POS_SPECIFIC;
+        	xpg = XParseGeometry(gpos, &x, &y, &w, &h);
+            if (xpg & (XValue | YValue)) {
+            	g.option_posX = x;
+            	g.option_posY = y;
+            } else {
+                fprintf (stderr, inv, "position");
+                g.option_positioning = POS_CENTER;
+            }
+        }
+    }
+	if (g.debug > 0) {
+		fprintf(stderr, "positioning policy: %d, position: +%d+%d\n",
+			g.option_positioning, g.option_posX, g.option_posY);
 	}
 
 	endptr = NULL;
