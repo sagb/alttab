@@ -104,7 +104,7 @@ int x_initWindowsInfoRecursive(Window win, int reclevel)
             && (g.option_wm != WM_TWM || winname != NULL)
 //            && (g.option_wm != WM_TWM || leader == win)
             ) {
-        addWindowInfo(win, reclevel, 0, winname);
+        addWindowInfo(win, reclevel, 0, DESKTOP_UNKNOWN, winname);
 	}
 // skip children if max recursion level reached
     if (g.option_max_reclevel != -1 && reclevel >= g.option_max_reclevel)
