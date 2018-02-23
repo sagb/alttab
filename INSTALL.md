@@ -16,6 +16,10 @@ Binaries
 
     `pkg install alttab`
 
+* In Arch Linux, alttab is available in [AUR](https://aur.archlinux.org/packages/?O=0&K=alttab).
+
+* In Alpine Linux, alttab is in aports/testing repository.
+
 
 Building from source
 --------------------
