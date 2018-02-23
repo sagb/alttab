@@ -233,11 +233,15 @@ int ewmh_setFocus(int winNdx, Window fwin)
 {
     Window win = (fwin != 0) ? fwin : g.winlist[winNdx].id;
     if (g.debug>1) {
-        fprintf(stderr, "ewmh_setFocus %lx\n", win);
+        fprintf(stderr, "ewmh_setFocus win %lx\n", win);
     }
     if (fwin == 0 && g.option_desktop != DESK_CURRENT) {
         unsigned long wdesk = g.winlist[winNdx].desktop;
         unsigned long cdesk = ewmh_getCurrentDesktop();
+        if (g.debug>1) {
+            fprintf(stderr, "ewmh_setFocus fwin %lx opt %d wdesk %lu cdesk %lu\n",
+                   fwin, g.option_desktop, wdesk, cdesk);
+        }
         if (cdesk != wdesk && wdesk != DESKTOP_UNKNOWN) {
             ewmh_switch_desktop(wdesk);
         }
