@@ -12,7 +12,7 @@
 or standalone X11 session.
 ```
   alttab  [-w N] [-mm N] [-bm N] [-mk N] [-kk N] [-t NxM] [-i NxM]
-  [-s N] [-theme name] [-bg color] [-fg color] [-frame color]
+  [-p str] [-s N] [-theme name] [-bg color] [-fg color] [-frame color]
   [-font name] [-v|-vv]
 ```
 (see man page for details)
