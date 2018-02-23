@@ -302,11 +302,27 @@ int uiShow(bool direction)
 		iconW = rt * iconW;
 	}
 	uiwinH = tileH + 2 * FRAME_W;
-	uiwinX = (scrW - uiwinW) / 2;
-	uiwinY = (scrH - uiwinH) / 2;
+    if (g.option_positioning == POS_CENTER) {
+    	uiwinX = (scrW - uiwinW) / 2;
+    	uiwinY = (scrH - uiwinH) / 2;
+    } else {
+        uiwinX = g.option_posX;
+        uiwinY = g.option_posY;
+    }
 	if (g.debug > 0) {
-		fprintf(stderr, "tile w=%d h=%d win w=%d h=%d\n", tileW, tileH,
-			uiwinW, uiwinH);
+		fprintf(stderr, "tile w=%d h=%d\n", tileW, tileH);
+        fprintf(stderr, "uiwin %dx%d +%d+%d", uiwinW, uiwinH, uiwinX, uiwinY);
+        if (g.debug > 1) {
+            int nscr, si;
+            Screen *s;
+            nscr = ScreenCount(dpy);
+            fprintf(stderr, ", %d screen(s): ", nscr);
+            for (si = 0; si < nscr; ++si) {
+                s = ScreenOfDisplay(dpy, si);
+                fprintf(stderr, "[%dx%d] ", s->width, s->height);
+            }
+        }
+        fprintf(stderr, "\n");
 	}
 // prepare tiles
 
@@ -466,16 +482,22 @@ int uiShow(bool direction)
 
     if (g.option_wm == WM_EWMH) {
         // required in JWM: centering
-        XSizeHints uiwinSizeHints = { USPosition|USSize|PPosition|PSize|PMinSize|PMaxSize|PBaseSize|PWinGravity,
-            uiwinX, uiwinY,
-            uiwinW, uiwinH,
-            uiwinW, uiwinH,
-            uiwinW, uiwinH,
-            0, 0,
-            {0,0}, {0,0},
-            uiwinW, uiwinH,
-            5 };
-        XSetWMNormalHints(dpy, uiwin, &uiwinSizeHints);
+        if (g.option_positioning != POS_NONE) {
+            long sflags;
+            sflags = USPosition|USSize|PPosition|PSize|PMinSize|PMaxSize|PBaseSize;
+            if (g.option_positioning == POS_CENTER)
+                sflags |= PWinGravity;
+            XSizeHints uiwinSizeHints = { sflags,
+                uiwinX, uiwinY,
+                uiwinW, uiwinH,
+                uiwinW, uiwinH,
+                uiwinW, uiwinH,
+                0, 0,
+                {0,0}, {0,0},
+                uiwinW, uiwinH,
+                (g.option_positioning == POS_CENTER) ? 5:0 };
+            XSetWMNormalHints(dpy, uiwin, &uiwinSizeHints);
+        }
         // required in Metacity
         ewmh_setFocus(0, uiwin);
     }
