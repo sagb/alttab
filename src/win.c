@@ -180,7 +180,7 @@ int addIconFromFiles(WindowInfo * wi)
 // used by x, rp, ...
 // only dpy and win are mandatory
 //
-int addWindowInfo(Window win, int reclevel, int wm_id, char *wm_name)
+int addWindowInfo(Window win, int reclevel, int wm_id, unsigned long desktop, char *wm_name)
 {
 	if (!
 	    (g.winlist =
@@ -308,6 +308,7 @@ int addWindowInfo(Window win, int reclevel, int wm_id, char *wm_name)
 // 4. other window data
 
 	g.winlist[g.maxNdx].reclevel = reclevel;
+	g.winlist[g.maxNdx].desktop = desktop;
 	g.maxNdx++;
 	if (g.debug > 1) {
 		fprintf(stderr, "window %d, id %lx added to list\n", g.maxNdx,
@@ -435,9 +436,15 @@ int setFocus(int winNdx)
 		break;
 	case WM_EWMH:
         r = ewmh_setFocus(winNdx, 0);
-        // skippy-xd does this and notes that "order is important"
-        // fixes #28
-        XSetInputFocus (dpy, g.winlist[winNdx].id, RevertToParent, CurrentTime);
+        // XSetInputFocus stuff.
+        // skippy-xd does it and notes that "order is important".
+        // fixes #28.
+        // it must be protected by testing IsViewable in the same way
+        // as in x.c, or BadMatch happens after switching desktops.
+        XWindowAttributes att;
+        XGetWindowAttributes(dpy, g.winlist[winNdx].id, &att);
+        if (att.map_state == IsViewable)
+            XSetInputFocus(dpy, g.winlist[winNdx].id, RevertToParent, CurrentTime);
 		break;
     case WM_TWM:
         r = ewmh_setFocus(winNdx, 0);

@@ -160,7 +160,7 @@ int rp_initWinlist()
 				break;
 			}
 			// the rest of string is name
-			addWindowInfo(win, 0, wm_id, rest2);
+			addWindowInfo(win, 0, wm_id, DESKTOP_UNKNOWN, rest2);
 		}
 	}
 
