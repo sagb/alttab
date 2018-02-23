@@ -37,7 +37,8 @@ extern Window root;
 
 // PRIVATE
 
-// this constant can't be 0, 1, -1, because WMs set it to these values incoherently
+// this constant can't be 0, 1, -1, MAXINT, 
+// because WMs set it to these values incoherently
 #define DESKTOP_UNKNOWN 0xdead
 
 //
@@ -155,6 +156,7 @@ int ewmh_initWinlist()
 
         window_desktop = ewmh_getDesktopOfWindow(w);
         if (current_desktop != window_desktop 
+                && g.option_desktop == DESK_CURRENT
                 && current_desktop != DESKTOP_UNKNOWN 
                 && window_desktop != DESKTOP_UNKNOWN) {
 	        if (g.debug > 1) {

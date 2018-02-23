@@ -11,7 +11,7 @@
 **alttab** is X11 window switcher designed for minimalistic window managers
 or standalone X11 session.
 ```
-  alttab  [-w N] [-mm N] [-bm N] [-mk N] [-kk N] [-t NxM] [-i NxM]
+  alttab  [-w N] [-d N] [-mm N] [-bm N] [-mk N] [-kk N] [-t NxM] [-i NxM]
   [-p str] [-s N] [-theme name] [-bg color] [-fg color] [-frame color]
   [-font name] [-v|-vv]
 ```

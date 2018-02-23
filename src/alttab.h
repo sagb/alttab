@@ -106,6 +106,12 @@ typedef struct {
 #define WM_TWM          3
 #define WM_MAX          3
 	int option_wm;
+#define DESK_MIN        0
+#define DESK_CURRENT    0
+#define DESK_ALL        1
+#define DESK_MAX        1
+#define DESK_DEFAULT    0
+    int option_desktop;
 	char *option_font;
 	int option_tileW, option_tileH;
 	int option_iconW, option_iconH;

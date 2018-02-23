@@ -7,7 +7,7 @@
 \fBalttab\fR \- the task switcher
 .
 .SH "SYNOPSIS"
-\fBalttab\fR [\fB\-w\fR \fIN\fR] [\fB\-mm\fR \fIN\fR] [\fB\-bm\fR \fIN\fR] [\fB\-mk\fR \fIN\fR] [\fB\-kk\fR \fIN\fR] [\fB\-t\fR \fINxM\fR] [\fB\-i\fR \fINxM\fR] [\fB\-s\fR \fIN\fR] [\fB\-theme\fR \fIname\fR] [\fB\-bg\fR \fIcolor\fR] [\fB\-fg\fR \fIcolor\fR] [\fB\-frame\fR \fIcolor\fR] [\fB\-font\fR \fIname\fR] [\fB\-v\fR|\fB\-vv\fR]
+\fBalttab\fR [\fB\-w\fR \fIN\fR] [\fB\-d\fR \fIN\fR] [\fB\-mm\fR \fIN\fR] [\fB\-bm\fR \fIN\fR] [\fB\-mk\fR \fIN\fR] [\fB\-kk\fR \fIN\fR] [\fB\-t\fR \fINxM\fR] [\fB\-i\fR \fINxM\fR] [\fB\-p\fR \fIstr\fR] [\fB\-s\fR \fIN\fR] [\fB\-theme\fR \fIname\fR] [\fB\-bg\fR \fIcolor\fR] [\fB\-fg\fR \fIcolor\fR] [\fB\-frame\fR \fIcolor\fR] [\fB\-font\fR \fIname\fR] [\fB\-v\fR|\fB\-vv\fR]
 .
 .SH "DESCRIPTION"
 The task switcher designed for minimalistic window managers or standalone X11 session\.
@@ -54,6 +54,25 @@ Alttab uses ratpoison own perfect remote control capability\. Additionally, altt
 .
 .IP
 Fallback, worse than \fI0\fR\. Search for application windows at random nodes of window tree (WM is probably reparenting) and select only those with a name, including non\-viewable (WM is probably iconifying)\. May cause lag\. List order is random\. Tested in twm, flwm, wm2\.
+.
+.TP
+\fB\-d\fR \fINUMBER\fR
+resource: alttab\.desktops
+.
+.br
+default: \fI0\fR
+.
+.IP
+Show windows belonging to desktops (workspaces, groups)\. \fINUMBER\fR must be 0 or 1:
+.
+.IP
+\fI0\fR: Current desktop\.
+.
+.IP
+This is default, but implemented for EWMH only (\fB\-w 1\fR)\.
+.
+.IP
+\fI1\fR: All desktops\.
 .
 .TP
 \fB\-mm\fR \fINUM\fR

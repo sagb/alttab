@@ -10,6 +10,9 @@
 ! Force using raw X11 interface
 !alttab.windowmanager:   0
 
+! Show windows belonging to all desktops
+!alttab.desktops:        1
+
 ! Ctrl-Tab instead of Alt-Tab
 !alttab.modifier.mask:   4
 !alttab.modifier.keysym: 0xffe3
@@ -20,9 +23,9 @@
 ! grave (back apostrophe) instead of Tab
 !alttab.key.keysym:      0x60
 
-! try to not interfere with WM's window positioning
+! Try to not interfere with WM's window positioning
 !alttab.position:        none
-! or specify the switcher position explicitly
+! Or specify the switcher position explicitly
 !alttab.position:        +100+100
 
 ! Big tiles

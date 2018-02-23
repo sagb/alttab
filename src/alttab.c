@@ -47,6 +47,7 @@ void helpexit()
 	fprintf(stderr, "alttab, the task switcher.\n\
 Options:\n\
     -w N      window manager: 0=no, 1=ewmh-compatible, 2=ratpoison, 3=old fashion\n\
+    -d N      desktop: 0=current 1=all\n\
    -mm N      main modifier mask\n\
    -bm N      backward scroll modifier mask\n\
    -kk N      keysym of main modifier\n\
@@ -111,6 +112,7 @@ int use_args_and_xrm(int *argc, char **argv)
 
 	XrmOptionDescRec xrmTable[] = {
 		{"-w", "*windowmanager", XrmoptionSepArg, NULL} ,
+		{"-d", "*desktops", XrmoptionSepArg, NULL} ,
 		{"-mm", "*modifier.mask", XrmoptionSepArg, NULL} ,
 		{"-bm", "*backscroll.mask", XrmoptionSepArg, NULL} ,
 		{"-mk", "*modifier.keysym", XrmoptionSepArg, NULL} ,
@@ -218,6 +220,25 @@ int use_args_and_xrm(int *argc, char **argv)
 	if (g.debug > 0) {
 		fprintf(stderr, "WM: %d\n", g.option_wm);
 	}
+
+	endptr = NULL;
+	char *dsindex = NULL;
+    int ds = DESK_DEFAULT;
+    g.option_desktop = DESK_DEFAULT;
+	XRESOURCE_LOAD_STRING(".desktops", dsindex, NULL);
+	if (dsindex) {
+        ds = strtol(dsindex, &endptr, 0);
+        if (*dsindex != '\0' && *endptr == '\0') {
+            if (ds >= DESK_MIN && ds <= DESK_MAX)
+                g.option_desktop = ds;
+            else
+                fprintf (stderr, "desktops argument must be from %d to %d, using default\n", DESK_MIN, DESK_MAX);
+        } else {
+            fprintf (stderr, inv, "desktops");
+        }
+    }
+	if (g.debug > 0)
+		fprintf(stderr, "desktops: %d\n", g.option_desktop);
 
 	unsigned int defaultModMask = DEFMODMASK;
 	unsigned int defaultBackMask = DEFBACKMASK;
