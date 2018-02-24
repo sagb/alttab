@@ -81,12 +81,15 @@ int ewmh_send_wm_evt(Window w, char *atom, unsigned long edata[])
 
 int ewmh_switch_desktop(unsigned long desktop)
 {
+    int evr;
 	unsigned long edata[] = {desktop, CurrentTime, 0,0,0};
     if (g.debug>1) {
         fprintf(stderr, "ewmh switching desktop to %ld\n", desktop);
     }
-    return
-        ewmh_send_wm_evt(root, "_NET_CURRENT_DESKTOP", edata);
+    evr = ewmh_send_wm_evt(root, "_NET_CURRENT_DESKTOP", edata);
+    if (evr == 1)
+        usleep(200000); // 200 ms
+    return evr;
 }
 
 int ewmh_switch_window(unsigned long window)
