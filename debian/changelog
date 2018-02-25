@@ -1,3 +1,11 @@
+alttab (1.1.0.20180225.78.g595f500-1~1.gbp696390) unstable; urgency=medium
+
+  ** SNAPSHOT build @696390509938f551b79ccc779477cb93f68368b6 **
+
+  * synchronize desktop change with WM
+
+ -- Alexander Kulak <sa-dev@rainbow.by>  Sun, 25 Feb 2018 15:54:49 +0300
+
 alttab (1.1.0.20180223.72.gc5bb567-1~1.gbp08de8b) unstable; urgency=medium
 
   ** SNAPSHOT build @08de8bbf64bc63155790841d1ce5b56961b66d7b **
