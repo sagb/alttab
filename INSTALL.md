@@ -8,7 +8,7 @@ Binaries
     apt install alttab
     ```
 
-    Also, unofficial backports are available.
+    Also, unofficial deb packages for snapshots and backports are available.
     Follow setup instructions [there](https://odd.systems/debian/).
     Pin their repository to low priority to prefer official packages in the future.
 
@@ -32,13 +32,13 @@ Building from source
     In Debian or Ubuntu:
 
     ```
-    apt-get install libx11-dev libxmu-dev libxft-dev libxrender-dev libpng-dev uthash-dev
+    apt install libx11-dev libxmu-dev libxft-dev libxrender-dev libpng-dev uthash-dev
     ```
 
     Maintainer or packager may also install autotools and ronn:
 
     ```
-    apt-get install autoconf automake ruby-ronn
+    apt install autoconf automake ruby-ronn
     ```
 
 2. Download:
