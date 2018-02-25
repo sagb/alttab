@@ -18,7 +18,6 @@ src/Makefile
 doc/Makefile
 Makefile
 stamp-h1
-missing
 
 src/alttab
 
