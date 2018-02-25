@@ -81,12 +81,27 @@ int ewmh_send_wm_evt(Window w, char *atom, unsigned long edata[])
 
 int ewmh_switch_desktop(unsigned long desktop)
 {
+    int evr, elapsed;
 	unsigned long edata[] = {desktop, CurrentTime, 0,0,0};
     if (g.debug>1) {
         fprintf(stderr, "ewmh switching desktop to %ld\n", desktop);
     }
-    return
-        ewmh_send_wm_evt(root, "_NET_CURRENT_DESKTOP", edata);
+    evr = ewmh_send_wm_evt(root, "_NET_CURRENT_DESKTOP", edata);
+    if (evr == 0)
+        return 0;
+    // wait for WM (#45)
+#define WM_POLL_TIMEOUT   200000  // 200 ms
+#define WM_POLL_INTERVAL   10000
+    for (elapsed = 0;
+            elapsed < WM_POLL_TIMEOUT
+            && ewmh_getCurrentDesktop() != desktop;
+            elapsed += WM_POLL_INTERVAL) {
+        if (g.debug>1) {
+            fprintf(stderr, "usleep %d\n", WM_POLL_INTERVAL);
+        }
+        usleep(WM_POLL_INTERVAL);
+    }
+    return evr;
 }
 
 int ewmh_switch_window(unsigned long window)
@@ -233,11 +248,15 @@ int ewmh_setFocus(int winNdx, Window fwin)
 {
     Window win = (fwin != 0) ? fwin : g.winlist[winNdx].id;
     if (g.debug>1) {
-        fprintf(stderr, "ewmh_setFocus %lx\n", win);
+        fprintf(stderr, "ewmh_setFocus win %lx\n", win);
     }
     if (fwin == 0 && g.option_desktop != DESK_CURRENT) {
         unsigned long wdesk = g.winlist[winNdx].desktop;
         unsigned long cdesk = ewmh_getCurrentDesktop();
+        if (g.debug>1) {
+            fprintf(stderr, "ewmh_setFocus fwin %lx opt %d wdesk %lu cdesk %lu\n",
+                   fwin, g.option_desktop, wdesk, cdesk);
+        }
         if (cdesk != wdesk && wdesk != DESKTOP_UNKNOWN) {
             ewmh_switch_desktop(wdesk);
         }
