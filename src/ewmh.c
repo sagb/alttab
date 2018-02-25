@@ -81,14 +81,26 @@ int ewmh_send_wm_evt(Window w, char *atom, unsigned long edata[])
 
 int ewmh_switch_desktop(unsigned long desktop)
 {
-    int evr;
+    int evr, elapsed;
 	unsigned long edata[] = {desktop, CurrentTime, 0,0,0};
     if (g.debug>1) {
         fprintf(stderr, "ewmh switching desktop to %ld\n", desktop);
     }
     evr = ewmh_send_wm_evt(root, "_NET_CURRENT_DESKTOP", edata);
-    if (evr == 1)
-        usleep(200000); // 200 ms
+    if (evr == 0)
+        return 0;
+    // wait for WM (#45)
+#define WM_POLL_TIMEOUT   200000  // 200 ms
+#define WM_POLL_INTERVAL   10000
+    for (elapsed = 0;
+            elapsed < WM_POLL_TIMEOUT
+            && ewmh_getCurrentDesktop() != desktop;
+            elapsed += WM_POLL_INTERVAL) {
+        if (g.debug>1) {
+            fprintf(stderr, "usleep %d\n", WM_POLL_INTERVAL);
+        }
+        usleep(WM_POLL_INTERVAL);
+    }
     return evr;
 }
 
