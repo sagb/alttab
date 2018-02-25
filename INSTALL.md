@@ -2,13 +2,19 @@
 Binaries
 --------
 
-* Unofficial packages for Debian are available.
-Follow setup instructions [there](https://odd.systems/debian/).
-Pin their repository to low priority to prefer official packages in the future.
+* In Debian _unstable_ or Ubuntu _bionic_, install alttab from the official repository:
+
+    ```
+    apt install alttab
+    ```
+
+    Also, unofficial deb packages for snapshots and backports are available.
+    Follow setup instructions [there](https://odd.systems/debian/).
+    Pin their repository to low priority to prefer official packages in the future.
 
 * In FreeBSD, install [the port](https://www.freshports.org/x11/alttab/):
 
-`pkg install alttab`
+    `pkg install alttab`
 
 
 Building from source
