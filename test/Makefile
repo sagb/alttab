@@ -1,7 +1,7 @@
 #
 # Stub for possible future test facility.
 #
-# Copyright 2017 Alexander Kulak.
+# Copyright 2017-2018 Alexander Kulak.
 # This file is part of alttab program.
 #
 # alttab is free software: you can redistribute it and/or modify

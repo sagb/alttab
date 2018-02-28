@@ -41,5 +41,5 @@ Usually it should run fully functional without any argument: `alttab`.
 [no-wm](https://github.com/patrickhaller/no-wm): use X11 without a window manager  
    
    
-alttab (C) Alexander Kulak &lt;sa-dev AT rainbow POINT by&gt; 2016, 2017
+alttab (C) Alexander Kulak &lt;sa-dev AT rainbow POINT by&gt; 2016-2018
 
