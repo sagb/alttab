@@ -1,33 +1,64 @@
 
-Dependencies
-------------
+Binaries
+--------
 
-Basic Xlib, Xft, Xrender, libpng libraries and uthash macros are required.
-In Debian or Ubuntu:
+* In Debian _unstable_ or Ubuntu _bionic_, install alttab from the official repository:
 
-> apt-get install libx11-dev libxmu-dev libxft-dev libxrender-dev libpng-dev uthash-dev
+    ```
+    apt install alttab
+    ```
 
-As maintainer or packager, also install autotools and ronn:
+    Also, unofficial deb packages for snapshots and backports are available.
+    Follow setup instructions [there](https://odd.systems/debian/).
+    Pin their repository to low priority to prefer official packages in the future.
 
-> apt-get install autoconf automake ruby-ronn
+* In FreeBSD, install [the port](https://www.freshports.org/x11/alttab/):
+
+    ```
+    pkg install alttab
+    ```
+
+* In Arch Linux, alttab is available in [AUR](https://aur.archlinux.org/packages/?O=0&K=alttab).
+
+* In Alpine Linux, alttab is in aports/testing repository.
 
 
-Installing alttab
------------------
+Building from source
+--------------------
 
-1. Download:
+1. Install build dependencies.
+    Basic Xlib, Xft, Xrender, libpng libraries
+    and [uthash macros](http://troydhanson.github.io/uthash/) are required.
+    In Debian or Ubuntu:
 
-> git clone https://github.com/sagb/alttab.git
+    ```
+    apt install libx11-dev libxmu-dev libxft-dev libxrender-dev libpng-dev uthash-dev
+    ```
 
-2. Maintainer or packager may want to update autotools stuff and refresh documentation with ronn:
+    Maintainer or packager may also install autotools and ronn:
 
-> ./bootstrap.sh
+    ```
+    apt install autoconf automake ruby-ronn
+    ```
 
-3. Build:
+2. Download:
 
-> ./configure  
-> make  
-> make install
+    ```
+    git clone https://github.com/sagb/alttab.git
+    ```
 
-See README for usage notes.
+3. Maintainer or packager may want to update autotools stuff and refresh documentation with ronn:
+
+    ```
+    ./bootstrap.sh
+    ```
+
+4. Build:
+
+    ```
+    ./configure  
+    make  
+    make install
+    ```
+    See README for usage notes.
 

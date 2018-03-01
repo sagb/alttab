@@ -1,7 +1,7 @@
 /*
 Parsing options/resources, top-level keygrab functions and main().
 
-Copyright 2017 Alexander Kulak.
+Copyright 2017-2018 Alexander Kulak.
 This file is part of alttab program.
 
 alttab is free software: you can redistribute it and/or modify
@@ -46,7 +46,7 @@ void helpexit()
 {
 	fprintf(stderr, "alttab, the task switcher.\n\
 Options:\n\
-    -w N      window manager: 0=no, 1=ewmh-compatible, 2=ratpoison\n\
+    -w N      window manager: 0=no, 1=ewmh-compatible, 2=ratpoison, 3=old fashion\n\
    -mm N      main modifier mask\n\
    -bm N      backward scroll modifier mask\n\
    -kk N      keysym of main modifier\n\
@@ -158,7 +158,7 @@ int use_args_and_xrm(int *argc, char **argv)
 	char *type;
 
 #define XRESOURCE_LOAD_STRING(NAME, DST, DEFAULT)           \
-	XrmGetResource (db, NAME, "String", &type, &v);         \
+	XrmGetResource (db, XRMAPPNAME NAME, XCLASS NAME, &type, &v);         \
 	if (v.addr != NULL && !strncmp ("String", type, 64))    \
 		DST = v.addr;                                       \
     else                                                    \
@@ -169,7 +169,7 @@ int use_args_and_xrm(int *argc, char **argv)
 
 	endptr = NULL;
 	char *wmindex = NULL;
-	XRESOURCE_LOAD_STRING(XRMAPPNAME ".windowmanager", wmindex, NULL);
+    XRESOURCE_LOAD_STRING(".windowmanager", wmindex, NULL);
 	if (wmindex)
 		g.option_wm = strtol(wmindex, &endptr, 0);
 	if ((endptr != NULL) && (*endptr == '\0') && (g.option_wm >= WM_MIN)
@@ -209,9 +209,9 @@ int use_args_and_xrm(int *argc, char **argv)
 		XFree(nwm);
 	}
 	if (g.debug > 0) {
-		fprintf(stderr, "unknown WM, using raw X\n");
+		fprintf(stderr, "unknown WM, using WM_TWM\n");
 	}
-	g.option_wm = WM_NO;
+	g.option_wm = WM_TWM;
  wmDone:
 	if (g.debug > 0) {
 		fprintf(stderr, "WM: %d\n", g.option_wm);
@@ -227,7 +227,7 @@ int use_args_and_xrm(int *argc, char **argv)
 
     g.option_modMask = defaultModMask;
 	endptr = s = NULL;
-	XRESOURCE_LOAD_STRING(XRMAPPNAME ".modifier.mask", s, NULL);
+	XRESOURCE_LOAD_STRING(".modifier.mask", s, NULL);
 	if (s) {
 		mask = strtol(s, &endptr, 0);
         if (*s != '\0' && *endptr == '\0')
@@ -238,7 +238,7 @@ int use_args_and_xrm(int *argc, char **argv)
 
     g.option_backMask = defaultBackMask;
 	endptr = s = NULL;
-	XRESOURCE_LOAD_STRING(XRMAPPNAME ".backscroll.mask", s, NULL);
+	XRESOURCE_LOAD_STRING(".backscroll.mask", s, NULL);
 	if (s) {
 		mask = strtol(s, &endptr, 0);
         if (*s != '\0' && *endptr == '\0')
@@ -249,7 +249,7 @@ int use_args_and_xrm(int *argc, char **argv)
 
     g.option_modCode = XKeysymToKeycode(dpy, defaultModSym);
 	endptr = s = NULL;
-	XRESOURCE_LOAD_STRING(XRMAPPNAME ".modifier.keysym", s, NULL);
+	XRESOURCE_LOAD_STRING(".modifier.keysym", s, NULL);
 	if (s) {
 		ksym = strtol(s, &endptr, 0);
         if (*s != '\0' && *endptr == '\0') {
@@ -265,7 +265,7 @@ int use_args_and_xrm(int *argc, char **argv)
 
     g.option_keyCode = XKeysymToKeycode(dpy, defaultKeySym);
 	endptr = s = NULL;
-	XRESOURCE_LOAD_STRING(XRMAPPNAME ".key.keysym", s, NULL);
+	XRESOURCE_LOAD_STRING(".key.keysym", s, NULL);
 	if (s) {
 		ksym = strtol(s, &endptr, 0);
         if (*s != '\0' && *endptr == '\0') {
@@ -294,7 +294,7 @@ int use_args_and_xrm(int *argc, char **argv)
     g.option_tileW = DEFTILEW;
     g.option_tileH = DEFTILEH;
 	char *defaultTileGeo = DEFTILE;
-	XRESOURCE_LOAD_STRING(XRMAPPNAME ".tile.geometry", gtile,
+	XRESOURCE_LOAD_STRING(".tile.geometry", gtile,
 			      defaultTileGeo);
     if (gtile) {
     	xpg = XParseGeometry(gtile, &x, &y, &w, &h);
@@ -311,7 +311,7 @@ int use_args_and_xrm(int *argc, char **argv)
     g.option_iconW = DEFICONW;
     g.option_iconH = DEFICONH;
 	char *defaultIconGeo = DEFICON;
-	XRESOURCE_LOAD_STRING(XRMAPPNAME ".icon.geometry", gicon,
+	XRESOURCE_LOAD_STRING(".icon.geometry", gicon,
 			      defaultIconGeo);
     if (gicon) {
     	xpg = XParseGeometry(gicon, &x, &y, &w, &h);
@@ -335,7 +335,7 @@ int use_args_and_xrm(int *argc, char **argv)
 	char *isrcindex = NULL;
     int isrc = ISRC_DEFAULT;
     g.option_iconSrc = ISRC_DEFAULT;
-	XRESOURCE_LOAD_STRING(XRMAPPNAME ".icon.source", isrcindex, NULL);
+	XRESOURCE_LOAD_STRING(".icon.source", isrcindex, NULL);
 	if (isrcindex) {
         isrc = strtol(isrcindex, &endptr, 0);
         if (*isrcindex != '\0' && *endptr == '\0') {
@@ -352,24 +352,24 @@ int use_args_and_xrm(int *argc, char **argv)
 
 	char *defaultTheme = DEFTHEME;
     g.option_theme = NULL;
-	XRESOURCE_LOAD_STRING(XRMAPPNAME ".theme", g.option_theme, defaultTheme);
+	XRESOURCE_LOAD_STRING(".theme", g.option_theme, defaultTheme);
     if (!g.option_theme)
 		g.option_theme = defaultTheme;
 	if (g.debug > 0)
 		fprintf(stderr, "icon theme: %s\n", g.option_theme);
 
 	char *defaultColorBG = DEFCOLBG;
-	XRESOURCE_LOAD_STRING(XRMAPPNAME ".background", g.color[COLBG].name,
+	XRESOURCE_LOAD_STRING(".background", g.color[COLBG].name,
 			      defaultColorBG);
 	char *defaultColorFG = DEFCOLFG;
-	XRESOURCE_LOAD_STRING(XRMAPPNAME ".foreground", g.color[COLFG].name,
+	XRESOURCE_LOAD_STRING(".foreground", g.color[COLFG].name,
 			      defaultColorFG);
 	char *defaultColorFrame = DEFCOLFRAME;
-	XRESOURCE_LOAD_STRING(XRMAPPNAME ".framecolor", g.color[COLFRAME].name,
+	XRESOURCE_LOAD_STRING(".framecolor", g.color[COLFRAME].name,
 			      defaultColorFrame);
 
 	char *defaultFont = DEFFONT;
-	XRESOURCE_LOAD_STRING(XRMAPPNAME ".font", g.option_font, defaultFont);
+	XRESOURCE_LOAD_STRING(".font", g.option_font, defaultFont);
 	if ((strncmp(g.option_font, "xft:", 4) == 0)
 	    && (*(g.option_font + 4) != '\0')) {
 		g.option_font += 4;
@@ -397,7 +397,7 @@ int grabAllKeys(bool grabUngrab)
 {
 	g.ignored_modmask = getOffendingModifiersMask(dpy);	// or 0 for g.debug
 	char *grabhint =
-	    "Error while (un)grabbing key 0x%x with mask 0x%x/0x%x.\nProbably other program already grabbed this combination.\nCheck: xdotool keydown alt+Tab; xdotool key XF86LogGrabInfo; xdotool keyup Tab; sleep 1; xdotool keyup alt; tail /var/log/Xorg.0.log\nOr try Ctrl-Tab instead of Alt-Tab:  -mm 4 -mk 0xffe3\n";
+	    "Error while (un)grabbing key 0x%x with mask 0x%x/0x%x.\nProbably other program already grabbed this combination.\nCheck: xdotool keydown alt+Tab; xdotool key XF86LogGrabInfo; xdotool keyup Tab; sleep 1; xdotool keyup alt; tail /var/log/Xorg.0.log\nOr try Ctrl-Tab instead of Alt-Tab:  alttab -mm 4 -mk 0xffe3\n";
 // attempt XF86Ungrab? probably too invasive
 	if (!changeKeygrab
 	    (root, grabUngrab, g.option_keyCode, g.option_modMask,

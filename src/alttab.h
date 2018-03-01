@@ -1,7 +1,7 @@
 /*
 Global includes.
 
-Copyright 2017 Alexander Kulak.
+Copyright 2017-2018 Alexander Kulak.
 This file is part of alttab program.
 
 alttab is free software: you can redistribute it and/or modify
@@ -33,6 +33,8 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 
 #define XWINNAME    "alttab"
 #define XRMAPPNAME  XWINNAME
+#define XCLASSNAME  XWINNAME
+#define XCLASS      "AltTab"
 #define DEFTILEW    112
 #define DEFTILEH    128
 #define DEFTILE     "112x128"
@@ -100,7 +102,8 @@ typedef struct {
 #define WM_NO           0
 #define WM_EWMH         1
 #define WM_RATPOISON    2
-#define WM_MAX          2
+#define WM_TWM          3
+#define WM_MAX          3
 	int option_wm;
 	char *option_font;
 	int option_tileW, option_tileH;
@@ -149,6 +152,9 @@ int pulloutWindowToTop(int winNdx);
 /* EWHM */
 char *ewmh_getWmName();
 int ewmh_initWinlist();
-int ewmh_setFocus(int winNdx);
+int ewmh_setFocus(int winNdx, Window fwin); // fwin used if non-zero
+unsigned long ewmh_getCurrentDesktop();
+unsigned long ewmh_getDesktopOfWindow(Window w);
+bool ewmh_skipWindowInTaskbar(Window w);
 
 #endif

@@ -1,7 +1,7 @@
 /*
 Draw and interface with our switcher window.
 
-Copyright 2017 Alexander Kulak.
+Copyright 2017-2018 Alexander Kulak.
 This file is part of alttab program.
 
 alttab is free software: you can redistribute it and/or modify
@@ -206,7 +206,7 @@ int startupGUItasks()
 //fontLabel = XLoadFont (dpy, LABELFONT);  // using Xft instead
 	fontLabel = XftFontOpenName(dpy, scrNum, g.option_font);
 	if (!fontLabel) {
-		fprintf(stderr, "can't allocate font: %s", g.option_font);
+		fprintf(stderr, "can't allocate font: %s\ncheck installed fontconfig fonts: fc-list\n", g.option_font);
 	}
 // having colors, GC may be built
 // they are required early for addWindow when transforming icon depth
@@ -230,9 +230,10 @@ int startupGUItasks()
 //
 int uiShow(bool direction)
 {
-	if (g.debug > 0) {
+    if (g.debug > 0) {
 		fprintf(stderr, "preparing ui\n");
 	}
+    XClassHint class_h = { XCLASSNAME, XCLASS };
 // init X junk early, because depth conversion in addWindow requires GC
 
 	g.uiShowHasRun = true;	// begin allocations
@@ -304,8 +305,11 @@ int uiShow(bool direction)
 	uiwinX = (scrW - uiwinW) / 2;
 	uiwinY = (scrH - uiwinH) / 2;
 	if (g.debug > 0) {
-		fprintf(stderr, "tile w=%d h=%d win w=%d h=%d\n", tileW, tileH,
-			uiwinW, uiwinH);
+		fprintf(stderr, "tile w=%d h=%d\n", tileW, tileH);
+        fprintf(stderr, "uiwin w=%d h=%d, x=%d y=%d, scr w=%d h=%d, default was %d now %d\n",
+               uiwinW, uiwinH, uiwinX, uiwinY,
+               scrW, scrH,
+               scr, DefaultScreen(dpy));
 	}
 // prepare tiles
 
@@ -422,10 +426,12 @@ int uiShow(bool direction)
 	if (uiwin <= 0)
 		die("can't create window");
 	if (g.debug > 0) {
-		fprintf(stderr, "our window is %lu\n", uiwin);
+        fprintf(stderr, "our window is %lx\n", uiwin);
 	}
+
 // set properties of our window
-	XStoreName(dpy, uiwin, XWINNAME);
+    XStoreName(dpy, uiwin, XWINNAME);
+    XSetClassHint(dpy, uiwin, &class_h);
 	XSelectInput(dpy, uiwin, ExposureMask | KeyPressMask | KeyReleaseMask);
 // set window type so that WM will hopefully not resize it
 // before mapping: https://specifications.freedesktop.org/wm-spec/1.3/ar01s05.html
@@ -434,11 +440,48 @@ int uiShow(bool direction)
 	Atom td = XInternAtom(dpy, "_NET_WM_WINDOW_TYPE_DIALOG", False);
 	if (at && wt && td)
 		XChangeProperty(dpy, uiwin, wt, at, 32, PropModeReplace,
-				(unsigned char *)(&td), 1);
+            (unsigned char *)(&td), 1);
+// disable appearance in taskbar
+    Atom st = XInternAtom(dpy, "_NET_WM_STATE", True);
+    Atom sk = XInternAtom(dpy, "_NET_WM_STATE_SKIP_TASKBAR", True); // there is also PAGER
+    if (at && st && sk)
+        XChangeProperty(dpy, uiwin, st, at, 32, PropModeReplace,
+            (unsigned char *)(&sk), 1);
 // xmonad ignores _NET_WM_WINDOW_TYPE_DIALOG but obeys WM_TRANSIENT_FOR
 	XSetTransientForHint(dpy, uiwin, uiwin);
+// disable window title and borders. works in xfwm4.
+#define PROP_MOTIF_WM_HINTS_ELEMENTS 5
+#define MWM_HINTS_DECORATIONS (1L << 1)
+    struct {
+        unsigned long flags;
+        unsigned long functions;
+        unsigned long decorations;
+        long inputMode;
+        unsigned long status;
+    } hints = { MWM_HINTS_DECORATIONS, 0, 0, };
+    Atom ma = XInternAtom(dpy, "_MOTIF_WM_HINTS", False);
+    if (ma) {
+        XChangeProperty(dpy, uiwin, ma, ma, 32, PropModeReplace,
+            (unsigned char *)&hints, PROP_MOTIF_WM_HINTS_ELEMENTS);
+    }
 
-	XMapWindow(dpy, uiwin);
+    XMapWindow(dpy, uiwin);
+
+    if (g.option_wm == WM_EWMH) {
+        // required in JWM: centering
+        XSizeHints uiwinSizeHints = { USPosition|USSize|PPosition|PSize|PMinSize|PMaxSize|PBaseSize|PWinGravity,
+            uiwinX, uiwinY,
+            uiwinW, uiwinH,
+            uiwinW, uiwinH,
+            uiwinW, uiwinH,
+            0, 0,
+            {0,0}, {0,0},
+            uiwinW, uiwinH,
+            5 };
+        XSetWMNormalHints(dpy, uiwin, &uiwinSizeHints);
+        // required in Metacity
+        ewmh_setFocus(0, uiwin);
+    }
 	return 1;
 }
 
@@ -478,20 +521,25 @@ void uiExpose()
 //
 int uiHide()
 {
+    // order is important: to set focus in Metacity,
+    // our window must be destroyed first
+	if (uiwin) {
+	    if (g.debug > 0) {
+            fprintf(stderr, "destroying our window\n");
+        }
+		XUnmapWindow(dpy, uiwin);
+		XDestroyWindow(dpy, uiwin);
+		uiwin = 0;
+	}
 	if (g.winlist) {
 		if (g.debug > 0) {
-			fprintf(stderr, "changing window focus to %lu\n",
+            fprintf(stderr, "changing focus to %lx\n",
 				g.winlist[g.selNdx].id);
 		}
 		setFocus(g.selNdx);	// before winlist destruction!
 	}
 	if (g.debug > 0) {
-		fprintf(stderr, "destroying our window and tiles\n");
-	}
-	if (uiwin) {
-		XUnmapWindow(dpy, uiwin);
-		XDestroyWindow(dpy, uiwin);
-		uiwin = 0;
+        fprintf(stderr, "destroying tiles\n");
 	}
 	int y;
 	for (y = 0; y < g.maxNdx; y++) {

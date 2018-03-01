@@ -1,7 +1,7 @@
 .\" generated with Ronn/v0.7.3
 .\" http://github.com/rtomayko/ronn/tree/0.7.3
 .
-.TH "ALTTAB" "1" "October 2017" "" ""
+.TH "ALTTAB" "1" "February 2018" "" ""
 .
 .SH "NAME"
 \fBalttab\fR \- the task switcher
@@ -19,35 +19,41 @@ Unlike task switchers integrated in most simple WMs, \fBalttab\fR features visua
 Being lightweight and depending only on core X11 libs, it still features customizable look and behaviour\.
 .
 .SH "OPTIONS"
-Most command line options have corresponding X resource\.
+Most command line options have corresponding X resource, see doc/alttab\.ad for example\.
 .
 .TP
 \fB\-w\fR \fINUMBER\fR
 resource: alttab\.windowmanager
 .
 .br
-default: autodetect
+default: autodetect, fallback to \fI3\fR
 .
 .IP
-Control how to obtain window list and set focus\. \fINUMBER\fR may be 0, 1 or 2:
+Control how to obtain window list and set focus\. \fINUMBER\fR must be between 0 and 3:
 .
 .IP
 \fI0\fR: No WM, raw X\.
 .
 .IP
-Only "leader" windows are listed, since Xlib has no other means to recognize main application window\. List order is random\. Running \fB\-w 0\fR under WM is discouraged: hidden windows or windows on another desktops will not be listed; instead, some strange windows may be included\. Nevertheless, this mode is suitable for dwm(1) and other managers which don\'t expose window list via EWMH\.
+Set this value manually, as it\'s not autodetected\. Only top\-level viewable children of root window are listed\. List order is random\. Running \fB\-w 0\fR under WM is discouraged: hidden windows or windows on another desktops will not be listed; instead, some strange windows may be included\.
 .
 .IP
 \fI1\fR: EWMH compatible\.
 .
 .IP
-Compatible WM list is in [SEE ALSO] below\. Tested in xmonad(1) (EWMH must be allowed, details in doc/xmonad\.md), i3(1), evilwm(1)\.
+Compatible WM list is in [SEE ALSO] below\. alttab functions in xmonad (EWMH must be allowed, details in doc/wm\-setup\.md), i3, evilwm, xfwm4, metacity, jwm, openbox, fluxbox, icewm, enlightenment, blackbox, aewm, fvwm, sawfish\. The following WMs support EWMH partially but work in \fB\-w 1\fR mode too: dwm (issue #9), matchbox (issue #34), windowmaker (issue #9), xpra (issue #37), cwm (issue #35), ctwm (issue #39), lwm (issue #40), awesome (issue #41)\.
 .
 .IP
 \fI2\fR: Ratpoison\.
 .
 .IP
-Alttab uses ratpoison(1) own perfect remote control capability\. Additionally, alttab registers itself in its "unmanaged list" automatically\.
+Alttab uses ratpoison own perfect remote control capability\. Additionally, alttab registers itself in its "unmanaged list" automatically\.
+.
+.IP
+\fI3\fR: Ancient WM\.
+.
+.IP
+Fallback, worse than \fI0\fR\. Search for application windows at random nodes of window tree (WM is probably reparenting) and select only those with a name, including non\-viewable (WM is probably iconifying)\. May cause lag\. List order is random\. Tested in twm, flwm, wm2\.
 .
 .TP
 \fB\-mm\fR \fINUM\fR
@@ -97,7 +103,7 @@ resource: alttab\.tile\.geometry
 default: \fI112x128\fR
 .
 .IP
-Maximum size of a single tile (mini\-window)\. If switcher doesn\'t fit the screen, tile may be thinner\.
+Size of a single tile (mini\-window)\. If switcher doesn\'t fit the screen, tile may be thinner\.
 .
 .TP
 \fB\-i\fR \fINNxMM\fR
@@ -114,7 +120,7 @@ Size of icons\.
 resource: alttab\.icon\.source
 .
 .br
-default: 0
+default: 2
 .
 .IP
 Source of icons\. \fINUMBER\fR must be between 0 and 3:
@@ -144,7 +150,7 @@ Alttab searches for PNG icons under:
 Directory structure should obey freedesktop standard, but desktop files are ignored, instead file name is expected to be equal to application class\.
 .
 .IP
-\fI2\fR: Prefer icon from file when it better match requested size (see \fB\-i\fR option)\.
+\fI2\fR: Prefer icon from file when it matches requested size better (see \fB\-i\fR option)\.
 .
 .IP
 \fI3\fR: Use icons from files only\.
@@ -200,10 +206,10 @@ resource: alttab\.font
 default: \fIxft:sans\-10\fR
 .
 .IP
-Label font name in format: \fBxft:fontconfig_pattern\fR, like in emacs(1) and rxvt(1)\. See [SEE ALSO] for fontconfig pattern\. It\'s neigher GTK font pattern nor legacy XLFD\.
+Label font name in format: \fBxft:fontconfig_pattern\fR, like in emacs and rxvt\. See [SEE ALSO] for fontconfig pattern\. It\'s neither GTK font pattern nor legacy XLFD\.
 .
 .P
-Your Xresources database probably already have *background, *foreground or *font wildcard definitions, which alttab will obey\. Precedence order (preferred first):
+Your Xresources database probably already has *background, *foreground or *font wildcard definitions, which alttab will obey\. Precedence order (preferred first):
 .
 .P
 alttab\.font resource,
@@ -232,7 +238,7 @@ short help
 Run alttab after WM, or it will fail to detect it\.
 .
 .SH "AUTHOR"
-Copyright 2017 Alexander Kulak \fB<sa\-dev AT rainbow POINT by>\fR\.
+Copyright 2017\-2018 Alexander Kulak \fB<sa\-dev AT rainbow POINT by>\fR\.
 .
 .SH "REPORTING BUGS"
 Please report issues on github \fIhttps://github\.com/sagb/alttab/issues\fR\.

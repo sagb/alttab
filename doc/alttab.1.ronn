@@ -2,7 +2,7 @@
 The source of alttab.1. Read doc/development.md.
 vim:ft=markdown
 
-Copyright 2017 Alexander Kulak.
+Copyright 2017-2018 Alexander Kulak.
 This file is part of alttab program.
 
 Copying and distribution of this file, with or without modification,
@@ -31,28 +31,43 @@ it still features customizable look and behaviour.
 
 ## OPTIONS
 
-Most command line options have corresponding X resource.
+Most command line options have corresponding X resource, see doc/alttab.ad for example.
 
   * `-w` <NUMBER>:
     resource: alttab.windowmanager  
-    default: autodetect
+    default: autodetect, fallback to <3>
 
-    Control how to obtain window list and set focus. <NUMBER> may be 0, 1 or 2:
+    Control how to obtain window list and set focus. <NUMBER> must be between 0 and 3:
 
       <0>: No WM, raw X.
 
-      Only "leader" windows are listed, since Xlib has no other means to recognize main application window. 
+      Set this value manually, as it's not autodetected. 
+      Only top-level viewable children of root window are listed.
       List order is random. 
       Running **-w 0** under WM is discouraged: hidden windows or windows on another desktops will not be listed; instead, some strange windows may be included. 
-      Nevertheless, this mode is suitable for dwm(1) and other managers which don't expose window list via EWMH.
 
       <1>: EWMH compatible.
 
-      Compatible WM list is in [SEE ALSO] below. Tested in xmonad(1) (EWMH must be allowed, details in doc/xmonad.md), i3(1), evilwm(1).
+      Compatible WM list is in [SEE ALSO] below. alttab functions in xmonad (EWMH must be
+      allowed, details in doc/wm-setup.md), i3, evilwm, xfwm4, metacity, jwm, openbox, fluxbox,
+      icewm, enlightenment, blackbox, aewm, fvwm, sawfish.
+      The following WMs support EWMH partially but work in **-w 1** mode too:
+      dwm (issue #9), matchbox (issue #34), windowmaker (issue #9),
+      xpra (issue #37), cwm (issue #35), ctwm (issue #39), lwm (issue #40),
+      awesome (issue #41).
 
       <2>: Ratpoison.
 
-      Alttab uses ratpoison(1) own perfect remote control capability. Additionally, alttab registers itself in its "unmanaged list" automatically.
+      Alttab uses ratpoison own perfect remote control capability. Additionally, alttab registers itself in its "unmanaged list" automatically.
+
+      <3>: Ancient WM.
+
+      Fallback, worse than <0>.
+      Search for application windows at random nodes of window tree (WM is probably reparenting)
+      and select only those with a name, including non-viewable (WM is probably iconifying).
+      May cause lag.
+      List order is random.
+      Tested in twm, flwm, wm2.
 
   * `-mm` <NUM>:
     resource: alttab.modifier.mask  
@@ -82,7 +97,7 @@ Most command line options have corresponding X resource.
     resource: alttab.tile.geometry  
     default: <112x128>
 
-    Maximum size of a single tile (mini-window). If switcher doesn't fit the screen, tile may be thinner.
+    Size of a single tile (mini-window). If switcher doesn't fit the screen, tile may be thinner.
 
   * `-i` <NNxMM>:
     resource: alttab.icon.geometry  
@@ -92,7 +107,7 @@ Most command line options have corresponding X resource.
 
   * `-s` <NUMBER>:
     resource: alttab.icon.source  
-    default: 0
+    default: 2
 
     Source of icons. <NUMBER> must be between 0 and 3:
 
@@ -109,7 +124,7 @@ Most command line options have corresponding X resource.
   
       Directory structure should obey freedesktop standard, but desktop files are ignored, instead file name is expected to be equal to application class. 
 
-      <2>: Prefer icon from file when it better match requested size (see `-i` option).
+      <2>: Prefer icon from file when it matches requested size better (see `-i` option).
 
       <3>: Use icons from files only.
 
@@ -143,9 +158,9 @@ The following three options accept color names or <#rrggbb>. Special value <\_rn
     resource: alttab.font  
     default: *xft:sans-10*
 
-    Label font name in format: `xft:fontconfig_pattern`, like in emacs(1) and rxvt(1). See [SEE ALSO] for fontconfig pattern. It's neigher GTK font pattern nor legacy XLFD.
+    Label font name in format: `xft:fontconfig_pattern`, like in emacs and rxvt. See [SEE ALSO] for fontconfig pattern. It's neither GTK font pattern nor legacy XLFD.
 
-Your Xresources database probably already have \*background, \*foreground or \*font wildcard definitions, which alttab will obey. Precedence order (preferred first):
+Your Xresources database probably already has \*background, \*foreground or \*font wildcard definitions, which alttab will obey. Precedence order (preferred first):
 
    alttab.font resource,  
    `-font` option,  
@@ -166,7 +181,7 @@ Run alttab after WM, or it will fail to detect it.
 
 ##AUTHOR
 
-Copyright 2017 Alexander Kulak `<sa-dev AT rainbow POINT by>`.
+Copyright 2017-2018 Alexander Kulak `<sa-dev AT rainbow POINT by>`.
 
 ##REPORTING BUGS
 

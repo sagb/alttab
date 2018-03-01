@@ -1,7 +1,7 @@
 /*
 icon.c definitions.
 
-Copyright 2017 Alexander Kulak.
+Copyright 2017-2018 Alexander Kulak.
 This file is part of alttab program.
 
 alttab is free software: you can redistribute it and/or modify
@@ -33,7 +33,6 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 #include <fts.h>
 #include <stdio.h>
 #include <ctype.h>
-#include <wordexp.h>
 
 #define MAXICONDIRS     64
 #define MAXAPPLEN       64
