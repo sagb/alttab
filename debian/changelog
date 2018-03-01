@@ -1,5 +1,12 @@
+alttab (1.2.0-1) unstable; urgency=medium
+
+  * New upstream release
+
+ -- Alexander Kulak <sa-dev@rainbow.by>  Wed,  1 Mar 2018 11:06:45 +0300
+
 alttab (1.1.0-1) unstable; urgency=medium
 
   * Initial release (Closes: #861533)
 
  -- Alexander Kulak <sa-dev@rainbow.by>  Wed, 25 Oct 2017 11:15:28 +0300
+
