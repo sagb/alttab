@@ -2,7 +2,7 @@
 Binaries
 --------
 
-* In Debian _unstable_ or Ubuntu _bionic_, install alttab from the official repository:
+* In Debian _unstable_, _buster_ or their Ubuntu derivatives, install alttab from the official repository:
 
     ```
     apt install alttab
