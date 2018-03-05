@@ -1,7 +1,7 @@
 /*
 Interface with foreign windows common for all WMs.
 
-Copyright 2017 Alexander Kulak.
+Copyright 2017-2018 Alexander Kulak.
 This file is part of alttab program.
 
 alttab is free software: you can redistribute it and/or modify
@@ -41,7 +41,7 @@ extern Window root;
 //
 static int sort_by_order(const void *p1, const void *p2)
 {
-	return (((WindowInfo *) p1)->order > ((WindowInfo *) p2)->order);
+    return (((WindowInfo *) p1)->order > ((WindowInfo *) p2)->order);
 }
 
 // PUBLIC
@@ -356,24 +356,24 @@ int initWinlist(bool direction)
 		pulloutWindowToTop(g.startNdx);
 
 // sort winlist according to .order
-	if (g.debug > 1) {
-		fprintf(stderr, "startNdx=%d\n", g.startNdx);
-		int ww;
-		fprintf(stderr, "before qsort:\n");
-		for (ww = 0; ww < g.maxNdx; ww++) {
-			fprintf(stderr, "[%d] %s\n", g.winlist[ww].order,
-				g.winlist[ww].name);
-		}
-	}
-	qsort(g.winlist, g.maxNdx, sizeof(WindowInfo), sort_by_order);
-	if (g.debug > 1) {
-		fprintf(stderr, "after  qsort:\n");
-		int ww;
-		for (ww = 0; ww < g.maxNdx; ww++) {
-			fprintf(stderr, "[%d] %s\n", g.winlist[ww].order,
-				g.winlist[ww].name);
-		}
-	}
+    if (g.debug > 1) {
+        fprintf(stderr, "startNdx=%d\n", g.startNdx);
+        int ww;
+        fprintf(stderr, "before qsort:\n");
+        for (ww = 0; ww < g.maxNdx; ww++) {
+            fprintf(stderr, "[%d] %s\n", g.winlist[ww].order,
+                    g.winlist[ww].name);
+        }
+    }
+    qsort(g.winlist, g.maxNdx, sizeof(WindowInfo), sort_by_order);
+    if (g.debug > 1) {
+        fprintf(stderr, "after  qsort:\n");
+        int ww;
+        for (ww = 0; ww < g.maxNdx; ww++) {
+            fprintf(stderr, "[%d] %s\n", g.winlist[ww].order,
+                    g.winlist[ww].name);
+        }
+    }
 
 	g.startNdx = 0;		// former pointer invalidated by qsort, brought to top
 	g.selNdx = direction ?
