@@ -90,6 +90,11 @@ typedef struct {
 } Color;
 
 typedef struct {
+    char *wmname;
+    bool try_stacking_list_first;
+} EwmhFeatures;
+
+typedef struct {
 	int debug;
 	bool uiShowHasRun;	// means: 1. window is ready to Expose, 2. need to call uiHide to free X stuff
 	WindowInfo *winlist;
@@ -139,6 +144,7 @@ typedef struct {
 	GC gcDirect, gcReverse, gcFrame;	// used in both gui.c and win.c
 	unsigned int ignored_modmask;
     icon_t *ic;  // cache of all icons
+    EwmhFeatures ewmh;  // guessed by ewmh_detectFeatures
 } Globals;
 
 // gui
@@ -166,7 +172,7 @@ int execAndReadStdout(char *exe, char *args[], char *buf, int bufsize);
 int pulloutWindowToTop(int winNdx);
 
 /* EWHM */
-char *ewmh_getWmName();
+bool ewmh_detectFeatures(EwmhFeatures *e);
 int ewmh_initWinlist();
 int ewmh_setFocus(int winNdx, Window fwin); // fwin used if non-zero
 unsigned long ewmh_getCurrentDesktop();

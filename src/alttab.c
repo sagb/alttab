@@ -183,11 +183,10 @@ int use_args_and_xrm(int *argc, char **argv)
 		fprintf(stderr, "no WM index or unknown, guessing\n");
 	}
 // EWMH?
-	char *ewmn = ewmh_getWmName(dpy);
-	if (ewmn != NULL) {
+	if (ewmh_detectFeatures(&(g.ewmh))) {
 		if (g.debug > 0) {
 			fprintf(stderr, "EWMH-compatible WM detected: %s\n",
-				ewmn);
+				g.ewmh.wmname);
 		}
 		g.option_wm = WM_EWMH;
 		goto wmDone;
