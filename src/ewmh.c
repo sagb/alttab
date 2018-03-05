@@ -49,6 +49,9 @@ Window *ewmh_get_client_list(unsigned long *client_list_size)
         if ((client_list =
 	     (Window *) get_x_property(root, XA_WINDOW, "_NET_CLIENT_LIST_STACKING",
 				       client_list_size)) != NULL) {
+            if (g.debug>1) {
+                fprintf(stderr, "ewmh found stacking window list\n");
+            }
             // reverse order
             int i, nw;
             Window w;
@@ -99,6 +102,8 @@ int ewmh_switch_desktop(unsigned long desktop)
 {
     int evr, elapsed;
 	unsigned long edata[] = {desktop, CurrentTime, 0,0,0};
+    if (desktop == -1 && g.ewmh.minus1_desktop_unusable)
+        return 0;
     if (g.debug>1) {
         fprintf(stderr, "ewmh switching desktop to %ld\n", desktop);
     }
@@ -150,10 +155,11 @@ bool ewmh_detectFeatures(EwmhFeatures *e)
     // We detect those WM as EWMH-compatible and return their name
     // as "unknown_ewmh_compatible".
 
-    e->wmname = (char*)NULL;
-    e->try_stacking_list_first = true; // ewmh_get_client_list will correct it
+    bzero (e, sizeof(EwmhFeatures));
+    e->try_stacking_list_first = true;
 
     // first, detect necessary feature: client list
+    // also, this resets try_stacking_list_first if necessary
     if (ewmh_get_client_list(&client_list_size) == NULL) {
         // WM is not usable in EWMH mode
         return false;
@@ -181,6 +187,11 @@ bool ewmh_detectFeatures(EwmhFeatures *e)
         free(chld_win);
 
     e->wmname = (r!=NULL) ? r : default_wm_name;
+
+    // special workarounds
+    if (strncmp(e->wmname, "CWM", 4) == 0)
+        e->minus1_desktop_unusable = true;
+
     return true;
 }
 

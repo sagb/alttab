@@ -92,6 +92,7 @@ typedef struct {
 typedef struct {
     char *wmname;
     bool try_stacking_list_first;
+    bool minus1_desktop_unusable;
 } EwmhFeatures;
 
 typedef struct {
