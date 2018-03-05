@@ -3,7 +3,7 @@ Upstream-Name: alttab
 Source: https://github.com/sagb/alttab
 
 Files: *
-Copyright: 2017 Alexander Kulak <sa-dev@rainbow.by>
+Copyright: 2017-2018 Alexander Kulak <sa-dev@rainbow.by>
 License: GPL-3.0+
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@ License: GPL-3.0+
  Public License version 3 can be found in "/usr/share/common-licenses/GPL-3".
 
 Files: doc/alttab.1.ronn
-Copyright: 2017 Alexander Kulak <sa-dev@rainbow.by>
+Copyright: 2017-2018 Alexander Kulak <sa-dev@rainbow.by>
 License: permissive
  Copying and distribution of this file, with or without modification,
  are permitted in any medium without royalty provided the copyright
