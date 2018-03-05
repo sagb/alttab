@@ -1,3 +1,16 @@
+alttab (1.2.0.20180305.19.g738121f-1~1.gbpc63412) unstable; urgency=medium
+
+  ** SNAPSHOT build @c63412d9497af4f9bb651f2152d342cf2007b669 **
+
+  * bump debian standards
+  * merge 1.2.0
+  * fix missing 'missing'
+  * fix debian dists in doc
+  * use stacking window list if EWMH WM supports it
+  * workaround for cwm
+
+ -- Alexander Kulak <sa-dev@rainbow.by>  Mon, 05 Mar 2018 14:44:27 +0300
+
 alttab (1.1.0.20180225.78.g595f500-1~1.gbp696390) unstable; urgency=medium
 
   ** SNAPSHOT build @696390509938f551b79ccc779477cb93f68368b6 **
