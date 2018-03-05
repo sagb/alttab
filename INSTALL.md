@@ -2,7 +2,7 @@
 Binaries
 --------
 
-* In Debian _unstable_, _buster_ or their Ubuntu derivatives, install alttab from the official repository:
+* In Debian _sid_, _buster_ or their Ubuntu derivatives, install alttab from the official repository:
 
     ```
     apt install alttab
@@ -15,12 +15,18 @@ Binaries
 * In FreeBSD, install [the port](https://www.freshports.org/x11/alttab/):
 
     ```
+    cd /usr/ports/x11/alttab/ && make install clean
+    ```
+
+    or add the package:
+
+    ```
     pkg install alttab
     ```
 
 * In Arch Linux, alttab is available in [AUR](https://aur.archlinux.org/packages/?O=0&K=alttab).
 
-* In Alpine Linux, alttab is in aports/testing repository.
+* In Alpine Linux, alttab is in _aports/testing_ repository.
 
 
 Building from source
@@ -44,7 +50,7 @@ Building from source
 2. Download:
 
     ```
-    git clone https://github.com/sagb/alttab.git
+    git clone https://github.com/sagb/alttab.git && cd alttab
     ```
 
 3. Maintainer or packager may want to update autotools stuff and refresh documentation with ronn:
