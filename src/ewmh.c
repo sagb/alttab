@@ -2,7 +2,7 @@
 Interface with EWMH-compatible window managers.
 Note: _WIN fallbacks are not part of EWMH or ICCCM, but kept here anyway.
 
-Copyright 2017 Alexander Kulak.
+Copyright 2017-2018 Alexander Kulak.
 This file is part of alttab program.
 
 alttab is free software: you can redistribute it and/or modify
@@ -45,17 +45,36 @@ Window *ewmh_get_client_list(unsigned long *client_list_size)
 {
     Window *client_list;
 
+	if (g.ewmh.try_stacking_list_first) {
+        if ((client_list =
+	     (Window *) get_x_property(root, XA_WINDOW, "_NET_CLIENT_LIST_STACKING",
+				       client_list_size)) != NULL) {
+            if (g.debug>1) {
+                fprintf(stderr, "ewmh found stacking window list\n");
+            }
+            // reverse order
+            int i, nw;
+            Window w;
+            nw = (*client_list_size) / sizeof(Window);
+    	    for (i = 0; i < nw / 2; i++) {
+        		w = client_list[i];
+                client_list[i] = client_list[nw-i-1];
+                client_list[nw-i-1] = w;
+            }
+            return client_list;
+        } else {
+            g.ewmh.try_stacking_list_first = false;
+        }
+    }
 	if ((client_list =
 	     (Window *) get_x_property(root, XA_WINDOW, "_NET_CLIENT_LIST",
-				       client_list_size)) == NULL) {
-		if ((client_list =
-		     (Window *) get_x_property(root, XA_CARDINAL,
-					       "_WIN_CLIENT_LIST",
-					       client_list_size)) == NULL) {
-			return 0;
-		}
-    }
-    return client_list;
+			       client_list_size)) != NULL)
+        return client_list;
+    if ((client_list =
+	     (Window *) get_x_property(root, XA_CARDINAL, "_WIN_CLIENT_LIST",
+			       client_list_size)) != NULL)
+		return client_list;
+    return 0;
 }
 
 int ewmh_send_wm_evt(Window w, char *atom, unsigned long edata[])
@@ -83,6 +102,8 @@ int ewmh_switch_desktop(unsigned long desktop)
 {
     int evr, elapsed;
 	unsigned long edata[] = {desktop, CurrentTime, 0,0,0};
+    if (desktop == -1 && g.ewmh.minus1_desktop_unusable)
+        return 0;
     if (g.debug>1) {
         fprintf(stderr, "ewmh switching desktop to %ld\n", desktop);
     }
@@ -117,12 +138,11 @@ int ewmh_switch_window(unsigned long window)
 // PUBLIC
 
 //
-// return the name of EWMH-compatible WM
-// or NULL if not found
+// initialize EwmhFeatures
+// return true if usable at all
 //
-char *ewmh_getWmName()
+bool ewmh_detectFeatures(EwmhFeatures *e)
 {
-
 	Window *chld_win;
 	char *r;
 	Atom utf8string;
@@ -135,17 +155,22 @@ char *ewmh_getWmName()
     // We detect those WM as EWMH-compatible and return their name
     // as "unknown_ewmh_compatible".
 
+    bzero (e, sizeof(EwmhFeatures));
+    e->try_stacking_list_first = true;
+
     // first, detect necessary feature: client list
+    // also, this resets try_stacking_list_first if necessary
     if (ewmh_get_client_list(&client_list_size) == NULL) {
         // WM is not usable in EWMH mode
-        return (char *)NULL;
+        return false;
     }
 
     // then, guess/devise WM name
 	chld_win = (Window *) NULL;
 	if (!  (chld_win = (Window *) get_x_property(root, XA_WINDOW, "_NET_SUPPORTING_WM_CHECK", NULL))) {
 		if (!  (chld_win = (Window *) get_x_property(root, XA_CARDINAL, "_WIN_SUPPORTING_WM_CHECK", NULL))) {
-			return default_wm_name;
+			e->wmname = default_wm_name;
+            return true;
 		}
 	}
 	r = (char *)NULL;
@@ -161,7 +186,13 @@ char *ewmh_getWmName()
 	if (chld_win!=NULL)
         free(chld_win);
 
-    return (r!=NULL) ? r : default_wm_name;
+    e->wmname = (r!=NULL) ? r : default_wm_name;
+
+    // special workarounds
+    if (strncmp(e->wmname, "CWM", 4) == 0)
+        e->minus1_desktop_unusable = true;
+
+    return true;
 }
 
 //
@@ -248,13 +279,13 @@ int ewmh_setFocus(int winNdx, Window fwin)
 {
     Window win = (fwin != 0) ? fwin : g.winlist[winNdx].id;
     if (g.debug>1) {
-        fprintf(stderr, "ewmh_setFocus win %lx\n", win);
+        fprintf(stderr, "ewmh_setFocus win 0x%lx\n", win);
     }
     if (fwin == 0 && g.option_desktop != DESK_CURRENT) {
         unsigned long wdesk = g.winlist[winNdx].desktop;
         unsigned long cdesk = ewmh_getCurrentDesktop();
         if (g.debug>1) {
-            fprintf(stderr, "ewmh_setFocus fwin %lx opt %d wdesk %lu cdesk %lu\n",
+            fprintf(stderr, "ewmh_setFocus fwin 0x%lx opt %d wdesk %lu cdesk %lu\n",
                    fwin, g.option_desktop, wdesk, cdesk);
         }
         if (cdesk != wdesk && wdesk != DESKTOP_UNKNOWN) {
