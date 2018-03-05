@@ -1,3 +1,20 @@
+2018-02-28  Alexander Kulak  <sa-dev@rainbow.by>
+
+	version 1.2.0
+
+	Ancient WM support (-w 3 option).
+	Test and adapt for many WMs.
+	Disable: other desktops, title, decorations, appearance in taskbar.
+	Get rid of shell name expansions (wordexp.h).
+	Windows focus in Metacity and Xfce.
+	Work in partially EWMH-compatible WM.
+	Centering the switcher via WM hints.
+	Build with musl libc (Alpine Linux).
+	Avoid including "panel" and other auxiliary windows.
+
+	Closes: #8, #9, #23, #24, #25, #26, #27, #28, #29, #30, #31, #32,
+	#34, #36, #37, #38, #39, #40, #41, #43.
+
 2017-10-22  Alexander Kulak  <sa-dev@rainbow.by>
 
 	version 1.1.0
