@@ -119,7 +119,8 @@ typedef struct {
 #define DESK_MIN        0
 #define DESK_CURRENT    0
 #define DESK_ALL        1
-#define DESK_MAX        1
+#define DESK_NOSPECIAL  2
+#define DESK_MAX        2
 #define DESK_DEFAULT    0
     int option_desktop;
 	char *option_font;
@@ -155,6 +156,8 @@ void uiExpose();
 int uiHide();
 int uiNextWindow();
 int uiPrevWindow();
+int uiSelectWindow(int ndx);
+void uiButtonEvent(XButtonEvent e);
 
 // windows
 int startupWintasks();

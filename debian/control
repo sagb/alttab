@@ -21,7 +21,7 @@ Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Suggests: fonts-dejavu-core
 Enhances: jwm, twm, evilwm, ratpoison, fluxbox, matchbox, blackbox,
- cwm, wm2, aewm, ctwm, lwm, sawfish, awesome
+ cwm, wm2, aewm, ctwm, lwm, sawfish, awesome, i3-wm
 Description: task switcher for minimalistic WMs or standalone X session
  alttab provides convenient visual interface and switching on releasing
  Alt, not on pressing Tab key. Being lightweight and depending only on
