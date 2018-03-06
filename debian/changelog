@@ -1,3 +1,11 @@
+alttab (1.2.0.20180306.22.ga6422c2-1~1.gbp698a11) testing; urgency=medium
+
+  ** SNAPSHOT build @698a1110348c46b285a7692c5db57abec5262c1b **
+
+  * backport to buster
+
+ -- Alexander Kulak <sa-dev@rainbow.by>  Tue, 06 Mar 2018 15:52:35 +0300
+
 alttab (1.2.0.20180306.22.ga6422c2-1~1.gbp2501ea) unstable; urgency=medium
 
   ** SNAPSHOT build @2501ea513543562992c77811a4b2e934819f1d5f **
