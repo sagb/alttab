@@ -36,6 +36,8 @@ extern Window root;
 // PRIVATE
 
 unsigned int tileW, tileH, iconW, iconH;
+unsigned int visualTileW;
+int lastPressedTile;
 int scrNum;
 int scrW, scrH;
 Window uiwin;
@@ -124,6 +126,20 @@ void framesRedraw()
 	}
 // _after_ unselected draw selected, because they may overlap
 	drawFr(g.gcFrame, g.selNdx);
+}
+
+//
+// given coordinates relative to our window,
+// return the tile number or -1
+//
+int pointedTile(int x, int y)
+{
+    if (x < (FRAME_W / 2)
+            || x > (uiwinW - (FRAME_W / 2))
+            || y < 0
+            || y > uiwinH )
+        return -1;
+    return (x - (FRAME_W / 2)) / visualTileW;
 }
 
 // PUBLIC
@@ -309,6 +325,7 @@ int uiShow(bool direction)
         uiwinX = g.option_posX;
         uiwinY = g.option_posY;
     }
+    visualTileW = (uiwinW - FRAME_W) / g.maxNdx;
 	if (g.debug > 0) {
 		fprintf(stderr, "tile w=%d h=%d\n", tileW, tileH);
         fprintf(stderr, "uiwin %dx%d +%d+%d", uiwinW, uiwinH, uiwinX, uiwinY);
@@ -445,7 +462,8 @@ int uiShow(bool direction)
 // set properties of our window
     XStoreName(dpy, uiwin, XWINNAME);
     XSetClassHint(dpy, uiwin, &class_h);
-	XSelectInput(dpy, uiwin, ExposureMask | KeyPressMask | KeyReleaseMask);
+	XSelectInput(dpy, uiwin, ExposureMask | KeyPressMask | KeyReleaseMask 
+        | ButtonPressMask | ButtonReleaseMask);
 // set window type so that WM will hopefully not resize it
 // before mapping: https://specifications.freedesktop.org/wm-spec/1.3/ar01s05.html
 	Atom at = XInternAtom(dpy, "ATOM", True);
@@ -607,3 +625,50 @@ int uiPrevWindow()
 	framesRedraw();
 	return 1;
 }
+
+//
+// select item in g.winlist
+//
+int uiSelectWindow(int ndx)
+{
+	if (!uiwin)
+		return 0;	// kb events may trigger it even when no window drawn yet
+    if (ndx < 0 || ndx >= g.maxNdx) {
+        return 0; }
+	g.selNdx = ndx;
+	if (g.debug > 0) {
+		fprintf(stderr, "item %d\n", g.selNdx);
+	}
+	framesRedraw();
+	return 1;
+}
+
+//
+// mouse press/release handler
+//
+void uiButtonEvent(XButtonEvent e)
+{
+    if (!uiwin)
+        return;
+    if (e.type == ButtonPress) {
+        switch (e.button) {
+            case 1:
+                lastPressedTile = pointedTile (e.x, e.y);
+                if (lastPressedTile != -1)
+                    uiSelectWindow (lastPressedTile);
+                break;
+            case 4:
+                uiPrevWindow();
+                break;
+            case 5:
+                uiNextWindow();
+                break;
+        }
+    }
+    if (e.type == ButtonRelease && e.button == 1) {
+        if (lastPressedTile != -1 
+                && lastPressedTile == pointedTile (e.x, e.y))
+            uiHide();
+    }
+}
+

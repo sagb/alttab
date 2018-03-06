@@ -238,12 +238,19 @@ int ewmh_initWinlist()
         }
 
         window_desktop = ewmh_getDesktopOfWindow(w);
-        if (current_desktop != window_desktop 
-                && g.option_desktop == DESK_CURRENT
+        if (g.option_desktop == DESK_CURRENT
+                && current_desktop != window_desktop 
                 && current_desktop != DESKTOP_UNKNOWN 
                 && window_desktop != DESKTOP_UNKNOWN) {
 	        if (g.debug > 1) {
                 fprintf (stderr, "window not on active desktop, skipped (window's %ld, current %ld)\n", window_desktop, current_desktop);
+            }
+            continue;
+        }
+        if (g.option_desktop == DESK_NOSPECIAL
+                && window_desktop == -1) {
+	        if (g.debug > 1) {
+                fprintf (stderr, "window on -1 desktop, skipped\n");
             }
             continue;
         }
