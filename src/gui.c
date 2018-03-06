@@ -36,6 +36,8 @@ extern Window root;
 // PRIVATE
 
 unsigned int tileW, tileH, iconW, iconH;
+unsigned int visualTileW;
+int lastPressedTile;
 int scrNum;
 int scrW, scrH;
 Window uiwin;
@@ -124,6 +126,20 @@ void framesRedraw()
 	}
 // _after_ unselected draw selected, because they may overlap
 	drawFr(g.gcFrame, g.selNdx);
+}
+
+//
+// given coordinates relative to our window,
+// return the tile number or -1
+//
+int pointedTile(int x, int y)
+{
+    if (x < (FRAME_W / 2)
+            || x > (uiwinW - (FRAME_W / 2))
+            || y < 0
+            || y > uiwinH )
+        return -1;
+    return (x - (FRAME_W / 2)) / visualTileW;
 }
 
 // PUBLIC
@@ -309,6 +325,7 @@ int uiShow(bool direction)
         uiwinX = g.option_posX;
         uiwinY = g.option_posY;
     }
+    visualTileW = (uiwinW - FRAME_W) / g.maxNdx;
 	if (g.debug > 0) {
 		fprintf(stderr, "tile w=%d h=%d\n", tileW, tileH);
         fprintf(stderr, "uiwin %dx%d +%d+%d", uiwinW, uiwinH, uiwinX, uiwinY);
@@ -631,15 +648,14 @@ int uiSelectWindow(int ndx)
 //
 void uiButtonEvent(XButtonEvent e)
 {
-    int visualTileW, ndx;
     if (!uiwin)
         return;
     if (e.type == ButtonPress) {
         switch (e.button) {
             case 1:
-                visualTileW = (uiwinW - FRAME_W) / g.maxNdx;
-                ndx = (e.x - (FRAME_W / 2)) / visualTileW;
-                uiSelectWindow (ndx);
+                lastPressedTile = pointedTile (e.x, e.y);
+                if (lastPressedTile != -1)
+                    uiSelectWindow (lastPressedTile);
                 break;
             case 4:
                 uiPrevWindow();
@@ -650,7 +666,9 @@ void uiButtonEvent(XButtonEvent e)
         }
     }
     if (e.type == ButtonRelease && e.button == 1) {
-        uiHide();
+        if (lastPressedTile != -1 
+                && lastPressedTile == pointedTile (e.x, e.y))
+            uiHide();
     }
 }
 
