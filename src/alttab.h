@@ -156,6 +156,8 @@ void uiExpose();
 int uiHide();
 int uiNextWindow();
 int uiPrevWindow();
+int uiSelectWindow(int ndx);
+void uiButtonEvent(XButtonEvent e);
 
 // windows
 int startupWintasks();

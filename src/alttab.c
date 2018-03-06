@@ -561,6 +561,11 @@ int main(int argc, char **argv)
 			}
 			break;
 
+		case ButtonPress:
+		case ButtonRelease:
+            uiButtonEvent(ev.xbutton);
+            break;
+
 		default:
 			if (g.debug > 1) {
 				fprintf(stderr, "Event type %d\n", ev.type);
