@@ -1,7 +1,7 @@
 .\" generated with Ronn/v0.7.3
 .\" http://github.com/rtomayko/ronn/tree/0.7.3
 .
-.TH "ALTTAB" "1" "February 2018" "" ""
+.TH "ALTTAB" "1" "March 2018" "" ""
 .
 .SH "NAME"
 \fBalttab\fR \- the task switcher
@@ -73,6 +73,12 @@ This is default, but implemented for EWMH only (\fB\-w 1\fR)\.
 .
 .IP
 \fI1\fR: All desktops\.
+.
+.IP
+\fI2\fR: All desktops, excluding special (\-1) one\.
+.
+.IP
+For EWMH only (\fB\-w 1\fR)\. In various WM this desktop may be designed hidden or containing sticky windows\. In i3, it\'s "scratchpad"\.
 .
 .TP
 \fB\-mm\fR \fINUM\fR
