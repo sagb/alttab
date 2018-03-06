@@ -81,6 +81,11 @@ Most command line options have corresponding X resource, see doc/alttab.ad for e
 
       <1>: All desktops.
 
+      <2>: All desktops, excluding special (-1) one.
+
+      For EWMH only (`-w 1`). In various WM this desktop may be designed hidden
+      or containing sticky windows. In i3, it's "scratchpad".
+
   * `-mm` <NUM>:
     resource: alttab.modifier.mask  
     default: <8> (Mod1Mask aka left Alt)
