@@ -147,6 +147,7 @@ typedef struct {
 	unsigned int ignored_modmask;
     icon_t *ic;  // cache of all icons
     EwmhFeatures ewmh;  // guessed by ewmh_detectFeatures
+    Atom naw;  // _NET_ACTIVE_WINDOW
 } Globals;
 
 // gui
@@ -158,6 +159,7 @@ int uiNextWindow();
 int uiPrevWindow();
 int uiSelectWindow(int ndx);
 void uiButtonEvent(XButtonEvent e);
+Window getUiwin();
 
 // windows
 int startupWintasks();
@@ -174,9 +176,11 @@ int x_setFocus(int wndx);
 int rp_setFocus(int winNdx);
 int execAndReadStdout(char *exe, char *args[], char *buf, int bufsize);
 int pulloutWindowToTop(int winNdx);
+void winPropChangeEvent(XPropertyEvent e);
 
 /* EWHM */
 bool ewmh_detectFeatures(EwmhFeatures *e);
+Window ewmh_getActiveWindow();
 int ewmh_initWinlist();
 int ewmh_setFocus(int winNdx, Window fwin); // fwin used if non-zero
 unsigned long ewmh_getCurrentDesktop();
