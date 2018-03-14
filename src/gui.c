@@ -672,3 +672,11 @@ void uiButtonEvent(XButtonEvent e)
     }
 }
 
+//
+// our window
+//
+Window getUiwin()
+{
+    return uiwin;
+}
+

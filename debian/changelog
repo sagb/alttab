@@ -1,10 +1,18 @@
-alttab (1.2.0.20180306.22.ga6422c2-1~1.gbp698a11) testing; urgency=medium
+alttab (1.2.0.20180314.23.gc5ebeeb-1~1.gbpf340ac) unstable; urgency=medium
 
-  ** SNAPSHOT build @698a1110348c46b285a7692c5db57abec5262c1b **
+  ** SNAPSHOT build @f340ac94433239f962b43fe6b88fe8a0504bfaa1 **
 
-  * backport to buster
+  * autobuild script rewritten for new gbp configuration
 
- -- Alexander Kulak <sa-dev@rainbow.by>  Tue, 06 Mar 2018 15:52:35 +0300
+ -- Alexander Kulak <sa-dev@rainbow.by>  Wed, 14 Mar 2018 13:09:26 +0300
+
+alttab (1.2.0.20180314.23.gc5ebeeb-1~1.gbp67cf90) unstable; urgency=medium
+
+  ** SNAPSHOT build @67cf904f3035fb96de26ced3f2fe4280f46f22b2 **
+
+  * change sort order on new active window event in WM
+
+ -- Alexander Kulak <sa-dev@rainbow.by>  Wed, 14 Mar 2018 12:10:36 +0300
 
 alttab (1.2.0.20180306.22.ga6422c2-1~1.gbp2501ea) unstable; urgency=medium
 

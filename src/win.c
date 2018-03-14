@@ -44,6 +44,20 @@ static int sort_by_order(const void *p1, const void *p2)
     return (((WindowInfo *) p1)->order > ((WindowInfo *) p2)->order);
 }
 
+//
+// returns index of Window in sortlist
+// or -1
+//
+int ndx_of_window_in_sortlist(Window w)
+{
+	int i;
+    for (i=0; i < g.sortNdx; i++) {
+        if (g.sortlist[i] == w)
+            return i;
+    }
+    return -1;
+}
+	
 // PUBLIC
 
 //
@@ -58,6 +72,12 @@ int startupWintasks()
 		g.ic = initIcon();
 		initIconHash(&(g.ic));
 	}
+    // watching for _NET_ACTIVE_WINDOW
+    XSelectInput(dpy, root, PropertyChangeMask);
+    g.naw = XInternAtom(dpy, "_NET_ACTIVE_WINDOW", false);
+    if (g.naw == None && g.debug > 0) {
+        fprintf (stderr, "no _NET_ACTIVE_WINDOW atom, window focus will not be tracked\n");
+    }
 	switch (g.option_wm) {
 	case WM_NO:
 		return 1;
@@ -330,7 +350,7 @@ int initWinlist(bool direction)
 		fprintf(stderr, "sortlist before initWinlist: ");
 		int sii;
 		for (sii = 0; sii < g.sortNdx; sii++) {
-			fprintf(stderr, "%ld ", g.sortlist[sii]);
+			fprintf(stderr, "0x%lx ", g.sortlist[sii]);
 		};
 		fprintf(stderr, "\n");
 	}
@@ -490,3 +510,48 @@ int pulloutWindowToTop(int winNdx)
 
 	return 1;
 }
+
+//
+// event handler for PropertyChange
+// most of the time called when winlist[] is not initialized
+// currently it updates sortlist on _NET_ACTIVE_WINDOW change
+// because it's a handler of frequent event,
+// there are shortcuts to return as soon as possible
+//
+void winPropChangeEvent(XPropertyEvent e)
+// man XPropertyEvent
+{
+    Window aw;
+    int wn;
+    int s;
+    // no _NET_ACTIVE_WINDOW atom, probably not EWMH?
+    if (g.naw == None) return;
+    // property change event not for root window?
+    if (e.window != root) return;
+    // root property other than _NET_ACTIVE_WINDOW changed?
+    if (e.atom != g.naw) return;
+    // sortlist is not initialized yet? skip update for safety
+    if (g.sortNdx <= 0) return;
+    // don't check for wm==EWMH, because _NET_ACTIVE_WINDOW changed for sure
+    aw = ewmh_getActiveWindow();
+    // can't get active window
+    if (!aw) return;
+    // focus changed to our own window?
+    if (g.uiShowHasRun && aw == getUiwin()) return;
+    // focus changed to window which is already top?
+    if (aw == g.sortlist[0]) return;
+    wn = ndx_of_window_in_sortlist(aw);
+    // can't get index of new active window?
+    // prior to adding it, set shift target index to the tail
+    if (wn == -1) wn = g.sortNdx;
+    if (g.debug>0)
+        fprintf (stderr, 
+            "wm reports new active window 0x%lx, pull sortlist[%d] to the top\n",
+            aw, wn);
+    // move down items in sortlist, O(n)
+	for (s = wn - 1; s >= 0; s--)
+		g.sortlist[s + 1] = g.sortlist[s];
+    // add to the head
+	g.sortlist[0] = aw;
+}
+
