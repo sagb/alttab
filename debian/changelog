@@ -1,10 +1,10 @@
-alttab (1.2.0.20180314.23.gc5ebeeb-1~1.gbp501e3d) testing; urgency=medium
+alttab (1.2.0.20180314.23.gc5ebeeb-1~1.gbp3e3110) unstable; urgency=medium
 
-  ** SNAPSHOT build @501e3d936c515d6df4aa4f4f28bf8b6a76a29747 **
+  ** SNAPSHOT build @3e3110fec28a289c335876b125d8e8745e914451 **
 
-  * backport to buster
+  * fix autobuild script
 
- -- Alexander Kulak <sa-dev@rainbow.by>  Wed, 14 Mar 2018 13:12:20 +0300
+ -- Alexander Kulak <sa-dev@rainbow.by>  Wed, 14 Mar 2018 13:31:33 +0300
 
 alttab (1.2.0.20180314.23.gc5ebeeb-1~1.gbpf340ac) unstable; urgency=medium
 
