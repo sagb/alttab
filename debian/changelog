@@ -1,3 +1,11 @@
+alttab (1.2.0.20180314.23.gc5ebeeb-1~1.gbpf340ac) unstable; urgency=medium
+
+  ** SNAPSHOT build @f340ac94433239f962b43fe6b88fe8a0504bfaa1 **
+
+  * autobuild script rewritten for new gbp configuration
+
+ -- Alexander Kulak <sa-dev@rainbow.by>  Wed, 14 Mar 2018 13:09:26 +0300
+
 alttab (1.2.0.20180314.23.gc5ebeeb-1~1.gbp67cf90) unstable; urgency=medium
 
   ** SNAPSHOT build @67cf904f3035fb96de26ced3f2fe4280f46f22b2 **
