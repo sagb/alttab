@@ -1,3 +1,11 @@
+alttab (1.2.0.20180314.23.gc5ebeeb-1~1.gbp3aaec8) jessie; urgency=medium
+
+  ** SNAPSHOT build @3aaec8429f4e320b8ee90103e467d0534bd423a6 **
+
+  * backport to jessie
+
+ -- Alexander Kulak <sa-dev@rainbow.by>  Wed, 14 Mar 2018 13:36:21 +0300
+
 alttab (1.2.0.20180314.23.gc5ebeeb-1~1.gbp3e3110) unstable; urgency=medium
 
   ** SNAPSHOT build @3e3110fec28a289c335876b125d8e8745e914451 **
