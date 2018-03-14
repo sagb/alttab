@@ -196,6 +196,24 @@ bool ewmh_detectFeatures(EwmhFeatures *e)
 }
 
 //
+// active window or 0
+//
+Window ewmh_getActiveWindow()
+{
+    Window w = (Window) 0;
+	char *awp;
+	unsigned long sz;
+	if ((awp = get_x_property(root, XA_WINDOW, "_NET_ACTIVE_WINDOW", &sz))) {
+		w = *((Window *) awp);
+		free(awp);
+	} else {
+		if (g.debug > 0)
+			fprintf(stderr, "can't obtain _NET_ACTIVE_WINDOW\n");
+	}
+    return w;
+}
+
+//
 // initialize winlist/startNdx
 // return 1 if ok
 //
@@ -205,22 +223,16 @@ int ewmh_initWinlist()
 	unsigned long client_list_size;
 	int i;
 	Window aw;
-	char *awp;
-	unsigned long sz;
 	char *title;
     unsigned long current_desktop, window_desktop;
 
-	aw = (Window) 0;
     current_desktop = ewmh_getCurrentDesktop();
 
-	if ((awp = get_x_property(root, XA_WINDOW, "_NET_ACTIVE_WINDOW", &sz))) {
-		aw = *((Window *) awp);
-		free(awp);
-	} else {
-		if (g.debug > 0)
-			fprintf(stderr, "can't obtain _NET_ACTIVE_WINDOW\n");
-		// not mandatory
-	}
+    aw = ewmh_getActiveWindow();
+	if (!aw && g.debug > 0) {
+        fprintf(stderr, "can't obtain _NET_ACTIVE_WINDOW\n");
+        // continue anyway
+    }
 
     if ((client_list = ewmh_get_client_list(&client_list_size)) == NULL) {
         fprintf(stderr, "can't get client list\n");

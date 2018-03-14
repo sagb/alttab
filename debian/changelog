@@ -1,10 +1,26 @@
-alttab (1.2.0.20180306.22.ga6422c2-1~1.gbpacf7a5) stretch; urgency=medium
+alttab (1.2.0.20180314.23.gc5ebeeb-1~1.gbp3e3110) unstable; urgency=medium
 
-  ** SNAPSHOT build @acf7a51600d9f4e13af8fb82ac5266de4a167d58 **
+  ** SNAPSHOT build @3e3110fec28a289c335876b125d8e8745e914451 **
 
-  * backport to stretch
+  * fix autobuild script
 
- -- Alexander Kulak <sa-dev@rainbow.by>  Tue, 06 Mar 2018 15:53:58 +0300
+ -- Alexander Kulak <sa-dev@rainbow.by>  Wed, 14 Mar 2018 13:31:33 +0300
+
+alttab (1.2.0.20180314.23.gc5ebeeb-1~1.gbpf340ac) unstable; urgency=medium
+
+  ** SNAPSHOT build @f340ac94433239f962b43fe6b88fe8a0504bfaa1 **
+
+  * autobuild script rewritten for new gbp configuration
+
+ -- Alexander Kulak <sa-dev@rainbow.by>  Wed, 14 Mar 2018 13:09:26 +0300
+
+alttab (1.2.0.20180314.23.gc5ebeeb-1~1.gbp67cf90) unstable; urgency=medium
+
+  ** SNAPSHOT build @67cf904f3035fb96de26ced3f2fe4280f46f22b2 **
+
+  * change sort order on new active window event in WM
+
+ -- Alexander Kulak <sa-dev@rainbow.by>  Wed, 14 Mar 2018 12:10:36 +0300
 
 alttab (1.2.0.20180306.22.ga6422c2-1~1.gbp2501ea) unstable; urgency=medium
 

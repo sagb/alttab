@@ -566,6 +566,10 @@ int main(int argc, char **argv)
             uiButtonEvent(ev.xbutton);
             break;
 
+		case PropertyNotify:
+            winPropChangeEvent(ev.xproperty);
+            break;
+
 		default:
 			if (g.debug > 1) {
 				fprintf(stderr, "Event type %d\n", ev.type);
