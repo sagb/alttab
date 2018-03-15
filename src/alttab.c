@@ -26,6 +26,7 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+#include <uthash.h>
 #include "alttab.h"
 #include "util.h"
 

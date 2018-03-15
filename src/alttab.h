@@ -74,7 +74,6 @@ typedef struct {
 	unsigned int icon_w, icon_h;
 	bool icon_allocated;	// we must free icon, because we created it (placeholder or depth conversion)
 	Pixmap tile;		// ready to display. w/h are all equal and defined in gui.c
-	int order;		// in sort stack, kept in sync with g.sortlist
 // this constant can't be 0, 1, -1, MAXINT, 
 // because WMs set it to these values incoherently
 #define DESKTOP_UNKNOWN 0xdead
@@ -95,6 +94,12 @@ typedef struct {
     bool minus1_desktop_unusable;
 } EwmhFeatures;
 
+// uthash doubly-linked list element
+typedef struct PermanentWindowInfo {
+    Window id;
+    struct PermanentWindowInfo *next, *prev;
+} PermanentWindowInfo;
+
 typedef struct {
 	int debug;
 	bool uiShowHasRun;	// means: 1. window is ready to Expose, 2. need to call uiHide to free X stuff
@@ -102,11 +107,9 @@ typedef struct {
 	int maxNdx;		// number of items in list above
 	int selNdx;		// current (selected) item
 	int startNdx;		// current item at start of uiShow (current window before setFocus)
-	Window sortlist[MAXWINDOWS];	// auxiliary list for sorting
+	PermanentWindowInfo *sortlist;	// auxiliary list for sorting
 	// display-wide, for all groups/desktops
 	// unlike g.winlist, survives uiHide
-	// for each uiShow, g.winlist[].order is initialized using this list
-	int sortNdx;		// number of elements in list above
 	// option_* are initialized from command line arguments or X resources or defaults
 	int option_max_reclevel;	// max reclevel. -1 is "everything"
 #define WM_MIN          0
