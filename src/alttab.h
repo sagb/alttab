@@ -24,7 +24,6 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 #define MAXNAMESZ   256
 #define MAXPATHSZ   8200
 #define MAXRPOUT    8200
-#define MAXWINDOWS  1024
 
 // as there are no files involved, we can die at any time
 // BUT? "it is a good idea to free all the pixmaps that your program created before exiting from the program, pixmaps are stored in the server, if they are not freed they could remain allocated after the program exits"
