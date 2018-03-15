@@ -73,7 +73,7 @@ Most command line options have corresponding X resource, see doc/alttab.ad for e
     resource: alttab.desktops  
     default: <0>
 
-    Show windows belonging to desktops (workspaces, groups). <NUMBER> must be 0 or 1:
+    Show windows belonging to desktops (workspaces, groups). <NUMBER> must be 0, 1 or 2:
 
       <0>: Current desktop.
 
