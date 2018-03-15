@@ -62,24 +62,28 @@ static int sort_by_order(const void *p1, const void *p2)
 //
 void add_to_sortlist(Window w, bool to_head, bool move)
 {
-    PermanentWindowInfo *s, *head, *del;
+    PermanentWindowInfo *s;
+    bool add = false;
 
-    head = g.sortlist;
-    del = NULL;
-    DL_SEARCH_SCALAR (head, s, id, w);
+    DL_SEARCH_SCALAR (g.sortlist, s, id, w);
     if (s == NULL) {
         s = malloc (sizeof (PermanentWindowInfo));
-        if (s == NULL) return; // safety
+        if (s == NULL) return;
         s->id = w;
-    } else if (move) {
-        del = s;
+        add = true;
+    } else {
+        if (move) {
+            DL_DELETE (g.sortlist, s);
+            add = true;
+        }
     }
-    if (to_head)
-        DL_PREPEND (head, s);
-    else
-        DL_APPEND (head, s);
-    if (del != NULL)
-        DL_DELETE (head, del);
+    if (add) {
+        if (to_head) {
+            DL_PREPEND (g.sortlist, s);
+        } else {
+            DL_APPEND (g.sortlist, s);
+        }
+    }
 }
 
 //
@@ -414,7 +418,7 @@ int initWinlist(bool direction)
 		break;
 	}
 	if (g.maxNdx > 1)
-        add_to_sortlist (g.winlist[g.startNdx].id, false, true);
+        add_to_sortlist (g.winlist[g.startNdx].id, true, true); // pull to head
 
 // sort winlist according to .order
     if (g.debug > 1) {
@@ -502,44 +506,11 @@ int setFocus(int winNdx)
 	default:
 		return 0;
 	}
-    add_to_sortlist (g.winlist[winNdx].id, false, true);
+    // pull to head
+    add_to_sortlist (g.winlist[winNdx].id, true, true);
 	return r;
 }
 
-/*
-//
-// pull out given window to the top of g.sortlist,
-// winNdx is an index of g.winlist
-//
-int pulloutWindowToTop(int winNdx)
-{
-	int s, w;
-	if (g.debug > 1) {
-		fprintf(stderr, "pull out g.winlist[%d] to top\n", winNdx);
-	}
-	int stop = g.winlist[winNdx].order;	// index of new top window in old sortlist
-	if (stop == 0)
-		return 1;	// shortcut, already on top
-
-// move down items in sortlist, O(n)
-	Window cachedwin = g.sortlist[stop];
-	for (s = stop - 1; s >= 0; s--) {
-		g.sortlist[s + 1] = g.sortlist[s];
-	}
-	g.sortlist[0] = cachedwin;
-
-// fix g.winlist[].order, O(n)
-	for (w = 0; w < g.maxNdx; w++) {
-		if (g.winlist[w].order < stop) {
-			g.winlist[w].order++;
-		} else if (g.winlist[w].order == stop) {
-			g.winlist[w].order = 0;
-		}
-	}
-
-	return 1;
-}
-*/
 //
 // event handler for PropertyChange
 // most of the time called when winlist[] is not initialized

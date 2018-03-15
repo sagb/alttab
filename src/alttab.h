@@ -107,9 +107,11 @@ typedef struct {
 	int maxNdx;		// number of items in list above
 	int selNdx;		// current (selected) item
 	int startNdx;		// current item at start of uiShow (current window before setFocus)
-	PermanentWindowInfo *sortlist;	// auxiliary list for sorting
-	// display-wide, for all groups/desktops
-	// unlike g.winlist, survives uiHide
+    /* auxiliary list for sorting
+     * head = recently focused
+     * display-wide, for all groups/desktops
+     * unlike g.winlist, survives uiHide */
+	PermanentWindowInfo *sortlist;
 	// option_* are initialized from command line arguments or X resources or defaults
 	int option_max_reclevel;	// max reclevel. -1 is "everything"
 #define WM_MIN          0
