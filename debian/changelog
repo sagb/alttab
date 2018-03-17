@@ -1,3 +1,14 @@
+alttab (1.2.0.20180317.29.g18cca83-1~1.gbp2d2120) unstable; urgency=medium
+
+  ** SNAPSHOT build @2d21206d4f3a1fde081f7f99eca0e28c02621c55 **
+
+  * man page multiple updates
+  * sortlist rewritten as double-linked utlist
+  * no more MAXWINDOWS limitation
+  * trim sortlist on windows destruction
+
+ -- Alexander Kulak <sa-dev@rainbow.by>  Sat, 17 Mar 2018 23:39:14 +0300
+
 alttab (1.2.0.20180314.23.gc5ebeeb-1~1.gbp3e3110) unstable; urgency=medium
 
   ** SNAPSHOT build @3e3110fec28a289c335876b125d8e8745e914451 **
