@@ -1,10 +1,13 @@
-alttab (1.2.0.20180314.23.gc5ebeeb-1~1.gbpe9dece) stretch; urgency=medium
+alttab (1.2.0.20180317.29.g18cca83-1~1.gbp2d2120) unstable; urgency=medium
 
-  ** SNAPSHOT build @e9decee087ae66ea6c125ffc2262aa05136b54a0 **
+  ** SNAPSHOT build @2d21206d4f3a1fde081f7f99eca0e28c02621c55 **
 
-  * backport to stretch
+  * man page multiple updates
+  * sortlist rewritten as double-linked utlist
+  * no more MAXWINDOWS limitation
+  * trim sortlist on windows destruction
 
- -- Alexander Kulak <sa-dev@rainbow.by>  Wed, 14 Mar 2018 13:34:22 +0300
+ -- Alexander Kulak <sa-dev@rainbow.by>  Sat, 17 Mar 2018 23:39:14 +0300
 
 alttab (1.2.0.20180314.23.gc5ebeeb-1~1.gbp3e3110) unstable; urgency=medium
 

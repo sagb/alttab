@@ -52,15 +52,6 @@ Window *ewmh_get_client_list(unsigned long *client_list_size)
             if (g.debug>1) {
                 fprintf(stderr, "ewmh found stacking window list\n");
             }
-            // reverse order
-            int i, nw;
-            Window w;
-            nw = (*client_list_size) / sizeof(Window);
-    	    for (i = 0; i < nw / 2; i++) {
-        		w = client_list[i];
-                client_list[i] = client_list[nw-i-1];
-                client_list[nw-i-1] = w;
-            }
             return client_list;
         } else {
             g.ewmh.try_stacking_list_first = false;
