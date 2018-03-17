@@ -24,7 +24,6 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 #define MAXNAMESZ   256
 #define MAXPATHSZ   8200
 #define MAXRPOUT    8200
-#define MAXWINDOWS  1024
 
 // as there are no files involved, we can die at any time
 // BUT? "it is a good idea to free all the pixmaps that your program created before exiting from the program, pixmaps are stored in the server, if they are not freed they could remain allocated after the program exits"
@@ -74,7 +73,6 @@ typedef struct {
 	unsigned int icon_w, icon_h;
 	bool icon_allocated;	// we must free icon, because we created it (placeholder or depth conversion)
 	Pixmap tile;		// ready to display. w/h are all equal and defined in gui.c
-	int order;		// in sort stack, kept in sync with g.sortlist
 // this constant can't be 0, 1, -1, MAXINT, 
 // because WMs set it to these values incoherently
 #define DESKTOP_UNKNOWN 0xdead
@@ -95,6 +93,12 @@ typedef struct {
     bool minus1_desktop_unusable;
 } EwmhFeatures;
 
+// uthash doubly-linked list element
+typedef struct PermanentWindowInfo {
+    Window id;
+    struct PermanentWindowInfo *next, *prev;
+} PermanentWindowInfo;
+
 typedef struct {
 	int debug;
 	bool uiShowHasRun;	// means: 1. window is ready to Expose, 2. need to call uiHide to free X stuff
@@ -102,11 +106,11 @@ typedef struct {
 	int maxNdx;		// number of items in list above
 	int selNdx;		// current (selected) item
 	int startNdx;		// current item at start of uiShow (current window before setFocus)
-	Window sortlist[MAXWINDOWS];	// auxiliary list for sorting
-	// display-wide, for all groups/desktops
-	// unlike g.winlist, survives uiHide
-	// for each uiShow, g.winlist[].order is initialized using this list
-	int sortNdx;		// number of elements in list above
+    /* auxiliary list for sorting
+     * head = recently focused
+     * display-wide, for all groups/desktops
+     * unlike g.winlist, survives uiHide */
+	PermanentWindowInfo *sortlist;
 	// option_* are initialized from command line arguments or X resources or defaults
 	int option_max_reclevel;	// max reclevel. -1 is "everything"
 #define WM_MIN          0
@@ -177,6 +181,7 @@ int rp_setFocus(int winNdx);
 int execAndReadStdout(char *exe, char *args[], char *buf, int bufsize);
 int pulloutWindowToTop(int winNdx);
 void winPropChangeEvent(XPropertyEvent e);
+void winDestroyEvent(XDestroyWindowEvent e);
 
 /* EWHM */
 bool ewmh_detectFeatures(EwmhFeatures *e);

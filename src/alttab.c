@@ -570,6 +570,10 @@ int main(int argc, char **argv)
             winPropChangeEvent(ev.xproperty);
             break;
 
+        case DestroyNotify:
+            winDestroyEvent(ev.xdestroywindow);
+            break;
+
 		default:
 			if (g.debug > 1) {
 				fprintf(stderr, "Event type %d\n", ev.type);

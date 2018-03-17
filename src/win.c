@@ -27,6 +27,7 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <utlist.h>
 #include "alttab.h"
 #include "util.h"
 extern Globals g;
@@ -38,26 +39,90 @@ extern Window root;
 
 //
 // helper for windows' qsort
+// CAUSES O(log(N)) OR EVEN WORSE! reintroduce winlist[]->order instead?
 //
 static int sort_by_order(const void *p1, const void *p2)
 {
-    return (((WindowInfo *) p1)->order > ((WindowInfo *) p2)->order);
+    PermanentWindowInfo *s;
+    WindowInfo *w1 = (WindowInfo*) p1;
+    WindowInfo *w2 = (WindowInfo*) p2;
+
+    DL_FOREACH(g.sortlist, s) {
+        if (s->id == w1->id )
+            return (s->id == w2->id) ? 0 : -1;
+        if (s->id == w2->id )
+            return 1;
+    }
+    return 0; // should not happen
 }
 
 //
-// returns index of Window in sortlist
-// or -1
+// add Window to the head/tail of sortlist, if it's not in sortlist already
+// if move==true and the item is already in sortlist, then move it to the head/tail
 //
-int ndx_of_window_in_sortlist(Window w)
+void add_to_sortlist(Window w, bool to_head, bool move)
 {
-	int i;
-    for (i=0; i < g.sortNdx; i++) {
-        if (g.sortlist[i] == w)
-            return i;
+    PermanentWindowInfo *s;
+    bool add = false;
+
+    DL_SEARCH_SCALAR (g.sortlist, s, id, w);
+    if (s == NULL) {
+        s = malloc (sizeof (PermanentWindowInfo));
+        if (s == NULL) return;
+        s->id = w;
+        add = true;
+    } else {
+        if (move) {
+            DL_DELETE (g.sortlist, s);
+            add = true;
+        }
     }
-    return -1;
+    if (add) {
+        if (to_head) {
+            DL_PREPEND (g.sortlist, s);
+        } else {
+            DL_APPEND (g.sortlist, s);
+        }
+        // for delete notification
+        XSelectInput(dpy, w, StructureNotifyMask);
+    }
 }
-	
+
+//
+// debug output of sortlist
+//
+void print_sortlist()
+{
+    PermanentWindowInfo *s;
+    fprintf (stderr, "sortlist:\n");
+    DL_FOREACH (g.sortlist, s) {
+        fprintf(stderr, "  0x%lx\n", s->id);
+    }
+}
+
+//
+// debug output of winlist
+//
+void print_winlist()
+{
+    int wi, si;
+    PermanentWindowInfo *s;
+
+    if (g.winlist == NULL && g.maxNdx == 0) return; // safety
+    fprintf (stderr, "winlist:\n");
+    for (wi = 0; wi < g.maxNdx; wi++) {
+        si = 0;
+        DL_FOREACH (g.sortlist, s) {
+            if (s == NULL) continue; // safety
+            if (s->id == g.winlist[wi].id )
+                break;
+            si++;
+        }
+        fprintf(stderr, "  %4d: 0x%lx  %s\n", si,
+                g.winlist[wi].id, g.winlist[wi].name);
+    }
+}
+
 // PUBLIC
 
 //
@@ -66,8 +131,8 @@ int ndx_of_window_in_sortlist(Window w)
 //
 int startupWintasks()
 {
-	g.sortNdx = 0;		// init g.sortlist
-	g.ic = NULL;
+	g.sortlist = NULL;  // utlist head must be initialized to NULL
+	g.ic = NULL;  // uthash too
 	if (g.option_iconSrc != ISRC_RAM) {
 		g.ic = initIcon();
 		initIconHash(&(g.ic));
@@ -309,21 +374,7 @@ int addWindowInfo(Window win, int reclevel, int wm_id, unsigned long desktop, ch
 	}
 // 3. sort
 
-// search in sortlist, O(n)
-	int si, ord;
-	ord = -1;
-	for (si = 0; si < g.sortNdx; si++) {
-		if (win == g.sortlist[si]) {
-			ord = si;
-			break;
-		}
-	}
-	if (ord == -1) {	// add window to the tail of sortlist
-		ord = g.sortNdx;
-		g.sortlist[ord] = win;
-		g.sortNdx++;
-	}
-	g.winlist[g.maxNdx].order = ord;
+    add_to_sortlist (win, false, false);
 
 // 4. other window data
 
@@ -347,12 +398,8 @@ int initWinlist(bool direction)
 {
 	int r;
 	if (g.debug > 1) {
-		fprintf(stderr, "sortlist before initWinlist: ");
-		int sii;
-		for (sii = 0; sii < g.sortNdx; sii++) {
-			fprintf(stderr, "0x%lx ", g.sortlist[sii]);
-		};
-		fprintf(stderr, "\n");
+		fprintf(stderr, "before initWinlist");
+        print_sortlist();
 	}
 	g.startNdx = 0;		// safe default
 	switch (g.option_wm) {
@@ -373,26 +420,18 @@ int initWinlist(bool direction)
 		break;
 	}
 	if (g.maxNdx > 1)
-		pulloutWindowToTop(g.startNdx);
+        add_to_sortlist (g.winlist[g.startNdx].id, true, true); // pull to head
 
 // sort winlist according to .order
     if (g.debug > 1) {
         fprintf(stderr, "startNdx=%d\n", g.startNdx);
-        int ww;
-        fprintf(stderr, "before qsort:\n");
-        for (ww = 0; ww < g.maxNdx; ww++) {
-            fprintf(stderr, "[%d] %s\n", g.winlist[ww].order,
-                    g.winlist[ww].name);
-        }
+        fprintf(stderr, "before qsort\n");
+        print_winlist();
     }
     qsort(g.winlist, g.maxNdx, sizeof(WindowInfo), sort_by_order);
     if (g.debug > 1) {
-        fprintf(stderr, "after  qsort:\n");
-        int ww;
-        for (ww = 0; ww < g.maxNdx; ww++) {
-            fprintf(stderr, "[%d] %s\n", g.winlist[ww].order,
-                    g.winlist[ww].name);
-        }
+        fprintf(stderr, "after qsort\n");
+        print_winlist();
     }
 
 	g.startNdx = 0;		// former pointer invalidated by qsort, brought to top
@@ -408,8 +447,8 @@ int initWinlist(bool direction)
 //if (g.selNdx<0 || g.selNdx>=g.maxNdx) { g.selNdx=0; } // just for case
 	if (g.debug > 1) {
 		fprintf(stderr,
-			"initWinlist ret: number of items in winlist: %d, current (selected) item in winlist: %d, current item at start of uiShow (current window before setFocus): %d, number of elements in sortlist: %d\n",
-			g.maxNdx, g.selNdx, g.startNdx, g.sortNdx);
+			"initWinlist ret: number of items in winlist: %d, current (selected) item in winlist: %d, current item at start of uiShow (current window before setFocus): %d\n",
+			g.maxNdx, g.selNdx, g.startNdx);
 	}
 
 	return r;
@@ -425,12 +464,8 @@ void freeWinlist()
 		fprintf(stderr, "destroying icons and winlist\n");
 	}
 	if (g.debug > 1) {
-		fprintf(stderr, "sortlist before freeWinlist: ");
-		int sii;
-		for (sii = 0; sii < g.sortNdx; sii++) {
-			fprintf(stderr, "%ld ", g.sortlist[sii]);
-		};
-		fprintf(stderr, "\n");
+		fprintf(stderr, "before freeWinlist\n");
+        print_sortlist();
 	}
 	int y;
 	for (y = 0; y < g.maxNdx; y++) {
@@ -473,42 +508,9 @@ int setFocus(int winNdx)
 	default:
 		return 0;
 	}
-	pulloutWindowToTop(winNdx);
+    // pull to head
+    add_to_sortlist (g.winlist[winNdx].id, true, true);
 	return r;
-}
-
-//
-// pull out given window to the top of g.sortlist,
-// fix g.winlist[].order
-// winNdx is an index of g.winlist
-//
-int pulloutWindowToTop(int winNdx)
-{
-	int s, w;
-	if (g.debug > 1) {
-		fprintf(stderr, "pull out g.winlist[%d] to top\n", winNdx);
-	}
-	int stop = g.winlist[winNdx].order;	// index of new top window in old sortlist
-	if (stop == 0)
-		return 1;	// shortcut, already on top
-
-// move down items in sortlist, O(n)
-	Window cachedwin = g.sortlist[stop];
-	for (s = stop - 1; s >= 0; s--) {
-		g.sortlist[s + 1] = g.sortlist[s];
-	}
-	g.sortlist[0] = cachedwin;
-
-// fix g.winlist[].order, O(n)
-	for (w = 0; w < g.maxNdx; w++) {
-		if (g.winlist[w].order < stop) {
-			g.winlist[w].order++;
-		} else if (g.winlist[w].order == stop) {
-			g.winlist[w].order = 0;
-		}
-	}
-
-	return 1;
 }
 
 //
@@ -522,16 +524,12 @@ void winPropChangeEvent(XPropertyEvent e)
 // man XPropertyEvent
 {
     Window aw;
-    int wn;
-    int s;
     // no _NET_ACTIVE_WINDOW atom, probably not EWMH?
     if (g.naw == None) return;
     // property change event not for root window?
     if (e.window != root) return;
     // root property other than _NET_ACTIVE_WINDOW changed?
     if (e.atom != g.naw) return;
-    // sortlist is not initialized yet? skip update for safety
-    if (g.sortNdx <= 0) return;
     // don't check for wm==EWMH, because _NET_ACTIVE_WINDOW changed for sure
     aw = ewmh_getActiveWindow();
     // can't get active window
@@ -539,19 +537,35 @@ void winPropChangeEvent(XPropertyEvent e)
     // focus changed to our own window?
     if (g.uiShowHasRun && aw == getUiwin()) return;
     // focus changed to window which is already top?
-    if (aw == g.sortlist[0]) return;
-    wn = ndx_of_window_in_sortlist(aw);
-    // can't get index of new active window?
-    // prior to adding it, set shift target index to the tail
-    if (wn == -1) wn = g.sortNdx;
+    if (g.sortlist != NULL && aw == g.sortlist->id) return;
+    // is window hidden in WM?
+    if (ewmh_skipWindowInTaskbar(aw)) return;
+    // finally, add/pop window to the head of sortlist
+    // unfortunately, on focus by alttab, this is fired twice:
+    // 1) when alttab window gone, previous window becomes active,
+    // 2) then alttab-focused window becomes active.
     if (g.debug>0)
         fprintf (stderr, 
-            "wm reports new active window 0x%lx, pull sortlist[%d] to the top\n",
-            aw, wn);
-    // move down items in sortlist, O(n)
-	for (s = wn - 1; s >= 0; s--)
-		g.sortlist[s + 1] = g.sortlist[s];
-    // add to the head
-	g.sortlist[0] = aw;
+            "wm reports new active window 0x%lx, pull to the head of sortlist\n",
+            aw);
+    add_to_sortlist (aw, true, true);
+}
+
+//
+// DestroyNotify handler
+// removes the window from sortlist
+//
+void winDestroyEvent(XDestroyWindowEvent e)
+// man XDestroyWindowEvent
+{
+    PermanentWindowInfo *s;
+
+    DL_SEARCH_SCALAR (g.sortlist, s, id, e.window);
+    if (s != NULL) {
+        if (g.debug>1) {
+            fprintf (stderr, "0x%lx found in sortlist, removing\n", e.window);
+        }
+        DL_DELETE (g.sortlist, s);
+    }
 }
 
