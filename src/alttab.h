@@ -181,6 +181,7 @@ int rp_setFocus(int winNdx);
 int execAndReadStdout(char *exe, char *args[], char *buf, int bufsize);
 int pulloutWindowToTop(int winNdx);
 void winPropChangeEvent(XPropertyEvent e);
+void winDestroyEvent(XDestroyWindowEvent e);
 
 /* EWHM */
 bool ewmh_detectFeatures(EwmhFeatures *e);

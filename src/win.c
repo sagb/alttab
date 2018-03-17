@@ -83,6 +83,8 @@ void add_to_sortlist(Window w, bool to_head, bool move)
         } else {
             DL_APPEND (g.sortlist, s);
         }
+        // for delete notification
+        XSelectInput(dpy, w, StructureNotifyMask);
     }
 }
 
@@ -536,11 +538,34 @@ void winPropChangeEvent(XPropertyEvent e)
     if (g.uiShowHasRun && aw == getUiwin()) return;
     // focus changed to window which is already top?
     if (g.sortlist != NULL && aw == g.sortlist->id) return;
+    // is window hidden in WM?
+    if (ewmh_skipWindowInTaskbar(aw)) return;
     // finally, add/pop window to the head of sortlist
+    // unfortunately, on focus by alttab, this is fired twice:
+    // 1) when alttab window gone, previous window becomes active,
+    // 2) then alttab-focused window becomes active.
     if (g.debug>0)
         fprintf (stderr, 
             "wm reports new active window 0x%lx, pull to the head of sortlist\n",
             aw);
     add_to_sortlist (aw, true, true);
+}
+
+//
+// DestroyNotify handler
+// removes the window from sortlist
+//
+void winDestroyEvent(XDestroyWindowEvent e)
+// man XDestroyWindowEvent
+{
+    PermanentWindowInfo *s;
+
+    DL_SEARCH_SCALAR (g.sortlist, s, id, e.window);
+    if (s != NULL) {
+        if (g.debug>1) {
+            fprintf (stderr, "0x%lx found in sortlist, removing\n", e.window);
+        }
+        DL_DELETE (g.sortlist, s);
+    }
 }
 
