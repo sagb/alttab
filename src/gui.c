@@ -26,6 +26,7 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <math.h>
 #include "alttab.h"
 #include "util.h"
 extern Globals g;
@@ -301,10 +302,11 @@ int uiShow(bool direction)
 // tiles may be smaller if they don't fit screen
 	uiwinW = (tileW + FRAME_W) * g.maxNdx + FRAME_W;
 	if (uiwinW > scrW) {
-		rt = (float)scrW / (float)uiwinW;
-		uiwinW = scrW;
-		tileW = tileW * rt;
-		tileH = tileH * rt;
+        int frames = FRAME_W * g.maxNdx + FRAME_W;
+		rt = ((float)(scrW - frames)) / ((float)(tileW * g.maxNdx));
+		tileW = (float)tileW * rt;
+		tileH = (float)tileH * rt;
+		uiwinW = tileW * g.maxNdx + frames;
 	}
 // icon may be smaller if it doesn't fit tile
 	if (iconW > tileW) {
