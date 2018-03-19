@@ -26,7 +26,6 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <math.h>
 #include "alttab.h"
 #include "util.h"
 extern Globals g;
@@ -553,6 +552,13 @@ void uiExpose()
 	}
 // frame
 	framesRedraw();
+// debug for #54
+    if (g.debug > 1) {
+        XWindowAttributes uwa;
+        XGetWindowAttributes (dpy, uiwin, &uwa);
+        fprintf (stderr, "attr x %d y %d width %d height %d border_width %d\n",
+                uwa.x, uwa.y, uwa.width, uwa.height, uwa.border_width);
+    }
 }
 
 //
