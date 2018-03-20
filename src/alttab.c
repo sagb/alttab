@@ -355,14 +355,12 @@ int use_args_and_xrm(int *argc, char **argv)
 			g.option_iconH);
 	}
 
-    g.option_viewport_specified = false;
     g.option_vpW = g.option_vpH =
     g.option_vpX = g.option_vpY = 0;
 	char *defaultViewGeo = "00000x00000+00000+00000";
 	XRESOURCE_LOAD_STRING(".viewport", gview,
 			      defaultViewGeo);
     if (gview) {
-        g.option_viewport_specified = true;
     	xpg = XParseGeometry(gview, &x, &y, &w, &h);
         if (xpg & WidthValue)
         	g.option_vpW = w;
@@ -382,8 +380,7 @@ int use_args_and_xrm(int *argc, char **argv)
             fprintf (stderr, inv, "viewport Y offset");
     }
 	if (g.debug > 0) {
-		fprintf(stderr, "viewport: %d, %dx%d+%d+%d\n",
-			g.option_viewport_specified,
+		fprintf(stderr, "viewport: %dx%d+%d+%d\n",
             g.option_vpW, g.option_vpH,
             g.option_vpX, g.option_vpY);
 	}

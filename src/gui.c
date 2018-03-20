@@ -143,6 +143,14 @@ int pointedTile(int x, int y)
     return (x - (FRAME_W / 2)) / visualTileW;
 }
 
+//
+// is viewport geometry is equal to default screen geometry
+// 
+bool viewport_is_default_screen()
+{
+    return (vpX == 0 && vpY == 0 && vpW == scrW && vpH == scrH);
+}
+
 // PUBLIC
 
 //
@@ -164,7 +172,7 @@ int startupGUItasks()
 
 	scrW = DisplayWidth(dpy, scr);
 	scrH = DisplayHeight(dpy, scr);
-    if (g.option_viewport_specified) {
+    if (! viewport_is_default_screen()) {
         vpW = g.option_vpW;
         vpH = g.option_vpH;
         vpX = g.option_vpX;
@@ -519,7 +527,7 @@ int uiShow(bool direction)
         // but allowed only when viewport==screen
         if (
                 (g.option_positioning == POS_CENTER && 
-                 (vpX == 0 && vpY == 0 && vpW == scrW && vpH == scrH))
+                 viewport_is_default_screen())
             ||
                 (g.option_positioning == POS_SPECIFIC)
           ) {
