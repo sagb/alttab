@@ -148,10 +148,15 @@ int pointedTile(int x, int y)
 // 
 bool viewport_is_default_screen()
 {
-    return (
-            (vpX == 0 && vpY == 0 && vpW == scrW && vpH == scrH)
-            || (vpX ==0 && vpY == 0 && vpW == 0 && vpH == 0)
-           );
+    return (vpX == 0 && vpY == 0 && vpW == scrW && vpH == scrH);
+}
+
+//
+// is viewport undefined
+// 
+bool viewport_undefined()
+{
+    return (g.option_vpX ==0 && g.option_vpY == 0 && g.option_vpW == 0 && g.option_vpH == 0);
 }
 
 // PUBLIC
@@ -175,7 +180,7 @@ int startupGUItasks()
 
 	scrW = DisplayWidth(dpy, scr);
 	scrH = DisplayHeight(dpy, scr);
-    if (! viewport_is_default_screen()) {
+    if (! viewport_undefined()) {
         vpW = g.option_vpW;
         vpH = g.option_vpH;
         vpX = g.option_vpX;
