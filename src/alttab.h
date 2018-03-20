@@ -130,6 +130,9 @@ typedef struct {
 	char *option_font;
 	int option_tileW, option_tileH;
 	int option_iconW, option_iconH;
+    bool option_viewport_specified;
+    int option_vpW, option_vpH;
+    int option_vpX, option_vpY;
 #define POS_CENTER      0
 #define POS_NONE        1
 #define POS_SPECIFIC    2

@@ -40,6 +40,7 @@ unsigned int visualTileW;
 int lastPressedTile;
 int scrNum;
 int scrW, scrH;
+int vpW, vpH, vpX, vpY;
 Window uiwin;
 int uiwinW, uiwinH, uiwinX, uiwinY;
 Colormap colormap;
@@ -163,6 +164,17 @@ int startupGUItasks()
 
 	scrW = DisplayWidth(dpy, scr);
 	scrH = DisplayHeight(dpy, scr);
+    if (g.option_viewport_specified) {
+        vpW = g.option_vpW;
+        vpH = g.option_vpH;
+        vpX = g.option_vpX;
+        vpY = g.option_vpY;
+    } else {
+        vpW = scrW;
+        vpH = scrH;
+        vpX = 0;
+        vpY = 0;
+    }
 
 // colors
 	colormap = DefaultColormap(dpy, scr);
@@ -294,15 +306,16 @@ int uiShow(bool direction)
 	}
 // have winlist, now back to uiwin stuff
 // calculate dimensions
-	tileW = g.option_tileW, tileH = g.option_tileH;
+	tileW = g.option_tileW;
+    tileH = g.option_tileH;
 	iconW = g.option_iconW;
 	iconH = g.option_iconH;
 	float rt = 1.0;
-// tiles may be smaller if they don't fit screen
+// tiles may be smaller if they don't fit viewport
 	uiwinW = (tileW + FRAME_W) * g.maxNdx + FRAME_W;
-	if (uiwinW > scrW) {
+	if (uiwinW > vpW) {
         int frames = FRAME_W * g.maxNdx + FRAME_W;
-		rt = ((float)(scrW - frames)) / ((float)(tileW * g.maxNdx));
+		rt = ((float)(vpW - frames)) / ((float)(tileW * g.maxNdx));
 		tileW = (float)tileW * rt;
 		tileH = (float)tileH * rt;
 		uiwinW = tileW * g.maxNdx + frames;
@@ -320,11 +333,11 @@ int uiShow(bool direction)
 	}
 	uiwinH = tileH + 2 * FRAME_W;
     if (g.option_positioning == POS_CENTER) {
-    	uiwinX = (scrW - uiwinW) / 2;
-    	uiwinY = (scrH - uiwinH) / 2;
+    	uiwinX = (vpW - uiwinW) / 2 + vpX;
+    	uiwinY = (vpH - uiwinH) / 2 + vpY;
     } else {
-        uiwinX = g.option_posX;
-        uiwinY = g.option_posY;
+        uiwinX = g.option_posX + vpX;
+        uiwinY = g.option_posY + vpY;
     }
     visualTileW = (uiwinW - FRAME_W) / g.maxNdx;
 	if (g.debug > 0) {
@@ -334,11 +347,12 @@ int uiShow(bool direction)
             int nscr, si;
             Screen *s;
             nscr = ScreenCount(dpy);
-            fprintf(stderr, ", %d screen(s): ", nscr);
+            fprintf(stderr, ", %d screen(s):", nscr);
             for (si = 0; si < nscr; ++si) {
                 s = ScreenOfDisplay(dpy, si);
-                fprintf(stderr, "[%dx%d] ", s->width, s->height);
+                fprintf(stderr, " [%dx%d]", s->width, s->height);
             }
+            fprintf(stderr, ", viewport %dx%d+%d+%d", vpW, vpH, vpX, vpY);
         }
         fprintf(stderr, "\n");
 	}
@@ -500,8 +514,15 @@ int uiShow(bool direction)
     XMapWindow(dpy, uiwin);
 
     if (g.option_wm == WM_EWMH) {
-        // required in JWM: centering
-        if (g.option_positioning != POS_NONE) {
+        // positioning hints.
+        // centering required in JWM,
+        // but allowed only when viewport==screen
+        if (
+                (g.option_positioning == POS_CENTER && 
+                 (vpX == 0 && vpY == 0 && vpW == scrW && vpH == scrH))
+            ||
+                (g.option_positioning == POS_SPECIFIC)
+          ) {
             long sflags;
             sflags = USPosition|USSize|PPosition|PSize|PMinSize|PMaxSize|PBaseSize;
             if (g.option_positioning == POS_CENTER)

@@ -7,7 +7,7 @@
 \fBalttab\fR \- the task switcher
 .
 .SH "SYNOPSIS"
-\fBalttab\fR [\fB\-w\fR \fIN\fR] [\fB\-d\fR \fIN\fR] [\fB\-mm\fR \fIN\fR] [\fB\-bm\fR \fIN\fR] [\fB\-mk\fR \fIN\fR] [\fB\-kk\fR \fIN\fR] [\fB\-t\fR \fINxM\fR] [\fB\-i\fR \fINxM\fR] [\fB\-p\fR \fIstr\fR] [\fB\-s\fR \fIN\fR] [\fB\-theme\fR \fIname\fR] [\fB\-bg\fR \fIcolor\fR] [\fB\-fg\fR \fIcolor\fR] [\fB\-frame\fR \fIcolor\fR] [\fB\-font\fR \fIname\fR] [\fB\-v\fR|\fB\-vv\fR]
+\fBalttab\fR [\fB\-w\fR \fIN\fR] [\fB\-d\fR \fIN\fR] [\fB\-mm\fR \fIN\fR] [\fB\-bm\fR \fIN\fR] [\fB\-mk\fR \fIN\fR] [\fB\-kk\fR \fIN\fR] [\fB\-t\fR \fINxM\fR] [\fB\-i\fR \fINxM\fR] [\fB\-vp\fR \fIWxH+X+Y\fR] [\fB\-p\fR \fIstr\fR] [\fB\-s\fR \fIN\fR] [\fB\-theme\fR \fIname\fR] [\fB\-bg\fR \fIcolor\fR] [\fB\-fg\fR \fIcolor\fR] [\fB\-frame\fR \fIcolor\fR] [\fB\-font\fR \fIname\fR] [\fB\-v\fR|\fB\-vv\fR]
 .
 .SH "DESCRIPTION"
 The task switcher designed for minimalistic window managers or standalone X11 session\.
@@ -131,7 +131,7 @@ resource: alttab\.tile\.geometry
 default: \fI112x128\fR
 .
 .IP
-Size of a single tile (mini\-window)\. If switcher doesn\'t fit the screen, tile may be thinner\.
+Size of a single tile (mini\-window)\. If switcher doesn\'t fit the viewport (\fB\-vp\fR), tile may be thinner\.
 .
 .TP
 \fB\-i\fR \fINNxMM\fR
@@ -144,6 +144,16 @@ default: \fI32x32\fR
 Size of icons\.
 .
 .TP
+\fB\-vp\fR \fIWxH+X+Y\fR
+resource: alttab\.viewport
+.
+.br
+default: geometry of default screen
+.
+.IP
+Limit viewport for the switcher relative to default (possibly combined) screen\. The switcher always has variable size, but never more than \fB\-vp\fR rectangle, while \fB\-p\fR specifies positioning behaviour within this rectangle\. Together these options allow for simple multi\-monitor support\. Suppose Xorg operates in default configuration for two 2560х1440 monitors, resulting in combined screen of 5120x1440 size\. Then the switcher may be positioned at the center of the right monitor with \fB\-vp 2560x1440+2560+0 \-p center\fR\.
+.
+.TP
 \fB\-p\fR \fIstr\fR
 resource: alttab\.position
 .
@@ -151,7 +161,7 @@ resource: alttab\.position
 default: center
 .
 .IP
-Position of switcher: "center", "none" or specific position relative to upper left screen corner, in the form \fI+X+Y\fR\.
+Position of switcher: "center", "none" or specific position relative to upper left corner of viewport, in the form \fI+X+Y\fR\.
 .
 .TP
 \fB\-s\fR \fINUMBER\fR

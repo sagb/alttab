@@ -16,7 +16,7 @@ alttab(1) -- the task switcher
 
 ## SYNOPSIS
 
-`alttab` [`-w` <N>] [`-d` <N>] [`-mm` <N>] [`-bm` <N>] [`-mk` <N>] [`-kk` <N>] [`-t` <NxM>] [`-i` <NxM>] [`-p` <str>] [`-s` <N>] [`-theme` <name>] [`-bg` <color>] [`-fg` <color>] [`-frame` <color>] [`-font` <name>] [`-v`|`-vv`]
+`alttab` [`-w` <N>] [`-d` <N>] [`-mm` <N>] [`-bm` <N>] [`-mk` <N>] [`-kk` <N>] [`-t` <NxM>] [`-i` <NxM>] [`-vp` <WxH+X+Y>] [`-p` <str>] [`-s` <N>] [`-theme` <name>] [`-bg` <color>] [`-fg` <color>] [`-frame` <color>] [`-font` <name>] [`-v`|`-vv`]
 
 ## DESCRIPTION
 
@@ -116,7 +116,7 @@ Most command line options have corresponding X resource, see doc/alttab.ad for e
     resource: alttab.tile.geometry  
     default: <112x128>
 
-    Size of a single tile (mini-window). If switcher doesn't fit the screen, tile may be thinner.
+    Size of a single tile (mini-window). If switcher doesn't fit the viewport (`-vp`), tile may be thinner.
 
   * `-i` <NNxMM>:
     resource: alttab.icon.geometry  
@@ -124,11 +124,23 @@ Most command line options have corresponding X resource, see doc/alttab.ad for e
 
     Size of icons.
 
+  * `-vp` <WxH+X+Y>:
+    resource: alttab.viewport  
+    default: geometry of default screen
+
+    Limit viewport for the switcher relative to default (possibly combined) screen.
+    The switcher always has variable size, but never more than `-vp` rectangle,
+    while `-p` specifies positioning behaviour within this rectangle.
+    Together these options allow for simple multi-monitor support. Suppose Xorg operates
+    in default configuration for two 2560х1440 monitors, resulting in combined screen
+    of 5120x1440 size. Then the switcher may be positioned at the center of the right
+    monitor with `-vp 2560x1440+2560+0 -p center`.
+
   * `-p` <str>:
     resource: alttab.position  
     default: center
 
-    Position of switcher: "center", "none" or specific position relative to upper left screen corner, in the form <+X+Y>.
+    Position of switcher: "center", "none" or specific position relative to upper left corner of viewport, in the form <+X+Y>.
 
   * `-s` <NUMBER>:
     resource: alttab.icon.source  

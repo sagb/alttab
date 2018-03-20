@@ -54,6 +54,7 @@ Options:\n\
    -mk N      keysym of main key\n\
     -t NxM    tile geometry\n\
     -i NxM    icon geometry\n\
+   -vp geo    switcher viewport, WxH+X+Y\n\
     -p str    switcher position: center, none, +X+Y\n\
     -s N      icon source: 0=X11 only, 1=fallback to files, 2=best size, 3=files only\n\
 -theme name   icon theme\n\
@@ -119,6 +120,7 @@ int use_args_and_xrm(int *argc, char **argv)
 		{"-kk", "*key.keysym", XrmoptionSepArg, NULL} ,
 		{"-t", "*tile.geometry", XrmoptionSepArg, NULL} ,
 		{"-i", "*icon.geometry", XrmoptionSepArg, NULL} ,
+		{"-vp", "*viewport", XrmoptionSepArg, NULL} ,
 		{"-p", "*position", XrmoptionSepArg, NULL} ,
 		{"-s", "*icon.source", XrmoptionSepArg, NULL} ,
 		{"-theme", "*theme", XrmoptionSepArg, NULL} ,
@@ -308,7 +310,7 @@ int use_args_and_xrm(int *argc, char **argv)
 			g.option_keyCode);
 	}
 
-	char *gtile, *gicon, *gpos;
+	char *gtile, *gicon, *gview, *gpos;
 	int x, y;
 	unsigned int w, h;
 	int xpg;
@@ -351,6 +353,39 @@ int use_args_and_xrm(int *argc, char **argv)
 		fprintf(stderr, "%dx%d tile, %dx%d icon\n",
 			g.option_tileW, g.option_tileH, g.option_iconW,
 			g.option_iconH);
+	}
+
+    g.option_viewport_specified = false;
+    g.option_vpW = g.option_vpH =
+    g.option_vpX = g.option_vpY = 0;
+	char *defaultViewGeo = "00000x00000+00000+00000";
+	XRESOURCE_LOAD_STRING(".viewport", gview,
+			      defaultViewGeo);
+    if (gview) {
+        g.option_viewport_specified = true;
+    	xpg = XParseGeometry(gview, &x, &y, &w, &h);
+        if (xpg & WidthValue)
+        	g.option_vpW = w;
+        else
+            fprintf (stderr, inv, "viewport width");
+        if (xpg & HeightValue)
+        	g.option_vpH = h;
+        else
+            fprintf (stderr, inv, "viewport height");
+        if (xpg & XValue)
+        	g.option_vpX = x;
+        else
+            fprintf (stderr, inv, "viewport X offset");
+        if (xpg & YValue)
+        	g.option_vpY = y;
+        else
+            fprintf (stderr, inv, "viewport Y offset");
+    }
+	if (g.debug > 0) {
+		fprintf(stderr, "viewport: %d, %dx%d+%d+%d\n",
+			g.option_viewport_specified,
+            g.option_vpW, g.option_vpH,
+            g.option_vpX, g.option_vpY);
 	}
 
     g.option_positioning = 1;

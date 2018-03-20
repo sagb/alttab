@@ -23,6 +23,10 @@
 ! grave (back apostrophe) instead of Tab
 !alttab.key.keysym:      0x60
 
+! Limit the switcher to this rectangle 
+! instead of default screen size
+!alttab.viewport:        1280x1024+1280+0
+
 ! Try to not interfere with WM's window positioning
 !alttab.position:        none
 ! Or specify the switcher position explicitly
