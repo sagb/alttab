@@ -148,7 +148,10 @@ int pointedTile(int x, int y)
 // 
 bool viewport_is_default_screen()
 {
-    return (vpX == 0 && vpY == 0 && vpW == scrW && vpH == scrH);
+    return (
+            (vpX == 0 && vpY == 0 && vpW == scrW && vpH == scrH)
+            || (vpX ==0 && vpY == 0 && vpW == 0 && vpH == 0)
+           );
 }
 
 // PUBLIC
