@@ -26,6 +26,7 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+//#include <sys/time.h>
 #include "alttab.h"
 #include "util.h"
 extern Globals g;
@@ -38,9 +39,8 @@ extern Window root;
 unsigned int tileW, tileH, iconW, iconH;
 unsigned int visualTileW;
 int lastPressedTile;
-int scrNum;
-int scrW, scrH;
-int vpW, vpH, vpX, vpY;
+quad scrdim;
+quad vp;
 Window uiwin;
 int uiwinW, uiwinH, uiwinX, uiwinY;
 Colormap colormap;
@@ -143,27 +143,12 @@ int pointedTile(int x, int y)
     return (x - (FRAME_W / 2)) / visualTileW;
 }
 
-//
-// is viewport geometry is equal to default screen geometry
-// 
-bool viewport_is_default_screen()
-{
-    return (vpX == 0 && vpY == 0 && vpW == scrW && vpH == scrH);
-}
-
-//
-// is viewport undefined
-// 
-bool viewport_undefined()
-{
-    return (g.option_vpX ==0 && g.option_vpY == 0 && g.option_vpW == 0 && g.option_vpH == 0);
-}
-
 // PUBLIC
 
 //
 // early initialization
 // called once per execution
+// mostly initializes g.*
 // TODO: counterpair for freeing X resources, 
 //   even if called once per execution:
 /*
@@ -177,21 +162,11 @@ if (g.gcFrame) XFreeGC (dpy, g.gcFrame);
 */
 int startupGUItasks()
 {
-
-	scrW = DisplayWidth(dpy, scr);
-	scrH = DisplayHeight(dpy, scr);
-    if (! viewport_undefined()) {
-        vpW = g.option_vpW;
-        vpH = g.option_vpH;
-        vpX = g.option_vpX;
-        vpY = g.option_vpY;
-    } else {
-        vpW = scrW;
-        vpH = scrH;
-        vpX = 0;
-        vpY = 0;
+// if viewport is not fixed, then initialize vp* at every show
+    if (g.option_vp_mode == VP_SPECIFIC) {
+        vp = g.option_vp;
     }
-
+    g.has_randr = randrAvailable();
 // colors
 	colormap = DefaultColormap(dpy, scr);
 	visual = DefaultVisual(dpy, scr);
@@ -248,7 +223,7 @@ int startupGUItasks()
 		fprintf(stderr, "early opening font\n");
 	}
 //fontLabel = XLoadFont (dpy, LABELFONT);  // using Xft instead
-	fontLabel = XftFontOpenName(dpy, scrNum, g.option_font);
+	fontLabel = XftFontOpenName(dpy, scr, g.option_font);
 	if (!fontLabel) {
 		fprintf(stderr, "can't allocate font: %s\ncheck installed fontconfig fonts: fc-list\n", g.option_font);
 	}
@@ -277,16 +252,60 @@ int uiShow(bool direction)
     if (g.debug > 0) {
 		fprintf(stderr, "preparing ui\n");
 	}
-    XClassHint class_h = { XCLASSNAME, XCLASS };
-// init X junk early, because depth conversion in addWindow requires GC
-
 	g.uiShowHasRun = true;	// begin allocations
+// screen-related stuff is not at startup but here,
+// because screen configuration may get changed at runtime
+    scrdim.x = scrdim.y = 0;
+	scrdim.w = DisplayWidth(dpy, scr);
+	scrdim.h = DisplayHeight(dpy, scr);
+// caculate viewport.
+#define VPM  g.option_vp_mode
+    switch (VPM) {
+        case VP_SPECIFIC:
+            // initialized at startup instead
+            break;
+        case VP_TOTAL:
+            vp = scrdim;
+            break;
+        case VP_FOCUS:
+        case VP_POINTER:
+            if (g.has_randr) {
+                bool multihead;
+                if (! randrGetViewport (&vp, &multihead)) {
+                    if (g.debug > 0) {
+                        fprintf (stderr, 
+                          "can't obtain viewport from randr, using default screen\n");
+                    }
+                    vp = scrdim;
+                }
+                if (! multihead) {
+                    if (g.debug > 0) {
+                        fprintf (stderr, 
+                          "randr reports single head, using default screen instead\n");
+                    }
+                    vp = scrdim;
+                }
+            } else {
+                if (g.debug > 0) {
+                    fprintf (stderr, 
+                      "no randr, using default screen as viewport\n");
+                }
+                vp = scrdim;
+            }
+            break;
+        default:
+            fprintf (stderr, 
+              "unknown viewport mode, using default screen\n");
+            vp = scrdim;
+    }
+
+    XClassHint class_h = { XCLASSNAME, XCLASS };
 
 // GC initialized earlier, now able to init winlist
 
 	g.winlist = NULL;
 	g.maxNdx = 0;
-	if (!initWinlist(direction)) {
+	if (!initWinlist(direction, vp)) {
 		if (g.debug > 0) {
 			fprintf(stderr,
 				"initWinlist failed, skipping ui initialization\n");
@@ -327,11 +346,16 @@ int uiShow(bool direction)
 	iconW = g.option_iconW;
 	iconH = g.option_iconH;
 	float rt = 1.0;
+// for subsequent calculation of width(s), use 'avail_w'
+// instead of vp.w, because they don't match for POS_SPECIFIC
+    int avail_w = vp.w;
+    if (g.option_positioning == POS_SPECIFIC)
+        avail_w -= g.option_posX;
 // tiles may be smaller if they don't fit viewport
 	uiwinW = (tileW + FRAME_W) * g.maxNdx + FRAME_W;
-	if (uiwinW > vpW) {
+	if (uiwinW > avail_w) {
         int frames = FRAME_W * g.maxNdx + FRAME_W;
-		rt = ((float)(vpW - frames)) / ((float)(tileW * g.maxNdx));
+		rt = ((float)(avail_w - frames)) / ((float)(tileW * g.maxNdx));
 		tileW = (float)tileW * rt;
 		tileH = (float)tileH * rt;
 		uiwinW = tileW * g.maxNdx + frames;
@@ -349,11 +373,11 @@ int uiShow(bool direction)
 	}
 	uiwinH = tileH + 2 * FRAME_W;
     if (g.option_positioning == POS_CENTER) {
-    	uiwinX = (vpW - uiwinW) / 2 + vpX;
-    	uiwinY = (vpH - uiwinH) / 2 + vpY;
+    	uiwinX = (vp.w - uiwinW) / 2 + vp.x;
+    	uiwinY = (vp.h - uiwinH) / 2 + vp.y;
     } else {
-        uiwinX = g.option_posX + vpX;
-        uiwinY = g.option_posY + vpY;
+        uiwinX = g.option_posX + vp.x;
+        uiwinY = g.option_posY + vp.y;
     }
     visualTileW = (uiwinW - FRAME_W) / g.maxNdx;
 	if (g.debug > 0) {
@@ -368,7 +392,8 @@ int uiShow(bool direction)
                 s = ScreenOfDisplay(dpy, si);
                 fprintf(stderr, " [%dx%d]", s->width, s->height);
             }
-            fprintf(stderr, ", viewport %dx%d+%d+%d", vpW, vpH, vpX, vpY);
+            fprintf(stderr, ", viewport %dx%d+%d+%d, avail_w %d", 
+                    vp.w, vp.h, vp.x, vp.y, avail_w);
         }
         fprintf(stderr, "\n");
 	}
@@ -487,7 +512,7 @@ int uiShow(bool direction)
 	if (uiwin <= 0)
 		die("can't create window");
 	if (g.debug > 0) {
-        fprintf(stderr, "our window is %lx\n", uiwin);
+        fprintf(stderr, "our window is 0x%lx\n", uiwin);
 	}
 
 // set properties of our window
@@ -529,34 +554,34 @@ int uiShow(bool direction)
 
     XMapWindow(dpy, uiwin);
 
+    // positioning and size hints.
+    // centering required in JWM.
+    // should really perform centering when 
+    //  viewport == wm screen. how would we know the latter?
+    long sflags;
+    sflags = USPosition|USSize|PPosition|PSize|PMinSize|PMaxSize|PBaseSize;
+    // gravity: https://tronche.com/gui/x/xlib/window/attributes/gravity.html
+    if (g.option_positioning != POS_NONE)
+        sflags |= PWinGravity;
+    XSizeHints uiwinSizeHints = { sflags,
+        uiwinX, uiwinY, // obsoleted
+        uiwinW, uiwinH, // obsoleted
+        uiwinW, uiwinH,
+        uiwinW, uiwinH,
+        0, 0,
+        {0,0}, {0,0},
+        uiwinW, uiwinH,
+        (g.option_positioning == POS_CENTER 
+         //&& g.option_vp_mode != VP_SPECIFIC) ? CenterGravity : ForgetGravity };
+         && g.option_vp_mode != VP_SPECIFIC) ? CenterGravity : StaticGravity };
+    XSetWMNormalHints(dpy, uiwin, &uiwinSizeHints);
+
     if (g.option_wm == WM_EWMH) {
-        // positioning hints.
-        // centering required in JWM,
-        // but allowed only when viewport==screen
-        if (
-                (g.option_positioning == POS_CENTER && 
-                 viewport_is_default_screen())
-            ||
-                (g.option_positioning == POS_SPECIFIC)
-          ) {
-            long sflags;
-            sflags = USPosition|USSize|PPosition|PSize|PMinSize|PMaxSize|PBaseSize;
-            if (g.option_positioning == POS_CENTER)
-                sflags |= PWinGravity;
-            XSizeHints uiwinSizeHints = { sflags,
-                uiwinX, uiwinY,
-                uiwinW, uiwinH,
-                uiwinW, uiwinH,
-                uiwinW, uiwinH,
-                0, 0,
-                {0,0}, {0,0},
-                uiwinW, uiwinH,
-                (g.option_positioning == POS_CENTER) ? 5:0 };
-            XSetWMNormalHints(dpy, uiwin, &uiwinSizeHints);
-        }
         // required in Metacity
         ewmh_setFocus(0, uiwin);
     }
+    // absolute coordinates (get_absolute_coordinates) are still correct here
+    // (as requested). they change only on Expose
 	return 1;
 }
 
@@ -569,6 +594,27 @@ void uiExpose()
 	if (g.debug > 0) {
 		fprintf(stderr, "expose ui\n");
 	}
+// if WM moved uiwin, here is the place
+// where we first see 'bad' absolute coordinates.
+// try to correct them.
+    quad uwq;
+    if (get_absolute_coordinates(uiwin, &uwq)) {
+// debug for #54
+        if (g.debug > 1) {
+            fprintf (stderr, "attr abs at expose: %dx%d +%d+%d\n",
+                uwq.w, uwq.h, uwq.x, uwq.y);
+        }
+        int xdiff = uwq.x - uiwinX;
+        int ydiff = uwq.y - uiwinY;
+        if (abs(xdiff) > FRAME_W / 2 || 
+              abs(ydiff) > FRAME_W / 2) {
+            if (g.debug > 1) {
+                fprintf (stderr, 
+                  "WM mess badly with uiwin position, trying to correct\n");
+            }
+            XMoveWindow(dpy, uiwin, uiwinX, uiwinY);
+        }
+    }
 // icons
 	int j;
 	for (j = 0; j < g.maxNdx; j++) {
@@ -589,13 +635,6 @@ void uiExpose()
 	}
 // frame
 	framesRedraw();
-// debug for #54
-    if (g.debug > 1) {
-        XWindowAttributes uwa;
-        XGetWindowAttributes (dpy, uiwin, &uwa);
-        fprintf (stderr, "attr x %d y %d width %d height %d border_width %d\n",
-                uwa.x, uwa.y, uwa.width, uwa.height, uwa.border_width);
-    }
 }
 
 //
@@ -615,9 +654,16 @@ int uiHide()
 	}
 	if (g.winlist) {
 		if (g.debug > 0) {
-            fprintf(stderr, "changing focus to %lx\n",
+            fprintf(stderr, "changing focus to 0x%lx\n",
 				g.winlist[g.selNdx].id);
 		}
+        /*
+        // save the switch moment for detecting
+        // subsequent false focus event from WM
+        gettimeofday(&(g.last.tv), NULL);
+        g.last.prev = g.winlist[g.startNdx].id;
+        g.last.to = g.winlist[g.selNdx].id;
+        */
 		setFocus(g.selNdx);	// before winlist destruction!
 	}
 	if (g.debug > 0) {

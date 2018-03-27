@@ -48,13 +48,14 @@ void helpexit()
 Options:\n\
     -w N      window manager: 0=no, 1=ewmh-compatible, 2=ratpoison, 3=old fashion\n\
     -d N      desktop: 0=current 1=all, 2=all but special\n\
+   -sc N      screen: 0=current 1=all\n\
    -mm N      main modifier mask\n\
    -bm N      backward scroll modifier mask\n\
    -kk N      keysym of main modifier\n\
    -mk N      keysym of main key\n\
     -t NxM    tile geometry\n\
     -i NxM    icon geometry\n\
-   -vp geo    switcher viewport, WxH+X+Y\n\
+   -vp geo    switcher viewport: focus, pointer, total, WxH+X+Y\n\
     -p str    switcher position: center, none, +X+Y\n\
     -s N      icon source: 0=X11 only, 1=fallback to files, 2=best size, 3=files only\n\
 -theme name   icon theme\n\
@@ -114,6 +115,7 @@ int use_args_and_xrm(int *argc, char **argv)
 	XrmOptionDescRec xrmTable[] = {
 		{"-w", "*windowmanager", XrmoptionSepArg, NULL} ,
 		{"-d", "*desktops", XrmoptionSepArg, NULL} ,
+        {"-sc", "*screens", XrmoptionSepArg, NULL} ,
 		{"-mm", "*modifier.mask", XrmoptionSepArg, NULL} ,
 		{"-bm", "*backscroll.mask", XrmoptionSepArg, NULL} ,
 		{"-mk", "*modifier.keysym", XrmoptionSepArg, NULL} ,
@@ -241,6 +243,27 @@ int use_args_and_xrm(int *argc, char **argv)
 	if (g.debug > 0)
 		fprintf(stderr, "desktops: %d\n", g.option_desktop);
 
+	endptr = NULL;
+	char *scindex = NULL;
+    int sc = SCR_DEFAULT;
+    g.option_screen = SCR_DEFAULT;
+	XRESOURCE_LOAD_STRING(".screens", scindex, NULL);
+	if (scindex) {
+        sc = strtol(scindex, &endptr, 0);
+        if (*scindex != '\0' && *endptr == '\0') {
+            if (sc >= SCR_MIN && sc <= SCR_MAX)
+                g.option_screen = sc;
+            else
+                fprintf (stderr, 
+                  "screens argument must be from %d to %d, using default\n", 
+                  SCR_MIN, SCR_MAX);
+        } else {
+            fprintf (stderr, inv, "screens");
+        }
+    }
+	if (g.debug > 0)
+		fprintf(stderr, "screens: %d\n", g.option_screen);
+
 	unsigned int defaultModMask = DEFMODMASK;
 	unsigned int defaultBackMask = DEFBACKMASK;
 	KeySym defaultModSym = DEFMODKS;
@@ -355,37 +378,40 @@ int use_args_and_xrm(int *argc, char **argv)
 			g.option_iconH);
 	}
 
-    g.option_vpW = g.option_vpH =
-    g.option_vpX = g.option_vpY = 0;
-	char *defaultViewGeo = "00000x00000+00000+00000";
+    bzero (&(g.option_vp), sizeof(g.option_vp));
+    g.option_vp_mode = VP_DEFAULT;
+	char *defaultViewGeo = DEFVP;
 	XRESOURCE_LOAD_STRING(".viewport", gview,
 			      defaultViewGeo);
     if (gview) {
-    	xpg = XParseGeometry(gview, &x, &y, &w, &h);
-        if (xpg & WidthValue)
-        	g.option_vpW = w;
-        else
-            fprintf (stderr, inv, "viewport width");
-        if (xpg & HeightValue)
-        	g.option_vpH = h;
-        else
-            fprintf (stderr, inv, "viewport height");
-        if (xpg & XValue)
-        	g.option_vpX = x;
-        else
-            fprintf (stderr, inv, "viewport X offset");
-        if (xpg & YValue)
-        	g.option_vpY = y;
-        else
-            fprintf (stderr, inv, "viewport Y offset");
+        if (strncmp(gview, "focus", 6) == 0) {
+            g.option_vp_mode = VP_FOCUS;
+        } else if (strncmp(gview, "pointer", 8) == 0) {
+            g.option_vp_mode = VP_POINTER;
+        } else if (strncmp(gview, "total", 6) == 0) {
+            g.option_vp_mode = VP_TOTAL;
+        } else {
+            g.option_vp_mode = VP_SPECIFIC;
+            xpg = XParseGeometry(gview, &x, &y, &w, &h);
+            if (xpg & (XValue | YValue | WidthValue | HeightValue)) {
+                g.option_vp.w = w;
+                g.option_vp.h = h;
+                g.option_vp.x = x;
+                g.option_vp.y = y;
+            } else {
+                fprintf (stderr, inv, "viewport");
+                g.option_vp_mode = VP_DEFAULT;
+            }
+        }
     }
 	if (g.debug > 0) {
-		fprintf(stderr, "viewport: %dx%d+%d+%d\n",
-            g.option_vpW, g.option_vpH,
-            g.option_vpX, g.option_vpY);
+		fprintf(stderr, "viewport: mode %d, %dx%d+%d+%d\n",
+            g.option_vp_mode,
+            g.option_vp.w, g.option_vp.h,
+            g.option_vp.x, g.option_vp.y);
 	}
 
-    g.option_positioning = 1;
+    g.option_positioning = POS_DEFAULT;
     g.option_posX = 0;
     g.option_posY = 0;
 	char *defaultPosStr = DEFPOS;
@@ -404,7 +430,7 @@ int use_args_and_xrm(int *argc, char **argv)
             	g.option_posY = y;
             } else {
                 fprintf (stderr, inv, "position");
-                g.option_positioning = POS_CENTER;
+                g.option_positioning = POS_DEFAULT;
             }
         }
     }
@@ -525,7 +551,7 @@ int main(int argc, char **argv)
 
 	struct timespec nanots;
 	nanots.tv_sec = 0;
-	nanots.tv_nsec = 10000000;
+	nanots.tv_nsec = 1E7;
 	char keys_pressed[32];
 	int octet = g.option_modCode / 8;
 	int kmask = 1 << (g.option_modCode - octet * 8);

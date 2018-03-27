@@ -40,6 +40,7 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 #define DEFICONW    32
 #define DEFICONH    32
 #define DEFICON     "32x32"
+#define DEFVP       "focus"
 #define DEFPOS      "center"
 #define DEFTHEME    "hicolor"
 #define FRAME_W     8
@@ -62,6 +63,14 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 #define DEFKEYKS    XK_Tab
 
 #include "icon.h"
+
+#ifndef COMTYPES
+#define COMTYPES
+typedef struct {
+    int w; int h;
+    int x; int y;
+} quad;
+#endif
 
 typedef struct {
 	Window id;
@@ -99,6 +108,14 @@ typedef struct PermanentWindowInfo {
     struct PermanentWindowInfo *next, *prev;
 } PermanentWindowInfo;
 
+/*
+typedef struct SwitchMoment {
+    Window prev;
+    Window to;
+    struct timeval tv;
+} SwitchMoment;
+*/
+
 typedef struct {
 	int debug;
 	bool uiShowHasRun;	// means: 1. window is ready to Expose, 2. need to call uiHide to free X stuff
@@ -125,16 +142,29 @@ typedef struct {
 #define DESK_ALL        1
 #define DESK_NOSPECIAL  2
 #define DESK_MAX        2
-#define DESK_DEFAULT    0
+#define DESK_DEFAULT    DESK_CURRENT
     int option_desktop;
+#define SCR_MIN        0
+#define SCR_CURRENT    0
+#define SCR_ALL        1
+#define SCR_MAX        1
+#define SCR_DEFAULT    SCR_ALL
+    int option_screen;
 	char *option_font;
 	int option_tileW, option_tileH;
 	int option_iconW, option_iconH;
-    int option_vpW, option_vpH;
-    int option_vpX, option_vpY;
+#define VP_FOCUS        0
+#define VP_POINTER      1
+#define VP_TOTAL        2
+#define VP_SPECIFIC     3
+#define VP_DEFAULT      VP_FOCUS
+    int option_vp_mode;
+    quad option_vp;
+    bool has_randr;
 #define POS_CENTER      0
 #define POS_NONE        1
 #define POS_SPECIFIC    2
+#define POS_DEFAULT     POS_CENTER
     int option_positioning;
     int option_posX, option_posY;
 #define ISRC_MIN        0
@@ -143,7 +173,7 @@ typedef struct {
 #define ISRC_SIZE       2
 #define ISRC_FILES      3
 #define ISRC_MAX        3
-#define ISRC_DEFAULT    2
+#define ISRC_DEFAULT    ISRC_SIZE
     int option_iconSrc;
     char *option_theme;
 	unsigned int option_modMask, option_backMask;
@@ -154,6 +184,7 @@ typedef struct {
     icon_t *ic;  // cache of all icons
     EwmhFeatures ewmh;  // guessed by ewmh_detectFeatures
     Atom naw;  // _NET_ACTIVE_WINDOW
+//    SwitchMoment last; // for detecting false focus events from WM
 } Globals;
 
 // gui
@@ -172,7 +203,7 @@ int startupWintasks();
 int addIconFromHints (WindowInfo* wi);
 int addIconFromFiles (WindowInfo* wi);
 int addWindowInfo(Window win, int reclevel, int wm_id, unsigned long desktop, char *wm_name);
-int initWinlist(bool direction);
+int initWinlist(bool direction, quad screen);
 void freeWinlist();
 int setFocus(int winNdx);
 int rp_startupWintasks();
@@ -193,5 +224,9 @@ int ewmh_setFocus(int winNdx, Window fwin); // fwin used if non-zero
 unsigned long ewmh_getCurrentDesktop();
 unsigned long ewmh_getDesktopOfWindow(Window w);
 bool ewmh_skipWindowInTaskbar(Window w);
+
+/* RANDR */
+bool randrAvailable();
+bool randrGetViewport(quad *res, bool *multihead);
 
 #endif
