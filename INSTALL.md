@@ -10,7 +10,6 @@ Binaries
 
     Also, unofficial deb packages for snapshots and backports are available.
     Follow setup instructions [there](https://odd.systems/debian/).
-    Pin their repository to low priority to prefer official packages in the future.
 
 * In FreeBSD, install [the port](https://www.freshports.org/x11/alttab/):
 
@@ -24,7 +23,7 @@ Binaries
     pkg install alttab
     ```
 
-* In Arch Linux, alttab is available in [AUR](https://aur.archlinux.org/packages/?O=0&K=alttab).
+* In Arch Linux, alttab is available in [AUR](https://aur.archlinux.org/packages/?O=0&K=alttab) (outdated version at Mar 2018).
 
 * In Alpine Linux, alttab is in _aports/testing_ repository.
 
@@ -33,12 +32,12 @@ Building from source
 --------------------
 
 1. Install build dependencies.
-    Basic Xlib, Xft, Xrender, libpng libraries
+    Basic Xlib, Xft, Xrender, Xrandr, libpng libraries
     and [uthash macros](http://troydhanson.github.io/uthash/) are required.
     In Debian or Ubuntu:
 
     ```
-    apt install libx11-dev libxmu-dev libxft-dev libxrender-dev libpng-dev uthash-dev
+    apt install libx11-dev libxmu-dev libxft-dev libxrender-dev libxrandr-dev libpng-dev uthash-dev
     ```
 
     Maintainer or packager may also install autotools and ronn:
