@@ -7,7 +7,7 @@
 \fBalttab\fR \- the task switcher
 .
 .SH "SYNOPSIS"
-\fBalttab\fR [\fB\-w\fR \fIN\fR] [\fB\-d\fR \fIN\fR] [\fB\-mm\fR \fIN\fR] [\fB\-bm\fR \fIN\fR] [\fB\-mk\fR \fIN\fR] [\fB\-kk\fR \fIN\fR] [\fB\-t\fR \fINxM\fR] [\fB\-i\fR \fINxM\fR] [\fB\-p\fR \fIstr\fR] [\fB\-s\fR \fIN\fR] [\fB\-theme\fR \fIname\fR] [\fB\-bg\fR \fIcolor\fR] [\fB\-fg\fR \fIcolor\fR] [\fB\-frame\fR \fIcolor\fR] [\fB\-font\fR \fIname\fR] [\fB\-v\fR|\fB\-vv\fR]
+\fBalttab\fR [\fB\-w\fR \fIN\fR] [\fB\-d\fR \fIN\fR] [\fB\-sc\fR \fIN\fR] [\fB\-mm\fR \fIN\fR] [\fB\-bm\fR \fIN\fR] [\fB\-mk\fR \fIN\fR] [\fB\-kk\fR \fIN\fR] [\fB\-t\fR \fINxM\fR] [\fB\-i\fR \fINxM\fR] [\fB\-vp\fR \fIstr\fR] [\fB\-p\fR \fIstr\fR] [\fB\-s\fR \fIN\fR] [\fB\-theme\fR \fIname\fR] [\fB\-bg\fR \fIcolor\fR] [\fB\-fg\fR \fIcolor\fR] [\fB\-frame\fR \fIcolor\fR] [\fB\-font\fR \fIname\fR] [\fB\-v\fR|\fB\-vv\fR]
 .
 .SH "DESCRIPTION"
 The task switcher designed for minimalistic window managers or standalone X11 session\.
@@ -63,7 +63,7 @@ resource: alttab\.desktops
 default: \fI0\fR
 .
 .IP
-Show windows belonging to desktops (workspaces, groups)\. \fINUMBER\fR must be 0, 1 or 2:
+Show windows belonging to desktops (workspaces, groups)\. \fINUMBER\fR must be between 0 and 3:
 .
 .IP
 \fI0\fR: Current desktop\.
@@ -82,6 +82,31 @@ Doesn\'t work in ratpoison\.
 .
 .IP
 In various EWMH WM this desktop may be designed hidden or containing sticky windows\. In i3, it\'s "scratchpad"\.
+.
+.IP
+\fI3\fR: All desktops, excluding current one\.
+.
+.TP
+\fB\-sc\fR \fINUMBER\fR
+resource: alttab\.screens
+.
+.br
+default: \fI1\fR
+.
+.IP
+Show windows belonging to screens\. \fINUMBER\fR must be 0 or 1:
+.
+.IP
+\fI0\fR: Current screen\.
+.
+.IP
+Screen is defined according to \fB\-vp\fR \fIpointer\fR or \fB\-vp\fR \fIfocus\fR, the latter is default\.
+.
+.IP
+\fI1\fR: All screens\.
+.
+.IP
+This is default\.
 .
 .TP
 \fB\-mm\fR \fINUM\fR
@@ -131,7 +156,7 @@ resource: alttab\.tile\.geometry
 default: \fI112x128\fR
 .
 .IP
-Size of a single tile (mini\-window)\. If switcher doesn\'t fit the screen, tile may be thinner\.
+Size of a single tile (mini\-window)\. If switcher doesn\'t fit the viewport (\fB\-vp\fR), tile may be thinner\.
 .
 .TP
 \fB\-i\fR \fINNxMM\fR
@@ -144,6 +169,37 @@ default: \fI32x32\fR
 Size of icons\.
 .
 .TP
+\fB\-vp\fR \fIstr\fR
+resource: alttab\.viewport
+.
+.br
+default: \fIfocus\fR
+.
+.IP
+Limit viewport for the switcher\. The switcher always has variable size and position, but tries to never break out of \fB\-vp\fR container, while \fB\-p\fR specifies position relative to this container\. Together these options allow for multi\-monitor support\. Possible values for \fB\-vp\fR:
+.
+.IP
+\fIfocus\fR: in multihead configuration: the monitor which shows largest part of currently focused window\. If this part is shared with other monitors, then the smallest of these monitors is choosen\. In single head configuration: the geometry of default screen\.
+.
+.IP
+\fIpointer\fR: the monitor which has mouse pointer, otherwise the same as \fIfocus\fR\.
+.
+.IP
+The "multihead" above means more than one active XRANDR output\. They are detected at runtime, so hopefully monitors may be attached/detached without restarting alttab\.
+.
+.IP
+\fItotal\fR: the geometry of default screen\.
+.
+.IP
+If you specify this in tiling multihead, then the switcher will be drawn relative to the entire combined screen, crossing monitors\' borders\.
+.
+.IP
+\fIWxH+X+Y\fR: Specific position relative to default screen\.
+.
+.IP
+This allows for static manual bounding if XRANDR detection fails\. Suppose X operates in tiling configuration for two 2560х1440 monitors, resulting in combined screen of 5120x1440 size\. Then the switcher may be positioned at the center of the right monitor with \-vp 2560x1440+2560+0 \-p center\.
+.
+.TP
 \fB\-p\fR \fIstr\fR
 resource: alttab\.position
 .
@@ -151,7 +207,7 @@ resource: alttab\.position
 default: center
 .
 .IP
-Position of switcher: "center", "none" or specific position relative to upper left screen corner, in the form \fI+X+Y\fR\.
+Position of switcher: "center", "none" or specific position relative to upper left corner of viewport, in the form \fI+X+Y\fR\.
 .
 .TP
 \fB\-s\fR \fINUMBER\fR

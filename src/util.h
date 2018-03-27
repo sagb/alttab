@@ -30,6 +30,14 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 
 #define MAXPROPLEN  4096
 
+#ifndef COMTYPES
+#define COMTYPES
+typedef struct {
+    int w; int h;
+    int x; int y;
+} quad;
+#endif
+
 XErrorEvent *ee_ignored;
 bool ee_complain;
 
@@ -63,5 +71,8 @@ Bool predproc_true(Display * display, XEvent * event, char *arg);
 
 char *get_x_property(Window win, Atom prop_type, char *prop_name,
 		     unsigned long *prop_size);
+
+bool rectangles_cross(quad a, quad b);
+bool get_absolute_coordinates(Window w, quad *q);
 
 #endif

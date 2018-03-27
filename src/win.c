@@ -28,6 +28,7 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 #include <unistd.h>
 #include <string.h>
 #include <utlist.h>
+//#include <sys/time.h>
 #include "alttab.h"
 #include "util.h"
 extern Globals g;
@@ -46,14 +47,20 @@ static int sort_by_order(const void *p1, const void *p2)
     PermanentWindowInfo *s;
     WindowInfo *w1 = (WindowInfo*) p1;
     WindowInfo *w2 = (WindowInfo*) p2;
+    int r = 0;
 
     DL_FOREACH(g.sortlist, s) {
-        if (s->id == w1->id )
-            return (s->id == w2->id) ? 0 : -1;
-        if (s->id == w2->id )
-            return 1;
+        if (s->id == w1->id ) {
+            r = (s->id == w2->id) ? 0 : -1;
+            break;
+        }
+        if (s->id == w2->id ) {
+            r = 1;
+            break;
+        }
     }
-    return 0; // should not happen
+    //fprintf (stderr, "cmp 0x%lx <-> 0x%lx = %d\n", w1->id, w2->id, r);
+    return r;
 }
 
 //
@@ -394,7 +401,7 @@ int addWindowInfo(Window win, int reclevel, int wm_id, unsigned long desktop, ch
 // n.b.: in heavy WM, use _NET_CLIENT_LIST
 // direction is direction of first press: with shift or without
 //
-int initWinlist(bool direction)
+int initWinlist(bool direction, quad screen)
 {
 	int r;
 	if (g.debug > 1) {
@@ -410,7 +417,7 @@ int initWinlist(bool direction)
 		r = rp_initWinlist();
 		break;
 	case WM_EWMH:
-		r = ewmh_initWinlist();
+		r = ewmh_initWinlist(screen);
 		break;
     case WM_TWM:
         r = x_initWindowsInfoRecursive(root, 0);
@@ -534,19 +541,39 @@ void winPropChangeEvent(XPropertyEvent e)
     aw = ewmh_getActiveWindow();
     // can't get active window
     if (!aw) return;
-    // focus changed to our own window?
-    if (g.uiShowHasRun && aw == getUiwin()) return;
+    // focus changed to our own old/current/zero window?
+    if (aw == getUiwin()) return;
     // focus changed to window which is already top?
     if (g.sortlist != NULL && aw == g.sortlist->id) return;
     // is window hidden in WM?
     if (ewmh_skipWindowInTaskbar(aw)) return;
+/*
+    // the i3 sortlist bug is not here, see ewmh.c init_winlist instead
+    //
+    if (aw == g.last.prev) {
+        struct timeval ctv;
+        int usec_delta;
+        gettimeofday(&ctv, NULL);
+        usec_delta = (ctv.tv_sec - g.last.tv.tv_sec) * 1E6 
+          + (ctv.tv_usec - g.last.tv.tv_usec);
+        fprintf (stderr, "delta %d\n", usec_delta);
+        if (usec_delta < 5E5) {  // half a second
+            return;
+        }
+        fprintf (stderr, PREF"pulling 'prev' 0x%lx supressed\n", aw);
+    }
+    if (aw == g.last.to) {
+        fprintf (stderr, PREF"pulling 'to' 0x%lx supressed\n", aw);
+        return;
+    }
+*/
     // finally, add/pop window to the head of sortlist
     // unfortunately, on focus by alttab, this is fired twice:
     // 1) when alttab window gone, previous window becomes active,
     // 2) then alttab-focused window becomes active.
     if (g.debug>0)
         fprintf (stderr, 
-            "wm reports new active window 0x%lx, pull to the head of sortlist\n",
+            "wm new active window 0x%lx, pull to the head of sortlist\n",
             aw);
     add_to_sortlist (aw, true, true);
 }
