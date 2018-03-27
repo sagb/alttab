@@ -120,7 +120,7 @@ int ewmh_switch_window(unsigned long window)
 {
     unsigned long edata[] = {2, CurrentTime, 0,0,0};
     if (g.debug>1) {
-        fprintf(stderr, "ewmh switching window to %ld\n", window);
+        fprintf(stderr, "ewmh switching window to 0x%lx\n", window);
     }
     return
         ewmh_send_wm_evt(window, "_NET_ACTIVE_WINDOW", edata);
@@ -208,7 +208,7 @@ Window ewmh_getActiveWindow()
 // initialize winlist/startNdx
 // return 1 if ok
 //
-int ewmh_initWinlist()
+int ewmh_initWinlist(quad screen)
 {
 	Window *client_list;
 	unsigned long client_list_size;
@@ -216,6 +216,7 @@ int ewmh_initWinlist()
 	Window aw;
 	char *title;
     unsigned long current_desktop, window_desktop;
+    quad wq; // window's absolute coordinates
 
     current_desktop = ewmh_getCurrentDesktop();
 
@@ -246,7 +247,9 @@ int ewmh_initWinlist()
                 && current_desktop != DESKTOP_UNKNOWN 
                 && window_desktop != DESKTOP_UNKNOWN) {
 	        if (g.debug > 1) {
-                fprintf (stderr, "window not on active desktop, skipped (window's %ld, current %ld)\n", window_desktop, current_desktop);
+                fprintf (stderr, 
+                  "window not on active desktop, skipped (window's %ld, current %ld)\n", 
+                  window_desktop, current_desktop);
             }
             continue;
         }
@@ -256,6 +259,28 @@ int ewmh_initWinlist()
                 fprintf (stderr, "window on -1 desktop, skipped\n");
             }
             continue;
+        }
+        if (g.option_desktop == DESK_NOCURRENT
+                && current_desktop == window_desktop) {
+	        if (g.debug > 1) {
+                fprintf (stderr, "window on current desktop, skipped\n");
+            }
+            continue;
+        }
+
+        if (g.option_screen == SCR_CURRENT) {
+            if (! get_absolute_coordinates(w, &wq)) {
+                fprintf (stderr, 
+                  "can't get coordinates of window 0x%lx, included anyway\n", w);
+            } else {
+                if (! rectangles_cross(screen, wq)) {
+                    if (g.debug > 1) {
+                        fprintf (stderr, 
+                          "window's area doesn't cross with current screen, skipped\n");
+                    }
+                    continue;
+                }
+            }
         }
 
 		// build title
@@ -273,6 +298,8 @@ int ewmh_initWinlist()
 		}
 	}
 
+    // TODO: BUG? sometimes i3 returns previous active window,
+    // which breaks sortlist
 	if (g.debug > 1) {
 		fprintf(stderr, "ewmh active window: %lu index: %d name: %s\n",
 			aw, g.startNdx, (g.winlist ? g.winlist[g.startNdx].name : "null"));

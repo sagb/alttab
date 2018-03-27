@@ -6,6 +6,7 @@ AC_PROG_CC
 PKG_CHECK_MODULES([x11], [x11])
 PKG_CHECK_MODULES([xft], [xft])
 PKG_CHECK_MODULES([xrender], [xrender])
+PKG_CHECK_MODULES([xrandr], [xrandr])
 PKG_CHECK_MODULES([libpng], [libpng])
 
 AC_MSG_CHECKING(for standalone fts library)
