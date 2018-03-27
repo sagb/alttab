@@ -1,10 +1,13 @@
-alttab (1.2.0.20180317.29.g18cca83-1~1.gbp0bb134) testing; urgency=medium
+alttab (1.2.0.20180327.37.g1b37d33-1~1.gbp418aaf) unstable; urgency=medium
 
-  ** SNAPSHOT build @0bb1343fe17924f48bb3d72167a9179ed5b9813c **
+  ** SNAPSHOT build @418aaf5e65352647dff24ed77f14c418878b5fde **
 
-  * backport to buster
+  * multihead support: full functional -vp, -p, -sc
+  * -d 3 option for excluding current desktop
+  * fix tile shrink ratio
+  * numerous bugfixes
 
- -- Alexander Kulak <sa-dev@rainbow.by>  Sat, 17 Mar 2018 23:42:06 +0300
+ -- Alexander Kulak <sa-dev@rainbow.by>  Tue, 27 Mar 2018 17:31:51 +0300
 
 alttab (1.2.0.20180317.29.g18cca83-1~1.gbp2d2120) unstable; urgency=medium
 

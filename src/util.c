@@ -608,3 +608,35 @@ char *get_x_property(Window win, Atom prop_type, char *prop_name,
 	XFree(ret_prop);
 	return r;
 }
+
+//
+// do rectangles cross?
+//
+bool rectangles_cross(quad a, quad b)
+{
+    return !(
+    a.x >= (b.x + b.w) ||
+    (a.x + a.w) <= b.x ||
+    a.y >= (b.y + b.h) ||
+    (a.y + a.h) <= b.y );
+}
+
+//
+// coordinates relative to root
+//
+bool get_absolute_coordinates(Window w, quad *q)
+{
+    Window child;
+    XWindowAttributes wa;
+    int x, y;
+    if (XTranslateCoordinates (dpy, w, root, 0, 0, &x, &y, &child) == False)
+        return false;
+    if (XGetWindowAttributes (dpy, w, &wa) == 0)
+        return false;
+    q->x = x;
+    q->y = y;
+    q->w = wa.width;
+    q->h = wa.height;
+    return true;
+}
+
