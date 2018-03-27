@@ -73,7 +73,7 @@ Most command line options have corresponding X resource, see doc/alttab.ad for e
     resource: alttab.desktops  
     default: <0>
 
-    Show windows belonging to desktops (workspaces, groups). <NUMBER> must be 0, 1 or 2:
+    Show windows belonging to desktops (workspaces, groups). <NUMBER> must be between 0 and 3:
 
       <0>: Current desktop.
 
@@ -87,6 +87,8 @@ Most command line options have corresponding X resource, see doc/alttab.ad for e
 
       In various EWMH WM this desktop may be designed hidden
       or containing sticky windows. In i3, it's "scratchpad".
+
+      <3>: All desktops, excluding current one.
 
   * `-sc` <NUMBER>:
     resource: alttab.screens  

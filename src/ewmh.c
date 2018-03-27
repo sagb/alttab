@@ -260,6 +260,13 @@ int ewmh_initWinlist(quad screen)
             }
             continue;
         }
+        if (g.option_desktop == DESK_NOCURRENT
+                && current_desktop == window_desktop) {
+	        if (g.debug > 1) {
+                fprintf (stderr, "window on current desktop, skipped\n");
+            }
+            continue;
+        }
 
         if (g.option_screen == SCR_CURRENT) {
             if (! get_absolute_coordinates(w, &wq)) {

@@ -28,7 +28,7 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 #include <unistd.h>
 #include <string.h>
 #include <utlist.h>
-#include <sys/time.h>
+//#include <sys/time.h>
 #include "alttab.h"
 #include "util.h"
 extern Globals g;

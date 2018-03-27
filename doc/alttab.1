@@ -63,7 +63,7 @@ resource: alttab\.desktops
 default: \fI0\fR
 .
 .IP
-Show windows belonging to desktops (workspaces, groups)\. \fINUMBER\fR must be 0, 1 or 2:
+Show windows belonging to desktops (workspaces, groups)\. \fINUMBER\fR must be between 0 and 3:
 .
 .IP
 \fI0\fR: Current desktop\.
@@ -82,6 +82,9 @@ Doesn\'t work in ratpoison\.
 .
 .IP
 In various EWMH WM this desktop may be designed hidden or containing sticky windows\. In i3, it\'s "scratchpad"\.
+.
+.IP
+\fI3\fR: All desktops, excluding current one\.
 .
 .TP
 \fB\-sc\fR \fINUMBER\fR
