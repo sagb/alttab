@@ -88,7 +88,7 @@ Most command line options have corresponding X resource, see doc/alttab.ad for e
       In various EWMH WM this desktop may be designed hidden
       or containing sticky windows. In i3, it's "scratchpad".
 
-      <3>: All desktops, excluding current one.
+      <3>: All desktops, excluding current and special.
 
   * `-sc` <NUMBER>:
     resource: alttab.screens  
