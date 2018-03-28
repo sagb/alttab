@@ -610,9 +610,17 @@ void uiExpose()
               abs(ydiff) > FRAME_W / 2) {
             if (g.debug > 1) {
                 fprintf (stderr, 
-                  "WM mess badly with uiwin position, trying to correct\n");
+                  "WM moved uiwin too far, trying to correct\n");
             }
             XMoveWindow(dpy, uiwin, uiwinX, uiwinY);
+        }
+        if (uwq.w != uiwinW || uwq.h != uiwinH) {
+            // WM resized our window, like
+            // floating_maximum_size in #54.
+            // there is little can be done here,
+            // so just complain.
+            fprintf (stderr, 
+              "AltTab switcher window resized, expect bugs. Please configure WM to not interfere with alttab window size, for example, disable 'floating_maximum_size' in i3\n");
         }
     }
 // icons
