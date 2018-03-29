@@ -504,11 +504,20 @@ int uiShow(bool direction)
 		XftFontClose(dpy, fontLabel);
 
 // prepare our window
-	uiwin = XCreateSimpleWindow(dpy, root,
-				    uiwinX, uiwinY,
-				    uiwinW, uiwinH,
-				    0, g.color[COLFRAME].xcolor.pixel,
-				    g.color[COLBG].xcolor.pixel);
+	unsigned long valuemask = CWBackPixel | CWBorderPixel | CWOverrideRedirect;
+	XSetWindowAttributes attributes;
+	attributes.background_pixel = g.color[COLBG].xcolor.pixel;
+	attributes.border_pixel = g.color[COLFRAME].xcolor.pixel;
+	attributes.override_redirect = 1;
+	uiwin = XCreateWindow(
+				dpy, root,
+				uiwinX, uiwinY,
+				uiwinW, uiwinH,
+				0, // border_width
+				CopyFromParent, // depth
+				InputOutput, // class
+				CopyFromParent, // visual
+				valuemask, &attributes);
 	if (uiwin <= 0)
 		die("can't create window");
 	if (g.debug > 0) {
