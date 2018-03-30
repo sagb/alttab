@@ -84,7 +84,7 @@ Doesn\'t work in ratpoison\.
 In various EWMH WM this desktop may be designed hidden or containing sticky windows\. In i3, it\'s "scratchpad"\.
 .
 .IP
-\fI3\fR: All desktops, excluding current one\.
+\fI3\fR: All desktops, excluding current and special\.
 .
 .TP
 \fB\-sc\fR \fINUMBER\fR
@@ -100,7 +100,7 @@ Show windows belonging to screens\. \fINUMBER\fR must be 0 or 1:
 \fI0\fR: Current screen\.
 .
 .IP
-Screen is defined according to \fB\-vp\fR \fIpointer\fR or \fB\-vp\fR \fIfocus\fR, the latter is default\.
+Screen is defined according to \fB\-vp\fR \fIpointer\fR or \fB\-vp\fR \fIfocus\fR\.
 .
 .IP
 \fI1\fR: All screens\.
@@ -241,7 +241,7 @@ Alttab searches for PNG icons under:
 ~/\.local/share/icons
 .
 .IP
-Directory structure should obey freedesktop standard, but desktop files are ignored, instead file name is expected to be equal to application class\. That is, if alttab in default configuration doesn\'t recognize an icon for window with class foo, as obtained by xprop WM_CLASS, then just drop an icon into /usr/local/share/icons/hicolor/32x32/apps/foo\.png\.
+Directory structure should obey freedesktop standard, but desktop files are ignored, instead file name is expected to be equal to application class\. That is, if alttab doesn\'t recognize an icon for window of class foo, as obtained by \'xprop WM_CLASS\', then just drop a 32x32 icon into /usr/local/share/icons/hicolor/32x32/apps/foo\.png\.
 .
 .IP
 \fI2\fR: Prefer icon from file when it matches requested size better (see \fB\-i\fR option)\.

@@ -504,11 +504,20 @@ int uiShow(bool direction)
 		XftFontClose(dpy, fontLabel);
 
 // prepare our window
-	uiwin = XCreateSimpleWindow(dpy, root,
-				    uiwinX, uiwinY,
-				    uiwinW, uiwinH,
-				    0, g.color[COLFRAME].xcolor.pixel,
-				    g.color[COLBG].xcolor.pixel);
+	unsigned long valuemask = CWBackPixel | CWBorderPixel | CWOverrideRedirect;
+	XSetWindowAttributes attributes;
+	attributes.background_pixel = g.color[COLBG].xcolor.pixel;
+	attributes.border_pixel = g.color[COLFRAME].xcolor.pixel;
+	attributes.override_redirect = 1;
+	uiwin = XCreateWindow(
+				dpy, root,
+				uiwinX, uiwinY,
+				uiwinW, uiwinH,
+				0, // border_width
+				CopyFromParent, // depth
+				InputOutput, // class
+				CopyFromParent, // visual
+				valuemask, &attributes);
 	if (uiwin <= 0)
 		die("can't create window");
 	if (g.debug > 0) {
@@ -610,9 +619,17 @@ void uiExpose()
               abs(ydiff) > FRAME_W / 2) {
             if (g.debug > 1) {
                 fprintf (stderr, 
-                  "WM mess badly with uiwin position, trying to correct\n");
+                  "WM moved uiwin too far, trying to correct\n");
             }
             XMoveWindow(dpy, uiwin, uiwinX, uiwinY);
+        }
+        if (uwq.w != uiwinW || uwq.h != uiwinH) {
+            // WM resized our window, like
+            // floating_maximum_size in #54.
+            // there is little can be done here,
+            // so just complain.
+            fprintf (stderr, 
+              "AltTab switcher window resized, expect bugs. Please configure WM to not interfere with alttab window size, for example, disable 'floating_maximum_size' in i3\n");
         }
     }
 // icons
