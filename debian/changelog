@@ -1,3 +1,17 @@
+alttab (1.2.0.20180330.43.g57d3702-1~1.gbp0072cf) unstable; urgency=medium
+
+  ** SNAPSHOT build @0072cf16c1bfbc655c2f8cae95d5a67ede30fcf4 **
+
+  [ Alexander Kulak ]
+  * xrandr dependency documented
+  * -d 3 excludes special desktop too
+  * complain on unexpected resize
+
+  [ johannes karoff ]
+  * set override redirect flag for ui window
+
+ -- Alexander Kulak <sa-dev@rainbow.by>  Fri, 30 Mar 2018 15:23:14 +0300
+
 alttab (1.2.0.20180327.37.g1b37d33-1~1.gbp418aaf) unstable; urgency=medium
 
   ** SNAPSHOT build @418aaf5e65352647dff24ed77f14c418878b5fde **
