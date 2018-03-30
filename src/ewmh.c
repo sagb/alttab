@@ -260,10 +260,11 @@ int ewmh_initWinlist(quad screen)
             }
             continue;
         }
-        if (g.option_desktop == DESK_NOCURRENT
-                && current_desktop == window_desktop) {
+        if (g.option_desktop == DESK_NOCURRENT && 
+                (window_desktop == current_desktop ||
+                 window_desktop == -1)) {
 	        if (g.debug > 1) {
-                fprintf (stderr, "window on current desktop, skipped\n");
+                fprintf (stderr, "window on current or -1 desktop, skipped\n");
             }
             continue;
         }
