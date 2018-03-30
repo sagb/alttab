@@ -98,8 +98,7 @@ Most command line options have corresponding X resource, see doc/alttab.ad for e
 
       <0>: Current screen.
 
-      Screen is defined according to `-vp` <pointer> or `-vp` <focus>,
-      the latter is default.
+      Screen is defined according to `-vp` <pointer> or `-vp` <focus>.
 
       <1>: All screens.
 
@@ -202,9 +201,11 @@ Most command line options have corresponding X resource, see doc/alttab.ad for e
       ~/.icons  
       ~/.local/share/icons  
   
-      Directory structure should obey freedesktop standard, but desktop files are ignored, instead file name is expected to be equal to application class. 
-      That is, if alttab in default configuration doesn't recognize an icon for window with class foo,
-      as obtained by xprop WM_CLASS, then just drop an icon into /usr/local/share/icons/hicolor/32x32/apps/foo.png.
+      Directory structure should obey freedesktop standard, but desktop files are ignored,
+      instead file name is expected to be equal to application class. 
+      That is, if alttab doesn't recognize an icon for window of class foo,
+      as obtained by 'xprop WM_CLASS', then just drop a 32x32 icon into
+      /usr/local/share/icons/hicolor/32x32/apps/foo.png.
 
       <2>: Prefer icon from file when it matches requested size better (see `-i` option).
 
