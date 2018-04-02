@@ -1,10 +1,14 @@
-alttab (1.2.0.20180330.43.g57d3702-1~1.gbp4c4038) jessie; urgency=medium
+alttab (1.2.0.20180402.46.ge2fdceb-1~1.gbp2ab220) unstable; urgency=medium
 
-  ** SNAPSHOT build @4c4038770d501bbccd60b422e4966f461ab6dc7e **
+  ** SNAPSHOT build @2ab220de5c1fd59c58735800d764d45bc572a3c8 **
 
-  * backport to jessie
+  [ Alexander Kulak ]
+  * ewmh_setFocus isn't required anymore
 
- -- Alexander Kulak <sa-dev@rainbow.by>  Fri, 30 Mar 2018 15:30:05 +0300
+  [ stepan boyko ]
+  * Better detection of screen dimensions (Closes: #59)
+
+ -- Alexander Kulak <sa-dev@rainbow.by>  Mon, 02 Apr 2018 18:05:42 +0300
 
 alttab (1.2.0.20180330.43.g57d3702-1~1.gbp0072cf) unstable; urgency=medium
 
