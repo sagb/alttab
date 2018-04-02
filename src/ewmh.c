@@ -208,7 +208,7 @@ Window ewmh_getActiveWindow()
 // initialize winlist/startNdx
 // return 1 if ok
 //
-int ewmh_initWinlist(quad screen)
+int ewmh_initWinlist()
 {
 	Window *client_list;
 	unsigned long client_list_size;
@@ -216,7 +216,6 @@ int ewmh_initWinlist(quad screen)
 	Window aw;
 	char *title;
     unsigned long current_desktop, window_desktop;
-    quad wq; // window's absolute coordinates
 
     current_desktop = ewmh_getCurrentDesktop();
 
@@ -234,55 +233,12 @@ int ewmh_initWinlist(quad screen)
 	for (i = 0; i < client_list_size / sizeof(Window); i++) {
 		Window w = client_list[i];
 
-        if (ewmh_skipWindowInTaskbar(w)) {
-	        if (g.debug > 1) {
-                fprintf (stderr, "window %lx has \"skip on taskbar\" property, skipped\n", w);
-            }
+        if (ewmh_skipWindowInTaskbar(w))
             continue;
-        }
 
         window_desktop = ewmh_getDesktopOfWindow(w);
-        if (g.option_desktop == DESK_CURRENT
-                && current_desktop != window_desktop 
-                && current_desktop != DESKTOP_UNKNOWN 
-                && window_desktop != DESKTOP_UNKNOWN) {
-	        if (g.debug > 1) {
-                fprintf (stderr, 
-                  "window not on active desktop, skipped (window's %ld, current %ld)\n", 
-                  window_desktop, current_desktop);
-            }
+        if (common_skipWindow(w, current_desktop, window_desktop))
             continue;
-        }
-        if (g.option_desktop == DESK_NOSPECIAL
-                && window_desktop == -1) {
-	        if (g.debug > 1) {
-                fprintf (stderr, "window on -1 desktop, skipped\n");
-            }
-            continue;
-        }
-        if (g.option_desktop == DESK_NOCURRENT && 
-                (window_desktop == current_desktop ||
-                 window_desktop == -1)) {
-	        if (g.debug > 1) {
-                fprintf (stderr, "window on current or -1 desktop, skipped\n");
-            }
-            continue;
-        }
-
-        if (g.option_screen == SCR_CURRENT) {
-            if (! get_absolute_coordinates(w, &wq)) {
-                fprintf (stderr, 
-                  "can't get coordinates of window 0x%lx, included anyway\n", w);
-            } else {
-                if (! rectangles_cross(screen, wq)) {
-                    if (g.debug > 1) {
-                        fprintf (stderr, 
-                          "window's area doesn't cross with current screen, skipped\n");
-                    }
-                    continue;
-                }
-            }
-        }
 
 		// build title
 		char *wmn1 = get_x_property(w, XA_STRING, "WM_NAME", NULL);

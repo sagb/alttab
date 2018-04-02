@@ -159,6 +159,8 @@ int rp_initWinlist()
 			default:
 				break;
 			}
+            if (common_skipWindow(win, DESKTOP_UNKNOWN, DESKTOP_UNKNOWN))
+                return 0;
 			// the rest of string is name
 			addWindowInfo(win, 0, wm_id, DESKTOP_UNKNOWN, rest2);
 		}

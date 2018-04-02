@@ -401,7 +401,7 @@ int addWindowInfo(Window win, int reclevel, int wm_id, unsigned long desktop, ch
 // n.b.: in heavy WM, use _NET_CLIENT_LIST
 // direction is direction of first press: with shift or without
 //
-int initWinlist(bool direction, quad screen)
+int initWinlist(bool direction)
 {
 	int r;
 	if (g.debug > 1) {
@@ -417,7 +417,7 @@ int initWinlist(bool direction, quad screen)
 		r = rp_initWinlist();
 		break;
 	case WM_EWMH:
-		r = ewmh_initWinlist(screen);
+		r = ewmh_initWinlist();
 		break;
     case WM_TWM:
         r = x_initWindowsInfoRecursive(root, 0);
@@ -594,5 +594,60 @@ void winDestroyEvent(XDestroyWindowEvent e)
         }
         DL_DELETE (g.sortlist, s);
     }
+}
+
+//
+// common filter before adding window to winlist
+// it checks: desktop, screen
+// depending on global options and dimensions
+//
+bool common_skipWindow(Window w, 
+    unsigned long current_desktop, unsigned long window_desktop)
+{
+    quad wq; // window's absolute coordinates
+
+    if (g.option_desktop == DESK_CURRENT
+            && current_desktop != window_desktop 
+            && current_desktop != DESKTOP_UNKNOWN 
+            && window_desktop != DESKTOP_UNKNOWN) {
+        if (g.debug > 1) {
+            fprintf (stderr, 
+                    "window not on active desktop, skipped (window's %ld, current %ld)\n", 
+                    window_desktop, current_desktop);
+        }
+        return true;
+    }
+    if (g.option_desktop == DESK_NOSPECIAL
+            && window_desktop == -1) {
+        if (g.debug > 1) {
+            fprintf (stderr, "window on -1 desktop, skipped\n");
+        }
+        return true;
+    }
+    if (g.option_desktop == DESK_NOCURRENT && 
+            (window_desktop == current_desktop ||
+             window_desktop == -1)) {
+        if (g.debug > 1) {
+            fprintf (stderr, "window on current or -1 desktop, skipped\n");
+        }
+        return true;
+    }
+
+    if (g.option_screen == SCR_CURRENT) {
+        if (! get_absolute_coordinates(w, &wq)) {
+            fprintf (stderr, 
+                    "can't get coordinates of window 0x%lx, included anyway\n", w);
+        } else {
+            if (! rectangles_cross(g.vp, wq)) {
+                if (g.debug > 1) {
+                    fprintf (stderr, 
+                            "window's area doesn't cross with current screen, skipped\n");
+                }
+                return true;
+            }
+        }
+    }
+
+    return false;
 }
 
