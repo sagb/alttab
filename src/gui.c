@@ -255,9 +255,21 @@ int uiShow(bool direction)
 	g.uiShowHasRun = true;	// begin allocations
 // screen-related stuff is not at startup but here,
 // because screen configuration may get changed at runtime
-    scrdim.x = scrdim.y = 0;
-	scrdim.w = DisplayWidth(dpy, scr);
-	scrdim.h = DisplayHeight(dpy, scr);
+// moreover, DisplayWidth/Height aren't changed without
+// reconnecting to X server, that's why root geometry is used
+    XWindowAttributes ra;
+    if (XGetWindowAttributes(dpy, root, &ra) != 0) {
+        scrdim.x = ra.x;
+        scrdim.y = ra.y;
+        scrdim.w = ra.width;
+        scrdim.h = ra.height;
+    } else {
+        fprintf (stderr, 
+          "can't get root window attributes, using screen dimensions\n");
+        scrdim.x = scrdim.y = 0;
+    	scrdim.w = DisplayWidth(dpy, scr);
+    	scrdim.h = DisplayHeight(dpy, scr);
+    }
 // caculate viewport.
 #define VPM  g.option_vp_mode
     switch (VPM) {
