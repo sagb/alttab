@@ -154,7 +154,7 @@ Most command line options have corresponding X resource, see doc/alttab.ad for e
       <focus>: in multihead configuration: the monitor which shows
       largest part of currently focused window. If this part is shared
       with other monitors, then the smallest of these monitors is choosen.
-      In single head configuration: the geometry of default screen.
+      In single head configuration: the geometry of default root window.
 
       <pointer>: the monitor which has mouse pointer, otherwise
       the same as <focus>.
@@ -163,13 +163,13 @@ Most command line options have corresponding X resource, see doc/alttab.ad for e
       They are detected at runtime, so hopefully monitors
       may be attached/detached without restarting alttab.
 
-      <total>: the geometry of default screen.
+      <total>: the geometry of default root window.
 
       If you specify this in tiling multihead, then the switcher
       will be drawn relative to the entire combined screen, crossing
       monitors' borders.
 
-      <WxH+X+Y>: Specific position relative to default screen.
+      <WxH+X+Y>: Specific position relative to default root window.
 
       This allows for static manual bounding if XRANDR detection fails.
       Suppose X operates in tiling configuration for two 2560х1440 monitors, 
