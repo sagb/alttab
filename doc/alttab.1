@@ -1,7 +1,7 @@
 .\" generated with Ronn/v0.7.3
 .\" http://github.com/rtomayko/ronn/tree/0.7.3
 .
-.TH "ALTTAB" "1" "March 2018" "" ""
+.TH "ALTTAB" "1" "April 2018" "" ""
 .
 .SH "NAME"
 \fBalttab\fR \- the task switcher
@@ -179,7 +179,7 @@ default: \fIfocus\fR
 Limit viewport for the switcher\. The switcher always has variable size and position, but tries to never break out of \fB\-vp\fR container, while \fB\-p\fR specifies position relative to this container\. Together these options allow for multi\-monitor support\. Possible values for \fB\-vp\fR:
 .
 .IP
-\fIfocus\fR: in multihead configuration: the monitor which shows largest part of currently focused window\. If this part is shared with other monitors, then the smallest of these monitors is choosen\. In single head configuration: the geometry of default screen\.
+\fIfocus\fR: in multihead configuration: the monitor which shows largest part of currently focused window\. If this part is shared with other monitors, then the smallest of these monitors is choosen\. In single head configuration: the geometry of default root window\.
 .
 .IP
 \fIpointer\fR: the monitor which has mouse pointer, otherwise the same as \fIfocus\fR\.
@@ -188,13 +188,13 @@ Limit viewport for the switcher\. The switcher always has variable size and posi
 The "multihead" above means more than one active XRANDR output\. They are detected at runtime, so hopefully monitors may be attached/detached without restarting alttab\.
 .
 .IP
-\fItotal\fR: the geometry of default screen\.
+\fItotal\fR: the geometry of default root window\.
 .
 .IP
 If you specify this in tiling multihead, then the switcher will be drawn relative to the entire combined screen, crossing monitors\' borders\.
 .
 .IP
-\fIWxH+X+Y\fR: Specific position relative to default screen\.
+\fIWxH+X+Y\fR: Specific position relative to default root window\.
 .
 .IP
 This allows for static manual bounding if XRANDR detection fails\. Suppose X operates in tiling configuration for two 2560х1440 monitors, resulting in combined screen of 5120x1440 size\. Then the switcher may be positioned at the center of the right monitor with \-vp 2560x1440+2560+0 \-p center\.

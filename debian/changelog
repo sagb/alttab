@@ -1,10 +1,14 @@
-alttab (1.2.0.20180330.43.g57d3702-1~1.gbpc7f4a1) testing; urgency=medium
+alttab (1.2.0.20180402.46.ge2fdceb-1~1.gbp2ab220) unstable; urgency=medium
 
-  ** SNAPSHOT build @c7f4a10d05ea1b1a1e82bb7120d88de2d1258f56 **
+  ** SNAPSHOT build @2ab220de5c1fd59c58735800d764d45bc572a3c8 **
 
-  * backport to buster
+  [ Alexander Kulak ]
+  * ewmh_setFocus isn't required anymore
 
- -- Alexander Kulak <sa-dev@rainbow.by>  Fri, 30 Mar 2018 15:26:35 +0300
+  [ stepan boyko ]
+  * Better detection of screen dimensions (Closes: #59)
+
+ -- Alexander Kulak <sa-dev@rainbow.by>  Mon, 02 Apr 2018 18:05:42 +0300
 
 alttab (1.2.0.20180330.43.g57d3702-1~1.gbp0072cf) unstable; urgency=medium
 
