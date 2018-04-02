@@ -585,12 +585,6 @@ int uiShow(bool direction)
          && g.option_vp_mode != VP_SPECIFIC) ? CenterGravity : StaticGravity };
     XSetWMNormalHints(dpy, uiwin, &uiwinSizeHints);
 
-    if (g.option_wm == WM_EWMH) {
-        // required in Metacity
-        ewmh_setFocus(0, uiwin);
-    }
-    // absolute coordinates (get_absolute_coordinates) are still correct here
-    // (as requested). they change only on Expose
 	return 1;
 }
 
