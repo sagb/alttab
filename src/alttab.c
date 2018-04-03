@@ -559,16 +559,17 @@ int main(int argc, char **argv)
 	while (true) {
 		memset(&(ev.xkey), 0, sizeof(ev.xkey));
 
-		if (g.uiShowHasRun) {
-			// poll: lag and consume cpu, but necessary because of bug #1 and #2
-			nanosleep(&nanots, NULL);
-			XQueryKeymap(dpy, keys_pressed);
-			if (!(keys_pressed[octet] & kmask)) {	// Alt released
-				uiHide();
-				continue;
-			}
-			if (!XCheckIfEvent(dpy, &ev, *predproc_true, NULL))
-				continue;
+        if (g.uiShowHasRun) {
+            // poll: lag and consume cpu, but necessary because of bug #1 and #2
+            XQueryKeymap(dpy, keys_pressed);
+            if (!(keys_pressed[octet] & kmask)) {	// Alt released
+                uiHide();
+                continue;
+            }
+            if (!XCheckIfEvent(dpy, &ev, *predproc_true, NULL)) {
+                nanosleep(&nanots, NULL);
+                continue;
+            }
 		} else {
 			// event: immediate, when we don't care about Alt release
 			XNextEvent(dpy, &ev);
