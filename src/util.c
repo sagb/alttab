@@ -174,10 +174,11 @@ int execAndReadStdout(char *exe, char *args[], char *buf, int bufsize)
 		return 0;
 	} else {
 		close(link[1]);
-		rb = read(link[0], buf, bufsize);
-		if (rb == -1)
-			*buf = '\0';
-//printf("Output: (%.*s)\n", nbytes, buf);
+        if (buf != NULL) {
+    		rb = read(link[0], buf, bufsize);
+    		if (rb == -1)
+    			*buf = '\0';
+        }
 		close(link[0]);
 		wait(NULL);
 	}

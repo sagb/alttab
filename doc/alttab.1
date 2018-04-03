@@ -47,7 +47,7 @@ Compatible WM list is in [SEE ALSO] below\. alttab functions in xmonad (EWMH mus
 \fI2\fR: Ratpoison\.
 .
 .IP
-Alttab uses ratpoison own perfect remote control capability\. Additionally, alttab registers itself in its "unmanaged list" automatically\.
+Alttab uses ratpoison own remote control capability\. Additionally, alttab registers itself in its "unmanaged list" automatically\.
 .
 .IP
 \fI3\fR: Ancient WM\.
@@ -75,9 +75,6 @@ This is default, although in non EWMH\-compatible WM, except ratpoison, it\'s ef
 \fI1\fR: All desktops\.
 .
 .IP
-Doesn\'t work in ratpoison\.
-.
-.IP
 \fI2\fR: All desktops, excluding special (\-1) one\.
 .
 .IP
@@ -94,7 +91,7 @@ resource: alttab\.screens
 default: \fI1\fR
 .
 .IP
-Show windows belonging to screens\. \fINUMBER\fR must be 0 or 1:
+Show windows belonging to xrandr/xinerama screens\. \fINUMBER\fR must be 0 or 1:
 .
 .IP
 \fI0\fR: Current screen\.

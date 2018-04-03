@@ -32,7 +32,71 @@ extern Globals g;
 
 // PRIVATE
 
+#define RP_MAXGROUPS    64
+
 char *ratpoison_cmd;
+
+//
+// process ratpoison window_group, adding its windows 
+// to winlist/startNdx/sortlist.
+// window_group must be selected in advance.
+//
+int rp_add_windows_in_group(int current_group, int window_group)
+{
+	char *args[] = { "ratpoison", "-c", "windows %n %i %s %t", NULL };
+	char buf[MAXRPOUT];
+	char *rpse = "bad token while parsing ratpoison output: ";
+
+	bzero(buf, MAXRPOUT);
+	if (!execAndReadStdout(ratpoison_cmd, args, buf, MAXRPOUT)) {
+		fprintf(stderr, "can't exec ratpoison\n");
+		return 0;
+	}
+	if (g.debug > 1) {
+		fprintf(stderr, "windows in current rp group:\n%s", buf);
+	}
+	char *rest = buf;
+	char *tok;
+
+	if (strstr(buf, "No managed windows")) {
+		// no windows at all.
+		return 0;
+	} else {
+		while ((tok = strsep(&rest, "\r\n")) && (*tok)) {
+			// parse single line
+			char *rest2 = tok;
+			char *tok2;
+			char *endptr;
+			if (!((tok2 = strsep(&rest2, " \t")) && (*tok2)))
+				die2(rpse, rest2);
+			int wm_id = strtol(tok2, &endptr, 10);
+			if (endptr == tok2)
+				die2(rpse, tok2);
+			if (!((tok2 = strsep(&rest2, " \t")) && (*tok2)))
+				die2(rpse, rest2);
+			int win = strtol(tok2, &endptr, 10);
+			if (endptr == tok2)
+				die2(rpse, tok2);
+			if (!((tok2 = strsep(&rest2, " \t")) && (*tok2)))
+				die2(rpse, rest2);
+			switch (*tok2) {
+			case '*':
+				g.startNdx = g.maxNdx;
+				break;
+			case '+':
+			case '-':
+				break;	// use?
+			default:
+				break;
+			}
+            if (common_skipWindow(win, current_group, window_group))
+                return 0;
+			// the rest of string is name
+			addWindowInfo(win, 0, wm_id, window_group, rest2);
+		}
+	}
+	return 1;
+}
 
 // PUBLIC
 
@@ -107,66 +171,62 @@ int rp_startupWintasks()
 //
 int rp_initWinlist()
 {
-
-	char *args[] = { "ratpoison", "-c", "windows %n %i %s %t", NULL };
-	char buf[MAXRPOUT];
-	char *rpse = "bad token while parsing ratpoison output: ";
-
-	memset(buf, '\0', MAXRPOUT);
-	g.maxNdx = 0;
-	if (!execAndReadStdout(ratpoison_cmd, args, buf, MAXRPOUT)) {
-		fprintf(stderr, "can't exec ratpoison\n");
-		return 0;
-	}
-	if (g.debug > 1) {
-		fprintf(stderr, "ratpoison reports windows:\n%s", buf);
-	}
-	char *rest = buf;
+#define  fallback    { fprintf (stderr, "using current rp group\n") ; \
+    return rp_add_windows_in_group(DESKTOP_UNKNOWN, DESKTOP_UNKNOWN); }
+#define  arg2len  19
+#define  intlen   10
+    char arg2[arg2len]; // fits 'groups', 'gselect N'
+    char *args[] = { "ratpoison", "-c", arg2, NULL };
+    char buf[MAXRPOUT];
+    int gr[RP_MAXGROUPS]; int ngr, gri; // numbers from 'groups' output
+    int w_group; // window group
+    int c_group = DESKTOP_UNKNOWN; // current group
+    char *endptr;
+	char *rest;
 	char *tok;
 
-	if (strstr(buf, "No managed windows")) {
-		// no windows at all.
-		return 0;
-	} else {
-		while ((tok = strsep(&rest, "\r\n")) && (*tok)) {
-			if (g.debug > 1) {
-				fprintf(stderr, "token: %s\n", tok);
-			}
-			// parse single line
-			char *rest2 = tok;
-			char *tok2;
-			char *endptr;
-			if (!((tok2 = strsep(&rest2, " \t")) && (*tok2)))
-				die2(rpse, rest2);
-			int wm_id = strtol(tok2, &endptr, 10);
-			if (endptr == tok2)
-				die2(rpse, tok2);
-			if (!((tok2 = strsep(&rest2, " \t")) && (*tok2)))
-				die2(rpse, rest2);
-			int win = strtol(tok2, &endptr, 10);
-			if (endptr == tok2)
-				die2(rpse, tok2);
-			if (!((tok2 = strsep(&rest2, " \t")) && (*tok2)))
-				die2(rpse, rest2);
-			switch (*tok2) {
-			case '*':
-				g.startNdx = g.maxNdx;
-				break;
-			case '+':
-				break;	// use?
-			case '-':
-				break;
-			default:
-				break;
-			}
-            if (common_skipWindow(win, DESKTOP_UNKNOWN, DESKTOP_UNKNOWN))
-                return 0;
-			// the rest of string is name
-			addWindowInfo(win, 0, wm_id, DESKTOP_UNKNOWN, rest2);
-		}
-	}
+    g.maxNdx = 0;
+    if (g.option_desktop == DESK_CURRENT)
+        return rp_add_windows_in_group(DESKTOP_UNKNOWN, DESKTOP_UNKNOWN);
 
-	return 1;
+    // discover rp groups
+    strncpy (arg2, "groups", arg2len);
+    bzero(buf, MAXRPOUT);
+    if (!execAndReadStdout(ratpoison_cmd, args, buf, MAXRPOUT))
+        fallback
+    rest = buf;
+    for (ngr = 0;
+            ((tok = strsep(&rest, "\r\n")) && (*tok) && ngr < RP_MAXGROUPS);
+            ngr++) {
+        // parse single line
+        gr[ngr] = strtol(tok, &endptr, 10);
+        if (endptr == tok) {
+            fprintf (stderr, "no group number detected in rp output\n");
+            fallback
+        }
+        if (*endptr == '*')
+            c_group = gr[ngr];
+        // the rest of line is group name, skip
+    }
+    if (ngr < 1) {
+        if (g.debug > 0)
+            fprintf (stderr, "no ratpoison (rpws) groups detected\n");
+        fallback
+    }
+    if (g.debug > 0)
+        fprintf (stderr, "number of ratpoison (rpws) groups: %d, current: %d\n", ngr, c_group);
+
+    // cycle through rp groups
+    for (gri = 0; gri < ngr; gri++) {
+        w_group = gr[gri];
+        if (g.debug > 0)
+            fprintf (stderr, "processing rp group %d\n", w_group);
+        snprintf (arg2, arg2len, "gselect %d", w_group);
+        if (!execAndReadStdout(ratpoison_cmd, args, NULL, 0))
+            continue;
+        rp_add_windows_in_group(c_group, w_group);
+    }
+    return 1;
 }
 
 //
@@ -175,10 +235,17 @@ int rp_initWinlist()
 int rp_setFocus(int winNdx)
 {
 	char selarg[64];
-	snprintf(selarg, 63, "select %d", g.winlist[winNdx].wm_id);
 	char *args[] = { "ratpoison", "-c", selarg, NULL };
 	char buf[MAXRPOUT];
 
+    // don't skip changing group if it's current, because 
+    // rp_initWinlist left current group inconsistent
+    if (g.winlist[winNdx].desktop != DESKTOP_UNKNOWN) {
+    	snprintf(selarg, 63, "gselect %lu", g.winlist[winNdx].desktop);
+	    execAndReadStdout(ratpoison_cmd, args, buf, MAXRPOUT);
+        // ignore possible failure
+    }
+	snprintf(selarg, 63, "select %d", g.winlist[winNdx].wm_id);
 	if (!execAndReadStdout(ratpoison_cmd, args, buf, MAXRPOUT))
 		return 0;
 

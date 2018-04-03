@@ -58,7 +58,7 @@ Most command line options have corresponding X resource, see doc/alttab.ad for e
 
       <2>: Ratpoison.
 
-      Alttab uses ratpoison own perfect remote control capability. Additionally, alttab registers itself in its "unmanaged list" automatically.
+      Alttab uses ratpoison own remote control capability. Additionally, alttab registers itself in its "unmanaged list" automatically.
 
       <3>: Ancient WM.
 
@@ -81,8 +81,6 @@ Most command line options have corresponding X resource, see doc/alttab.ad for e
 
       <1>: All desktops.
 
-      Doesn't work in ratpoison.
-
       <2>: All desktops, excluding special (-1) one.
 
       In various EWMH WM this desktop may be designed hidden
@@ -94,7 +92,7 @@ Most command line options have corresponding X resource, see doc/alttab.ad for e
     resource: alttab.screens  
     default: <1>
 
-    Show windows belonging to screens. <NUMBER> must be 0 or 1:
+    Show windows belonging to xrandr/xinerama screens. <NUMBER> must be 0 or 1:
 
       <0>: Current screen.
 
