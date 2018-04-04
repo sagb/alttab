@@ -21,7 +21,6 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef ALTTAB_H
 #define ALTTAB_H
 
-#define MAXNAMESZ   256
 #define MAXPATHSZ   8200
 #define MAXRPOUT    8200
 
@@ -70,6 +69,7 @@ typedef struct {
     int w; int h;
     int x; int y;
 } quad;
+#define MAXNAMESZ   256
 #endif
 
 typedef struct {

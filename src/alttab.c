@@ -79,115 +79,6 @@ See man alttab for details.\n");
 }
 
 //
-// removes argument from argv
-//
-void remove_arg(int *argc, char **argv, int argn)
-{
-    int i;
-    for(i = argn; i < (*argc); ++i)
-    argv[i] = argv[i+1];
-    --(*argc);
-}
-
-//
-// return resource/option `alttab.name'
-// or NULL if not specified
-//
-char* xresource_load_string(XrmDatabase *db, char *name)
-{
-    char xname[MAXNAMESZ];
-    char xclass[MAXNAMESZ];
-    XrmValue v;
-    char *type;
-
-    snprintf (xname, MAXNAMESZ, XRMAPPNAME".%s", name);
-    snprintf (xclass, MAXNAMESZ, XCLASS".%s", name);
-	XrmGetResource (*db, xname, xclass, &type, &v);
-	return
-      (v.addr != NULL && !strncmp ("String", type, 64)) ? 
-      v.addr : NULL;
-}
-
-//
-// return resource/option `alttab.name' in *ret
-// or false if not specified
-//
-bool xresource_load_int(XrmDatabase *db, char *name, unsigned int *ret)
-{
-    unsigned int r;
-    char *endptr;
-    char *s = xresource_load_string(db, name);
-
-    if (s != NULL) {
-        r = strtol(s, &endptr, 0);
-        if (*s != '\0' && *endptr == '\0') {
-            *ret = r;
-            return true;
-        }
-    }
-    return false;
-}
-
-//
-// return keycode corresponding to resource/option `alttab.name.keysym'
-// or 0 if not specified
-//
-KeyCode ksym_option_to_keycode(XrmDatabase *db, const char *name)
-{
-	char *endptr, *opt;
-    KeySym ksym;
-    char xresr[MAXNAMESZ];
-    KeyCode retcode = 0; // default
-
-    endptr = opt = NULL;
-    snprintf (xresr, MAXNAMESZ, "%s.keysym", name); xresr[MAXNAMESZ-1]='\0';
-    opt = xresource_load_string(db, xresr);
-	if (opt) {
-        ksym = XStringToKeysym(opt);
-        if (ksym == NoSymbol) {
-    		ksym = strtol(opt, &endptr, 0);
-            if (!(*opt != '\0' && *endptr == '\0'))
-                ksym = NoSymbol;
-        }
-        if (ksym != NoSymbol) {
-            retcode = XKeysymToKeycode(dpy, ksym);
-            if (retcode == 0) {
-                fprintf (stderr,
-                  "the specified %s keysym is not defined for any keycode, using default\n",
-                  name);
-            }
-        } else {
-            fprintf (stderr, "invalid %s keysym, using default\n", name);
-        }
-    }
-    return retcode;
-}
-
-//
-// scan modifier table,
-// return first modifier corresponding to given keycode,
-// in the form of modmask,
-// or zero if not found
-// 
-unsigned int keycode_to_modmask(KeyCode kc)
-{
-    int mi, ksi;
-    KeyCode tkc;
-    XModifierKeymap *xmk = XGetModifierMapping(dpy);
-
-    for (mi = 0; mi < 8; mi++) {
-        for (ksi = 0; ksi < xmk->max_keypermod; ksi++) {
-            tkc = (xmk->modifiermap)[xmk->max_keypermod * mi + ksi];
-            if (tkc == kc) {
-                return (1 << mi);
-            }
-        }
-    }
-    return 0;
-}
-
-
-//
 // initialize globals based on executable agruments and Xresources
 // return 1 if success, 0 otherwise
 //
@@ -272,7 +163,7 @@ int use_args_and_xrm(int *argc, char **argv)
         fprintf (stderr, ", use -h for help\n");
     }
 
-// initializing g.option_wm
+// initialize g.option_wm
 
 	endptr = NULL;
 	char *wmindex = NULL;
@@ -366,17 +257,17 @@ int use_args_and_xrm(int *argc, char **argv)
     const char *rmb = "fatal: can't figure out modmask from keycode 0x%x\n";
 
 #define  MC  g.option_modCode
-    MC = ksym_option_to_keycode(&db, "modifier");
+    MC = ksym_option_to_keycode(&db, XRMAPPNAME, "modifier");
     if (MC == 0)
         MC = XKeysymToKeycode(dpy, DEFMODKS);
 
 #define  KC  g.option_keyCode
-    KC = ksym_option_to_keycode(&db, "key");
+    KC = ksym_option_to_keycode(&db, XRMAPPNAME, "key");
     if (KC == 0)
         KC = XKeysymToKeycode(dpy, DEFKEYKS);
 
 #define  GMM  g.option_modMask
-    if (xresource_load_int(&db, "modifier.mask", &(GMM))) {
+    if (xresource_load_int(&db, XRMAPPNAME, "modifier.mask", &(GMM))) {
         fprintf (stderr, 
           "Using obsoleted -mm option or modifier.mask resource, see man page for upgrade\n");
     } else {
@@ -388,11 +279,11 @@ int use_args_and_xrm(int *argc, char **argv)
     }
 
 #define  GBM  g.option_backMask
-    if (xresource_load_int(&db, "backscroll.mask", &(GBM))) {
+    if (xresource_load_int(&db, XRMAPPNAME, "backscroll.mask", &(GBM))) {
         fprintf (stderr, 
           "Using obsoleted -bm option or backscroll.mask resource, see man page for upgrade\n");
     } else {
-        KeyCode BC = ksym_option_to_keycode(&db, "backscroll");
+        KeyCode BC = ksym_option_to_keycode(&db, XRMAPPNAME, "backscroll");
         if (BC != 0) {
             GBM = keycode_to_modmask(BC);
             if (GBM == 0) {
@@ -575,14 +466,14 @@ int use_args_and_xrm(int *argc, char **argv)
 }
 
 //
-// grab Alt-Tab and Alt
+// grab Alt-Tab and Alt-Shift-Tab
 // note: exit() on failure
 //
 int grabAllKeys(bool grabUngrab)
 {
 	g.ignored_modmask = getOffendingModifiersMask(dpy);	// or 0 for g.debug
 	char *grabhint =
-	    "Error while (un)grabbing key 0x%x with mask 0x%x/0x%x.\nProbably other program already grabbed this combination.\nCheck: xdotool keydown alt+Tab; xdotool key XF86LogGrabInfo; xdotool keyup Tab; sleep 1; xdotool keyup alt; tail /var/log/Xorg.0.log\nOr try Ctrl-Tab instead of Alt-Tab:  alttab -mm 4 -mk 0xffe3\n";
+	    "Error while (un)grabbing key 0x%x with mask 0x%x/0x%x.\nProbably other program already grabbed this combination.\nCheck: xdotool keydown alt+Tab; xdotool key XF86LogGrabInfo; xdotool keyup Tab; sleep 1; xdotool keyup alt; tail /var/log/Xorg.0.log\nOr try Ctrl-Tab instead of Alt-Tab:  alttab -mk Control_L\n";
 // attempt XF86Ungrab? probably too invasive
 	if (!changeKeygrab
 	    (root, grabUngrab, g.option_keyCode, g.option_modMask,
