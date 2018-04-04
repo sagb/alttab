@@ -16,7 +16,7 @@ alttab(1) -- the task switcher
 
 ## SYNOPSIS
 
-`alttab` [`-w` <N>] [`-d` <N>] [`-sc` <N>] [`-mm` <N>] [`-bm` <N>] [`-mk` <N>] [`-kk` <N>] [`-t` <NxM>] [`-i` <NxM>] [`-vp` <str>] [`-p` <str>] [`-s` <N>] [`-theme` <name>] [`-bg` <color>] [`-fg` <color>] [`-frame` <color>] [`-font` <name>] [`-v`|`-vv`]
+`alttab` [`-w` <N>] [`-d` <N>] [`-sc` <N>] [`-mk` <str>] [`-kk` <str>] [`-bk` <str>] [`-mm` <N>] [`-bm` <N>] [`-t` <NxM>] [`-i` <NxM>] [`-vp` <str>] [`-p` <str>] [`-s` <N>] [`-theme` <name>] [`-bg` <color>] [`-fg` <color>] [`-frame` <color>] [`-font` <name>] [`-v`|`-vv`]
 
 ## DESCRIPTION
 
@@ -58,7 +58,7 @@ Most command line options have corresponding X resource, see doc/alttab.ad for e
 
       <2>: Ratpoison.
 
-      Alttab uses ratpoison own perfect remote control capability. Additionally, alttab registers itself in its "unmanaged list" automatically.
+      Alttab uses ratpoison own remote control capability. Additionally, alttab registers itself in its "unmanaged list" automatically.
 
       <3>: Ancient WM.
 
@@ -81,8 +81,6 @@ Most command line options have corresponding X resource, see doc/alttab.ad for e
 
       <1>: All desktops.
 
-      Doesn't work in ratpoison.
-
       <2>: All desktops, excluding special (-1) one.
 
       In various EWMH WM this desktop may be designed hidden
@@ -94,39 +92,45 @@ Most command line options have corresponding X resource, see doc/alttab.ad for e
     resource: alttab.screens  
     default: <1>
 
-    Show windows belonging to screens. <NUMBER> must be 0 or 1:
+    Show windows belonging to xrandr/xinerama screens. <NUMBER> must be 0 or 1:
 
       <0>: Current screen.
 
-      Screen is defined according to `-vp` <pointer> or `-vp` <focus>.
+      As defined according to `-vp` <pointer> or `-vp` <focus>.
 
       <1>: All screens.
 
       This is default.
 
+  * `-mk` <str>:
+    resource: alttab.modifier.keysym  
+    default: Alt_L
+
+    Keysym of main modifier, string or number.
+    Suitable examples: Control_L, Super_L.
+
+  * `-kk` <str>:
+    resource: alttab.key.keysym  
+    default: Tab
+
+    Keysym of main key.
+    For example, grave (aka tilde), Escape.
+
+  * `-bk` <str>:
+    resource: alttab.backscroll.keysym  
+    default: any Shift, according to ShiftMask
+
+    Keysym of backward scroll key.
+
   * `-mm` <NUM>:
     resource: alttab.modifier.mask  
-    default: <8> (Mod1Mask aka left Alt)
 
-    Main modifier mask. See /usr/include/X11/X.h.
+    OBSOLETED, guessed from -mk instead.
 
   * `-bm` <NUM>:
     resource: alttab.backscroll.mask  
-    default: <1> (ShiftMask)
 
-    Backward scroll modifier mask.
-
-  * `-mk` <NUM>:
-    resource: alttab.modifier.keysym  
-    default: <0xffe9> (XK\_Alt\_L aka left Alt)
-
-    Keysym of main modifier alone. See /usr/include/X11/keysymdef.h. Keep in sync with `-mm`.
-
-  * `-kk` <NUM>:
-    resource: alttab.key.keysym  
-    default: <0xff09> (XK\_Tab)
-
-    Keysym of main key.
+    OBSOLETED, guessed from -bk instead.
 
   * `-t` <NNxMM>:
     resource: alttab.tile.geometry  

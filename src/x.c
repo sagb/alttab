@@ -103,6 +103,7 @@ int x_initWindowsInfoRecursive(Window win, int reclevel)
             && reclevel != 0 
             && (g.option_wm != WM_TWM || winname != NULL)
 //            && (g.option_wm != WM_TWM || leader == win)
+            && ! common_skipWindow(win, DESKTOP_UNKNOWN, DESKTOP_UNKNOWN)
             ) {
         addWindowInfo(win, reclevel, 0, DESKTOP_UNKNOWN, winname);
 	}

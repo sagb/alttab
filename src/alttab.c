@@ -39,6 +39,14 @@ Window root;
 
 // PRIVATE
 
+#define XRESOURCE_LOAD_STRING(NAME, DST, DEFAULT)           \
+	XrmGetResource (db, XRMAPPNAME NAME, XCLASS NAME, &type, &v);         \
+	if (v.addr != NULL && !strncmp ("String", type, 64))    \
+		DST = v.addr;                                       \
+    else                                                    \
+        DST = DEFAULT;                                      \
+    if (g.debug>1) {fprintf (stderr, NAME": %s\n", DST);}
+
 //
 // help and exit
 //
@@ -49,10 +57,11 @@ Options:\n\
     -w N      window manager: 0=no, 1=ewmh-compatible, 2=ratpoison, 3=old fashion\n\
     -d N      desktop: 0=current 1=all, 2=all but special, 3=all but current\n\
    -sc N      screen: 0=current 1=all\n\
-   -mm N      main modifier mask\n\
-   -bm N      backward scroll modifier mask\n\
-   -kk N      keysym of main modifier\n\
-   -mk N      keysym of main key\n\
+   -kk str    keysym of main modifier\n\
+   -mk str    keysym of main key\n\
+   -bk str    keysym of backscroll modifier\n\
+   -mm N      (obsoleted) main modifier mask\n\
+   -bm N      (obsoleted) backward scroll modifier mask\n\
     -t NxM    tile geometry\n\
     -i NxM    icon geometry\n\
    -vp str    switcher viewport: focus, pointer, total, WxH+X+Y\n\
@@ -70,17 +79,6 @@ See man alttab for details.\n");
 }
 
 //
-// removes argument from argv
-//
-void remove_arg(int *argc, char **argv, int argn)
-{
-    int i;
-    for(i = argn; i < (*argc); ++i)
-    argv[i] = argv[i+1];
-    --(*argc);
-}
-
-//
 // initialize globals based on executable agruments and Xresources
 // return 1 if success, 0 otherwise
 //
@@ -89,6 +87,10 @@ int use_args_and_xrm(int *argc, char **argv)
 // set debug level early
 	g.debug = 0;
 	char *endptr;
+    XrmDatabase db;
+    XrmValue v;
+    char *type;
+
 // not using getopt() because of need for "-v" before Xrm
 	int arg;
 	for (arg = 0; arg < (*argc); arg++) {
@@ -110,7 +112,6 @@ int use_args_and_xrm(int *argc, char **argv)
 	}
 
     const char* inv = "invalid %s specified, using default\n";
-    const char* nosym = "the specified %s keysym is not defined for any keycode, using default\n";
 
 	XrmOptionDescRec xrmTable[] = {
 		{"-w", "*windowmanager", XrmoptionSepArg, NULL} ,
@@ -120,6 +121,7 @@ int use_args_and_xrm(int *argc, char **argv)
 		{"-bm", "*backscroll.mask", XrmoptionSepArg, NULL} ,
 		{"-mk", "*modifier.keysym", XrmoptionSepArg, NULL} ,
 		{"-kk", "*key.keysym", XrmoptionSepArg, NULL} ,
+		{"-bk", "*backscroll.keysym", XrmoptionSepArg, NULL} ,
 		{"-t", "*tile.geometry", XrmoptionSepArg, NULL} ,
 		{"-i", "*icon.geometry", XrmoptionSepArg, NULL} ,
 		{"-vp", "*viewport", XrmoptionSepArg, NULL} ,
@@ -131,7 +133,6 @@ int use_args_and_xrm(int *argc, char **argv)
 		{"-frame", "*framecolor", XrmoptionSepArg, NULL} ,
 		{"-font", "*font", XrmoptionSepArg, NULL} ,
 	};
-	XrmDatabase db;
 	XrmInitialize();
 	char *rm = XResourceManagerString(dpy);
 	char *empty = "";
@@ -162,18 +163,7 @@ int use_args_and_xrm(int *argc, char **argv)
         fprintf (stderr, ", use -h for help\n");
     }
 
-	XrmValue v;
-	char *type;
-
-#define XRESOURCE_LOAD_STRING(NAME, DST, DEFAULT)           \
-	XrmGetResource (db, XRMAPPNAME NAME, XCLASS NAME, &type, &v);         \
-	if (v.addr != NULL && !strncmp ("String", type, 64))    \
-		DST = v.addr;                                       \
-    else                                                    \
-        DST = DEFAULT;                                      \
-    if (g.debug>1) {fprintf (stderr, NAME": %s\n", DST);}
-
-// initializing g.option_wm
+// initialize g.option_wm
 
 	endptr = NULL;
 	char *wmindex = NULL;
@@ -264,73 +254,51 @@ int use_args_and_xrm(int *argc, char **argv)
 	if (g.debug > 0)
 		fprintf(stderr, "screens: %d\n", g.option_screen);
 
-	unsigned int defaultModMask = DEFMODMASK;
-	unsigned int defaultBackMask = DEFBACKMASK;
-	KeySym defaultModSym = DEFMODKS;
-	KeySym defaultKeySym = DEFKEYKS;
-	char *s;
-	KeySym ksym = defaultModSym;
-	unsigned int mask = defaultModMask;
+    const char *rmb = "fatal: can't figure out modmask from keycode 0x%x\n";
 
-    g.option_modMask = defaultModMask;
-	endptr = s = NULL;
-	XRESOURCE_LOAD_STRING(".modifier.mask", s, NULL);
-	if (s) {
-		mask = strtol(s, &endptr, 0);
-        if (*s != '\0' && *endptr == '\0')
-            g.option_modMask = mask;
-        else
-            fprintf (stderr, inv, "modifier mask");
-    }
+#define  MC  g.option_modCode
+    MC = ksym_option_to_keycode(&db, XRMAPPNAME, "modifier");
+    if (MC == 0)
+        MC = XKeysymToKeycode(dpy, DEFMODKS);
 
-    g.option_backMask = defaultBackMask;
-	endptr = s = NULL;
-	XRESOURCE_LOAD_STRING(".backscroll.mask", s, NULL);
-	if (s) {
-		mask = strtol(s, &endptr, 0);
-        if (*s != '\0' && *endptr == '\0')
-            g.option_backMask = mask;
-        else
-            fprintf (stderr, inv, "backscroll mask");
-    }
+#define  KC  g.option_keyCode
+    KC = ksym_option_to_keycode(&db, XRMAPPNAME, "key");
+    if (KC == 0)
+        KC = XKeysymToKeycode(dpy, DEFKEYKS);
 
-    g.option_modCode = XKeysymToKeycode(dpy, defaultModSym);
-	endptr = s = NULL;
-	XRESOURCE_LOAD_STRING(".modifier.keysym", s, NULL);
-	if (s) {
-		ksym = strtol(s, &endptr, 0);
-        if (*s != '\0' && *endptr == '\0') {
-            g.option_modCode = XKeysymToKeycode(dpy, ksym);
-            if (g.option_modCode == 0) {
-                fprintf (stderr, nosym, "modifier");
-                g.option_modCode = XKeysymToKeycode(dpy, defaultModSym);
-            }
-        } else {
-            fprintf (stderr, inv, "modifier keysym");
+#define  GMM  g.option_modMask
+    if (xresource_load_int(&db, XRMAPPNAME, "modifier.mask", &(GMM))) {
+        fprintf (stderr, 
+          "Using obsoleted -mm option or modifier.mask resource, see man page for upgrade\n");
+    } else {
+        GMM = keycode_to_modmask(MC);
+        if (GMM == 0) {
+            fprintf (stderr, rmb, MC);
+            return 0;
         }
     }
 
-    g.option_keyCode = XKeysymToKeycode(dpy, defaultKeySym);
-	endptr = s = NULL;
-	XRESOURCE_LOAD_STRING(".key.keysym", s, NULL);
-	if (s) {
-		ksym = strtol(s, &endptr, 0);
-        if (*s != '\0' && *endptr == '\0') {
-            g.option_keyCode = XKeysymToKeycode(dpy, ksym);
-            if (g.option_keyCode == 0) {
-                fprintf (stderr, nosym, "main key");
-                g.option_keyCode = XKeysymToKeycode(dpy, defaultKeySym);
+#define  GBM  g.option_backMask
+    if (xresource_load_int(&db, XRMAPPNAME, "backscroll.mask", &(GBM))) {
+        fprintf (stderr, 
+          "Using obsoleted -bm option or backscroll.mask resource, see man page for upgrade\n");
+    } else {
+        KeyCode BC = ksym_option_to_keycode(&db, XRMAPPNAME, "backscroll");
+        if (BC != 0) {
+            GBM = keycode_to_modmask(BC);
+            if (GBM == 0) {
+                fprintf (stderr, rmb, BC);
+                return 0;
             }
         } else {
-            fprintf (stderr, inv, "main key keysym");
+            GBM = DEFBACKMASK;
         }
     }
 
 	if (g.debug > 0) {
 		fprintf(stderr,
 			"modMask %d, backMask %d, modCode %d, keyCode %d\n",
-			g.option_modMask, g.option_backMask, g.option_modCode,
-			g.option_keyCode);
+			GMM, GBM, MC, KC);
 	}
 
 	char *gtile, *gicon, *gview, *gpos;
@@ -498,14 +466,14 @@ int use_args_and_xrm(int *argc, char **argv)
 }
 
 //
-// grab Alt-Tab and Alt
+// grab Alt-Tab and Alt-Shift-Tab
 // note: exit() on failure
 //
 int grabAllKeys(bool grabUngrab)
 {
 	g.ignored_modmask = getOffendingModifiersMask(dpy);	// or 0 for g.debug
 	char *grabhint =
-	    "Error while (un)grabbing key 0x%x with mask 0x%x/0x%x.\nProbably other program already grabbed this combination.\nCheck: xdotool keydown alt+Tab; xdotool key XF86LogGrabInfo; xdotool keyup Tab; sleep 1; xdotool keyup alt; tail /var/log/Xorg.0.log\nOr try Ctrl-Tab instead of Alt-Tab:  alttab -mm 4 -mk 0xffe3\n";
+	    "Error while (un)grabbing key 0x%x with mask 0x%x/0x%x.\nProbably other program already grabbed this combination.\nCheck: xdotool keydown alt+Tab; xdotool key XF86LogGrabInfo; xdotool keyup Tab; sleep 1; xdotool keyup alt; tail /var/log/Xorg.0.log\nOr try Ctrl-Tab instead of Alt-Tab:  alttab -mk Control_L\n";
 // attempt XF86Ungrab? probably too invasive
 	if (!changeKeygrab
 	    (root, grabUngrab, g.option_keyCode, g.option_modMask,
@@ -559,16 +527,17 @@ int main(int argc, char **argv)
 	while (true) {
 		memset(&(ev.xkey), 0, sizeof(ev.xkey));
 
-		if (g.uiShowHasRun) {
-			// poll: lag and consume cpu, but necessary because of bug #1 and #2
-			nanosleep(&nanots, NULL);
-			XQueryKeymap(dpy, keys_pressed);
-			if (!(keys_pressed[octet] & kmask)) {	// Alt released
-				uiHide();
-				continue;
-			}
-			if (!XCheckIfEvent(dpy, &ev, *predproc_true, NULL))
-				continue;
+        if (g.uiShowHasRun) {
+            // poll: lag and consume cpu, but necessary because of bug #1 and #2
+            XQueryKeymap(dpy, keys_pressed);
+            if (!(keys_pressed[octet] & kmask)) {	// Alt released
+                uiHide();
+                continue;
+            }
+            if (!XCheckIfEvent(dpy, &ev, *predproc_true, NULL)) {
+                nanosleep(&nanots, NULL);
+                continue;
+            }
 		} else {
 			// event: immediate, when we don't care about Alt release
 			XNextEvent(dpy, &ev);
