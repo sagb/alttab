@@ -633,7 +633,11 @@ bool common_skipWindow(Window w,
         return true;
     }
 
-    if (g.option_screen == SCR_CURRENT) {
+    // man page: -sc 0: Screen is defined according to -vp pointer or -vp focus.
+    // assuming g.vp already calculated in gui.c
+    if (g.option_screen == SCR_CURRENT &&
+            (g.option_vp_mode == VP_POINTER ||
+            g.option_vp_mode == VP_FOCUS)) {
         if (! get_absolute_coordinates(w, &wq)) {
             fprintf (stderr, 
                     "can't get coordinates of window 0x%lx, included anyway\n", w);

@@ -312,7 +312,9 @@ int uiShow(bool direction)
 
     XClassHint class_h = { XCLASSNAME, XCLASS };
 
-// GC initialized earlier, now able to init winlist
+// to init winlist, the following must be initialized:
+// GC,
+// g.vp (for SCR_CURRENT)
 
 	g.winlist = NULL;
 	g.maxNdx = 0;
