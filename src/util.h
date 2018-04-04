@@ -27,6 +27,7 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 #include <X11/Xutil.h>
 #include <X11/Xft/Xft.h>
 #include <X11/extensions/Xrender.h>
+#include <X11/Xresource.h>
 
 #define MAXPROPLEN  4096
 
@@ -36,6 +37,7 @@ typedef struct {
     int w; int h;
     int x; int y;
 } quad;
+#define MAXNAMESZ   256
 #endif
 
 XErrorEvent *ee_ignored;
@@ -74,5 +76,11 @@ char *get_x_property(Window win, Atom prop_type, char *prop_name,
 
 bool rectangles_cross(quad a, quad b);
 bool get_absolute_coordinates(Window w, quad *q);
+
+void remove_arg(int *argc, char **argv, int argn);
+char* xresource_load_string(XrmDatabase *db, const char *appname, char *name);
+bool xresource_load_int(XrmDatabase *db, const char *appname, char *name, unsigned int *ret);
+KeyCode ksym_option_to_keycode(XrmDatabase *db, const char *appname, const char *name);
+unsigned int keycode_to_modmask(KeyCode kc);
 
 #endif
