@@ -17,14 +17,13 @@
 !alttab.screens:         0
 
 ! Ctrl-Tab instead of Alt-Tab
-!alttab.modifier.mask:   4
-!alttab.modifier.keysym: 0xffe3
+!alttab.modifier.keysym: Control_L
 
 ! Ctrl instead of Shift for backscroll
-!alttab.backscroll.mask: 4
+!alttab.backscroll.keysym: Control_L
 
 ! grave (back apostrophe) instead of Tab
-!alttab.key.keysym:      0x60
+!alttab.key.keysym:      grave
 
 ! Limit the switcher to this rectangle 
 ! instead of default screen size

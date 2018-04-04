@@ -40,7 +40,6 @@ unsigned int tileW, tileH, iconW, iconH;
 unsigned int visualTileW;
 int lastPressedTile;
 quad scrdim;
-quad vp;
 Window uiwin;
 int uiwinW, uiwinH, uiwinX, uiwinY;
 Colormap colormap;
@@ -164,7 +163,7 @@ int startupGUItasks()
 {
 // if viewport is not fixed, then initialize vp* at every show
     if (g.option_vp_mode == VP_SPECIFIC) {
-        vp = g.option_vp;
+        g.vp = g.option_vp;
     }
     g.has_randr = randrAvailable();
 // colors
@@ -277,47 +276,49 @@ int uiShow(bool direction)
             // initialized at startup instead
             break;
         case VP_TOTAL:
-            vp = scrdim;
+            g.vp = scrdim;
             break;
         case VP_FOCUS:
         case VP_POINTER:
             if (g.has_randr) {
                 bool multihead;
-                if (! randrGetViewport (&vp, &multihead)) {
+                if (! randrGetViewport (&(g.vp), &multihead)) {
                     if (g.debug > 0) {
                         fprintf (stderr, 
                           "can't obtain viewport from randr, using default screen\n");
                     }
-                    vp = scrdim;
+                    g.vp = scrdim;
                 }
                 if (! multihead) {
                     if (g.debug > 0) {
                         fprintf (stderr, 
                           "randr reports single head, using default screen instead\n");
                     }
-                    vp = scrdim;
+                    g.vp = scrdim;
                 }
             } else {
                 if (g.debug > 0) {
                     fprintf (stderr, 
                       "no randr, using default screen as viewport\n");
                 }
-                vp = scrdim;
+                g.vp = scrdim;
             }
             break;
         default:
             fprintf (stderr, 
               "unknown viewport mode, using default screen\n");
-            vp = scrdim;
+            g.vp = scrdim;
     }
 
     XClassHint class_h = { XCLASSNAME, XCLASS };
 
-// GC initialized earlier, now able to init winlist
+// to init winlist, the following must be initialized:
+// GC,
+// g.vp (for SCR_CURRENT)
 
 	g.winlist = NULL;
 	g.maxNdx = 0;
-	if (!initWinlist(direction, vp)) {
+	if (!initWinlist(direction)) {
 		if (g.debug > 0) {
 			fprintf(stderr,
 				"initWinlist failed, skipping ui initialization\n");
@@ -359,8 +360,8 @@ int uiShow(bool direction)
 	iconH = g.option_iconH;
 	float rt = 1.0;
 // for subsequent calculation of width(s), use 'avail_w'
-// instead of vp.w, because they don't match for POS_SPECIFIC
-    int avail_w = vp.w;
+// instead of g.vp.w, because they don't match for POS_SPECIFIC
+    int avail_w = g.vp.w;
     if (g.option_positioning == POS_SPECIFIC)
         avail_w -= g.option_posX;
 // tiles may be smaller if they don't fit viewport
@@ -385,11 +386,11 @@ int uiShow(bool direction)
 	}
 	uiwinH = tileH + 2 * FRAME_W;
     if (g.option_positioning == POS_CENTER) {
-    	uiwinX = (vp.w - uiwinW) / 2 + vp.x;
-    	uiwinY = (vp.h - uiwinH) / 2 + vp.y;
+    	uiwinX = (g.vp.w - uiwinW) / 2 + g.vp.x;
+    	uiwinY = (g.vp.h - uiwinH) / 2 + g.vp.y;
     } else {
-        uiwinX = g.option_posX + vp.x;
-        uiwinY = g.option_posY + vp.y;
+        uiwinX = g.option_posX + g.vp.x;
+        uiwinY = g.option_posY + g.vp.y;
     }
     visualTileW = (uiwinW - FRAME_W) / g.maxNdx;
 	if (g.debug > 0) {
@@ -405,7 +406,7 @@ int uiShow(bool direction)
                 fprintf(stderr, " [%dx%d]", s->width, s->height);
             }
             fprintf(stderr, ", viewport %dx%d+%d+%d, avail_w %d", 
-                    vp.w, vp.h, vp.x, vp.y, avail_w);
+                    g.vp.w, g.vp.h, g.vp.x, g.vp.y, avail_w);
         }
         fprintf(stderr, "\n");
 	}
