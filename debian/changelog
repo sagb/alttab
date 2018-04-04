@@ -1,10 +1,13 @@
-alttab (1.2.0.20180402.46.ge2fdceb-1~1.gbpf3f84e) stretch; urgency=medium
+alttab (1.2.0.20180404.52.g6efa031-1~1.gbpa4c7dc) unstable; urgency=medium
 
-  ** SNAPSHOT build @f3f84e3c08135048542d79f703b8d6e9ccb3a78f **
+  ** SNAPSHOT build @a4c7dc721d330b4fd1e1a18afa7615acec98b610 **
 
-  * backport to stretch
+  * all keys-related options use symbolic keysym names
+  * sleep on negative XCheckIfEvent, not every cycle, fix lags
+  * common filtering by desktop and screen
+  * desktop (group) support in ratpoison
 
- -- Alexander Kulak <sa-dev@rainbow.by>  Mon, 02 Apr 2018 18:10:21 +0300
+ -- Alexander Kulak <sa-dev@rainbow.by>  Wed, 04 Apr 2018 19:03:09 +0300
 
 alttab (1.2.0.20180402.46.ge2fdceb-1~1.gbp2ab220) unstable; urgency=medium
 

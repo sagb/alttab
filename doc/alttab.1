@@ -7,7 +7,7 @@
 \fBalttab\fR \- the task switcher
 .
 .SH "SYNOPSIS"
-\fBalttab\fR [\fB\-w\fR \fIN\fR] [\fB\-d\fR \fIN\fR] [\fB\-sc\fR \fIN\fR] [\fB\-mm\fR \fIN\fR] [\fB\-bm\fR \fIN\fR] [\fB\-mk\fR \fIN\fR] [\fB\-kk\fR \fIN\fR] [\fB\-t\fR \fINxM\fR] [\fB\-i\fR \fINxM\fR] [\fB\-vp\fR \fIstr\fR] [\fB\-p\fR \fIstr\fR] [\fB\-s\fR \fIN\fR] [\fB\-theme\fR \fIname\fR] [\fB\-bg\fR \fIcolor\fR] [\fB\-fg\fR \fIcolor\fR] [\fB\-frame\fR \fIcolor\fR] [\fB\-font\fR \fIname\fR] [\fB\-v\fR|\fB\-vv\fR]
+\fBalttab\fR [\fB\-w\fR \fIN\fR] [\fB\-d\fR \fIN\fR] [\fB\-sc\fR \fIN\fR] [\fB\-mk\fR \fIstr\fR] [\fB\-kk\fR \fIstr\fR] [\fB\-bk\fR \fIstr\fR] [\fB\-mm\fR \fIN\fR] [\fB\-bm\fR \fIN\fR] [\fB\-t\fR \fINxM\fR] [\fB\-i\fR \fINxM\fR] [\fB\-vp\fR \fIstr\fR] [\fB\-p\fR \fIstr\fR] [\fB\-s\fR \fIN\fR] [\fB\-theme\fR \fIname\fR] [\fB\-bg\fR \fIcolor\fR] [\fB\-fg\fR \fIcolor\fR] [\fB\-frame\fR \fIcolor\fR] [\fB\-font\fR \fIname\fR] [\fB\-v\fR|\fB\-vv\fR]
 .
 .SH "DESCRIPTION"
 The task switcher designed for minimalistic window managers or standalone X11 session\.
@@ -47,7 +47,7 @@ Compatible WM list is in [SEE ALSO] below\. alttab functions in xmonad (EWMH mus
 \fI2\fR: Ratpoison\.
 .
 .IP
-Alttab uses ratpoison own perfect remote control capability\. Additionally, alttab registers itself in its "unmanaged list" automatically\.
+Alttab uses ratpoison own remote control capability\. Additionally, alttab registers itself in its "unmanaged list" automatically\.
 .
 .IP
 \fI3\fR: Ancient WM\.
@@ -75,9 +75,6 @@ This is default, although in non EWMH\-compatible WM, except ratpoison, it\'s ef
 \fI1\fR: All desktops\.
 .
 .IP
-Doesn\'t work in ratpoison\.
-.
-.IP
 \fI2\fR: All desktops, excluding special (\-1) one\.
 .
 .IP
@@ -94,13 +91,13 @@ resource: alttab\.screens
 default: \fI1\fR
 .
 .IP
-Show windows belonging to screens\. \fINUMBER\fR must be 0 or 1:
+Show windows belonging to xrandr/xinerama screens\. \fINUMBER\fR must be 0 or 1:
 .
 .IP
 \fI0\fR: Current screen\.
 .
 .IP
-Screen is defined according to \fB\-vp\fR \fIpointer\fR or \fB\-vp\fR \fIfocus\fR\.
+As defined according to \fB\-vp\fR \fIpointer\fR or \fB\-vp\fR \fIfocus\fR\.
 .
 .IP
 \fI1\fR: All screens\.
@@ -109,44 +106,48 @@ Screen is defined according to \fB\-vp\fR \fIpointer\fR or \fB\-vp\fR \fIfocus\f
 This is default\.
 .
 .TP
+\fB\-mk\fR \fIstr\fR
+resource: alttab\.modifier\.keysym
+.
+.br
+default: Alt_L
+.
+.IP
+Keysym of main modifier, string or number\. Suitable examples: Control_L, Super_L\.
+.
+.TP
+\fB\-kk\fR \fIstr\fR
+resource: alttab\.key\.keysym
+.
+.br
+default: Tab
+.
+.IP
+Keysym of main key\. For example, grave (aka tilde), Escape\.
+.
+.TP
+\fB\-bk\fR \fIstr\fR
+resource: alttab\.backscroll\.keysym
+.
+.br
+default: any Shift, according to ShiftMask
+.
+.IP
+Keysym of backward scroll key\.
+.
+.TP
 \fB\-mm\fR \fINUM\fR
 resource: alttab\.modifier\.mask
 .
-.br
-default: \fI8\fR (Mod1Mask aka left Alt)
-.
 .IP
-Main modifier mask\. See /usr/include/X11/X\.h\.
+OBSOLETED, guessed from \-mk instead\.
 .
 .TP
 \fB\-bm\fR \fINUM\fR
 resource: alttab\.backscroll\.mask
 .
-.br
-default: \fI1\fR (ShiftMask)
-.
 .IP
-Backward scroll modifier mask\.
-.
-.TP
-\fB\-mk\fR \fINUM\fR
-resource: alttab\.modifier\.keysym
-.
-.br
-default: \fI0xffe9\fR (XK_Alt_L aka left Alt)
-.
-.IP
-Keysym of main modifier alone\. See /usr/include/X11/keysymdef\.h\. Keep in sync with \fB\-mm\fR\.
-.
-.TP
-\fB\-kk\fR \fINUM\fR
-resource: alttab\.key\.keysym
-.
-.br
-default: \fI0xff09\fR (XK_Tab)
-.
-.IP
-Keysym of main key\.
+OBSOLETED, guessed from \-bk instead\.
 .
 .TP
 \fB\-t\fR \fINNxMM\fR

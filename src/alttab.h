@@ -21,7 +21,6 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef ALTTAB_H
 #define ALTTAB_H
 
-#define MAXNAMESZ   256
 #define MAXPATHSZ   8200
 #define MAXRPOUT    8200
 
@@ -70,6 +69,7 @@ typedef struct {
     int w; int h;
     int x; int y;
 } quad;
+#define MAXNAMESZ   256
 #endif
 
 typedef struct {
@@ -161,6 +161,7 @@ typedef struct {
 #define VP_DEFAULT      VP_FOCUS
     int option_vp_mode;
     quad option_vp;
+    quad vp;
     bool has_randr;
 #define POS_CENTER      0
 #define POS_NONE        1
@@ -204,7 +205,7 @@ int startupWintasks();
 int addIconFromHints (WindowInfo* wi);
 int addIconFromFiles (WindowInfo* wi);
 int addWindowInfo(Window win, int reclevel, int wm_id, unsigned long desktop, char *wm_name);
-int initWinlist(bool direction, quad screen);
+int initWinlist(bool direction);
 void freeWinlist();
 int setFocus(int winNdx);
 int rp_startupWintasks();
@@ -216,6 +217,7 @@ int execAndReadStdout(char *exe, char *args[], char *buf, int bufsize);
 int pulloutWindowToTop(int winNdx);
 void winPropChangeEvent(XPropertyEvent e);
 void winDestroyEvent(XDestroyWindowEvent e);
+bool common_skipWindow(Window w, unsigned long current_desktop, unsigned long window_desktop);
 
 /* EWHM */
 bool ewmh_detectFeatures(EwmhFeatures *e);
