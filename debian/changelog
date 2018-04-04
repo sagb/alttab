@@ -1,3 +1,14 @@
+alttab (1.2.0.20180404.52.g6efa031-1~1.gbpa4c7dc) unstable; urgency=medium
+
+  ** SNAPSHOT build @a4c7dc721d330b4fd1e1a18afa7615acec98b610 **
+
+  * all keys-related options use symbolic keysym names
+  * sleep on negative XCheckIfEvent, not every cycle, fix lags
+  * common filtering by desktop and screen
+  * desktop (group) support in ratpoison
+
+ -- Alexander Kulak <sa-dev@rainbow.by>  Wed, 04 Apr 2018 19:03:09 +0300
+
 alttab (1.2.0.20180402.46.ge2fdceb-1~1.gbp2ab220) unstable; urgency=medium
 
   ** SNAPSHOT build @2ab220de5c1fd59c58735800d764d45bc572a3c8 **
