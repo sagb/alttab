@@ -39,6 +39,14 @@ Window root;
 
 // PRIVATE
 
+#define XRESOURCE_LOAD_STRING(NAME, DST, DEFAULT)           \
+	XrmGetResource (db, XRMAPPNAME NAME, XCLASS NAME, &type, &v);         \
+	if (v.addr != NULL && !strncmp ("String", type, 64))    \
+		DST = v.addr;                                       \
+    else                                                    \
+        DST = DEFAULT;                                      \
+    if (g.debug>1) {fprintf (stderr, NAME": %s\n", DST);}
+
 //
 // help and exit
 //
@@ -49,10 +57,11 @@ Options:\n\
     -w N      window manager: 0=no, 1=ewmh-compatible, 2=ratpoison, 3=old fashion\n\
     -d N      desktop: 0=current 1=all, 2=all but special, 3=all but current\n\
    -sc N      screen: 0=current 1=all\n\
-   -mm N      main modifier mask\n\
-   -bm N      backward scroll modifier mask\n\
-   -kk N      keysym of main modifier\n\
-   -mk N      keysym of main key\n\
+   -kk str    keysym of main modifier\n\
+   -mk str    keysym of main key\n\
+   -bk str    keysym of backscroll modifier\n\
+   -mm N      (obsoleted) main modifier mask\n\
+   -bm N      (obsoleted) backward scroll modifier mask\n\
     -t NxM    tile geometry\n\
     -i NxM    icon geometry\n\
    -vp str    switcher viewport: focus, pointer, total, WxH+X+Y\n\
@@ -81,6 +90,104 @@ void remove_arg(int *argc, char **argv, int argn)
 }
 
 //
+// return resource/option `alttab.name'
+// or NULL if not specified
+//
+char* xresource_load_string(XrmDatabase *db, char *name)
+{
+    char xname[MAXNAMESZ];
+    char xclass[MAXNAMESZ];
+    XrmValue v;
+    char *type;
+
+    snprintf (xname, MAXNAMESZ, XRMAPPNAME".%s", name);
+    snprintf (xclass, MAXNAMESZ, XCLASS".%s", name);
+	XrmGetResource (*db, xname, xclass, &type, &v);
+	return
+      (v.addr != NULL && !strncmp ("String", type, 64)) ? 
+      v.addr : NULL;
+}
+
+//
+// return resource/option `alttab.name' in *ret
+// or false if not specified
+//
+bool xresource_load_int(XrmDatabase *db, char *name, unsigned int *ret)
+{
+    unsigned int r;
+    char *endptr;
+    char *s = xresource_load_string(db, name);
+
+    if (s != NULL) {
+        r = strtol(s, &endptr, 0);
+        if (*s != '\0' && *endptr == '\0') {
+            *ret = r;
+            return true;
+        }
+    }
+    return false;
+}
+
+//
+// return keycode corresponding to resource/option `alttab.name.keysym'
+// or 0 if not specified
+//
+KeyCode ksym_option_to_keycode(XrmDatabase *db, const char *name)
+{
+	char *endptr, *opt;
+    KeySym ksym;
+    char xresr[MAXNAMESZ];
+    KeyCode retcode = 0; // default
+
+    endptr = opt = NULL;
+    snprintf (xresr, MAXNAMESZ, "%s.keysym", name); xresr[MAXNAMESZ-1]='\0';
+    opt = xresource_load_string(db, xresr);
+	if (opt) {
+        ksym = XStringToKeysym(opt);
+        if (ksym == NoSymbol) {
+    		ksym = strtol(opt, &endptr, 0);
+            if (!(*opt != '\0' && *endptr == '\0'))
+                ksym = NoSymbol;
+        }
+        if (ksym != NoSymbol) {
+            retcode = XKeysymToKeycode(dpy, ksym);
+            if (retcode == 0) {
+                fprintf (stderr,
+                  "the specified %s keysym is not defined for any keycode, using default\n",
+                  name);
+            }
+        } else {
+            fprintf (stderr, "invalid %s keysym, using default\n", name);
+        }
+    }
+    return retcode;
+}
+
+//
+// scan modifier table,
+// return first modifier corresponding to given keycode,
+// in the form of modmask,
+// or zero if not found
+// 
+unsigned int keycode_to_modmask(KeyCode kc)
+{
+    int mi, ksi;
+    KeyCode tkc;
+    XModifierKeymap *xmk = XGetModifierMapping(dpy);
+
+    for (mi = 0; mi < 8; mi++) {
+        for (ksi = 0; ksi < xmk->max_keypermod; ksi++) {
+            tkc = (xmk->modifiermap)[xmk->max_keypermod * mi + ksi];
+            if (tkc == kc) {
+                return (1 << mi);
+            }
+        }
+    }
+    return 0;
+}
+
+
+//
 // initialize globals based on executable agruments and Xresources
 // return 1 if success, 0 otherwise
 //
@@ -89,6 +196,10 @@ int use_args_and_xrm(int *argc, char **argv)
 // set debug level early
 	g.debug = 0;
 	char *endptr;
+    XrmDatabase db;
+    XrmValue v;
+    char *type;
+
 // not using getopt() because of need for "-v" before Xrm
 	int arg;
 	for (arg = 0; arg < (*argc); arg++) {
@@ -110,7 +221,6 @@ int use_args_and_xrm(int *argc, char **argv)
 	}
 
     const char* inv = "invalid %s specified, using default\n";
-    const char* nosym = "the specified %s keysym is not defined for any keycode, using default\n";
 
 	XrmOptionDescRec xrmTable[] = {
 		{"-w", "*windowmanager", XrmoptionSepArg, NULL} ,
@@ -120,6 +230,7 @@ int use_args_and_xrm(int *argc, char **argv)
 		{"-bm", "*backscroll.mask", XrmoptionSepArg, NULL} ,
 		{"-mk", "*modifier.keysym", XrmoptionSepArg, NULL} ,
 		{"-kk", "*key.keysym", XrmoptionSepArg, NULL} ,
+		{"-bk", "*backscroll.keysym", XrmoptionSepArg, NULL} ,
 		{"-t", "*tile.geometry", XrmoptionSepArg, NULL} ,
 		{"-i", "*icon.geometry", XrmoptionSepArg, NULL} ,
 		{"-vp", "*viewport", XrmoptionSepArg, NULL} ,
@@ -131,7 +242,6 @@ int use_args_and_xrm(int *argc, char **argv)
 		{"-frame", "*framecolor", XrmoptionSepArg, NULL} ,
 		{"-font", "*font", XrmoptionSepArg, NULL} ,
 	};
-	XrmDatabase db;
 	XrmInitialize();
 	char *rm = XResourceManagerString(dpy);
 	char *empty = "";
@@ -161,17 +271,6 @@ int use_args_and_xrm(int *argc, char **argv)
         }
         fprintf (stderr, ", use -h for help\n");
     }
-
-	XrmValue v;
-	char *type;
-
-#define XRESOURCE_LOAD_STRING(NAME, DST, DEFAULT)           \
-	XrmGetResource (db, XRMAPPNAME NAME, XCLASS NAME, &type, &v);         \
-	if (v.addr != NULL && !strncmp ("String", type, 64))    \
-		DST = v.addr;                                       \
-    else                                                    \
-        DST = DEFAULT;                                      \
-    if (g.debug>1) {fprintf (stderr, NAME": %s\n", DST);}
 
 // initializing g.option_wm
 
@@ -264,73 +363,51 @@ int use_args_and_xrm(int *argc, char **argv)
 	if (g.debug > 0)
 		fprintf(stderr, "screens: %d\n", g.option_screen);
 
-	unsigned int defaultModMask = DEFMODMASK;
-	unsigned int defaultBackMask = DEFBACKMASK;
-	KeySym defaultModSym = DEFMODKS;
-	KeySym defaultKeySym = DEFKEYKS;
-	char *s;
-	KeySym ksym = defaultModSym;
-	unsigned int mask = defaultModMask;
+    const char *rmb = "fatal: can't figure out modmask from keycode 0x%x\n";
 
-    g.option_modMask = defaultModMask;
-	endptr = s = NULL;
-	XRESOURCE_LOAD_STRING(".modifier.mask", s, NULL);
-	if (s) {
-		mask = strtol(s, &endptr, 0);
-        if (*s != '\0' && *endptr == '\0')
-            g.option_modMask = mask;
-        else
-            fprintf (stderr, inv, "modifier mask");
-    }
+#define  MC  g.option_modCode
+    MC = ksym_option_to_keycode(&db, "modifier");
+    if (MC == 0)
+        MC = XKeysymToKeycode(dpy, DEFMODKS);
 
-    g.option_backMask = defaultBackMask;
-	endptr = s = NULL;
-	XRESOURCE_LOAD_STRING(".backscroll.mask", s, NULL);
-	if (s) {
-		mask = strtol(s, &endptr, 0);
-        if (*s != '\0' && *endptr == '\0')
-            g.option_backMask = mask;
-        else
-            fprintf (stderr, inv, "backscroll mask");
-    }
+#define  KC  g.option_keyCode
+    KC = ksym_option_to_keycode(&db, "key");
+    if (KC == 0)
+        KC = XKeysymToKeycode(dpy, DEFKEYKS);
 
-    g.option_modCode = XKeysymToKeycode(dpy, defaultModSym);
-	endptr = s = NULL;
-	XRESOURCE_LOAD_STRING(".modifier.keysym", s, NULL);
-	if (s) {
-		ksym = strtol(s, &endptr, 0);
-        if (*s != '\0' && *endptr == '\0') {
-            g.option_modCode = XKeysymToKeycode(dpy, ksym);
-            if (g.option_modCode == 0) {
-                fprintf (stderr, nosym, "modifier");
-                g.option_modCode = XKeysymToKeycode(dpy, defaultModSym);
-            }
-        } else {
-            fprintf (stderr, inv, "modifier keysym");
+#define  GMM  g.option_modMask
+    if (xresource_load_int(&db, "modifier.mask", &(GMM))) {
+        fprintf (stderr, 
+          "Using obsoleted -mm option or modifier.mask resource, see man page for upgrade\n");
+    } else {
+        GMM = keycode_to_modmask(MC);
+        if (GMM == 0) {
+            fprintf (stderr, rmb, MC);
+            return 0;
         }
     }
 
-    g.option_keyCode = XKeysymToKeycode(dpy, defaultKeySym);
-	endptr = s = NULL;
-	XRESOURCE_LOAD_STRING(".key.keysym", s, NULL);
-	if (s) {
-		ksym = strtol(s, &endptr, 0);
-        if (*s != '\0' && *endptr == '\0') {
-            g.option_keyCode = XKeysymToKeycode(dpy, ksym);
-            if (g.option_keyCode == 0) {
-                fprintf (stderr, nosym, "main key");
-                g.option_keyCode = XKeysymToKeycode(dpy, defaultKeySym);
+#define  GBM  g.option_backMask
+    if (xresource_load_int(&db, "backscroll.mask", &(GBM))) {
+        fprintf (stderr, 
+          "Using obsoleted -bm option or backscroll.mask resource, see man page for upgrade\n");
+    } else {
+        KeyCode BC = ksym_option_to_keycode(&db, "backscroll");
+        if (BC != 0) {
+            GBM = keycode_to_modmask(BC);
+            if (GBM == 0) {
+                fprintf (stderr, rmb, BC);
+                return 0;
             }
         } else {
-            fprintf (stderr, inv, "main key keysym");
+            GBM = DEFBACKMASK;
         }
     }
 
 	if (g.debug > 0) {
 		fprintf(stderr,
 			"modMask %d, backMask %d, modCode %d, keyCode %d\n",
-			g.option_modMask, g.option_backMask, g.option_modCode,
-			g.option_keyCode);
+			GMM, GBM, MC, KC);
 	}
 
 	char *gtile, *gicon, *gview, *gpos;
