@@ -106,7 +106,7 @@ Most command line options have corresponding X resource, see doc/alttab.ad for e
     resource: alttab.modifier.keysym  
     default: Alt_L
 
-    Keysym of main modifier, string or number.
+    Keysym of main modifier. String or number accepted.
     Suitable examples: Control_L, Super_L.
 
   * `-kk` <str>:
@@ -264,7 +264,7 @@ Your Xresources database probably already has \*background, \*foreground or \*fo
 
 ##CAVEATS
 
-Run alttab after WM, or it will fail to detect it.
+Run alttab after WM, or autodetection will fail.
 
 ##AUTHOR
 
