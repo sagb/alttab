@@ -1,3 +1,11 @@
+alttab (1.2.0.20180406.53.g3701388-1~1.gbp168b9f) unstable; urgency=medium
+
+  ** SNAPSHOT build @168b9f5cd1711f32f5f48aa7eccc4605b6a36f5e **
+
+  * man page clarification
+
+ -- Alexander Kulak <sa-dev@rainbow.by>  Fri, 06 Apr 2018 23:06:25 +0300
+
 alttab (1.2.0.20180404.52.g6efa031-1~1.gbpa4c7dc) unstable; urgency=medium
 
   ** SNAPSHOT build @a4c7dc721d330b4fd1e1a18afa7615acec98b610 **
