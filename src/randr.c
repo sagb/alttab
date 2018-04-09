@@ -70,12 +70,11 @@ int randr_update_outputs(Window w, quad **outs)
         (*outs)[nout].y = crtc_info->y;
         (*outs)[nout].w = crtc_info->width;
         (*outs)[nout].h = crtc_info->height;
-        if (g.debug > 0) {
-            fprintf(stderr, "output %d (%d by randr) crtc: +%d+%d %dx%d noutput %d npossible %d\n", 
-                nout, out,
-                crtc_info->x, crtc_info->y, crtc_info->width, crtc_info->height, 
-                crtc_info->noutput, crtc_info->npossible);
-        }
+        msg(0,
+          "output %d (%d by randr) crtc: +%d+%d %dx%d noutput %d npossible %d\n", 
+          nout, out,
+          crtc_info->x, crtc_info->y, crtc_info->width, crtc_info->height, 
+          crtc_info->noutput, crtc_info->npossible);
         XRRFreeCrtcInfo(crtc_info);
         XRRFreeOutputInfo (out_info);
         nout++;
@@ -101,18 +100,16 @@ bool x_get_activity_area (quad *res, Window *fw)
 
     if (VPM == VP_FOCUS) {
         if (XGetInputFocus (dpy, fw, &rtr) == 0 || (*fw) == 0) {
-            fprintf (stderr, "can't recognize focused window\n");
+            msg(-1, "can't recognize focused window\n");
             return false;
         }
         if (! get_absolute_coordinates(*fw, res)) {
-            fprintf (stderr, "can't get window 0x%lx absolute coordinates\n", (*fw));
+            msg(-1, "can't get window 0x%lx absolute coordinates\n", (*fw));
             return false;
         }
-        if (g.debug > 0) {
-            fprintf (stderr, "focus in window 0x%lx (%dx%d +%d+%d)\n",
-                    (*fw), res->w, res->h,
-                    res->x, res->y);
-        }
+        msg(0, "focus in window 0x%lx (%dx%d +%d+%d)\n",
+          (*fw), res->w, res->h,
+          res->x, res->y);
         return true;
     }
 
@@ -126,9 +123,7 @@ bool x_get_activity_area (quad *res, Window *fw)
         res->y = win_y;
         res->w = res->h = 1;
         *fw = root;
-        if (g.debug > 0) {
-            fprintf (stderr, "pointer: +%d+%d\n", res->x, res->y);
-        }
+        msg(0, "pointer: +%d+%d\n", res->x, res->y);
         return true;
     }
 
@@ -157,9 +152,9 @@ bool randrAvailable()
     }
     if (g.debug > 0) {
         if (s == 0)
-            fprintf (stderr, "randr not available\n");
+            msg(0, "randr not available\n");
         else
-            fprintf (stderr, "randr v. %d.%d available (%ssufficient)\n",
+            msg(0, "randr v. %d.%d available (%ssufficient)\n",
                     maj, min, ok ? "" : "not ");
     }
     return ok;
@@ -186,17 +181,13 @@ bool randrGetViewport(quad *res, bool *multihead)
     //no = randr_update_outputs(fw != 0 ? fw : root, &oq); // no fw here
     no = randr_update_outputs(root, &oq);
     if (no < 1) {
-        if (g.debug > 0) {
-            fprintf (stderr, "randr didn't detect any output\n");
-        }
+        msg(0, "randr didn't detect any output\n");
         *multihead = false;
         if (oq != NULL) free (oq);
         return false;
     }
     if (no == 1) {
-        if (g.debug > 0) {
-            fprintf (stderr, "using single randr output as viewport\n");
-        }
+        msg(0, "using single randr output as viewport\n");
         *res = oq[0];
         *multihead = false;
         free (oq); return true;
@@ -205,9 +196,7 @@ bool randrGetViewport(quad *res, bool *multihead)
     *multihead = true;
 
     if (! x_get_activity_area (&aq, &fw)) {
-        if (g.debug > 0) {
-            fprintf (stderr, "failed to detect activity area, using first randr output\n");
-        }
+        msg(0, "failed to detect activity area, using first randr output\n");
         *res = oq[0];
         free (oq); return true;
     }
@@ -221,9 +210,7 @@ bool randrGetViewport(quad *res, bool *multihead)
             y1 = aq.y > oq[o].y ? aq.y : oq[o].y;
             y2 = (aq.y + aq.h) < (oq[o].y + oq[o].h) ? (aq.y + aq.h) :(oq[o].y + oq[o].h);
             area = (x2 - x1) * (y2 - y1);
-            if (g.debug > 0) {
-                fprintf (stderr, "output %d cross-section: %d\n", o, area);
-            }
+            msg(0, "output %d cross-section: %d\n", o, area);
             if (area > largest_cross_area) {
                 best_1_stage_output = o;
                 lq.x = x1;
@@ -243,17 +230,13 @@ bool randrGetViewport(quad *res, bool *multihead)
             if (bot_diff > 0) res->h += bot_diff;
             */
         } else {
-            if (g.debug > 0) {
-              fprintf (stderr, "output %d doesn't cross with activity area\n", o);
-            }
+            msg(0, "output %d doesn't cross with activity area\n", o);
         }
     } // outputs
 
     if (best_1_stage_output == -1) {
-        if (g.debug > 0) {
-            fprintf (stderr, 
-              "failed to find largest cross-section, using first randr output\n");
-        }
+        msg(0, 
+          "failed to find largest cross-section, using first randr output\n");
         *res = oq[0];
         free (oq); return true;
     }
@@ -275,21 +258,17 @@ bool randrGetViewport(quad *res, bool *multihead)
     if (best_2_stage_output == -1) {
         best_2_stage_output = best_1_stage_output;
     } else {
-        if (g.debug > 0) {
-            fprintf (stderr, 
-              "found better (smallest output) candidate: %d\n",
-              best_2_stage_output);
-        }
+        msg(0, 
+          "found better (smallest output) candidate: %d\n",
+          best_2_stage_output);
     }
 
     // the single result here is  best_2_stage_output
 
     *res = oq[best_2_stage_output];
-    if (g.debug > 0) {
-        fprintf (stderr, 
-                "best viewport from randr: %dx%d +%d+%d\n",
-                res->w, res->h, res->x, res->y);
-    }
+    msg(0, 
+      "best viewport from randr: %dx%d +%d+%d\n",
+      res->w, res->h, res->x, res->y);
     free (oq); return true;
 }
 

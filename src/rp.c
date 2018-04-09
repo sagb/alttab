@@ -28,6 +28,7 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 #include <string.h>
 #include <unistd.h>
 #include "alttab.h"
+#include "util.h"
 extern Globals g;
 
 // PRIVATE
@@ -49,12 +50,10 @@ int rp_add_windows_in_group(int current_group, int window_group)
 
 	bzero(buf, MAXRPOUT);
 	if (!execAndReadStdout(ratpoison_cmd, args, buf, MAXRPOUT)) {
-		fprintf(stderr, "can't exec ratpoison\n");
+		msg(-1, "can't exec ratpoison\n");
 		return 0;
 	}
-	if (g.debug > 1) {
-		fprintf(stderr, "windows in current rp group:\n%s", buf);
-	}
+    msg(1, "windows in current rp group:\n%s", buf);
 	char *rest = buf;
 	char *tok;
 
@@ -68,17 +67,17 @@ int rp_add_windows_in_group(int current_group, int window_group)
 			char *tok2;
 			char *endptr;
 			if (!((tok2 = strsep(&rest2, " \t")) && (*tok2)))
-				die2(rpse, rest2);
+				die(rpse, rest2);
 			int wm_id = strtol(tok2, &endptr, 10);
 			if (endptr == tok2)
-				die2(rpse, tok2);
+				die(rpse, tok2);
 			if (!((tok2 = strsep(&rest2, " \t")) && (*tok2)))
-				die2(rpse, rest2);
+				die(rpse, rest2);
 			int win = strtol(tok2, &endptr, 10);
 			if (endptr == tok2)
-				die2(rpse, tok2);
+				die(rpse, tok2);
 			if (!((tok2 = strsep(&rest2, " \t")) && (*tok2)))
-				die2(rpse, rest2);
+				die(rpse, rest2);
 			switch (*tok2) {
 			case '*':
 				g.startNdx = g.maxNdx;
@@ -115,19 +114,17 @@ int rp_startupWintasks()
 	if ((fp = popen("which ratpoison", "r"))) {
 		fr = fgets(ratpoison_cmd, MAXPATHSZ, fp);
         if (fr == NULL) {
-		    fprintf(stderr, "can't find ratpoison executable\n");
+		    msg(-1, "can't find ratpoison executable\n");
 		    return 0;
         }
 		pclose(fp);
 	}
 	if (strlen(ratpoison_cmd) < 2) {
-		fprintf(stderr, "can't find ratpoison executable\n");
+		msg(-1, "can't find ratpoison executable\n");
 		return 0;
 	} else {
 		ratpoison_cmd[strcspn(ratpoison_cmd, "\r\n")] = 0;
-		if (g.debug > 0) {
-			fprintf(stderr, "ratpoison: %s\n", ratpoison_cmd);
-		}
+        msg(0, "ratpoison: %s\n", ratpoison_cmd);
 	}
 
 // insert myself in "unmanaged windows" list
@@ -138,29 +135,23 @@ int rp_startupWintasks()
 	char buf[MAXRPOUT];
 	memset(buf, '\0', MAXRPOUT);
 	if (!execAndReadStdout(ratpoison_cmd, ua, buf, MAXRPOUT)) {
-		fprintf(stderr,
+		msg(-1,
 			"can't get unmanaged window list from ratpoison\n");
 		return 1;	// not fatal
 	}
-	if (g.debug > 1) {
-		fprintf(stderr, "ratpoison reports unmanaged:\n%s", buf);
-	}
+    msg(1, "ratpoison reports unmanaged:\n%s", buf);
 	if (!strstr(buf, XWINNAME)) {
-		if (g.debug > 0) {
-			fprintf(stderr,
-				"registering in ratpoison unmanaged list\n");
-		}
+        msg(0,
+		  "registering in ratpoison unmanaged list\n");
 		//memset (buf, '\0', MAXRPOUT);
 		if (!execAndReadStdout(ratpoison_cmd, uains, buf, MAXRPOUT)) {
-			fprintf(stderr,
+			msg(-1,
 				"can't register in ratpoison unmanaged window list\n");
 			return 1;	// not fatal
 		}
 	} else {
-		if (g.debug > 0) {
-			fprintf(stderr,
-				"our window is already in ratpoison unmanaged list\n");
-		}
+        msg(0,
+		  "our window is already in ratpoison unmanaged list\n");
 	}
 
 	return 1;
@@ -171,7 +162,7 @@ int rp_startupWintasks()
 //
 int rp_initWinlist()
 {
-#define  fallback    { fprintf (stderr, "using current rp group\n") ; \
+#define  fallback    { msg(-1, "using current rp group\n") ; \
     return rp_add_windows_in_group(DESKTOP_UNKNOWN, DESKTOP_UNKNOWN); }
 #define  arg2len  19
 #define  intlen   10
@@ -201,7 +192,7 @@ int rp_initWinlist()
         // parse single line
         gr[ngr] = strtol(tok, &endptr, 10);
         if (endptr == tok) {
-            fprintf (stderr, "no group number detected in rp output\n");
+            msg(-1, "no group number detected in rp output\n");
             fallback
         }
         if (*endptr == '*')
@@ -209,18 +200,16 @@ int rp_initWinlist()
         // the rest of line is group name, skip
     }
     if (ngr < 1) {
-        if (g.debug > 0)
-            fprintf (stderr, "no ratpoison (rpws) groups detected\n");
+        msg(0, "no ratpoison (rpws) groups detected\n");
         fallback
     }
-    if (g.debug > 0)
-        fprintf (stderr, "number of ratpoison (rpws) groups: %d, current: %d\n", ngr, c_group);
+    msg(0, "number of ratpoison (rpws) groups: %d, current: %d\n",
+      ngr, c_group);
 
     // cycle through rp groups
     for (gri = 0; gri < ngr; gri++) {
         w_group = gr[gri];
-        if (g.debug > 0)
-            fprintf (stderr, "processing rp group %d\n", w_group);
+        msg(0, "processing rp group %d\n", w_group);
         snprintf (arg2, arg2len, "gselect %d", w_group);
         if (!execAndReadStdout(ratpoison_cmd, args, NULL, 0))
             continue;

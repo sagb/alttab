@@ -82,7 +82,7 @@ int x_initWindowsInfoRecursive(Window win, int reclevel)
     leader = 0;
     if (g.option_wm == WM_TWM) {
         leader = x_get_leader (win);
-        if (g.debug>1) {fprintf (stderr, "win: 0x%lx leader: 0x%lx\n", win, leader);}
+        msg(1, "win: 0x%lx leader: 0x%lx\n", win, leader);
     }
 */
 // in non-twm, add viewable only
@@ -113,9 +113,7 @@ int x_initWindowsInfoRecursive(Window win, int reclevel)
 
 // recursion
 	if (XQueryTree(dpy, win, &root, &parent, &children, &nchildren) == 0) {
-		if (g.debug > 0) {
-            fprintf(stderr, "can't get window tree for 0x%lx\n", win);
-		}
+        msg(0, "can't get window tree for 0x%lx\n", win);
 		return 0;
 	}
 	for (i = 0; i < nchildren; ++i) {
