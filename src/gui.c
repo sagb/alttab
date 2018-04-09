@@ -208,12 +208,12 @@ int startupGUItasks()
 					      g.color[p].name,
 					      &(g.color[p].xcolor),
 					      &(g.color[p].xcolor)))
-				die2("failed to allocate X color: ",
+				die("failed to allocate X color: ",
 				     g.color[p].name);
 			if (!XftColorAllocName
 			    (dpy, visual, colormap, g.color[p].name,
 			     &(g.color[p].xftcolor)))
-				die2("failed to allocate Xft color: ",
+				die("failed to allocate Xft color: ",
 				     g.color[p].name);
 		}
 	}

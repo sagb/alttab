@@ -26,20 +26,16 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 
 // as there are no files involved, we can die at any time
 // BUT? "it is a good idea to free all the pixmaps that your program created before exiting from the program, pixmaps are stored in the server, if they are not freed they could remain allocated after the program exits"
-#define die(e)      do { fprintf(stderr, "%s\n", e); exit(1); } while (0);
-#define die2(e,f)   do { fprintf(stderr, "%s%s\n", e, f); exit(1); } while (0);
 
 #define XWINNAME    "alttab"
 #define XRMAPPNAME  XWINNAME
 #define XCLASSNAME  XWINNAME
+#define MSGPREFIX   "alttab: "
 #define XCLASS      "AltTab"
 #define DEFTILEW    112
 #define DEFTILEH    128
-#define DEFTILE     "112x128"
 #define DEFICONW    32
 #define DEFICONH    32
-#define DEFICON     "32x32"
-#define DEFVP       "focus"
 #define DEFPOS      "center"
 #define DEFTHEME    "hicolor"
 #define FRAME_W     8
@@ -117,7 +113,7 @@ typedef struct SwitchMoment {
 */
 
 typedef struct {
-	int debug;
+    int debug;
 	bool uiShowHasRun;	// means: 1. window is ready to Expose, 2. need to call uiHide to free X stuff
 	WindowInfo *winlist;
 	int maxNdx;		// number of items in list above
@@ -231,5 +227,9 @@ bool ewmh_skipWindowInTaskbar(Window w);
 /* RANDR */
 bool randrAvailable();
 bool randrGetViewport(quad *res, bool *multihead);
+
+/* autil */
+void die(const char *format, ...);
+void msg(int lvl, const char *format, ...);
 
 #endif

@@ -101,7 +101,7 @@ am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am_alttab_OBJECTS = alttab.$(OBJEXT) gui.$(OBJEXT) win.$(OBJEXT) \
 	x.$(OBJEXT) rp.$(OBJEXT) util.$(OBJEXT) ewmh.$(OBJEXT) \
-	icon.$(OBJEXT) pngd.$(OBJEXT) randr.$(OBJEXT)
+	icon.$(OBJEXT) pngd.$(OBJEXT) randr.$(OBJEXT) autil.$(OBJEXT)
 alttab_OBJECTS = $(am_alttab_OBJECTS)
 alttab_LDADD = $(LDADD)
 AM_V_P = $(am__v_P_@AM_V@)
@@ -264,7 +264,7 @@ xrandr_CFLAGS = @xrandr_CFLAGS@
 xrandr_LIBS = @xrandr_LIBS@
 xrender_CFLAGS = @xrender_CFLAGS@
 xrender_LIBS = @xrender_LIBS@
-alttab_SOURCES = alttab.c gui.c win.c x.c rp.c util.c ewmh.c icon.c pngd.c randr.c
+alttab_SOURCES = alttab.c gui.c win.c x.c rp.c util.c ewmh.c icon.c pngd.c randr.c autil.c
 AM_CFLAGS = $(x11_CFLAGS) $(xft_CFLAGS) $(xrender_CFLAGS) $(xrandr_CFLAGS) $(libpng_CFLAGS) $(fts_CFLAGS) -Wall
 all: all-am
 
@@ -353,6 +353,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/alttab.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/autil.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ewmh.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gui.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/icon.Po@am__quote@

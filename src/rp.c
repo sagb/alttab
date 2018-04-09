@@ -28,6 +28,7 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 #include <string.h>
 #include <unistd.h>
 #include "alttab.h"
+#include "util.h"
 extern Globals g;
 
 // PRIVATE
@@ -68,17 +69,17 @@ int rp_add_windows_in_group(int current_group, int window_group)
 			char *tok2;
 			char *endptr;
 			if (!((tok2 = strsep(&rest2, " \t")) && (*tok2)))
-				die2(rpse, rest2);
+				die(rpse, rest2);
 			int wm_id = strtol(tok2, &endptr, 10);
 			if (endptr == tok2)
-				die2(rpse, tok2);
+				die(rpse, tok2);
 			if (!((tok2 = strsep(&rest2, " \t")) && (*tok2)))
-				die2(rpse, rest2);
+				die(rpse, rest2);
 			int win = strtol(tok2, &endptr, 10);
 			if (endptr == tok2)
-				die2(rpse, tok2);
+				die(rpse, tok2);
 			if (!((tok2 = strsep(&rest2, " \t")) && (*tok2)))
-				die2(rpse, rest2);
+				die(rpse, rest2);
 			switch (*tok2) {
 			case '*':
 				g.startNdx = g.maxNdx;
