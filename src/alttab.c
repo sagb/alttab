@@ -44,7 +44,7 @@ Window root;
 //
 void helpexit()
 {
-	fprintf(stderr, "alttab, the task switcher.\n\
+	msg(-1, "the task switcher.\n\
 Options:\n\
     -w N      window manager: 0=no, 1=ewmh-compatible, 2=ratpoison, 3=old fashion\n\
     -d N      desktop: 0=current 1=all, 2=all but special, 3=all but current\n\
@@ -154,11 +154,12 @@ int use_args_and_xrm(int *argc, char **argv)
 	XrmParseCommand(&db, xrmTable, sizeof(xrmTable) / sizeof(xrmTable[0]),
 			XRMAPPNAME, argc, argv);
     if ((*argc) > 1) {
-        fprintf(stderr, "alttab: unknown options or wrong arguments:");
+        g.debug = 1;
+        msg(-1, "unknown options or wrong arguments:");
         for (uo = 1; uo < (*argc); uo++) {
-            fprintf(stderr, " \"%s\"", argv[uo]);
+            msg(0, " \"%s\"", argv[uo]);
         }
-        fprintf(stderr, ", use -h for help\n");
+        msg(0, ", use -h for help\n");
         exit(1);
     }
 

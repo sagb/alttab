@@ -122,7 +122,7 @@ int updateIconsFromFile(icon_t ** ihash)
 	icon_dirs[idndx] = NULL;
 	if (g.debug > 1) {
 		for (idndx = 0; icon_dirs[idndx] != NULL; idndx++)
-			fprintf(stderr, "icon dir: %s\n", icon_dirs[idndx]);
+			msg(1, "icon dir: %s\n", icon_dirs[idndx]);
 	}
 
 	if ((ftsp = fts_open(icon_dirs, fts_options, NULL)) == NULL) {
@@ -142,7 +142,7 @@ int updateIconsFromFile(icon_t ** ihash)
 			d_c++;
 			break;
 		case FTS_F:
-			//fprintf(stderr, "f %s\n", p->fts_path);
+			//msg(1, "f %s\n", p->fts_path);
 			inspectIconFile(p);
 			f_c++;
 			break;
@@ -152,11 +152,11 @@ int updateIconsFromFile(icon_t ** ihash)
 	}
 	fts_close(ftsp);
 	if (g.debug > 0) {
-		fprintf(stderr, "icon dirs: %d, files: %d, apps: %d\n", d_c,
+		msg(0, "icon dirs: %d, files: %d, apps: %d\n", d_c,
 			f_c, HASH_COUNT(*ihash));
 		if (g.debug > 1) {
 			HASH_ITER(hh, *ihash, iiter, tmp) {
-				fprintf(stderr, "app \"%s\" [%s] (%dx%d)\n",
+				msg(1, "app \"%s\" [%s] (%dx%d)\n",
 					iiter->app, iiter->src_path,
 					iiter->src_w, iiter->src_h);
 			}
@@ -262,7 +262,7 @@ int loadIconContent(icon_t * ic)
 		ic->drawable =
 		    XCreatePixmap(dpy, root, ic->src_w, ic->src_h, XDEPTH);
 		if (ic->drawable == None) {
-			fprintf(stderr, "can't create pixmap for png icon\n");
+			msg(-1, "can't create pixmap for png icon\n");
 			return 0;
 		}
 		ic->drawable_allocated = true;
@@ -271,7 +271,7 @@ int loadIconContent(icon_t * ic)
 	if (pngReadToDrawable
 	    (ic->src_path, ic->drawable, g.color[COLBG].xcolor.red,
 	     g.color[COLBG].xcolor.green, g.color[COLBG].xcolor.blue) == 0) {
-		fprintf(stderr, "can't read png to drawable\n");
+		msg(-1, "can't read png to drawable\n");
 		return 0;
 	}
 
