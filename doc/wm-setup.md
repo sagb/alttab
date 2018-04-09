@@ -4,7 +4,7 @@ Setting up window manager for alttab
 
 1. Disable WM's own Alt-Tab and any other applications which grab Alt-Tab
 exclusively. Alternatively, let alttab use another shortcut, f.e. Left Ctrl
-instead of Alt: `alttab -mm 4 -mk 0xffe3`.
+instead of Alt: `alttab -mk Control_L`.
 
 2. Start alttab and check is it usable at all: are windows recognized,
 does alttab change focus? If no, then try to set `-w` option to the

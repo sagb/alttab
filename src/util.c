@@ -665,15 +665,18 @@ char* xresource_load_string(XrmDatabase *db, const char *appname, char *name)
     snprintf (xappname, MAXNAMESZ, "%s.%s", appname, name);
 	XrmGetResource (*db, xappname, xappname, &type, &v);
 	return
-      (v.addr != NULL && !strncmp ("String", type, 64)) ? 
+      (v.addr != NULL && !strncmp ("String", type, 6)) ? 
       v.addr : NULL;
 }
 
 //
-// return resource/option `alttab.name' in *ret
-// or false if not specified
+// search for resource/option `appname.name'
+// return:
+//  1: ok, result in *ret
+//  0: not specified
+// -1: conversion error
 //
-bool xresource_load_int(XrmDatabase *db, const char *appname, char *name, unsigned int *ret)
+int xresource_load_int(XrmDatabase *db, const char *appname, char *name, unsigned int *ret)
 {
     unsigned int r;
     char *endptr;
@@ -683,22 +686,27 @@ bool xresource_load_int(XrmDatabase *db, const char *appname, char *name, unsign
         r = strtol(s, &endptr, 0);
         if (*s != '\0' && *endptr == '\0') {
             *ret = r;
-            return true;
+            return 1;
+        } else {
+            return -1;
         }
+    } else {
+        return 0;
     }
-    return false;
+    return 0;
 }
 
 //
-// return keycode corresponding to resource/option `alttab.name.keysym'
-// or 0 if not specified
+// return keycode corresponding to resource/option `appname.name.keysym'
+//  0: not specified
+// -1: bad value, errmsg is set (caller must free)
 //
-KeyCode ksym_option_to_keycode(XrmDatabase *db, const char *appname, const char *name)
+int ksym_option_to_keycode(XrmDatabase *db, const char *appname, const char *name, char **errmsg)
 {
 	char *endptr, *opt;
     KeySym ksym;
     char xresr[MAXNAMESZ];
-    KeyCode retcode = 0; // default
+    KeyCode retcode = 0;
 
     endptr = opt = NULL;
     snprintf (xresr, MAXNAMESZ, "%s.keysym", name); xresr[MAXNAMESZ-1]='\0';
@@ -713,15 +721,20 @@ KeyCode ksym_option_to_keycode(XrmDatabase *db, const char *appname, const char 
         if (ksym != NoSymbol) {
             retcode = XKeysymToKeycode(dpy, ksym);
             if (retcode == 0) {
-                fprintf (stderr,
-                  "the specified %s keysym is not defined for any keycode, using default\n",
+                *errmsg = malloc(ERRLEN);
+                snprintf(*errmsg, ERRLEN,
+                  "the specified %s keysym is not defined for any keycode",
                   name);
+                return -1;
             }
+            return retcode;
         } else {
-            fprintf (stderr, "invalid %s keysym, using default\n", name);
+            *errmsg = malloc(ERRLEN);
+            snprintf(*errmsg, ERRLEN, "invalid %s keysym", name);
+            return -1;
         }
     }
-    return retcode;
+    return 0;
 }
 
 //

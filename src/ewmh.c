@@ -49,9 +49,7 @@ Window *ewmh_get_client_list(unsigned long *client_list_size)
         if ((client_list =
 	     (Window *) get_x_property(root, XA_WINDOW, "_NET_CLIENT_LIST_STACKING",
 				       client_list_size)) != NULL) {
-            if (g.debug>1) {
-                fprintf(stderr, "ewmh found stacking window list\n");
-            }
+            msg(1, "ewmh found stacking window list\n");
             return client_list;
         } else {
             g.ewmh.try_stacking_list_first = false;
@@ -83,7 +81,7 @@ int ewmh_send_wm_evt(Window w, char *atom, unsigned long edata[])
     int ei; for (ei = 0; ei < 5; ei++)
         evt.xclient.data.l[ei] = edata[ei];
     if (!XSendEvent(dpy, root, False, rn_mask, &evt)) {
-        fprintf(stderr, "can't send %s xevent\n", atom);
+        msg(-1, "can't send %s xevent\n", atom);
         return 0;
     }
     return 1;
@@ -95,9 +93,7 @@ int ewmh_switch_desktop(unsigned long desktop)
 	unsigned long edata[] = {desktop, CurrentTime, 0,0,0};
     if (desktop == -1 && g.ewmh.minus1_desktop_unusable)
         return 0;
-    if (g.debug>1) {
-        fprintf(stderr, "ewmh switching desktop to %ld\n", desktop);
-    }
+    msg(1, "ewmh switching desktop to %ld\n", desktop);
     evr = ewmh_send_wm_evt(root, "_NET_CURRENT_DESKTOP", edata);
     if (evr == 0)
         return 0;
@@ -108,9 +104,7 @@ int ewmh_switch_desktop(unsigned long desktop)
             elapsed < WM_POLL_TIMEOUT
             && ewmh_getCurrentDesktop() != desktop;
             elapsed += WM_POLL_INTERVAL) {
-        if (g.debug>1) {
-            fprintf(stderr, "usleep %d\n", WM_POLL_INTERVAL);
-        }
+        msg(1, "usleep %d\n", WM_POLL_INTERVAL);
         usleep(WM_POLL_INTERVAL);
     }
     return evr;
@@ -119,9 +113,7 @@ int ewmh_switch_desktop(unsigned long desktop)
 int ewmh_switch_window(unsigned long window)
 {
     unsigned long edata[] = {2, CurrentTime, 0,0,0};
-    if (g.debug>1) {
-        fprintf(stderr, "ewmh switching window to 0x%lx\n", window);
-    }
+    msg(1, "ewmh switching window to 0x%lx\n", window);
     return
         ewmh_send_wm_evt(window, "_NET_ACTIVE_WINDOW", edata);
 }
@@ -198,8 +190,7 @@ Window ewmh_getActiveWindow()
 		w = *((Window *) awp);
 		free(awp);
 	} else {
-		if (g.debug > 0)
-			fprintf(stderr, "can't obtain _NET_ACTIVE_WINDOW\n");
+        msg(0, "can't obtain _NET_ACTIVE_WINDOW\n");
 	}
     return w;
 }
@@ -220,13 +211,13 @@ int ewmh_initWinlist()
     current_desktop = ewmh_getCurrentDesktop();
 
     aw = ewmh_getActiveWindow();
-	if (!aw && g.debug > 0) {
-        fprintf(stderr, "can't obtain _NET_ACTIVE_WINDOW\n");
+	if (!aw) {
+        msg(0, "can't obtain _NET_ACTIVE_WINDOW\n");
         // continue anyway
     }
 
     if ((client_list = ewmh_get_client_list(&client_list_size)) == NULL) {
-        fprintf(stderr, "can't get client list\n");
+        msg(-1, "can't get client list\n");
         return 0;
     }
 
@@ -257,10 +248,8 @@ int ewmh_initWinlist()
 
     // TODO: BUG? sometimes i3 returns previous active window,
     // which breaks sortlist
-	if (g.debug > 1) {
-		fprintf(stderr, "ewmh active window: %lu index: %d name: %s\n",
-			aw, g.startNdx, (g.winlist ? g.winlist[g.startNdx].name : "null"));
-	}
+    msg(1, "ewmh active window: %lu index: %d name: %s\n",
+	  aw, g.startNdx, (g.winlist ? g.winlist[g.startNdx].name : "null"));
 
 	return 1;
 }
@@ -272,16 +261,12 @@ int ewmh_initWinlist()
 int ewmh_setFocus(int winNdx, Window fwin)
 {
     Window win = (fwin != 0) ? fwin : g.winlist[winNdx].id;
-    if (g.debug>1) {
-        fprintf(stderr, "ewmh_setFocus win 0x%lx\n", win);
-    }
+    msg(1, "ewmh_setFocus win 0x%lx\n", win);
     if (fwin == 0 && g.option_desktop != DESK_CURRENT) {
         unsigned long wdesk = g.winlist[winNdx].desktop;
         unsigned long cdesk = ewmh_getCurrentDesktop();
-        if (g.debug>1) {
-            fprintf(stderr, "ewmh_setFocus fwin 0x%lx opt %d wdesk %lu cdesk %lu\n",
-                   fwin, g.option_desktop, wdesk, cdesk);
-        }
+        msg(1, "ewmh_setFocus fwin 0x%lx opt %d wdesk %lu cdesk %lu\n",
+          fwin, g.option_desktop, wdesk, cdesk);
         if (cdesk != wdesk && wdesk != DESKTOP_UNKNOWN) {
             ewmh_switch_desktop(wdesk);
         }
@@ -333,17 +318,13 @@ bool ewmh_skipWindowInTaskbar(Window w)
 
     state = (Atom*)get_x_property(w, XA_ATOM, "_NET_WM_STATE", &state_propsize);
     if (state == NULL || state_propsize == 0) {
-        if (g.debug>1) {
-            fprintf (stderr, "%lx: no _NET_WM_STATE property\n", w);
-        }
+        msg(1, "%lx: no _NET_WM_STATE property\n", w);
         return false;
     }
     a_skip_tb = XInternAtom(dpy, "_NET_WM_STATE_SKIP_TASKBAR", True);
 	for (i = 0; i < state_propsize / sizeof(Atom); i++) {
         if (state[i] == a_skip_tb) {
-            if (g.debug>1) {
-                fprintf (stderr, "%lx: _NET_WM_STATE_SKIP_TASKBAR found\n", w);
-            }
+            msg(1, "%lx: _NET_WM_STATE_SKIP_TASKBAR found\n", w);
             return true;
         }
     }
