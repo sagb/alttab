@@ -39,26 +39,18 @@ Window root;
 
 // PRIVATE
 
-#define XRESOURCE_LOAD_STRING(NAME, DST, DEFAULT)           \
-	XrmGetResource (db, XRMAPPNAME NAME, XCLASS NAME, &type, &v);         \
-	if (v.addr != NULL && !strncmp ("String", type, 64))    \
-		DST = v.addr;                                       \
-    else                                                    \
-        DST = DEFAULT;                                      \
-    if (g.debug>1) {fprintf (stderr, NAME": %s\n", DST);}
-
 //
 // help and exit
 //
 void helpexit()
 {
-	fprintf(stderr, "alttab, the task switcher.\n\
+	msg(-1, "the task switcher.\n\
 Options:\n\
     -w N      window manager: 0=no, 1=ewmh-compatible, 2=ratpoison, 3=old fashion\n\
     -d N      desktop: 0=current 1=all, 2=all but special, 3=all but current\n\
    -sc N      screen: 0=current 1=all\n\
-   -kk str    keysym of main modifier\n\
-   -mk str    keysym of main key\n\
+   -kk str    keysym of main key\n\
+   -mk str    keysym of main modifier\n\
    -bk str    keysym of backscroll modifier\n\
    -mm N      (obsoleted) main modifier mask\n\
    -bm N      (obsoleted) backward scroll modifier mask\n\
@@ -81,38 +73,29 @@ See man alttab for details.\n");
 //
 // initialize globals based on executable agruments and Xresources
 // return 1 if success, 0 otherwise
+// on fatal failure, calls die/exit
 //
 int use_args_and_xrm(int *argc, char **argv)
 {
 // set debug level early
 	g.debug = 0;
-	char *endptr;
     XrmDatabase db;
-    XrmValue v;
-    char *type;
-
-// not using getopt() because of need for "-v" before Xrm
-	int arg;
-	for (arg = 0; arg < (*argc); arg++) {
-		if ((strcmp(argv[arg], "-v") == 0)) {
-			g.debug = 1;
-            remove_arg(argc, argv, arg);
-        }
-        else if ((strcmp(argv[arg], "-vv") == 0)) {
-			g.debug = 2;
-            remove_arg(argc, argv, arg);
-        }
-        else if ((strcmp(argv[arg], "-h") == 0)) {
-			helpexit();
-            remove_arg(argc, argv, arg);
-        }
-	}
-	if (g.debug > 0) {
-		fprintf(stderr, "debug level %d\n", g.debug);
-	}
-
-    const char* inv = "invalid %s specified, using default\n";
-
+    char *errmsg;
+    int ksi;
+    KeyCode BC;
+	unsigned int wmindex, dsindex, scindex, isrc;
+	char *gtile, *gicon, *gview, *gpos;
+	int x, y;
+	unsigned int w, h;
+	int xpg;
+    char *s;
+	char *rm;
+	char *empty = "";
+    int uo;
+	Atom nwm_prop, atype;
+	unsigned char *nwm;
+	int form;
+	unsigned long remain, len;
 	XrmOptionDescRec xrmTable[] = {
 		{"-w", "*windowmanager", XrmoptionSepArg, NULL} ,
 		{"-d", "*desktops", XrmoptionSepArg, NULL} ,
@@ -133,71 +116,84 @@ int use_args_and_xrm(int *argc, char **argv)
 		{"-frame", "*framecolor", XrmoptionSepArg, NULL} ,
 		{"-font", "*font", XrmoptionSepArg, NULL} ,
 	};
-	XrmInitialize();
-	char *rm = XResourceManagerString(dpy);
-	char *empty = "";
-	if (g.debug > 1) {
-		fprintf(stderr, "resource manager: \"%s\"\n", rm);
+    const char *inv = "invalid %s, use -h for help\n";
+    const char *rmb = "can't figure out modmask from keycode 0x%x\n";
+
+// not using getopt() because of need for "-v" before Xrm
+	int arg;
+	for (arg = 0; arg < (*argc); arg++) {
+		if ((strcmp(argv[arg], "-v") == 0)) {
+			g.debug = 1;
+            remove_arg(argc, argv, arg);
+        }
+        else if ((strcmp(argv[arg], "-vv") == 0)) {
+			g.debug = 2;
+            remove_arg(argc, argv, arg);
+        }
+        else if ((strcmp(argv[arg], "-h") == 0)) {
+			helpexit();
+            remove_arg(argc, argv, arg);
+        }
 	}
+    msg(0, "debug level %d\n", g.debug);
+
+	XrmInitialize();
+	rm = XResourceManagerString(dpy);
+    msg(1, "resource manager: \"%s\"\n", rm);
 	if (!rm) {
-		if (g.debug > 0) {
-			fprintf(stderr,
-				"can't get resource manager, using empty db\n");
-		}
+        msg(0, "can't get resource manager, using empty db\n");
 		//return 0;  // we can do it
 		//db = XrmGetDatabase (dpy);
 		rm = empty;
 	}
 	db = XrmGetStringDatabase(rm);
 	if (!db) {
-		fprintf(stderr, "can't get resource database\n");
+        msg(-1, "can't get resource database\n");
 		return 0;
 	}
 	XrmParseCommand(&db, xrmTable, sizeof(xrmTable) / sizeof(xrmTable[0]),
 			XRMAPPNAME, argc, argv);
     if ((*argc) > 1) {
-        fprintf (stderr, "unknown options or wrong arguments:");
-        int uo; for (uo = 1; uo < (*argc); uo++) {
-            fprintf (stderr, " \"%s\"", argv[uo]);
+        g.debug = 1;
+        msg(-1, "unknown options or wrong arguments:");
+        for (uo = 1; uo < (*argc); uo++) {
+            msg(0, " \"%s\"", argv[uo]);
         }
-        fprintf (stderr, ", use -h for help\n");
+        msg(0, ", use -h for help\n");
+        exit(1);
     }
 
-// initialize g.option_wm
-
-	endptr = NULL;
-	char *wmindex = NULL;
-    XRESOURCE_LOAD_STRING(".windowmanager", wmindex, NULL);
-	if (wmindex)
-		g.option_wm = strtol(wmindex, &endptr, 0);
-	if ((endptr != NULL) && (*endptr == '\0') && (g.option_wm >= WM_MIN)
-	    && (g.option_wm <= WM_MAX))
-		goto wmDone;
-	if (g.debug > 0) {
-		fprintf(stderr, "no WM index or unknown, guessing\n");
-	}
+    switch (xresource_load_int(&db, XRMAPPNAME, "windowmanager", 
+      &wmindex)) {
+        case 1:
+            if (wmindex >= WM_MIN && wmindex <= WM_MAX) {
+                g.option_wm = wmindex;
+                goto wmDone;
+            } else {
+                die(inv, "windowmanager argument range");
+            }
+            break;
+        case 0:
+            msg(0, "no WM index or unknown, guessing\n");
+            break;
+        case -1:
+            die(inv, "windowmanager argument");
+            break;
+    }
 // EWMH?
 	if (ewmh_detectFeatures(&(g.ewmh))) {
-		if (g.debug > 0) {
-			fprintf(stderr, "EWMH-compatible WM detected: %s\n",
-				g.ewmh.wmname);
-		}
+        msg(0, "EWMH-compatible WM detected: %s\n",
+                g.ewmh.wmname);
 		g.option_wm = WM_EWMH;
 		goto wmDone;
 	}
 // ratpoison?
-	Atom nwm_prop = XInternAtom(dpy, "_NET_WM_NAME", false), atype;
-	unsigned char *nwm;
-	int form;
-	unsigned long remain, len;
+	nwm_prop = XInternAtom(dpy, "_NET_WM_NAME", false);
 	if (XGetWindowProperty(dpy, root, nwm_prop, 0, MAXNAMESZ, false,
 			       AnyPropertyType, &atype, &form, &len, &remain,
-			       &nwm) == Success && nwm) {
-		if (g.debug > 0) {
-			fprintf(stderr,
-				"_NET_WM_NAME root property present: %s\n",
+                   &nwm) == Success && nwm) {
+        msg (0, "_NET_WM_NAME root property present: %s\n",
 				nwm);
-		}
 		if (strstr((char *)nwm, "ratpoison") != NULL) {
 			g.option_wm = WM_RATPOISON;
 			XFree(nwm);
@@ -205,152 +201,135 @@ int use_args_and_xrm(int *argc, char **argv)
 		}
 		XFree(nwm);
 	}
-	if (g.debug > 0) {
-		fprintf(stderr, "unknown WM, using WM_TWM\n");
-	}
+    msg(0, "unknown WM, using WM_TWM\n");
 	g.option_wm = WM_TWM;
  wmDone:
-	if (g.debug > 0) {
-		fprintf(stderr, "WM: %d\n", g.option_wm);
-	}
+    msg(0, "WM: %d\n", g.option_wm);
 
-	endptr = NULL;
-	char *dsindex = NULL;
-    int ds = DESK_DEFAULT;
-    g.option_desktop = DESK_DEFAULT;
-	XRESOURCE_LOAD_STRING(".desktops", dsindex, NULL);
-	if (dsindex) {
-        ds = strtol(dsindex, &endptr, 0);
-        if (*dsindex != '\0' && *endptr == '\0') {
-            if (ds >= DESK_MIN && ds <= DESK_MAX)
-                g.option_desktop = ds;
+    switch (xresource_load_int(&db, XRMAPPNAME, "desktops", 
+      &dsindex)) {
+        case 1:
+            if (dsindex >= DESK_MIN && dsindex <= DESK_MAX)
+                g.option_desktop = dsindex;
             else
-                fprintf (stderr, "desktops argument must be from %d to %d, using default\n", DESK_MIN, DESK_MAX);
-        } else {
-            fprintf (stderr, inv, "desktops");
-        }
+                die(inv, "desktops argument range");
+            break;
+        case 0:
+            g.option_desktop = DESK_DEFAULT;
+            break;
+        case -1:
+            die(inv, "desktops argument");
+            break;
     }
-	if (g.debug > 0)
-		fprintf(stderr, "desktops: %d\n", g.option_desktop);
+    msg(0, "desktops: %d\n", g.option_desktop);
 
-	endptr = NULL;
-	char *scindex = NULL;
-    int sc = SCR_DEFAULT;
-    g.option_screen = SCR_DEFAULT;
-	XRESOURCE_LOAD_STRING(".screens", scindex, NULL);
-	if (scindex) {
-        sc = strtol(scindex, &endptr, 0);
-        if (*scindex != '\0' && *endptr == '\0') {
-            if (sc >= SCR_MIN && sc <= SCR_MAX)
-                g.option_screen = sc;
+    switch (xresource_load_int(&db, XRMAPPNAME, "screens", 
+      &scindex)) {
+        case 1:
+            if (scindex >= SCR_MIN && scindex <= SCR_MAX)
+                g.option_screen = scindex;
             else
-                fprintf (stderr, 
-                  "screens argument must be from %d to %d, using default\n", 
-                  SCR_MIN, SCR_MAX);
-        } else {
-            fprintf (stderr, inv, "screens");
-        }
+                die(inv, "screens argument range");
+            break;
+        case 0:
+            g.option_screen = SCR_DEFAULT;
+            break;
+        case -1:
+            die(inv, "screens argument");
+            break;
     }
-	if (g.debug > 0)
-		fprintf(stderr, "screens: %d\n", g.option_screen);
-
-    const char *rmb = "fatal: can't figure out modmask from keycode 0x%x\n";
+    msg(0, "screens: %d\n", g.option_screen);
 
 #define  MC  g.option_modCode
-    MC = ksym_option_to_keycode(&db, XRMAPPNAME, "modifier");
-    if (MC == 0)
-        MC = XKeysymToKeycode(dpy, DEFMODKS);
-
 #define  KC  g.option_keyCode
-    KC = ksym_option_to_keycode(&db, XRMAPPNAME, "key");
-    if (KC == 0)
-        KC = XKeysymToKeycode(dpy, DEFKEYKS);
-
 #define  GMM  g.option_modMask
-    if (xresource_load_int(&db, XRMAPPNAME, "modifier.mask", &(GMM))) {
-        fprintf (stderr, 
-          "Using obsoleted -mm option or modifier.mask resource, see man page for upgrade\n");
-    } else {
-        GMM = keycode_to_modmask(MC);
-        if (GMM == 0) {
-            fprintf (stderr, rmb, MC);
-            return 0;
-        }
-    }
-
 #define  GBM  g.option_backMask
-    if (xresource_load_int(&db, XRMAPPNAME, "backscroll.mask", &(GBM))) {
-        fprintf (stderr, 
-          "Using obsoleted -bm option or backscroll.mask resource, see man page for upgrade\n");
-    } else {
-        KeyCode BC = ksym_option_to_keycode(&db, XRMAPPNAME, "backscroll");
-        if (BC != 0) {
-            GBM = keycode_to_modmask(BC);
-            if (GBM == 0) {
-                fprintf (stderr, rmb, BC);
-                return 0;
-            }
-        } else {
-            GBM = DEFBACKMASK;
-        }
+
+    ksi = ksym_option_to_keycode(&db, XRMAPPNAME, "modifier", &errmsg);
+    if (ksi == -1)
+        die("%s\n", errmsg);
+    MC = ksi != 0 ? ksi : XKeysymToKeycode(dpy, DEFMODKS);
+
+    ksi = ksym_option_to_keycode(&db, XRMAPPNAME, "key", &errmsg);
+    if (ksi == -1)
+        die("%s\n", errmsg);
+    KC = ksi != 0 ? ksi : XKeysymToKeycode(dpy, DEFKEYKS);
+
+    switch (xresource_load_int(&db, XRMAPPNAME, "modifier.mask", &(GMM))) {
+        case 1:
+            msg(-1, 
+              "Using obsoleted -mm option or modifier.mask resource, see man page for upgrade\n");
+            break;
+        case 0:
+            GMM = keycode_to_modmask(MC);
+            if (GMM == 0)
+                die (rmb, MC);
+            break;
+        case -1:
+            die(inv, "modifier mask");
+            break;
     }
 
-	if (g.debug > 0) {
-		fprintf(stderr,
-			"modMask %d, backMask %d, modCode %d, keyCode %d\n",
-			GMM, GBM, MC, KC);
-	}
+    switch (xresource_load_int(&db, XRMAPPNAME, "backscroll.mask", &(GBM))) {
+        case 1:
+            msg(-1,
+              "Using obsoleted -bm option or backscroll.mask resource, see man page for upgrade\n");
+            break;
+        case 0:
+            BC = ksym_option_to_keycode(&db, XRMAPPNAME, "backscroll", &errmsg);
+            if (BC != 0) {
+                GBM = keycode_to_modmask(BC);
+                if (GBM == 0)
+                    die(rmb, BC);
+            } else {
+                GBM = DEFBACKMASK;
+            }
+            break;
+        case -1:
+            die(inv, "backscroll mask");
+            break;
+    }
 
-	char *gtile, *gicon, *gview, *gpos;
-	int x, y;
-	unsigned int w, h;
-	int xpg;
+    msg(0, "modMask %d, backMask %d, modCode %d, keyCode %d\n",
+      GMM, GBM, MC, KC);
 
     g.option_tileW = DEFTILEW;
     g.option_tileH = DEFTILEH;
-	char *defaultTileGeo = DEFTILE;
-	XRESOURCE_LOAD_STRING(".tile.geometry", gtile,
-			      defaultTileGeo);
-    if (gtile) {
-    	xpg = XParseGeometry(gtile, &x, &y, &w, &h);
+    gtile = xresource_load_string(&db, XRMAPPNAME, "tile.geometry");
+    if (gtile != NULL) {
+        xpg = XParseGeometry(gtile, &x, &y, &w, &h);
         if (xpg & WidthValue)
-        	g.option_tileW = w;
+            g.option_tileW = w;
         else
-            fprintf (stderr, inv, "tile width");
+            die(inv, "tile width");
         if (xpg & HeightValue)
-        	g.option_tileH = h;
+            g.option_tileH = h;
         else
-            fprintf (stderr, inv, "tile height");
+            die(inv, "tile height");
     }
 
     g.option_iconW = DEFICONW;
     g.option_iconH = DEFICONH;
-	char *defaultIconGeo = DEFICON;
-	XRESOURCE_LOAD_STRING(".icon.geometry", gicon,
-			      defaultIconGeo);
+    gicon = xresource_load_string(&db, XRMAPPNAME, "icon.geometry");
     if (gicon) {
     	xpg = XParseGeometry(gicon, &x, &y, &w, &h);
         if (xpg & WidthValue)
         	g.option_iconW = w;
         else
-            fprintf (stderr, inv, "icon width");
+            die(inv, "icon width");
         if (xpg & HeightValue)
         	g.option_iconH = h;
         else
-            fprintf (stderr, inv, "icon height");
+            die(inv, "icon height");
     }
 
-	if (g.debug > 0) {
-		fprintf(stderr, "%dx%d tile, %dx%d icon\n",
-			g.option_tileW, g.option_tileH, g.option_iconW,
-			g.option_iconH);
-	}
+    msg(0, "%dx%d tile, %dx%d icon\n",
+      g.option_tileW, g.option_tileH, g.option_iconW,
+      g.option_iconH);
 
     bzero (&(g.option_vp), sizeof(g.option_vp));
     g.option_vp_mode = VP_DEFAULT;
-	char *defaultViewGeo = DEFVP;
-	XRESOURCE_LOAD_STRING(".viewport", gview,
-			      defaultViewGeo);
+    gview = xresource_load_string(&db, XRMAPPNAME, "viewport");
     if (gview) {
         if (strncmp(gview, "focus", 6) == 0) {
             g.option_vp_mode = VP_FOCUS;
@@ -367,24 +346,19 @@ int use_args_and_xrm(int *argc, char **argv)
                 g.option_vp.x = x;
                 g.option_vp.y = y;
             } else {
-                fprintf (stderr, inv, "viewport");
-                g.option_vp_mode = VP_DEFAULT;
+                die(inv, "viewport");
             }
         }
     }
-	if (g.debug > 0) {
-		fprintf(stderr, "viewport: mode %d, %dx%d+%d+%d\n",
-            g.option_vp_mode,
-            g.option_vp.w, g.option_vp.h,
-            g.option_vp.x, g.option_vp.y);
-	}
+    msg(0, "viewport: mode %d, %dx%d+%d+%d\n",
+      g.option_vp_mode,
+      g.option_vp.w, g.option_vp.h,
+      g.option_vp.x, g.option_vp.y);
 
     g.option_positioning = POS_DEFAULT;
     g.option_posX = 0;
     g.option_posY = 0;
-	char *defaultPosStr = DEFPOS;
-	XRESOURCE_LOAD_STRING(".position", gpos,
-			      defaultPosStr);
+    gpos = xresource_load_string(&db, XRMAPPNAME, "position");
     if (gpos) {
         if (strncmp(gpos, "center", 7) == 0) {
             g.option_positioning = POS_CENTER;
@@ -397,64 +371,57 @@ int use_args_and_xrm(int *argc, char **argv)
             	g.option_posX = x;
             	g.option_posY = y;
             } else {
-                fprintf (stderr, inv, "position");
-                g.option_positioning = POS_DEFAULT;
+                die(inv, "position");
             }
         }
     }
-	if (g.debug > 0) {
-		fprintf(stderr, "positioning policy: %d, position: +%d+%d\n",
-			g.option_positioning, g.option_posX, g.option_posY);
-	}
+    msg(0, "positioning policy: %d, position: +%d+%d\n",
+      g.option_positioning, g.option_posX, g.option_posY);
 
-	endptr = NULL;
-	char *isrcindex = NULL;
-    int isrc = ISRC_DEFAULT;
     g.option_iconSrc = ISRC_DEFAULT;
-	XRESOURCE_LOAD_STRING(".icon.source", isrcindex, NULL);
-	if (isrcindex) {
-        isrc = strtol(isrcindex, &endptr, 0);
-        if (*isrcindex != '\0' && *endptr == '\0') {
+    switch (xresource_load_int(&db, XRMAPPNAME, "icon.source", &isrc)) {
+        case 1:
             if (isrc >= ISRC_MIN && isrc <= ISRC_MAX)
                 g.option_iconSrc = isrc;
             else
-                fprintf (stderr, "icon source argument must be from %d to %d, using default\n", ISRC_MIN, ISRC_MAX);
-        } else {
-            fprintf (stderr, inv, "icon source");
-        }
+                die("icon source argument must be from %d to %d\n",
+                  ISRC_MIN, ISRC_MAX);
+            break;
+        case 0:
+            g.option_iconSrc = ISRC_DEFAULT;
+            break;
+        case -1:
+            die(inv, "icon source");
+            break;
     }
-	if (g.debug > 0)
-		fprintf(stderr, "icon source: %d\n", g.option_iconSrc);
+    msg(0, "icon source: %d\n", g.option_iconSrc);
 
-	char *defaultTheme = DEFTHEME;
-    g.option_theme = NULL;
-	XRESOURCE_LOAD_STRING(".theme", g.option_theme, defaultTheme);
-    if (!g.option_theme)
-		g.option_theme = defaultTheme;
-	if (g.debug > 0)
-		fprintf(stderr, "icon theme: %s\n", g.option_theme);
+    s = xresource_load_string(&db, XRMAPPNAME, "theme");
+	g.option_theme = s ? s : DEFTHEME;
+    msg(0, "icon theme: %s\n", g.option_theme);
 
-	char *defaultColorBG = DEFCOLBG;
-	XRESOURCE_LOAD_STRING(".background", g.color[COLBG].name,
-			      defaultColorBG);
-	char *defaultColorFG = DEFCOLFG;
-	XRESOURCE_LOAD_STRING(".foreground", g.color[COLFG].name,
-			      defaultColorFG);
-	char *defaultColorFrame = DEFCOLFRAME;
-	XRESOURCE_LOAD_STRING(".framecolor", g.color[COLFRAME].name,
-			      defaultColorFrame);
+    s = xresource_load_string(&db, XRMAPPNAME, "background");
+    g.color[COLBG].name = s ? s : DEFCOLBG;
+    s = xresource_load_string(&db, XRMAPPNAME, "foreground");
+    g.color[COLFG].name = s ? s : DEFCOLFG;
+    s = xresource_load_string(&db, XRMAPPNAME, "framecolor");
+    g.color[COLFRAME].name = s ? s : DEFCOLFRAME;
 
-	char *defaultFont = DEFFONT;
-	XRESOURCE_LOAD_STRING(".font", g.option_font, defaultFont);
-	if ((strncmp(g.option_font, "xft:", 4) == 0)
-	    && (*(g.option_font + 4) != '\0')) {
-		g.option_font += 4;
-	} else {
-        fprintf(stderr,
-                "invalid font: \"%s\", using default: %s\n",
-                g.option_font, defaultFont);
-		g.option_font = defaultFont + 4;
-	}
+    s = xresource_load_string(&db, XRMAPPNAME, "font");
+    if (s) {
+        if ((strncmp(s, "xft:", 4) == 0)
+                && (*(s + 4) != '\0')) {
+            g.option_font = s + 4;
+        } else {
+            // resource may indeed be valid but non-xft
+            msg(-1,
+              "invalid font: %s, using default: %s\n",
+              s, DEFFONT);
+            g.option_font = DEFFONT + 4;
+        }
+    } else {
+        g.option_font = DEFFONT + 4;
+    }
 
 // max recursion for searching windows
 // -1 is "everything" 
@@ -473,21 +440,19 @@ int grabAllKeys(bool grabUngrab)
 {
 	g.ignored_modmask = getOffendingModifiersMask(dpy);	// or 0 for g.debug
 	char *grabhint =
-	    "Error while (un)grabbing key 0x%x with mask 0x%x/0x%x.\nProbably other program already grabbed this combination.\nCheck: xdotool keydown alt+Tab; xdotool key XF86LogGrabInfo; xdotool keyup Tab; sleep 1; xdotool keyup alt; tail /var/log/Xorg.0.log\nOr try Ctrl-Tab instead of Alt-Tab:  alttab -mk Control_L\n";
+	    "Error while (un)grabbing key 0x%x with mask 0x%x/0x%x.\nProbably other program already grabbed this combination.\nCheck: xdotool keydown alt+Tab; xdotool key XF86LogGrabInfo; xdotool keyup Tab; sleep 1; xdotool keyup alt\nand then look for active device grabs in /var/log/Xorg.0.log\nOr try Ctrl-Tab instead of Alt-Tab:  alttab -mk Control_L\n";
 // attempt XF86Ungrab? probably too invasive
 	if (!changeKeygrab
 	    (root, grabUngrab, g.option_keyCode, g.option_modMask,
 	     g.ignored_modmask)) {
-		fprintf(stderr, grabhint, g.option_keyCode,
+		die(grabhint, g.option_keyCode,
             g.option_modMask, g.ignored_modmask);
-		exit(1);
 	}
 	if (!changeKeygrab
 	    (root, grabUngrab, g.option_keyCode,
 	     g.option_modMask | g.option_backMask, g.ignored_modmask)) {
-		fprintf(stderr, grabhint, g.option_keyCode,
+		die(grabhint, g.option_keyCode,
 			g.option_modMask | g.option_backMask, g.ignored_modmask);
-		exit(1);
 	}
 	return 1;
 }
@@ -545,11 +510,9 @@ int main(int argc, char **argv)
 
 		switch (ev.type) {
 		case KeyPress:
-			if (g.debug > 1) {
-				fprintf(stderr, "Press %lx: %d-%d\n",
-					ev.xkey.window, ev.xkey.state,
-					ev.xkey.keycode);
-			}
+            msg (1, "Press %lx: %d-%d\n",
+              ev.xkey.window, ev.xkey.state,
+              ev.xkey.keycode);
 			if (!
 			    ((ev.xkey.state & g.option_modMask)
 			     && ev.xkey.keycode == g.option_keyCode)) {
@@ -567,11 +530,9 @@ int main(int argc, char **argv)
 			break;
 
 		case KeyRelease:
-			if (g.debug > 1) {
-				fprintf(stderr, "Release %lx: %d-%d\n",
-					ev.xkey.window, ev.xkey.state,
-					ev.xkey.keycode);
-			}
+            msg(1, "Release %lx: %d-%d\n",
+              ev.xkey.window, ev.xkey.state,
+              ev.xkey.keycode);
 			// interested only in "final" release
 			if (!
 			    ((ev.xkey.state & g.option_modMask)
@@ -602,9 +563,7 @@ int main(int argc, char **argv)
             break;
 
 		default:
-			if (g.debug > 1) {
-				fprintf(stderr, "Event type %d\n", ev.type);
-			}
+            msg(1, "Event type %d\n", ev.type);
 			break;
 		}
 
