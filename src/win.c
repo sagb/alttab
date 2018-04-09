@@ -59,7 +59,7 @@ static int sort_by_order(const void *p1, const void *p2)
             break;
         }
     }
-    //fprintf (stderr, "cmp 0x%lx <-> 0x%lx = %d\n", w1->id, w2->id, r);
+    //msg(0, "cmp 0x%lx <-> 0x%lx = %d\n", w1->id, w2->id, r);
     return r;
 }
 
@@ -101,9 +101,9 @@ void add_to_sortlist(Window w, bool to_head, bool move)
 void print_sortlist()
 {
     PermanentWindowInfo *s;
-    fprintf (stderr, "sortlist:\n");
+    msg(0, "sortlist:\n");
     DL_FOREACH (g.sortlist, s) {
-        fprintf(stderr, "  0x%lx\n", s->id);
+        msg(0, "  0x%lx\n", s->id);
     }
 }
 
@@ -116,7 +116,7 @@ void print_winlist()
     PermanentWindowInfo *s;
 
     if (g.winlist == NULL && g.maxNdx == 0) return; // safety
-    fprintf (stderr, "winlist:\n");
+    msg(0, "winlist:\n");
     for (wi = 0; wi < g.maxNdx; wi++) {
         si = 0;
         DL_FOREACH (g.sortlist, s) {
@@ -125,8 +125,8 @@ void print_winlist()
                 break;
             si++;
         }
-        fprintf(stderr, "  %4d: 0x%lx  %s\n", si,
-                g.winlist[wi].id, g.winlist[wi].name);
+        msg(0, "  %4d: 0x%lx  %s\n", si,
+          g.winlist[wi].id, g.winlist[wi].name);
     }
 }
 
@@ -147,8 +147,9 @@ int startupWintasks()
     // watching for _NET_ACTIVE_WINDOW
     XSelectInput(dpy, root, PropertyChangeMask);
     g.naw = XInternAtom(dpy, "_NET_ACTIVE_WINDOW", false);
-    if (g.naw == None && g.debug > 0) {
-        fprintf (stderr, "no _NET_ACTIVE_WINDOW atom, window focus will not be tracked\n");
+    if (g.naw == None) {
+        msg(0,
+          "no _NET_ACTIVE_WINDOW atom, window focus will not be tracked\n");
     }
 	switch (g.option_wm) {
 	case WM_NO:
@@ -178,18 +179,15 @@ int addIconFromHints(WindowInfo * wi)
 
 	hicon = hmask = 0;
 	if ((hints = XGetWMHints(dpy, wi->id))) {
-		if (g.debug > 1) {
-			fprintf(stderr,
-				"IconPixmapHint: %ld, icon_pixmap: %lu, IconMaskHint: %ld, icon_mask: %lu, IconWindowHint: %ld, icon_window: %lu\n",
-				hints->flags & IconPixmapHint,
-				hints->icon_pixmap, hints->flags & IconMaskHint,
-				hints->icon_mask, hints->flags & IconWindowHint,
-				hints->icon_window);
-		}
+        msg(1,
+          "IconPixmapHint: %ld, icon_pixmap: %lu, IconMaskHint: %ld, icon_mask: %lu, IconWindowHint: %ld, icon_window: %lu\n",
+          hints->flags & IconPixmapHint,
+          hints->icon_pixmap, hints->flags & IconMaskHint,
+          hints->icon_mask, hints->flags & IconWindowHint,
+          hints->icon_window);
 		if ((hints->flags & IconWindowHint) &
 		    (!(hints->flags & IconPixmapHint))) {
-			if (g.debug > 0)
-				fprintf(stderr, "icon_window without icon_pixmap in hints, ignoring\n");	// not usable in xterm?
+            msg(0, "icon_window without icon_pixmap in hints, ignoring\n");	// not usable in xterm?
 		}
 		hicon =
 		    (hints->flags & IconPixmapHint) ? hints->icon_pixmap : 0;
@@ -197,12 +195,10 @@ int addIconFromHints(WindowInfo * wi)
 //            (hints->flags & IconWindowHint) ?  hints->icon_window : 0));
 		hmask = (hints->flags & IconMaskHint) ? hints->icon_mask : 0;
 		XFree(hints);
-		if (hicon && (g.debug > 0))
-			fprintf(stderr, "no icon in WM hints (%s)\n", wi->name);
+		if (hicon)
+			msg(0, "no icon in WM hints (%s)\n", wi->name);
 	} else {
-		if (g.debug > 0) {
-			fprintf(stderr, "no WM hints (%s)\n", wi->name);
-		}
+        msg(0, "no WM hints (%s)\n", wi->name);
 	}
 	if (hmask != 0)
 		wi->icon_mask = hmask;
@@ -239,18 +235,15 @@ int addIconFromFiles(WindowInfo * wi)
 			     || iconMatchBetter(ic->src_w, ic->src_h,
 						wi->icon_w, wi->icon_h))
 			    ) {
-				if (g.debug > 0)
-					fprintf(stderr,
-						"using png icon for %s\n",
-						tryclass);
+                msg(0,
+				  "using png icon for %s\n",
+				  tryclass);
 				if (ic->drawable == None) {
-					if (g.debug > 1)
-						fprintf(stderr,
-							"loading content for %s\n",
-							ic->app);
+                    msg(1,
+					  "loading content for %s\n",
+					  ic->app);
 					if (loadIconContent(ic) == 0) {
-						fprintf(stderr,
-							"can't load png icon content\n");
+						msg(-1, "can't load png icon content\n");
 						continue;
 					}
 				}
@@ -260,9 +253,8 @@ int addIconFromFiles(WindowInfo * wi)
 			}
 		}
 	} else {
-		if (g.debug > 0)
-			fprintf(stderr, "can't find WM_CLASS for \"%s\"\n",
-				wi->name);
+        msg(0, "can't find WM_CLASS for \"%s\"\n",
+		  wi->name);
 	}
 	return 0;
 }
@@ -336,26 +328,20 @@ int addWindowInfo(Window win, int reclevel, int wm_id, unsigned long desktop, ch
 				 &(g.winlist[g.maxNdx].icon_w),
 				 &(g.winlist[g.maxNdx].icon_h),
 				 &border_width_return, &icon_depth) == 0) {
-			if (g.debug > 0) {
-				fprintf(stderr,
-					"icon dimensions unknown (%s)\n",
-					g.winlist[g.maxNdx].name);
-			}
+            msg(0,
+			  "icon dimensions unknown (%s)\n",
+			  g.winlist[g.maxNdx].name);
 			// probably draw placeholder?
 			g.winlist[g.maxNdx].icon_drawable = 0;
 		} else {
-			if (g.debug > 1) {
-				fprintf(stderr, "depth=%d\n", icon_depth);
-			}
+            msg(1, "depth=%d\n", icon_depth);
 		}
 	}
 // convert icon with different depth (currently 1 only) into default depth
 	if (g.winlist[g.maxNdx].icon_drawable && icon_depth == 1) {
-		if (g.debug > 0) {
-			fprintf(stderr,
-				"rebuilding icon from depth 1 to %d (%s)\n",
-				XDEPTH, g.winlist[g.maxNdx].name);
-		}
+        msg(0,
+		  "rebuilding icon from depth 1 to %d (%s)\n",
+		  XDEPTH, g.winlist[g.maxNdx].name);
 		Pixmap pswap =
 		    XCreatePixmap(dpy, g.winlist[g.maxNdx].icon_drawable,
 				  g.winlist[g.maxNdx].icon_w,
@@ -373,8 +359,8 @@ int addWindowInfo(Window win, int reclevel, int wm_id, unsigned long desktop, ch
 		icon_depth = XDEPTH;
 	}
 	if (g.winlist[g.maxNdx].icon_drawable && icon_depth != XDEPTH) {
-		fprintf(stderr,
-			"Can't handle icon depth other than %d or 1 (%d, %s). Please report this condition.\n",
+		msg(-1,
+			"can't handle icon depth other than %d or 1 (%d, %s). Please report this condition.\n",
 			XDEPTH, icon_depth, g.winlist[g.maxNdx].name);
 		g.winlist[g.maxNdx].icon_drawable = g.winlist[g.maxNdx].icon_w =
 		    g.winlist[g.maxNdx].icon_h = 0;
@@ -388,10 +374,7 @@ int addWindowInfo(Window win, int reclevel, int wm_id, unsigned long desktop, ch
 	g.winlist[g.maxNdx].reclevel = reclevel;
 	g.winlist[g.maxNdx].desktop = desktop;
 	g.maxNdx++;
-	if (g.debug > 1) {
-		fprintf(stderr, "window %d, id %lx added to list\n", g.maxNdx,
-			win);
-	}
+    msg(1, "window %d, id %lx added to list\n", g.maxNdx, win);
 	return 1;
 }				// addWindowInfo()
 
@@ -405,7 +388,7 @@ int initWinlist(bool direction)
 {
 	int r;
 	if (g.debug > 1) {
-		fprintf(stderr, "before initWinlist");
+		msg(1, "before initWinlist");
         print_sortlist();
 	}
 	g.startNdx = 0;		// safe default
@@ -431,13 +414,13 @@ int initWinlist(bool direction)
 
 // sort winlist according to .order
     if (g.debug > 1) {
-        fprintf(stderr, "startNdx=%d\n", g.startNdx);
-        fprintf(stderr, "before qsort\n");
+        msg(1, "startNdx=%d\n", g.startNdx);
+        msg(1, "before qsort\n");
         print_winlist();
     }
     qsort(g.winlist, g.maxNdx, sizeof(WindowInfo), sort_by_order);
     if (g.debug > 1) {
-        fprintf(stderr, "after qsort\n");
+        msg(1, "after qsort\n");
         print_winlist();
     }
 
@@ -452,11 +435,9 @@ int initWinlist(bool direction)
 								  1)) ? 0 :
 								g.startNdx + 1);
 //if (g.selNdx<0 || g.selNdx>=g.maxNdx) { g.selNdx=0; } // just for case
-	if (g.debug > 1) {
-		fprintf(stderr,
-			"initWinlist ret: number of items in winlist: %d, current (selected) item in winlist: %d, current item at start of uiShow (current window before setFocus): %d\n",
-			g.maxNdx, g.selNdx, g.startNdx);
-	}
+    msg(1,
+	  "initWinlist ret: number of items in winlist: %d, current (selected) item in winlist: %d, current item at start of uiShow (current window before setFocus): %d\n",
+	  g.maxNdx, g.selNdx, g.startNdx);
 
 	return r;
 }
@@ -467,11 +448,9 @@ int initWinlist(bool direction)
 //
 void freeWinlist()
 {
-	if (g.debug > 0) {
-		fprintf(stderr, "destroying icons and winlist\n");
-	}
+    msg(0, "destroying icons and winlist\n");
 	if (g.debug > 1) {
-		fprintf(stderr, "before freeWinlist\n");
+		msg(1, "before freeWinlist\n");
         print_sortlist();
 	}
 	int y;
@@ -556,14 +535,14 @@ void winPropChangeEvent(XPropertyEvent e)
         gettimeofday(&ctv, NULL);
         usec_delta = (ctv.tv_sec - g.last.tv.tv_sec) * 1E6 
           + (ctv.tv_usec - g.last.tv.tv_usec);
-        fprintf (stderr, "delta %d\n", usec_delta);
+        msg(0, "delta %d\n", usec_delta);
         if (usec_delta < 5E5) {  // half a second
             return;
         }
-        fprintf (stderr, PREF"pulling 'prev' 0x%lx supressed\n", aw);
+        msg(0, PREF"pulling 'prev' 0x%lx supressed\n", aw);
     }
     if (aw == g.last.to) {
-        fprintf (stderr, PREF"pulling 'to' 0x%lx supressed\n", aw);
+        msg(0, PREF"pulling 'to' 0x%lx supressed\n", aw);
         return;
     }
 */
@@ -571,10 +550,9 @@ void winPropChangeEvent(XPropertyEvent e)
     // unfortunately, on focus by alttab, this is fired twice:
     // 1) when alttab window gone, previous window becomes active,
     // 2) then alttab-focused window becomes active.
-    if (g.debug>0)
-        fprintf (stderr, 
-            "wm new active window 0x%lx, pull to the head of sortlist\n",
-            aw);
+    msg(0, 
+      "wm new active window 0x%lx, pull to the head of sortlist\n",
+      aw);
     add_to_sortlist (aw, true, true);
 }
 
@@ -589,9 +567,7 @@ void winDestroyEvent(XDestroyWindowEvent e)
 
     DL_SEARCH_SCALAR (g.sortlist, s, id, e.window);
     if (s != NULL) {
-        if (g.debug>1) {
-            fprintf (stderr, "0x%lx found in sortlist, removing\n", e.window);
-        }
+        msg(1, "0x%lx found in sortlist, removing\n", e.window);
         DL_DELETE (g.sortlist, s);
     }
 }
@@ -610,26 +586,20 @@ bool common_skipWindow(Window w,
             && current_desktop != window_desktop 
             && current_desktop != DESKTOP_UNKNOWN 
             && window_desktop != DESKTOP_UNKNOWN) {
-        if (g.debug > 1) {
-            fprintf (stderr, 
-                    "window not on active desktop, skipped (window's %ld, current %ld)\n", 
-                    window_desktop, current_desktop);
-        }
+            msg(1, 
+              "window not on active desktop, skipped (window's %ld, current %ld)\n", 
+              window_desktop, current_desktop);
         return true;
     }
     if (g.option_desktop == DESK_NOSPECIAL
             && window_desktop == -1) {
-        if (g.debug > 1) {
-            fprintf (stderr, "window on -1 desktop, skipped\n");
-        }
+        msg(1, "window on -1 desktop, skipped\n");
         return true;
     }
     if (g.option_desktop == DESK_NOCURRENT && 
             (window_desktop == current_desktop ||
              window_desktop == -1)) {
-        if (g.debug > 1) {
-            fprintf (stderr, "window on current or -1 desktop, skipped\n");
-        }
+        msg(1, "window on current or -1 desktop, skipped\n");
         return true;
     }
 
@@ -639,14 +609,12 @@ bool common_skipWindow(Window w,
             (g.option_vp_mode == VP_POINTER ||
             g.option_vp_mode == VP_FOCUS)) {
         if (! get_absolute_coordinates(w, &wq)) {
-            fprintf (stderr, 
-                    "can't get coordinates of window 0x%lx, included anyway\n", w);
+            msg(-1, 
+              "can't get coordinates of window 0x%lx, included anyway\n", w);
         } else {
             if (! rectangles_cross(g.vp, wq)) {
-                if (g.debug > 1) {
-                    fprintf (stderr, 
-                            "window's area doesn't cross with current screen, skipped\n");
-                }
+                msg(1, 
+                  "window's area doesn't cross with current screen, skipped\n");
                 return true;
             }
         }

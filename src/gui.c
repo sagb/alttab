@@ -66,7 +66,7 @@ GC create_gc(int type)
 
 	gc = XCreateGC(dpy, root, valuemask, &values);
 	if (gc < 0) {
-		fprintf(stderr, "can't create GC\n");
+		msg(-1, "can't create GC\n");
 		return 0;
 	}
 	/* allocate foreground and background colors for this GC. */
@@ -90,7 +90,7 @@ GC create_gc(int type)
 				   join_style);
 		break;
 	default:
-		fprintf(stderr, "unknown GC type, not setting colors\n");
+		msg(-1, "unknown GC type, not setting colors\n");
 		break;
 	}
 	/* define the fill style for the GC. to be 'solid filling'. */
@@ -108,7 +108,7 @@ void drawFr(GC gc, int f)
 			       0 + (FRAME_W / 2),
 			       tileW + FRAME_W, tileH + FRAME_W);
 	if (!d) {
-		fprintf(stderr, "can't draw frame\n");
+		msg(-1, "can't draw frame\n");
 	}
 }
 
@@ -169,9 +169,7 @@ int startupGUItasks()
 // colors
 	colormap = DefaultColormap(dpy, scr);
 	visual = DefaultVisual(dpy, scr);
-	if (g.debug > 0) {
-		fprintf(stderr, "early allocating colors\n");
-	}
+    msg(0, "early allocating colors\n");
 	srand(time(NULL));
 	int p;
 	for (p = 0; p < NCOLORS; p++) {
@@ -198,39 +196,34 @@ int startupGUItasks()
 						       r[1] + 0x80);
 					g.color[p].name[7] = '\0';
 				}
-				if (g.debug > 1)
-					fprintf(stderr,
-						"color generated: %s, RAND_MAX=%d\n",
-						g.color[p].name, RAND_MAX);
+                msg(1,
+				  "color generated: %s, RAND_MAX=%d\n",
+				  g.color[p].name, RAND_MAX);
 			}
 			if (!XAllocNamedColor(dpy,
 					      colormap,
 					      g.color[p].name,
 					      &(g.color[p].xcolor),
 					      &(g.color[p].xcolor)))
-				die2("failed to allocate X color: ",
+				die("failed to allocate X color: ",
 				     g.color[p].name);
 			if (!XftColorAllocName
 			    (dpy, visual, colormap, g.color[p].name,
 			     &(g.color[p].xftcolor)))
-				die2("failed to allocate Xft color: ",
+				die("failed to allocate Xft color: ",
 				     g.color[p].name);
 		}
 	}
 
-	if (g.debug > 0) {
-		fprintf(stderr, "early opening font\n");
-	}
+    msg(0, "early opening font\n");
 //fontLabel = XLoadFont (dpy, LABELFONT);  // using Xft instead
 	fontLabel = XftFontOpenName(dpy, scr, g.option_font);
 	if (!fontLabel) {
-		fprintf(stderr, "can't allocate font: %s\ncheck installed fontconfig fonts: fc-list\n", g.option_font);
+		msg(-1, "can't allocate font: %s\ncheck installed fontconfig fonts: fc-list\n", g.option_font);
 	}
 // having colors, GC may be built
 // they are required early for addWindow when transforming icon depth
-	if (g.debug > 0) {
-		fprintf(stderr, "early building GCs\n");
-	}
+    msg(0, "early building GCs\n");
 	g.gcDirect = create_gc(0);
 	g.gcReverse = create_gc(1);
 	g.gcFrame = create_gc(2);
@@ -248,9 +241,7 @@ int startupGUItasks()
 //
 int uiShow(bool direction)
 {
-    if (g.debug > 0) {
-		fprintf(stderr, "preparing ui\n");
-	}
+    msg(0, "preparing ui\n");
 	g.uiShowHasRun = true;	// begin allocations
 // screen-related stuff is not at startup but here,
 // because screen configuration may get changed at runtime
@@ -263,7 +254,7 @@ int uiShow(bool direction)
         scrdim.w = ra.width;
         scrdim.h = ra.height;
     } else {
-        fprintf (stderr, 
+        msg(-1,
           "can't get root window attributes, using screen dimensions\n");
         scrdim.x = scrdim.y = 0;
     	scrdim.w = DisplayWidth(dpy, scr);
@@ -283,29 +274,23 @@ int uiShow(bool direction)
             if (g.has_randr) {
                 bool multihead;
                 if (! randrGetViewport (&(g.vp), &multihead)) {
-                    if (g.debug > 0) {
-                        fprintf (stderr, 
-                          "can't obtain viewport from randr, using default screen\n");
-                    }
+                    msg(0, 
+                      "can't obtain viewport from randr, using default screen\n");
                     g.vp = scrdim;
                 }
                 if (! multihead) {
-                    if (g.debug > 0) {
-                        fprintf (stderr, 
-                          "randr reports single head, using default screen instead\n");
-                    }
+                    msg(0, 
+                      "randr reports single head, using default screen instead\n");
                     g.vp = scrdim;
                 }
             } else {
-                if (g.debug > 0) {
-                    fprintf (stderr, 
-                      "no randr, using default screen as viewport\n");
-                }
+                msg(0, 
+                  "no randr, using default screen as viewport\n");
                 g.vp = scrdim;
             }
             break;
         default:
-            fprintf (stderr, 
+            msg(-1, 
               "unknown viewport mode, using default screen\n");
             g.vp = scrdim;
     }
@@ -319,33 +304,24 @@ int uiShow(bool direction)
 	g.winlist = NULL;
 	g.maxNdx = 0;
 	if (!initWinlist(direction)) {
-		if (g.debug > 0) {
-			fprintf(stderr,
-				"initWinlist failed, skipping ui initialization\n");
-		}
+        msg(0, "initWinlist failed, skipping ui initialization\n");
 		g.winlist = NULL;
 		g.maxNdx = 0;
 		return 0;
 	}
 	if (!g.winlist) {
-		if (g.debug > 0) {
-			fprintf(stderr,
-				"winlist doesn't exist, skipping ui initialization\n");
-		}
+        msg(0, "winlist doesn't exist, skipping ui initialization\n");
 		return 0;
 	}
 	if (g.maxNdx < 1) {
-		if (g.debug > 0) {
-			fprintf(stderr,
-				"number of windows < 1, skipping ui initialization\n");
-		}
+        msg(0, "number of windows < 1, skipping ui initialization\n");
 		return 0;
 	}
 	if (g.debug > 0) {
-		fprintf(stderr, "got %d windows\n", g.maxNdx);
+		msg(0, "got %d windows\n", g.maxNdx);
 		int i;
 		for (i = 0; i < g.maxNdx; i++) {
-			fprintf(stderr,
+			msg(0,
 				"%d: %lx (lvl %d, icon %lu (%dx%d)): %s\n", i,
 				g.winlist[i].id, g.winlist[i].reclevel,
 				g.winlist[i].icon_drawable, g.winlist[i].icon_w,
@@ -394,21 +370,21 @@ int uiShow(bool direction)
     }
     visualTileW = (uiwinW - FRAME_W) / g.maxNdx;
 	if (g.debug > 0) {
-		fprintf(stderr, "tile w=%d h=%d\n", tileW, tileH);
-        fprintf(stderr, "uiwin %dx%d +%d+%d", uiwinW, uiwinH, uiwinX, uiwinY);
+		msg(0, "tile w=%d h=%d\n", tileW, tileH);
+        msg(0, "uiwin %dx%d +%d+%d", uiwinW, uiwinH, uiwinX, uiwinY);
         if (g.debug > 1) {
             int nscr, si;
             Screen *s;
             nscr = ScreenCount(dpy);
-            fprintf(stderr, ", %d screen(s):", nscr);
+            msg(0, ", %d screen(s):", nscr);
             for (si = 0; si < nscr; ++si) {
                 s = ScreenOfDisplay(dpy, si);
-                fprintf(stderr, " [%dx%d]", s->width, s->height);
+                msg(0, " [%dx%d]", s->width, s->height);
             }
-            fprintf(stderr, ", viewport %dx%d+%d+%d, avail_w %d", 
+            msg(0, ", viewport %dx%d+%d+%d, avail_w %d", 
                     g.vp.w, g.vp.h, g.vp.x, g.vp.y, avail_w);
         }
-        fprintf(stderr, "\n");
+        msg(0, "\n");
 	}
 // prepare tiles
 
@@ -424,17 +400,14 @@ int uiShow(bool direction)
 		    XFillRectangle(dpy, g.winlist[m].tile, g.gcReverse, 0, 0,
 				   tileW, tileH);
 		if (!fr) {
-			fprintf(stderr, "can't fill tile\n");
+			msg(-1, "can't fill tile\n");
 		}
 		// place icons
 		if (g.winlist[m].icon_drawable) {
 			if (g.winlist[m].icon_w == iconW &&
 			    g.winlist[m].icon_h == iconH) {
 				// direct copy
-				if (g.debug > 1) {
-					fprintf(stderr, "%d: copying icon\n",
-						m);
-				}
+                msg(1, "%d: copying icon\n", m);
 				// prepare special GC to copy icon, with clip mask if icon_mask present
 				unsigned long ic_valuemask = 0;
 				XGCValues ic_values;
@@ -442,8 +415,7 @@ int uiShow(bool direction)
 				    XCreateGC(dpy, root, ic_valuemask,
 					      &ic_values);
 				if (ic_gc < 0) {
-					fprintf(stderr,
-						"can't create GC to draw icon\n");
+					msg(-1, "can't create GC to draw icon\n");
 					return 0;
 				}
 				if (g.winlist[m].icon_mask != 0) {
@@ -458,15 +430,11 @@ int uiShow(bool direction)
 						   g.winlist[m].icon_w, g.winlist[m].icon_h,	// src
 						   0, 0);	// dst
 				if (!or) {
-					fprintf(stderr,
-						"can't copy icon to tile\n");
+					msg(-1, "can't copy icon to tile\n");
 				}
 			} else {
 				// scale
-				if (g.debug > 1) {
-					fprintf(stderr, "%d: scaling icon\n",
-						m);
-				}
+                msg(1, "%d: scaling icon\n", m);
 				int sc = pixmapFit(g.winlist[m].icon_drawable,
 						   g.winlist[m].icon_mask,
 						   g.winlist[m].tile,
@@ -474,15 +442,14 @@ int uiShow(bool direction)
 						   g.winlist[m].icon_h,
 						   iconW, iconH);
 				if (!sc) {
-					fprintf(stderr,
-						"can't scale icon to tile\n");
+                    msg(-1, "can't scale icon to tile\n");
 				}
 			}
 		} else {
 			// draw placeholder or standalone icons from some WM
 			GC gcL = create_gc(0);	// GC for thin line
 			if (!gcL) {
-				fprintf(stderr, "can't create gcL\n");
+				msg(-1, "can't create gcL\n");
 			} else {
 				XSetLineAttributes(dpy, gcL, 1, LineSolid,
 						   CapButt, JoinMiter);
@@ -491,8 +458,7 @@ int uiShow(bool direction)
 				    XDrawRectangle(dpy, g.winlist[m].tile, gcL,
 						   0, 0, iconW, iconH);
 				if (!pr) {
-					fprintf(stderr,
-						"can't draw placeholder\n");
+					msg(-1, "can't draw placeholder\n");
 				}
 				XFreeGC(dpy, gcL);
 			}
@@ -506,13 +472,11 @@ int uiShow(bool direction)
 					  0, (iconH + 5), tileW,
 					  (tileH - iconH - 5));
 			if (dr != 1) {
-				fprintf(stderr, "can't draw label\n");
+				msg(-1, "can't draw label\n");
 			}
 		}
 	}
-	if (g.debug > 0) {
-		fprintf(stderr, "prepared %d tiles\n", m);
-	}
+    msg(0, "prepared %d tiles\n", m);
 	if (fontLabel)
 		XftFontClose(dpy, fontLabel);
 
@@ -533,9 +497,7 @@ int uiShow(bool direction)
 				valuemask, &attributes);
 	if (uiwin <= 0)
 		die("can't create window");
-	if (g.debug > 0) {
-        fprintf(stderr, "our window is 0x%lx\n", uiwin);
-	}
+    msg(0, "our window is 0x%lx\n", uiwin);
 
 // set properties of our window
     XStoreName(dpy, uiwin, XWINNAME);
@@ -607,27 +569,21 @@ int uiShow(bool direction)
 //
 void uiExpose()
 {
-	if (g.debug > 0) {
-		fprintf(stderr, "expose ui\n");
-	}
+    msg(0, "expose ui\n");
 // if WM moved uiwin, here is the place
 // where we first see 'bad' absolute coordinates.
 // try to correct them.
     quad uwq;
     if (get_absolute_coordinates(uiwin, &uwq)) {
 // debug for #54
-        if (g.debug > 1) {
-            fprintf (stderr, "attr abs at expose: %dx%d +%d+%d\n",
-                uwq.w, uwq.h, uwq.x, uwq.y);
-        }
+        msg(1, "attr abs at expose: %dx%d +%d+%d\n",
+          uwq.w, uwq.h, uwq.x, uwq.y);
         int xdiff = uwq.x - uiwinX;
         int ydiff = uwq.y - uiwinY;
         if (abs(xdiff) > FRAME_W / 2 || 
-              abs(ydiff) > FRAME_W / 2) {
-            if (g.debug > 1) {
-                fprintf (stderr, 
-                  "WM moved uiwin too far, trying to correct\n");
-            }
+          abs(ydiff) > FRAME_W / 2) {
+            msg(1, 
+              "WM moved uiwin too far, trying to correct\n");
             XMoveWindow(dpy, uiwin, uiwinX, uiwinY);
         }
         if (uwq.w != uiwinW || uwq.h != uiwinH) {
@@ -635,26 +591,21 @@ void uiExpose()
             // floating_maximum_size in #54.
             // there is little can be done here,
             // so just complain.
-            fprintf (stderr, 
-              "AltTab switcher window resized, expect bugs. Please configure WM to not interfere with alttab window size, for example, disable 'floating_maximum_size' in i3\n");
+            msg(-1, 
+              "switcher window resized, expect bugs. Please configure WM to not interfere with alttab window size, for example, disable 'floating_maximum_size' in i3\n");
         }
     }
 // icons
 	int j;
 	for (j = 0; j < g.maxNdx; j++) {
 		if (g.winlist[j].tile) {
-			if (g.debug > 1) {
-				fprintf(stderr, "copying tile %d to canvas\n",
-					j);
-			}
+            msg(1, "copying tile %d to canvas\n", j);
 			//XSync (dpy, false);
 			int r = XCopyArea(dpy, g.winlist[j].tile, uiwin,
 					  g.gcDirect, 0, 0, tileW, tileH,	// src
 					  j * (tileW + FRAME_W) + FRAME_W, FRAME_W);	// dst
 			//XSync (dpy, false);
-			if (g.debug > 1) {
-				fprintf(stderr, "XCopyArea returned %d\n", r);
-			}
+            msg(1, "XCopyArea returned %d\n", r);
 		}
 	}
 // frame
@@ -669,18 +620,14 @@ int uiHide()
     // order is important: to set focus in Metacity,
     // our window must be destroyed first
 	if (uiwin) {
-	    if (g.debug > 0) {
-            fprintf(stderr, "destroying our window\n");
-        }
+        msg(0, "destroying our window\n");
 		XUnmapWindow(dpy, uiwin);
 		XDestroyWindow(dpy, uiwin);
 		uiwin = 0;
 	}
 	if (g.winlist) {
-		if (g.debug > 0) {
-            fprintf(stderr, "changing focus to 0x%lx\n",
-				g.winlist[g.selNdx].id);
-		}
+        msg(0, "changing focus to 0x%lx\n",
+		  g.winlist[g.selNdx].id);
         /*
         // save the switch moment for detecting
         // subsequent false focus event from WM
@@ -690,9 +637,7 @@ int uiHide()
         */
 		setFocus(g.selNdx);	// before winlist destruction!
 	}
-	if (g.debug > 0) {
-        fprintf(stderr, "destroying tiles\n");
-	}
+    msg(0, "destroying tiles\n");
 	int y;
 	for (y = 0; y < g.maxNdx; y++) {
 		if (g.winlist && g.winlist[y].tile) {
@@ -717,9 +662,7 @@ int uiNextWindow()
 	g.selNdx++;
 	if (g.selNdx >= g.maxNdx)
 		g.selNdx = 0;
-	if (g.debug > 0) {
-		fprintf(stderr, "item %d\n", g.selNdx);
-	}
+    msg(0, "item %d\n", g.selNdx);
 	framesRedraw();
 	return 1;
 }
@@ -734,9 +677,7 @@ int uiPrevWindow()
 	g.selNdx--;
 	if (g.selNdx < 0)
 		g.selNdx = g.maxNdx - 1;
-	if (g.debug > 0) {
-		fprintf(stderr, "item %d\n", g.selNdx);
-	}
+    msg(0, "item %d\n", g.selNdx);
 	framesRedraw();
 	return 1;
 }
@@ -751,9 +692,7 @@ int uiSelectWindow(int ndx)
     if (ndx < 0 || ndx >= g.maxNdx) {
         return 0; }
 	g.selNdx = ndx;
-	if (g.debug > 0) {
-		fprintf(stderr, "item %d\n", g.selNdx);
-	}
+    msg(0, "item %d\n", g.selNdx);
 	framesRedraw();
 	return 1;
 }

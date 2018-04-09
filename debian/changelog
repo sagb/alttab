@@ -1,10 +1,12 @@
-alttab (1.2.0.20180406.53.g3701388-1~1.gbpd9ec13) jessie; urgency=medium
+alttab (1.2.0.20180409.55.g55dd5b0-1~1.gbp13ea55) unstable; urgency=medium
 
-  ** SNAPSHOT build @d9ec13c3916c3f400e535e07c5b0bc5217656a12 **
+  ** SNAPSHOT build @13ea55d75a25c245bd954e11b87273a8c53ea6ba **
 
-  * backport to jessie
+  * incorrect argument now abort execution
+  * diagnostic functions: die, msg
+  * get rid of resource macro
 
- -- Alexander Kulak <sa-dev@rainbow.by>  Fri, 06 Apr 2018 23:13:50 +0300
+ -- Alexander Kulak <sa-dev@rainbow.by>  Mon, 09 Apr 2018 17:15:09 +0300
 
 alttab (1.2.0.20180406.53.g3701388-1~1.gbp168b9f) unstable; urgency=medium
 
