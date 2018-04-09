@@ -1,3 +1,13 @@
+alttab (1.2.0.20180409.55.g55dd5b0-1~1.gbp13ea55) unstable; urgency=medium
+
+  ** SNAPSHOT build @13ea55d75a25c245bd954e11b87273a8c53ea6ba **
+
+  * incorrect argument now abort execution
+  * diagnostic functions: die, msg
+  * get rid of resource macro
+
+ -- Alexander Kulak <sa-dev@rainbow.by>  Mon, 09 Apr 2018 17:15:09 +0300
+
 alttab (1.2.0.20180406.53.g3701388-1~1.gbp168b9f) unstable; urgency=medium
 
   ** SNAPSHOT build @168b9f5cd1711f32f5f48aa7eccc4605b6a36f5e **
