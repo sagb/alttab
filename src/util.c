@@ -122,6 +122,7 @@ int changeKeygrab(Window win, bool grab, KeyCode keycode,
 	return 1;
 }
 
+/*
 //
 // register interest in KeyRelease events for the window
 // and its children recursively
@@ -134,6 +135,8 @@ void setSelectInput(Window win, int reg)
 
 	ee_complain = false;
 
+    // warning: this overwrites any previous mask,
+    // find other calls to XSelectInput
 	if (XSelectInput
 	    (dpy, win,
 	     reg ? KeyReleaseMask | SubstructureNotifyMask : 0) != BadWindow
@@ -147,6 +150,7 @@ void setSelectInput(Window win, int reg)
 
 	ee_complain = true;
 }
+*/
 
 //
 // execv program and read its stdout

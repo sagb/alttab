@@ -70,6 +70,7 @@ static int sort_by_order(const void *p1, const void *p2)
 void add_to_sortlist(Window w, bool to_head, bool move)
 {
     PermanentWindowInfo *s;
+    bool was = false;
     bool add = false;
 
     DL_SEARCH_SCALAR (g.sortlist, s, id, w);
@@ -79,6 +80,7 @@ void add_to_sortlist(Window w, bool to_head, bool move)
         s->id = w;
         add = true;
     } else {
+        was = true;
         if (move) {
             DL_DELETE (g.sortlist, s);
             add = true;
@@ -90,8 +92,11 @@ void add_to_sortlist(Window w, bool to_head, bool move)
         } else {
             DL_APPEND (g.sortlist, s);
         }
-        // for delete notification
-        XSelectInput(dpy, w, StructureNotifyMask);
+    }
+    if (add && !was) {
+        // new window
+        // register interest in events
+        x_setCommonPropertiesForAnyWindow(w);
     }
 }
 
@@ -138,19 +143,29 @@ void print_winlist()
 //
 int startupWintasks()
 {
+    long rootevmask = 0;
+
 	g.sortlist = NULL;  // utlist head must be initialized to NULL
 	g.ic = NULL;  // uthash too
 	if (g.option_iconSrc != ISRC_RAM) {
 		g.ic = initIcon();
 		initIconHash(&(g.ic));
 	}
-    // watching for _NET_ACTIVE_WINDOW
-    XSelectInput(dpy, root, PropertyChangeMask);
+
+    // root: watching for _NET_ACTIVE_WINDOW
     g.naw = XInternAtom(dpy, "_NET_ACTIVE_WINDOW", false);
-    if (g.naw == None) {
-        msg(0,
-          "no _NET_ACTIVE_WINDOW atom, window focus will not be tracked\n");
+    if (g.naw != None) {
+        rootevmask |= PropertyChangeMask;
+    } else {
+        msg(0, "no _NET_ACTIVE_WINDOW atom\n");
     }
+    // warning: this overwrites any previous value.
+    // note: x_setCommonPropertiesForAnyWindow does the similar thing
+    // for any window other than root and uiwin
+    if (rootevmask != 0) {
+        XSelectInput(dpy, root, rootevmask);
+    }
+
 	switch (g.option_wm) {
 	case WM_NO:
 		return 1;
@@ -373,6 +388,7 @@ int addWindowInfo(Window win, int reclevel, int wm_id, unsigned long desktop, ch
 
 	g.winlist[g.maxNdx].reclevel = reclevel;
 	g.winlist[g.maxNdx].desktop = desktop;
+
 	g.maxNdx++;
     msg(1, "window %d, id %lx added to list\n", g.maxNdx, win);
 	return 1;
@@ -621,5 +637,27 @@ bool common_skipWindow(Window w,
     }
 
     return false;
+}
+
+//
+// focus change handler
+// does the same as _NET_ACTIVE_WINDOW handler
+// but in non-EWMH WM only
+//
+void winFocusChangeEvent(XFocusChangeEvent e)
+{
+    // in non-EWMH only
+    // probably should also maintain _NET_ACTIVE_WINDOW 
+    // support flag in EwmhFeatures
+    if (g.option_wm == WM_EWMH) return;
+    // focusIn only
+    if (e.type != FocusIn) return;
+    Window w = e.window;
+    // focus changed to our own old/current/zero window?
+    if (w == getUiwin()) return;
+    // focus changed to window which is already top?
+    if (g.sortlist != NULL && w == g.sortlist->id) return;
+    msg(0, "focusIn 0x%lx, pull to the head of sortlist\n", w);
+    add_to_sortlist (w, true, true);
 }
 

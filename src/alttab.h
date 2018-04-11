@@ -212,7 +212,9 @@ int execAndReadStdout(char *exe, char *args[], char *buf, int bufsize);
 int pulloutWindowToTop(int winNdx);
 void winPropChangeEvent(XPropertyEvent e);
 void winDestroyEvent(XDestroyWindowEvent e);
+void winFocusChangeEvent(XFocusChangeEvent e);
 bool common_skipWindow(Window w, unsigned long current_desktop, unsigned long window_desktop);
+void x_setCommonPropertiesForAnyWindow(Window win);
 
 /* EWHM */
 bool ewmh_detectFeatures(EwmhFeatures *e);
