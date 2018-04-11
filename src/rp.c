@@ -39,7 +39,7 @@ char *ratpoison_cmd;
 
 //
 // process ratpoison window_group, adding its windows 
-// to winlist/startNdx/sortlist.
+// to winlist/sortlist.
 // window_group must be selected in advance.
 //
 int rp_add_windows_in_group(int current_group, int window_group)
@@ -80,7 +80,8 @@ int rp_add_windows_in_group(int current_group, int window_group)
 				die(rpse, rest2);
 			switch (*tok2) {
 			case '*':
-				g.startNdx = g.maxNdx;
+                // pull to head
+                addToSortlist (g.winlist[g.maxNdx].id, true, true);
 				break;
 			case '+':
 			case '-':
@@ -158,7 +159,7 @@ int rp_startupWintasks()
 }
 
 //
-// initialize winlist/startNdx/update sortlist from ratpoison output
+// initialize winlist/update sortlist from ratpoison output
 //
 int rp_initWinlist()
 {

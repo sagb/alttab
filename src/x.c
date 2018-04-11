@@ -61,7 +61,7 @@ Window x_get_leader(Window win)
 // PUBLIC
 
 //
-// set winlist,maxNdx,startNdx recursively using raw Xlib
+// set winlist,maxNdx recursively using raw Xlib
 // first call should be (win=root, reclevel=0)
 //
 int x_initWindowsInfoRecursive(Window win, int reclevel)
@@ -122,9 +122,6 @@ int x_initWindowsInfoRecursive(Window win, int reclevel)
 
 	if (nchildren > 0 && children) {
 		XFree(children);
-	}
-	if (reclevel == 0) {
-		g.startNdx = 0;
 	}
 	return 1;
 }

@@ -64,43 +64,6 @@ static int sort_by_order(const void *p1, const void *p2)
 }
 
 //
-// add Window to the head/tail of sortlist, if it's not in sortlist already
-// if move==true and the item is already in sortlist, then move it to the head/tail
-//
-void add_to_sortlist(Window w, bool to_head, bool move)
-{
-    PermanentWindowInfo *s;
-    bool was = false;
-    bool add = false;
-
-    DL_SEARCH_SCALAR (g.sortlist, s, id, w);
-    if (s == NULL) {
-        s = malloc (sizeof (PermanentWindowInfo));
-        if (s == NULL) return;
-        s->id = w;
-        add = true;
-    } else {
-        was = true;
-        if (move) {
-            DL_DELETE (g.sortlist, s);
-            add = true;
-        }
-    }
-    if (add) {
-        if (to_head) {
-            DL_PREPEND (g.sortlist, s);
-        } else {
-            DL_APPEND (g.sortlist, s);
-        }
-    }
-    if (add && !was) {
-        // new window
-        // register interest in events
-        x_setCommonPropertiesForAnyWindow(w);
-    }
-}
-
-//
 // debug output of sortlist
 //
 void print_sortlist()
@@ -138,6 +101,43 @@ void print_winlist()
 // PUBLIC
 
 //
+// add Window to the head/tail of sortlist, if it's not in sortlist already
+// if move==true and the item is already in sortlist, then move it to the head/tail
+//
+void addToSortlist(Window w, bool to_head, bool move)
+{
+    PermanentWindowInfo *s;
+    bool was = false;
+    bool add = false;
+
+    DL_SEARCH_SCALAR (g.sortlist, s, id, w);
+    if (s == NULL) {
+        s = malloc (sizeof (PermanentWindowInfo));
+        if (s == NULL) return;
+        s->id = w;
+        add = true;
+    } else {
+        was = true;
+        if (move) {
+            DL_DELETE (g.sortlist, s);
+            add = true;
+        }
+    }
+    if (add) {
+        if (to_head) {
+            DL_PREPEND (g.sortlist, s);
+        } else {
+            DL_APPEND (g.sortlist, s);
+        }
+    }
+    if (add && !was) {
+        // new window
+        // register interest in events
+        x_setCommonPropertiesForAnyWindow(w);
+    }
+}
+
+//
 // early initialization
 // once per execution
 //
@@ -153,11 +153,9 @@ int startupWintasks()
 	}
 
     // root: watching for _NET_ACTIVE_WINDOW
-    g.naw = XInternAtom(dpy, "_NET_ACTIVE_WINDOW", false);
-    if (g.naw != None) {
+    if (g.option_wm == WM_EWMH) {
+        g.naw = XInternAtom(dpy, "_NET_ACTIVE_WINDOW", true);
         rootevmask |= PropertyChangeMask;
-    } else {
-        msg(0, "no _NET_ACTIVE_WINDOW atom\n");
     }
     // warning: this overwrites any previous value.
     // note: x_setCommonPropertiesForAnyWindow does the similar thing
@@ -382,7 +380,7 @@ int addWindowInfo(Window win, int reclevel, int wm_id, unsigned long desktop, ch
 	}
 // 3. sort
 
-    add_to_sortlist (win, false, false);
+    addToSortlist (win, false, false);
 
 // 4. other window data
 
@@ -404,10 +402,9 @@ int initWinlist(bool direction)
 {
 	int r;
 	if (g.debug > 1) {
-		msg(1, "before initWinlist");
+		msg(1, "before initWinlist\n");
         print_sortlist();
 	}
-	g.startNdx = 0;		// safe default
 	switch (g.option_wm) {
 	case WM_NO:
 		r = x_initWindowsInfoRecursive(root, 0);	// note: direction/current window index aren't used
@@ -425,13 +422,11 @@ int initWinlist(bool direction)
 		r = 0;
 		break;
 	}
-	if (g.maxNdx > 1)
-        add_to_sortlist (g.winlist[g.startNdx].id, true, true); // pull to head
 
 // sort winlist according to .order
     if (g.debug > 1) {
-        msg(1, "startNdx=%d\n", g.startNdx);
         msg(1, "before qsort\n");
+        print_sortlist();
         print_winlist();
     }
     qsort(g.winlist, g.maxNdx, sizeof(WindowInfo), sort_by_order);
@@ -440,20 +435,13 @@ int initWinlist(bool direction)
         print_winlist();
     }
 
-	g.startNdx = 0;		// former pointer invalidated by qsort, brought to top
 	g.selNdx = direction ?
-	    ((g.startNdx < 1
-	      || g.startNdx >=
-	      g.maxNdx) ? (g.maxNdx - 1) : (g.startNdx - 1)) : ((g.startNdx < 0
-								 || g.startNdx
-								 >=
-								 (g.maxNdx -
-								  1)) ? 0 :
-								g.startNdx + 1);
+	    (g.maxNdx - 1) : 
+        (( 0 >= (g.maxNdx - 1)) ? 0 : 1);
 //if (g.selNdx<0 || g.selNdx>=g.maxNdx) { g.selNdx=0; } // just for case
     msg(1,
-	  "initWinlist ret: number of items in winlist: %d, current (selected) item in winlist: %d, current item at start of uiShow (current window before setFocus): %d\n",
-	  g.maxNdx, g.selNdx, g.startNdx);
+	  "initWinlist ret: number of items in winlist: %d, current (selected) item in winlist: %d\n",
+	  g.maxNdx, g.selNdx);
 
 	return r;
 }
@@ -511,7 +499,7 @@ int setFocus(int winNdx)
 		return 0;
 	}
     // pull to head
-    add_to_sortlist (g.winlist[winNdx].id, true, true);
+    addToSortlist (g.winlist[winNdx].id, true, true);
 	return r;
 }
 
@@ -567,9 +555,9 @@ void winPropChangeEvent(XPropertyEvent e)
     // 1) when alttab window gone, previous window becomes active,
     // 2) then alttab-focused window becomes active.
     msg(0, 
-      "wm new active window 0x%lx, pull to the head of sortlist\n",
+      "event PropertyChange: 0x%lx active, pull to the head of sortlist\n",
       aw);
-    add_to_sortlist (aw, true, true);
+    addToSortlist (aw, true, true);
 }
 
 //
@@ -583,7 +571,8 @@ void winDestroyEvent(XDestroyWindowEvent e)
 
     DL_SEARCH_SCALAR (g.sortlist, s, id, e.window);
     if (s != NULL) {
-        msg(1, "0x%lx found in sortlist, removing\n", e.window);
+        msg(1,
+          "event DestroyNotify: 0x%lx found in sortlist, removing\n", e.window);
         DL_DELETE (g.sortlist, s);
     }
 }
@@ -642,22 +631,26 @@ bool common_skipWindow(Window w,
 //
 // focus change handler
 // does the same as _NET_ACTIVE_WINDOW handler
-// but in non-EWMH WM only
+// but in non-EWMH environment
 //
 void winFocusChangeEvent(XFocusChangeEvent e)
 {
+    Window w;
     // in non-EWMH only
     // probably should also maintain _NET_ACTIVE_WINDOW 
     // support flag in EwmhFeatures
     if (g.option_wm == WM_EWMH) return;
     // focusIn only
     if (e.type != FocusIn) return;
-    Window w = e.window;
+    // skip Grab/Ungrab notification modes
+    if (e.mode != NotifyNormal) return;
     // focus changed to our own old/current/zero window?
+    w = e.window;
     if (w == getUiwin()) return;
     // focus changed to window which is already top?
     if (g.sortlist != NULL && w == g.sortlist->id) return;
-    msg(0, "focusIn 0x%lx, pull to the head of sortlist\n", w);
-    add_to_sortlist (w, true, true);
+
+    msg(1, "event focusIn 0x%lx, pull to the head of sortlist\n", w);
+    addToSortlist (w, true, true);
 }
 
