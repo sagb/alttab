@@ -1,10 +1,12 @@
-alttab (1.2.0.20180409.55.g55dd5b0-1~1.gbp0fe59b) stretch; urgency=medium
+alttab (1.2.0.20180411.58.g699af47-1~1.gbp45e25c) unstable; urgency=medium
 
-  ** SNAPSHOT build @0fe59b4a5e7fd74095905b5eea2b68d00c91cd2f **
+  ** SNAPSHOT build @45e25c270409c6bcaae934c80665268c5dfcdef6 **
 
-  * backport to stretch
+  * handle focusIn events - maintain correct MRU order without EWMH
+  * get rid of startNdx
+  * fix segfault in ratpoison
 
- -- Alexander Kulak <sa-dev@rainbow.by>  Mon, 09 Apr 2018 17:24:51 +0300
+ -- Alexander Kulak <sa-dev@rainbow.by>  Wed, 11 Apr 2018 23:21:43 +0300
 
 alttab (1.2.0.20180409.55.g55dd5b0-1~1.gbp13ea55) unstable; urgency=medium
 

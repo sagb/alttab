@@ -61,7 +61,7 @@ Window x_get_leader(Window win)
 // PUBLIC
 
 //
-// set winlist,maxNdx,startNdx recursively using raw Xlib
+// set winlist,maxNdx recursively using raw Xlib
 // first call should be (win=root, reclevel=0)
 //
 int x_initWindowsInfoRecursive(Window win, int reclevel)
@@ -123,9 +123,6 @@ int x_initWindowsInfoRecursive(Window win, int reclevel)
 	if (nchildren > 0 && children) {
 		XFree(children);
 	}
-	if (reclevel == 0) {
-		g.startNdx = 0;
-	}
 	return 1;
 }
 
@@ -154,3 +151,27 @@ int x_setFocus(int wndx)
 
 	return 1;
 }
+
+//
+// this is where alttab is supposed to set properties or
+// register interest in event for ANY foreign window encountered.
+// warning: this is called only on addition to sortlist.
+//
+void x_setCommonPropertiesForAnyWindow(Window win)
+{
+    long evmask = 0;
+    // root and our window are treated elsewhere
+    if (win == root || win == getUiwin())
+        return;
+    // for delete notification
+    evmask |= StructureNotifyMask;
+    // for focusIn notification
+    if (g.option_wm != WM_EWMH) {
+        msg(0, "using direct focus tracking for 0x%lx\n", win);
+        evmask |= FocusChangeMask;
+    }
+    // warning: this overwrites previous value
+    if (evmask != 0)
+        XSelectInput(dpy, win, evmask);
+}
+

@@ -35,7 +35,7 @@ Control how to obtain window list and set focus\. \fINUMBER\fR must be between 0
 \fI0\fR: No WM, raw X\.
 .
 .IP
-Set this value manually, as it\'s not autodetected\. Only top\-level viewable children of root window are listed\. List order is random\. Running \fB\-w 0\fR under WM is discouraged: hidden windows or windows on another desktops will not be listed; instead, some strange windows may be included\.
+Set this value manually, as it\'s not autodetected\. Only top\-level viewable children of root window are listed\. Running \fB\-w 0\fR under WM is discouraged: hidden windows or windows on another desktops will not be listed; instead, some strange windows may be included\.
 .
 .IP
 \fI1\fR: EWMH compatible\.
@@ -53,7 +53,7 @@ Alttab uses ratpoison own remote control capability\. Additionally, alttab regis
 \fI3\fR: Ancient WM\.
 .
 .IP
-Fallback, worse than \fI0\fR\. Search for application windows at random nodes of window tree (WM is probably reparenting) and select only those with a name, including non\-viewable (WM is probably iconifying)\. May cause lag\. List order is random\. Tested in twm, flwm, wm2\.
+Fallback, worse than \fI0\fR\. Search for application windows at random nodes of window tree (WM is probably reparenting) and select only those with a name, including non\-viewable (WM is probably iconifying)\. May cause lag\. Tested in twm, flwm, wm2\.
 .
 .TP
 \fB\-d\fR \fINUMBER\fR
