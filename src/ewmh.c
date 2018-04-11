@@ -196,7 +196,7 @@ Window ewmh_getActiveWindow()
 }
 
 //
-// initialize winlist/startNdx
+// initialize winlist, correcting sortlist
 // return 1 if ok
 //
 int ewmh_initWinlist()
@@ -242,14 +242,15 @@ int ewmh_initWinlist()
 
 		addWindowInfo(w, 0, 0, window_desktop, title);
 		if (w == aw) {
-			g.startNdx = g.maxNdx-1;
+            addToSortlist (w, true, true); // pull to head
 		}
 	}
 
     // TODO: BUG? sometimes i3 returns previous active window,
     // which breaks sortlist
-    msg(1, "ewmh active window: %lu index: %d name: %s\n",
-	  aw, g.startNdx, (g.winlist ? g.winlist[g.startNdx].name : "null"));
+    // no more startNdx, can't output this
+    //msg(1, "ewmh active window: %lu name: %s\n",
+	//  aw, (g.winlist ? g.winlist[g.startNdx].name : "null"));
 
 	return 1;
 }

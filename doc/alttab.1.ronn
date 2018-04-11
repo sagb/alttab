@@ -43,7 +43,6 @@ Most command line options have corresponding X resource, see doc/alttab.ad for e
 
       Set this value manually, as it's not autodetected. 
       Only top-level viewable children of root window are listed.
-      List order is random. 
       Running **-w 0** under WM is discouraged: hidden windows or windows on another desktops will not be listed; instead, some strange windows may be included. 
 
       <1>: EWMH compatible.
@@ -66,7 +65,6 @@ Most command line options have corresponding X resource, see doc/alttab.ad for e
       Search for application windows at random nodes of window tree (WM is probably reparenting)
       and select only those with a name, including non-viewable (WM is probably iconifying).
       May cause lag.
-      List order is random.
       Tested in twm, flwm, wm2.
 
   * `-d` <NUMBER>:

@@ -117,7 +117,6 @@ typedef struct {
 	WindowInfo *winlist;
 	int maxNdx;		// number of items in list above
 	int selNdx;		// current (selected) item
-	int startNdx;		// current item at start of uiShow (current window before setFocus)
     /* auxiliary list for sorting
      * head = recently focused
      * display-wide, for all groups/desktops
@@ -212,7 +211,10 @@ int execAndReadStdout(char *exe, char *args[], char *buf, int bufsize);
 int pulloutWindowToTop(int winNdx);
 void winPropChangeEvent(XPropertyEvent e);
 void winDestroyEvent(XDestroyWindowEvent e);
+void winFocusChangeEvent(XFocusChangeEvent e);
 bool common_skipWindow(Window w, unsigned long current_desktop, unsigned long window_desktop);
+void x_setCommonPropertiesForAnyWindow(Window win);
+void addToSortlist(Window w, bool to_head, bool move);
 
 /* EWHM */
 bool ewmh_detectFeatures(EwmhFeatures *e);

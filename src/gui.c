@@ -502,6 +502,8 @@ int uiShow(bool direction)
 // set properties of our window
     XStoreName(dpy, uiwin, XWINNAME);
     XSetClassHint(dpy, uiwin, &class_h);
+// warning: this overwrites any previous value.
+// note: x_setCommonPropertiesForAnyWindow does the same thing for any window
 	XSelectInput(dpy, uiwin, ExposureMask | KeyPressMask | KeyReleaseMask 
         | ButtonPressMask | ButtonReleaseMask);
 // set window type so that WM will hopefully not resize it
