@@ -562,6 +562,10 @@ int main(int argc, char **argv)
             winDestroyEvent(ev.xdestroywindow);
             break;
 
+        case FocusIn:
+            winFocusChangeEvent(ev.xfocus);
+            break;
+
 		default:
             msg(1, "Event type %d\n", ev.type);
 			break;
