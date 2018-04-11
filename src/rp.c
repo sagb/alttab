@@ -81,7 +81,8 @@ int rp_add_windows_in_group(int current_group, int window_group)
 			switch (*tok2) {
 			case '*':
                 // pull to head
-                addToSortlist (g.winlist[g.maxNdx].id, true, true);
+                // g.winlist isn't here yet!
+                addToSortlist (win, true, true);
 				break;
 			case '+':
 			case '-':
