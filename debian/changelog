@@ -1,3 +1,13 @@
+alttab (1.2.0.20180411.58.g699af47-1~1.gbp45e25c) unstable; urgency=medium
+
+  ** SNAPSHOT build @45e25c270409c6bcaae934c80665268c5dfcdef6 **
+
+  * handle focusIn events - maintain correct MRU order without EWMH
+  * get rid of startNdx
+  * fix segfault in ratpoison
+
+ -- Alexander Kulak <sa-dev@rainbow.by>  Wed, 11 Apr 2018 23:21:43 +0300
+
 alttab (1.2.0.20180409.55.g55dd5b0-1~1.gbp13ea55) unstable; urgency=medium
 
   ** SNAPSHOT build @13ea55d75a25c245bd954e11b87273a8c53ea6ba **
