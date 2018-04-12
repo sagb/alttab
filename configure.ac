@@ -1,4 +1,4 @@
-AC_INIT([alttab], [1.2.0])
+AC_INIT([alttab], [1.3.0])
 AM_INIT_AUTOMAKE([foreign subdir-objects])
 AC_CONFIG_SRCDIR([configure.ac])
 AC_CONFIG_HEADERS([config.h])
@@ -6,6 +6,7 @@ AC_PROG_CC
 PKG_CHECK_MODULES([x11], [x11])
 PKG_CHECK_MODULES([xft], [xft])
 PKG_CHECK_MODULES([xrender], [xrender])
+PKG_CHECK_MODULES([xrandr], [xrandr])
 PKG_CHECK_MODULES([libpng], [libpng])
 
 AC_MSG_CHECKING(for standalone fts library)

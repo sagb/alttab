@@ -27,6 +27,8 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <utlist.h>
+//#include <sys/time.h>
 #include "alttab.h"
 #include "util.h"
 extern Globals g;
@@ -38,13 +40,102 @@ extern Window root;
 
 //
 // helper for windows' qsort
+// CAUSES O(log(N)) OR EVEN WORSE! reintroduce winlist[]->order instead?
 //
 static int sort_by_order(const void *p1, const void *p2)
 {
-	return (((WindowInfo *) p1)->order > ((WindowInfo *) p2)->order);
+    PermanentWindowInfo *s;
+    WindowInfo *w1 = (WindowInfo*) p1;
+    WindowInfo *w2 = (WindowInfo*) p2;
+    int r = 0;
+
+    DL_FOREACH(g.sortlist, s) {
+        if (s->id == w1->id ) {
+            r = (s->id == w2->id) ? 0 : -1;
+            break;
+        }
+        if (s->id == w2->id ) {
+            r = 1;
+            break;
+        }
+    }
+    //msg(0, "cmp 0x%lx <-> 0x%lx = %d\n", w1->id, w2->id, r);
+    return r;
+}
+
+//
+// debug output of sortlist
+//
+void print_sortlist()
+{
+    PermanentWindowInfo *s;
+    msg(0, "sortlist:\n");
+    DL_FOREACH (g.sortlist, s) {
+        msg(0, "  0x%lx\n", s->id);
+    }
+}
+
+//
+// debug output of winlist
+//
+void print_winlist()
+{
+    int wi, si;
+    PermanentWindowInfo *s;
+
+    if (g.winlist == NULL && g.maxNdx == 0) return; // safety
+    msg(0, "winlist:\n");
+    for (wi = 0; wi < g.maxNdx; wi++) {
+        si = 0;
+        DL_FOREACH (g.sortlist, s) {
+            if (s == NULL) continue; // safety
+            if (s->id == g.winlist[wi].id )
+                break;
+            si++;
+        }
+        msg(0, "  %4d: 0x%lx  %s\n", si,
+          g.winlist[wi].id, g.winlist[wi].name);
+    }
 }
 
 // PUBLIC
+
+//
+// add Window to the head/tail of sortlist, if it's not in sortlist already
+// if move==true and the item is already in sortlist, then move it to the head/tail
+//
+void addToSortlist(Window w, bool to_head, bool move)
+{
+    PermanentWindowInfo *s;
+    bool was = false;
+    bool add = false;
+
+    DL_SEARCH_SCALAR (g.sortlist, s, id, w);
+    if (s == NULL) {
+        s = malloc (sizeof (PermanentWindowInfo));
+        if (s == NULL) return;
+        s->id = w;
+        add = true;
+    } else {
+        was = true;
+        if (move) {
+            DL_DELETE (g.sortlist, s);
+            add = true;
+        }
+    }
+    if (add) {
+        if (to_head) {
+            DL_PREPEND (g.sortlist, s);
+        } else {
+            DL_APPEND (g.sortlist, s);
+        }
+    }
+    if (add && !was) {
+        // new window
+        // register interest in events
+        x_setCommonPropertiesForAnyWindow(w);
+    }
+}
 
 //
 // early initialization
@@ -52,12 +143,27 @@ static int sort_by_order(const void *p1, const void *p2)
 //
 int startupWintasks()
 {
-	g.sortNdx = 0;		// init g.sortlist
-	g.ic = NULL;
+    long rootevmask = 0;
+
+	g.sortlist = NULL;  // utlist head must be initialized to NULL
+	g.ic = NULL;  // uthash too
 	if (g.option_iconSrc != ISRC_RAM) {
 		g.ic = initIcon();
 		initIconHash(&(g.ic));
 	}
+
+    // root: watching for _NET_ACTIVE_WINDOW
+    if (g.option_wm == WM_EWMH) {
+        g.naw = XInternAtom(dpy, "_NET_ACTIVE_WINDOW", true);
+        rootevmask |= PropertyChangeMask;
+    }
+    // warning: this overwrites any previous value.
+    // note: x_setCommonPropertiesForAnyWindow does the similar thing
+    // for any window other than root and uiwin
+    if (rootevmask != 0) {
+        XSelectInput(dpy, root, rootevmask);
+    }
+
 	switch (g.option_wm) {
 	case WM_NO:
 		return 1;
@@ -86,18 +192,15 @@ int addIconFromHints(WindowInfo * wi)
 
 	hicon = hmask = 0;
 	if ((hints = XGetWMHints(dpy, wi->id))) {
-		if (g.debug > 1) {
-			fprintf(stderr,
-				"IconPixmapHint: %ld, icon_pixmap: %lu, IconMaskHint: %ld, icon_mask: %lu, IconWindowHint: %ld, icon_window: %lu\n",
-				hints->flags & IconPixmapHint,
-				hints->icon_pixmap, hints->flags & IconMaskHint,
-				hints->icon_mask, hints->flags & IconWindowHint,
-				hints->icon_window);
-		}
+        msg(1,
+          "IconPixmapHint: %ld, icon_pixmap: %lu, IconMaskHint: %ld, icon_mask: %lu, IconWindowHint: %ld, icon_window: %lu\n",
+          hints->flags & IconPixmapHint,
+          hints->icon_pixmap, hints->flags & IconMaskHint,
+          hints->icon_mask, hints->flags & IconWindowHint,
+          hints->icon_window);
 		if ((hints->flags & IconWindowHint) &
 		    (!(hints->flags & IconPixmapHint))) {
-			if (g.debug > 0)
-				fprintf(stderr, "icon_window without icon_pixmap in hints, ignoring\n");	// not usable in xterm?
+            msg(0, "icon_window without icon_pixmap in hints, ignoring\n");	// not usable in xterm?
 		}
 		hicon =
 		    (hints->flags & IconPixmapHint) ? hints->icon_pixmap : 0;
@@ -105,12 +208,10 @@ int addIconFromHints(WindowInfo * wi)
 //            (hints->flags & IconWindowHint) ?  hints->icon_window : 0));
 		hmask = (hints->flags & IconMaskHint) ? hints->icon_mask : 0;
 		XFree(hints);
-		if (hicon && (g.debug > 0))
-			fprintf(stderr, "no icon in WM hints (%s)\n", wi->name);
+		if (hicon)
+			msg(0, "no icon in WM hints (%s)\n", wi->name);
 	} else {
-		if (g.debug > 0) {
-			fprintf(stderr, "no WM hints (%s)\n", wi->name);
-		}
+        msg(0, "no WM hints (%s)\n", wi->name);
 	}
 	if (hmask != 0)
 		wi->icon_mask = hmask;
@@ -147,18 +248,15 @@ int addIconFromFiles(WindowInfo * wi)
 			     || iconMatchBetter(ic->src_w, ic->src_h,
 						wi->icon_w, wi->icon_h))
 			    ) {
-				if (g.debug > 0)
-					fprintf(stderr,
-						"using png icon for %s\n",
-						tryclass);
+                msg(0,
+				  "using png icon for %s\n",
+				  tryclass);
 				if (ic->drawable == None) {
-					if (g.debug > 1)
-						fprintf(stderr,
-							"loading content for %s\n",
-							ic->app);
+                    msg(1,
+					  "loading content for %s\n",
+					  ic->app);
 					if (loadIconContent(ic) == 0) {
-						fprintf(stderr,
-							"can't load png icon content\n");
+						msg(-1, "can't load png icon content\n");
 						continue;
 					}
 				}
@@ -168,9 +266,8 @@ int addIconFromFiles(WindowInfo * wi)
 			}
 		}
 	} else {
-		if (g.debug > 0)
-			fprintf(stderr, "can't find WM_CLASS for \"%s\"\n",
-				wi->name);
+        msg(0, "can't find WM_CLASS for \"%s\"\n",
+		  wi->name);
 	}
 	return 0;
 }
@@ -180,7 +277,7 @@ int addIconFromFiles(WindowInfo * wi)
 // used by x, rp, ...
 // only dpy and win are mandatory
 //
-int addWindowInfo(Window win, int reclevel, int wm_id, char *wm_name)
+int addWindowInfo(Window win, int reclevel, int wm_id, unsigned long desktop, char *wm_name)
 {
 	if (!
 	    (g.winlist =
@@ -244,26 +341,20 @@ int addWindowInfo(Window win, int reclevel, int wm_id, char *wm_name)
 				 &(g.winlist[g.maxNdx].icon_w),
 				 &(g.winlist[g.maxNdx].icon_h),
 				 &border_width_return, &icon_depth) == 0) {
-			if (g.debug > 0) {
-				fprintf(stderr,
-					"icon dimensions unknown (%s)\n",
-					g.winlist[g.maxNdx].name);
-			}
+            msg(0,
+			  "icon dimensions unknown (%s)\n",
+			  g.winlist[g.maxNdx].name);
 			// probably draw placeholder?
 			g.winlist[g.maxNdx].icon_drawable = 0;
 		} else {
-			if (g.debug > 1) {
-				fprintf(stderr, "depth=%d\n", icon_depth);
-			}
+            msg(1, "depth=%d\n", icon_depth);
 		}
 	}
 // convert icon with different depth (currently 1 only) into default depth
 	if (g.winlist[g.maxNdx].icon_drawable && icon_depth == 1) {
-		if (g.debug > 0) {
-			fprintf(stderr,
-				"rebuilding icon from depth 1 to %d (%s)\n",
-				XDEPTH, g.winlist[g.maxNdx].name);
-		}
+        msg(0,
+		  "rebuilding icon from depth 1 to %d (%s)\n",
+		  XDEPTH, g.winlist[g.maxNdx].name);
 		Pixmap pswap =
 		    XCreatePixmap(dpy, g.winlist[g.maxNdx].icon_drawable,
 				  g.winlist[g.maxNdx].icon_w,
@@ -281,38 +372,23 @@ int addWindowInfo(Window win, int reclevel, int wm_id, char *wm_name)
 		icon_depth = XDEPTH;
 	}
 	if (g.winlist[g.maxNdx].icon_drawable && icon_depth != XDEPTH) {
-		fprintf(stderr,
-			"Can't handle icon depth other than %d or 1 (%d, %s). Please report this condition.\n",
+		msg(-1,
+			"can't handle icon depth other than %d or 1 (%d, %s). Please report this condition.\n",
 			XDEPTH, icon_depth, g.winlist[g.maxNdx].name);
 		g.winlist[g.maxNdx].icon_drawable = g.winlist[g.maxNdx].icon_w =
 		    g.winlist[g.maxNdx].icon_h = 0;
 	}
 // 3. sort
 
-// search in sortlist, O(n)
-	int si, ord;
-	ord = -1;
-	for (si = 0; si < g.sortNdx; si++) {
-		if (win == g.sortlist[si]) {
-			ord = si;
-			break;
-		}
-	}
-	if (ord == -1) {	// add window to the tail of sortlist
-		ord = g.sortNdx;
-		g.sortlist[ord] = win;
-		g.sortNdx++;
-	}
-	g.winlist[g.maxNdx].order = ord;
+    addToSortlist (win, false, false);
 
 // 4. other window data
 
 	g.winlist[g.maxNdx].reclevel = reclevel;
+	g.winlist[g.maxNdx].desktop = desktop;
+
 	g.maxNdx++;
-	if (g.debug > 1) {
-		fprintf(stderr, "window %d, id %lx added to list\n", g.maxNdx,
-			win);
-	}
+    msg(1, "window %d, id %lx added to list\n", g.maxNdx, win);
 	return 1;
 }				// addWindowInfo()
 
@@ -326,14 +402,9 @@ int initWinlist(bool direction)
 {
 	int r;
 	if (g.debug > 1) {
-		fprintf(stderr, "sortlist before initWinlist: ");
-		int sii;
-		for (sii = 0; sii < g.sortNdx; sii++) {
-			fprintf(stderr, "%ld ", g.sortlist[sii]);
-		};
-		fprintf(stderr, "\n");
+		msg(1, "before initWinlist\n");
+        print_sortlist();
 	}
-	g.startNdx = 0;		// safe default
 	switch (g.option_wm) {
 	case WM_NO:
 		r = x_initWindowsInfoRecursive(root, 0);	// note: direction/current window index aren't used
@@ -351,45 +422,26 @@ int initWinlist(bool direction)
 		r = 0;
 		break;
 	}
-	if (g.maxNdx > 1)
-		pulloutWindowToTop(g.startNdx);
 
 // sort winlist according to .order
-	if (g.debug > 1) {
-		fprintf(stderr, "startNdx=%d\n", g.startNdx);
-		int ww;
-		fprintf(stderr, "before qsort:\n");
-		for (ww = 0; ww < g.maxNdx; ww++) {
-			fprintf(stderr, "[%d] %s\n", g.winlist[ww].order,
-				g.winlist[ww].name);
-		}
-	}
-	qsort(g.winlist, g.maxNdx, sizeof(WindowInfo), sort_by_order);
-	if (g.debug > 1) {
-		fprintf(stderr, "after  qsort:\n");
-		int ww;
-		for (ww = 0; ww < g.maxNdx; ww++) {
-			fprintf(stderr, "[%d] %s\n", g.winlist[ww].order,
-				g.winlist[ww].name);
-		}
-	}
+    if (g.debug > 1) {
+        msg(1, "before qsort\n");
+        print_sortlist();
+        print_winlist();
+    }
+    qsort(g.winlist, g.maxNdx, sizeof(WindowInfo), sort_by_order);
+    if (g.debug > 1) {
+        msg(1, "after qsort\n");
+        print_winlist();
+    }
 
-	g.startNdx = 0;		// former pointer invalidated by qsort, brought to top
 	g.selNdx = direction ?
-	    ((g.startNdx < 1
-	      || g.startNdx >=
-	      g.maxNdx) ? (g.maxNdx - 1) : (g.startNdx - 1)) : ((g.startNdx < 0
-								 || g.startNdx
-								 >=
-								 (g.maxNdx -
-								  1)) ? 0 :
-								g.startNdx + 1);
+	    (g.maxNdx - 1) : 
+        (( 0 >= (g.maxNdx - 1)) ? 0 : 1);
 //if (g.selNdx<0 || g.selNdx>=g.maxNdx) { g.selNdx=0; } // just for case
-	if (g.debug > 1) {
-		fprintf(stderr,
-			"initWinlist ret: number of items in winlist: %d, current (selected) item in winlist: %d, current item at start of uiShow (current window before setFocus): %d, number of elements in sortlist: %d\n",
-			g.maxNdx, g.selNdx, g.startNdx, g.sortNdx);
-	}
+    msg(1,
+	  "initWinlist ret: number of items in winlist: %d, current (selected) item in winlist: %d\n",
+	  g.maxNdx, g.selNdx);
 
 	return r;
 }
@@ -400,16 +452,10 @@ int initWinlist(bool direction)
 //
 void freeWinlist()
 {
-	if (g.debug > 0) {
-		fprintf(stderr, "destroying icons and winlist\n");
-	}
+    msg(0, "destroying icons and winlist\n");
 	if (g.debug > 1) {
-		fprintf(stderr, "sortlist before freeWinlist: ");
-		int sii;
-		for (sii = 0; sii < g.sortNdx; sii++) {
-			fprintf(stderr, "%ld ", g.sortlist[sii]);
-		};
-		fprintf(stderr, "\n");
+		msg(1, "before freeWinlist\n");
+        print_sortlist();
 	}
 	int y;
 	for (y = 0; y < g.maxNdx; y++) {
@@ -435,9 +481,15 @@ int setFocus(int winNdx)
 		break;
 	case WM_EWMH:
         r = ewmh_setFocus(winNdx, 0);
-        // skippy-xd does this and notes that "order is important"
-        // fixes #28
-        XSetInputFocus (dpy, g.winlist[winNdx].id, RevertToParent, CurrentTime);
+        // XSetInputFocus stuff.
+        // skippy-xd does it and notes that "order is important".
+        // fixes #28.
+        // it must be protected by testing IsViewable in the same way
+        // as in x.c, or BadMatch happens after switching desktops.
+        XWindowAttributes att;
+        XGetWindowAttributes(dpy, g.winlist[winNdx].id, &att);
+        if (att.map_state == IsViewable)
+            XSetInputFocus(dpy, g.winlist[winNdx].id, RevertToParent, CurrentTime);
 		break;
     case WM_TWM:
         r = ewmh_setFocus(winNdx, 0);
@@ -446,40 +498,159 @@ int setFocus(int winNdx)
 	default:
 		return 0;
 	}
-	pulloutWindowToTop(winNdx);
+    // pull to head
+    addToSortlist (g.winlist[winNdx].id, true, true);
 	return r;
 }
 
 //
-// pull out given window to the top of g.sortlist,
-// fix g.winlist[].order
-// winNdx is an index of g.winlist
+// event handler for PropertyChange
+// most of the time called when winlist[] is not initialized
+// currently it updates sortlist on _NET_ACTIVE_WINDOW change
+// because it's a handler of frequent event,
+// there are shortcuts to return as soon as possible
 //
-int pulloutWindowToTop(int winNdx)
+void winPropChangeEvent(XPropertyEvent e)
+// man XPropertyEvent
 {
-	int s, w;
-	if (g.debug > 1) {
-		fprintf(stderr, "pull out g.winlist[%d] to top\n", winNdx);
-	}
-	int stop = g.winlist[winNdx].order;	// index of new top window in old sortlist
-	if (stop == 0)
-		return 1;	// shortcut, already on top
-
-// move down items in sortlist, O(n)
-	Window cachedwin = g.sortlist[stop];
-	for (s = stop - 1; s >= 0; s--) {
-		g.sortlist[s + 1] = g.sortlist[s];
-	}
-	g.sortlist[0] = cachedwin;
-
-// fix g.winlist[].order, O(n)
-	for (w = 0; w < g.maxNdx; w++) {
-		if (g.winlist[w].order < stop) {
-			g.winlist[w].order++;
-		} else if (g.winlist[w].order == stop) {
-			g.winlist[w].order = 0;
-		}
-	}
-
-	return 1;
+    Window aw;
+    // no _NET_ACTIVE_WINDOW atom, probably not EWMH?
+    if (g.naw == None) return;
+    // property change event not for root window?
+    if (e.window != root) return;
+    // root property other than _NET_ACTIVE_WINDOW changed?
+    if (e.atom != g.naw) return;
+    // don't check for wm==EWMH, because _NET_ACTIVE_WINDOW changed for sure
+    aw = ewmh_getActiveWindow();
+    // can't get active window
+    if (!aw) return;
+    // focus changed to our own old/current/zero window?
+    if (aw == getUiwin()) return;
+    // focus changed to window which is already top?
+    if (g.sortlist != NULL && aw == g.sortlist->id) return;
+    // is window hidden in WM?
+    if (ewmh_skipWindowInTaskbar(aw)) return;
+/*
+    // the i3 sortlist bug is not here, see ewmh.c init_winlist instead
+    //
+    if (aw == g.last.prev) {
+        struct timeval ctv;
+        int usec_delta;
+        gettimeofday(&ctv, NULL);
+        usec_delta = (ctv.tv_sec - g.last.tv.tv_sec) * 1E6 
+          + (ctv.tv_usec - g.last.tv.tv_usec);
+        msg(0, "delta %d\n", usec_delta);
+        if (usec_delta < 5E5) {  // half a second
+            return;
+        }
+        msg(0, PREF"pulling 'prev' 0x%lx supressed\n", aw);
+    }
+    if (aw == g.last.to) {
+        msg(0, PREF"pulling 'to' 0x%lx supressed\n", aw);
+        return;
+    }
+*/
+    // finally, add/pop window to the head of sortlist
+    // unfortunately, on focus by alttab, this is fired twice:
+    // 1) when alttab window gone, previous window becomes active,
+    // 2) then alttab-focused window becomes active.
+    msg(0, 
+      "event PropertyChange: 0x%lx active, pull to the head of sortlist\n",
+      aw);
+    addToSortlist (aw, true, true);
 }
+
+//
+// DestroyNotify handler
+// removes the window from sortlist
+//
+void winDestroyEvent(XDestroyWindowEvent e)
+// man XDestroyWindowEvent
+{
+    PermanentWindowInfo *s;
+
+    DL_SEARCH_SCALAR (g.sortlist, s, id, e.window);
+    if (s != NULL) {
+        msg(1,
+          "event DestroyNotify: 0x%lx found in sortlist, removing\n", e.window);
+        DL_DELETE (g.sortlist, s);
+    }
+}
+
+//
+// common filter before adding window to winlist
+// it checks: desktop, screen
+// depending on global options and dimensions
+//
+bool common_skipWindow(Window w, 
+    unsigned long current_desktop, unsigned long window_desktop)
+{
+    quad wq; // window's absolute coordinates
+
+    if (g.option_desktop == DESK_CURRENT
+            && current_desktop != window_desktop 
+            && current_desktop != DESKTOP_UNKNOWN 
+            && window_desktop != DESKTOP_UNKNOWN) {
+            msg(1, 
+              "window not on active desktop, skipped (window's %ld, current %ld)\n", 
+              window_desktop, current_desktop);
+        return true;
+    }
+    if (g.option_desktop == DESK_NOSPECIAL
+            && window_desktop == -1) {
+        msg(1, "window on -1 desktop, skipped\n");
+        return true;
+    }
+    if (g.option_desktop == DESK_NOCURRENT && 
+            (window_desktop == current_desktop ||
+             window_desktop == -1)) {
+        msg(1, "window on current or -1 desktop, skipped\n");
+        return true;
+    }
+
+    // man page: -sc 0: Screen is defined according to -vp pointer or -vp focus.
+    // assuming g.vp already calculated in gui.c
+    if (g.option_screen == SCR_CURRENT &&
+            (g.option_vp_mode == VP_POINTER ||
+            g.option_vp_mode == VP_FOCUS)) {
+        if (! get_absolute_coordinates(w, &wq)) {
+            msg(-1, 
+              "can't get coordinates of window 0x%lx, included anyway\n", w);
+        } else {
+            if (! rectangles_cross(g.vp, wq)) {
+                msg(1, 
+                  "window's area doesn't cross with current screen, skipped\n");
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+//
+// focus change handler
+// does the same as _NET_ACTIVE_WINDOW handler
+// but in non-EWMH environment
+//
+void winFocusChangeEvent(XFocusChangeEvent e)
+{
+    Window w;
+    // in non-EWMH only
+    // probably should also maintain _NET_ACTIVE_WINDOW 
+    // support flag in EwmhFeatures
+    if (g.option_wm == WM_EWMH) return;
+    // focusIn only
+    if (e.type != FocusIn) return;
+    // skip Grab/Ungrab notification modes
+    if (e.mode != NotifyNormal) return;
+    // focus changed to our own old/current/zero window?
+    w = e.window;
+    if (w == getUiwin()) return;
+    // focus changed to window which is already top?
+    if (g.sortlist != NULL && w == g.sortlist->id) return;
+
+    msg(1, "event focusIn 0x%lx, pull to the head of sortlist\n", w);
+    addToSortlist (w, true, true);
+}
+

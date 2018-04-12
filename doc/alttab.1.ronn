@@ -16,7 +16,7 @@ alttab(1) -- the task switcher
 
 ## SYNOPSIS
 
-`alttab` [`-w` <N>] [`-mm` <N>] [`-bm` <N>] [`-mk` <N>] [`-kk` <N>] [`-t` <NxM>] [`-i` <NxM>] [`-s` <N>] [`-theme` <name>] [`-bg` <color>] [`-fg` <color>] [`-frame` <color>] [`-font` <name>] [`-v`|`-vv`]
+`alttab` [`-w` <N>] [`-d` <N>] [`-sc` <N>] [`-mk` <str>] [`-kk` <str>] [`-bk` <str>] [`-mm` <N>] [`-bm` <N>] [`-t` <NxM>] [`-i` <NxM>] [`-vp` <str>] [`-p` <str>] [`-s` <N>] [`-theme` <name>] [`-bg` <color>] [`-fg` <color>] [`-frame` <color>] [`-font` <name>] [`-v`|`-vv`]
 
 ## DESCRIPTION
 
@@ -43,7 +43,6 @@ Most command line options have corresponding X resource, see doc/alttab.ad for e
 
       Set this value manually, as it's not autodetected. 
       Only top-level viewable children of root window are listed.
-      List order is random. 
       Running **-w 0** under WM is discouraged: hidden windows or windows on another desktops will not be listed; instead, some strange windows may be included. 
 
       <1>: EWMH compatible.
@@ -58,7 +57,7 @@ Most command line options have corresponding X resource, see doc/alttab.ad for e
 
       <2>: Ratpoison.
 
-      Alttab uses ratpoison own perfect remote control capability. Additionally, alttab registers itself in its "unmanaged list" automatically.
+      Alttab uses ratpoison own remote control capability. Additionally, alttab registers itself in its "unmanaged list" automatically.
 
       <3>: Ancient WM.
 
@@ -66,44 +65,126 @@ Most command line options have corresponding X resource, see doc/alttab.ad for e
       Search for application windows at random nodes of window tree (WM is probably reparenting)
       and select only those with a name, including non-viewable (WM is probably iconifying).
       May cause lag.
-      List order is random.
       Tested in twm, flwm, wm2.
+
+  * `-d` <NUMBER>:
+    resource: alttab.desktops  
+    default: <0>
+
+    Show windows belonging to desktops (workspaces, groups). <NUMBER> must be between 0 and 3:
+
+      <0>: Current desktop.
+
+      This is default, although in non EWMH-compatible WM, except ratpoison, it's effectively the same as <1>.
+
+      <1>: All desktops.
+
+      <2>: All desktops, excluding special (-1) one.
+
+      In various EWMH WM this desktop may be designed hidden
+      or containing sticky windows. In i3, it's "scratchpad".
+
+      <3>: All desktops, excluding current and special.
+
+  * `-sc` <NUMBER>:
+    resource: alttab.screens  
+    default: <1>
+
+    Show windows belonging to xrandr/xinerama screens. <NUMBER> must be 0 or 1:
+
+      <0>: Current screen.
+
+      As defined according to `-vp` <pointer> or `-vp` <focus>.
+
+      <1>: All screens.
+
+      This is default.
+
+  * `-mk` <str>:
+    resource: alttab.modifier.keysym  
+    default: Alt_L
+
+    Keysym of main modifier. String or number accepted.
+    Suitable examples: Control_L, Super_L.
+
+  * `-kk` <str>:
+    resource: alttab.key.keysym  
+    default: Tab
+
+    Keysym of main key.
+    For example, grave (aka tilde), Escape.
+
+  * `-bk` <str>:
+    resource: alttab.backscroll.keysym  
+    default: any Shift, according to ShiftMask
+
+    Keysym of backward scroll key.
 
   * `-mm` <NUM>:
     resource: alttab.modifier.mask  
-    default: <8> (Mod1Mask aka left Alt)
 
-    Main modifier mask. See /usr/include/X11/X.h.
+    OBSOLETED, guessed from -mk instead.
 
   * `-bm` <NUM>:
     resource: alttab.backscroll.mask  
-    default: <1> (ShiftMask)
 
-    Backward scroll modifier mask.
-
-  * `-mk` <NUM>:
-    resource: alttab.modifier.keysym  
-    default: <0xffe9> (XK\_Alt\_L aka left Alt)
-
-    Keysym of main modifier alone. See /usr/include/X11/keysymdef.h. Keep in sync with `-mm`.
-
-  * `-kk` <NUM>:
-    resource: alttab.key.keysym  
-    default: <0xff09> (XK\_Tab)
-
-    Keysym of main key.
+    OBSOLETED, guessed from -bk instead.
 
   * `-t` <NNxMM>:
     resource: alttab.tile.geometry  
     default: <112x128>
 
-    Size of a single tile (mini-window). If switcher doesn't fit the screen, tile may be thinner.
+    Size of a single tile (mini-window). If switcher doesn't fit the viewport (`-vp`), tile may be thinner.
 
   * `-i` <NNxMM>:
     resource: alttab.icon.geometry  
     default: <32x32>
 
     Size of icons.
+
+  * `-vp` <str>:
+    resource: alttab.viewport  
+    default: <focus>
+
+    Limit viewport for the switcher.
+    The switcher always has variable size and position,
+    but tries to never break out of `-vp` container,
+    while `-p` specifies position relative to this container.
+    Together these options allow for multi-monitor support.
+    Possible values for `-vp`:
+
+      <focus>: in multihead configuration: the monitor which shows
+      largest part of currently focused window. If this part is shared
+      with other monitors, then the smallest of these monitors is choosen.
+      In single head configuration: the geometry of default root window.
+
+      <pointer>: the monitor which has mouse pointer, otherwise
+      the same as <focus>.
+
+      The "multihead" above means more than one active XRANDR output. 
+      They are detected at runtime, so hopefully monitors
+      may be attached/detached without restarting alttab.
+
+      <total>: the geometry of default root window.
+
+      If you specify this in tiling multihead, then the switcher
+      will be drawn relative to the entire combined screen, crossing
+      monitors' borders.
+
+      <WxH+X+Y>: Specific position relative to default root window.
+
+      This allows for static manual bounding if XRANDR detection fails.
+      Suppose X operates in tiling configuration for two 2560х1440 monitors, 
+      resulting in combined screen of 5120x1440 size. Then the switcher 
+      may be positioned at the center of the right monitor 
+      with -vp 2560x1440+2560+0 -p center.
+
+  * `-p` <str>:
+    resource: alttab.position  
+    default: center
+
+    Position of switcher: "center", "none" or specific position relative
+    to upper left corner of viewport, in the form <+X+Y>.
 
   * `-s` <NUMBER>:
     resource: alttab.icon.source  
@@ -122,7 +203,11 @@ Most command line options have corresponding X resource, see doc/alttab.ad for e
       ~/.icons  
       ~/.local/share/icons  
   
-      Directory structure should obey freedesktop standard, but desktop files are ignored, instead file name is expected to be equal to application class. 
+      Directory structure should obey freedesktop standard, but desktop files are ignored,
+      instead file name is expected to be equal to application class. 
+      That is, if alttab doesn't recognize an icon for window of class foo,
+      as obtained by 'xprop WM_CLASS', then just drop a 32x32 icon into
+      /usr/local/share/icons/hicolor/32x32/apps/foo.png.
 
       <2>: Prefer icon from file when it matches requested size better (see `-i` option).
 
@@ -177,7 +262,7 @@ Your Xresources database probably already has \*background, \*foreground or \*fo
 
 ##CAVEATS
 
-Run alttab after WM, or it will fail to detect it.
+Run alttab after WM, or autodetection will fail.
 
 ##AUTHOR
 

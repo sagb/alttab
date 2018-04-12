@@ -73,6 +73,7 @@ int zeroErrorHandler(Display* dpy_our, XErrorEvent * theEvent)
 		memset(etext, '\0', EM);
 		XGetErrorText(dpy_our, theEvent->error_code, etext, EM);
 		fprintf(stderr, "Unexpected X Error: %s\n", etext);
+        fprintf(stderr, "Error details: request_code=%hhu minor_code=%hhu resourceid=%lu\n", theEvent->request_code, theEvent->minor_code, theEvent->resourceid);
 	}
 	return 0;
 }
@@ -121,6 +122,7 @@ int changeKeygrab(Window win, bool grab, KeyCode keycode,
 	return 1;
 }
 
+/*
 //
 // register interest in KeyRelease events for the window
 // and its children recursively
@@ -133,6 +135,8 @@ void setSelectInput(Window win, int reg)
 
 	ee_complain = false;
 
+    // warning: this overwrites any previous mask,
+    // find other calls to XSelectInput
 	if (XSelectInput
 	    (dpy, win,
 	     reg ? KeyReleaseMask | SubstructureNotifyMask : 0) != BadWindow
@@ -146,6 +150,7 @@ void setSelectInput(Window win, int reg)
 
 	ee_complain = true;
 }
+*/
 
 //
 // execv program and read its stdout
@@ -173,10 +178,11 @@ int execAndReadStdout(char *exe, char *args[], char *buf, int bufsize)
 		return 0;
 	} else {
 		close(link[1]);
-		rb = read(link[0], buf, bufsize);
-		if (rb == -1)
-			*buf = '\0';
-//printf("Output: (%.*s)\n", nbytes, buf);
+        if (buf != NULL) {
+    		rb = read(link[0], buf, bufsize);
+    		if (rb == -1)
+    			*buf = '\0';
+        }
 		close(link[0]);
 		wait(NULL);
 	}
@@ -607,3 +613,154 @@ char *get_x_property(Window win, Atom prop_type, char *prop_name,
 	XFree(ret_prop);
 	return r;
 }
+
+//
+// do rectangles cross?
+//
+bool rectangles_cross(quad a, quad b)
+{
+    return !(
+    a.x >= (b.x + b.w) ||
+    (a.x + a.w) <= b.x ||
+    a.y >= (b.y + b.h) ||
+    (a.y + a.h) <= b.y );
+}
+
+//
+// coordinates relative to root
+//
+bool get_absolute_coordinates(Window w, quad *q)
+{
+    Window child;
+    XWindowAttributes wa;
+    int x, y;
+    if (XTranslateCoordinates (dpy, w, root, 0, 0, &x, &y, &child) == False)
+        return false;
+    if (XGetWindowAttributes (dpy, w, &wa) == 0)
+        return false;
+    q->x = x;
+    q->y = y;
+    q->w = wa.width;
+    q->h = wa.height;
+    return true;
+}
+
+//
+// removes argument from argv
+//
+void remove_arg(int *argc, char **argv, int argn)
+{
+    int i;
+    for(i = argn; i < (*argc); ++i)
+    argv[i] = argv[i+1];
+    --(*argc);
+}
+
+//
+// return resource/option `appname.name'
+// or NULL if not specified
+//
+char* xresource_load_string(XrmDatabase *db, const char *appname, char *name)
+{
+    char xappname[MAXNAMESZ];
+    XrmValue v;
+    char *type;
+
+    snprintf (xappname, MAXNAMESZ, "%s.%s", appname, name);
+	XrmGetResource (*db, xappname, xappname, &type, &v);
+	return
+      (v.addr != NULL && !strncmp ("String", type, 6)) ? 
+      v.addr : NULL;
+}
+
+//
+// search for resource/option `appname.name'
+// return:
+//  1: ok, result in *ret
+//  0: not specified
+// -1: conversion error
+//
+int xresource_load_int(XrmDatabase *db, const char *appname, char *name, unsigned int *ret)
+{
+    unsigned int r;
+    char *endptr;
+    char *s = xresource_load_string(db, appname, name);
+
+    if (s != NULL) {
+        r = strtol(s, &endptr, 0);
+        if (*s != '\0' && *endptr == '\0') {
+            *ret = r;
+            return 1;
+        } else {
+            return -1;
+        }
+    } else {
+        return 0;
+    }
+    return 0;
+}
+
+//
+// return keycode corresponding to resource/option `appname.name.keysym'
+//  0: not specified
+// -1: bad value, errmsg is set (caller must free)
+//
+int ksym_option_to_keycode(XrmDatabase *db, const char *appname, const char *name, char **errmsg)
+{
+	char *endptr, *opt;
+    KeySym ksym;
+    char xresr[MAXNAMESZ];
+    KeyCode retcode = 0;
+
+    endptr = opt = NULL;
+    snprintf (xresr, MAXNAMESZ, "%s.keysym", name); xresr[MAXNAMESZ-1]='\0';
+    opt = xresource_load_string(db, appname, xresr);
+	if (opt) {
+        ksym = XStringToKeysym(opt);
+        if (ksym == NoSymbol) {
+    		ksym = strtol(opt, &endptr, 0);
+            if (!(*opt != '\0' && *endptr == '\0'))
+                ksym = NoSymbol;
+        }
+        if (ksym != NoSymbol) {
+            retcode = XKeysymToKeycode(dpy, ksym);
+            if (retcode == 0) {
+                *errmsg = malloc(ERRLEN);
+                snprintf(*errmsg, ERRLEN,
+                  "the specified %s keysym is not defined for any keycode",
+                  name);
+                return -1;
+            }
+            return retcode;
+        } else {
+            *errmsg = malloc(ERRLEN);
+            snprintf(*errmsg, ERRLEN, "invalid %s keysym", name);
+            return -1;
+        }
+    }
+    return 0;
+}
+
+//
+// scan modifier table,
+// return first modifier corresponding to given keycode,
+// in the form of modmask,
+// or zero if not found
+// 
+unsigned int keycode_to_modmask(KeyCode kc)
+{
+    int mi, ksi;
+    KeyCode tkc;
+    XModifierKeymap *xmk = XGetModifierMapping(dpy);
+
+    for (mi = 0; mi < 8; mi++) {
+        for (ksi = 0; ksi < xmk->max_keypermod; ksi++) {
+            tkc = (xmk->modifiermap)[xmk->max_keypermod * mi + ksi];
+            if (tkc == kc) {
+                return (1 << mi);
+            }
+        }
+    }
+    return 0;
+}
+

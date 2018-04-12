@@ -10,15 +10,31 @@
 ! Force using raw X11 interface
 !alttab.windowmanager:   0
 
+! Show windows belonging to all desktops
+!alttab.desktops:        1
+
+! Include only windows belonging to current screen
+!alttab.screens:         0
+
 ! Ctrl-Tab instead of Alt-Tab
-!alttab.modifier.mask:   4
-!alttab.modifier.keysym: 0xffe3
+!alttab.modifier.keysym: Control_L
 
 ! Ctrl instead of Shift for backscroll
-!alttab.backscroll.mask: 4
+!alttab.backscroll.keysym: Control_L
 
 ! grave (back apostrophe) instead of Tab
-!alttab.key.keysym:      0x60
+!alttab.key.keysym:      grave
+
+! Limit the switcher to this rectangle 
+! instead of default screen size
+!alttab.viewport:        1280x1024+1280+0
+! Or to the monitor with mouse pointer
+!alttab.viewport:        pointer
+
+! Try to not interfere with WM's window positioning
+!alttab.position:        none
+! Or specify the switcher position explicitly
+!alttab.position:        +100+100
 
 ! Big tiles
 alttab.tile.geometry:   260x300

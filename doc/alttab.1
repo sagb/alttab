@@ -1,13 +1,13 @@
 .\" generated with Ronn/v0.7.3
 .\" http://github.com/rtomayko/ronn/tree/0.7.3
 .
-.TH "ALTTAB" "1" "February 2018" "" ""
+.TH "ALTTAB" "1" "April 2018" "" ""
 .
 .SH "NAME"
 \fBalttab\fR \- the task switcher
 .
 .SH "SYNOPSIS"
-\fBalttab\fR [\fB\-w\fR \fIN\fR] [\fB\-mm\fR \fIN\fR] [\fB\-bm\fR \fIN\fR] [\fB\-mk\fR \fIN\fR] [\fB\-kk\fR \fIN\fR] [\fB\-t\fR \fINxM\fR] [\fB\-i\fR \fINxM\fR] [\fB\-s\fR \fIN\fR] [\fB\-theme\fR \fIname\fR] [\fB\-bg\fR \fIcolor\fR] [\fB\-fg\fR \fIcolor\fR] [\fB\-frame\fR \fIcolor\fR] [\fB\-font\fR \fIname\fR] [\fB\-v\fR|\fB\-vv\fR]
+\fBalttab\fR [\fB\-w\fR \fIN\fR] [\fB\-d\fR \fIN\fR] [\fB\-sc\fR \fIN\fR] [\fB\-mk\fR \fIstr\fR] [\fB\-kk\fR \fIstr\fR] [\fB\-bk\fR \fIstr\fR] [\fB\-mm\fR \fIN\fR] [\fB\-bm\fR \fIN\fR] [\fB\-t\fR \fINxM\fR] [\fB\-i\fR \fINxM\fR] [\fB\-vp\fR \fIstr\fR] [\fB\-p\fR \fIstr\fR] [\fB\-s\fR \fIN\fR] [\fB\-theme\fR \fIname\fR] [\fB\-bg\fR \fIcolor\fR] [\fB\-fg\fR \fIcolor\fR] [\fB\-frame\fR \fIcolor\fR] [\fB\-font\fR \fIname\fR] [\fB\-v\fR|\fB\-vv\fR]
 .
 .SH "DESCRIPTION"
 The task switcher designed for minimalistic window managers or standalone X11 session\.
@@ -35,7 +35,7 @@ Control how to obtain window list and set focus\. \fINUMBER\fR must be between 0
 \fI0\fR: No WM, raw X\.
 .
 .IP
-Set this value manually, as it\'s not autodetected\. Only top\-level viewable children of root window are listed\. List order is random\. Running \fB\-w 0\fR under WM is discouraged: hidden windows or windows on another desktops will not be listed; instead, some strange windows may be included\.
+Set this value manually, as it\'s not autodetected\. Only top\-level viewable children of root window are listed\. Running \fB\-w 0\fR under WM is discouraged: hidden windows or windows on another desktops will not be listed; instead, some strange windows may be included\.
 .
 .IP
 \fI1\fR: EWMH compatible\.
@@ -47,53 +47,107 @@ Compatible WM list is in [SEE ALSO] below\. alttab functions in xmonad (EWMH mus
 \fI2\fR: Ratpoison\.
 .
 .IP
-Alttab uses ratpoison own perfect remote control capability\. Additionally, alttab registers itself in its "unmanaged list" automatically\.
+Alttab uses ratpoison own remote control capability\. Additionally, alttab registers itself in its "unmanaged list" automatically\.
 .
 .IP
 \fI3\fR: Ancient WM\.
 .
 .IP
-Fallback, worse than \fI0\fR\. Search for application windows at random nodes of window tree (WM is probably reparenting) and select only those with a name, including non\-viewable (WM is probably iconifying)\. May cause lag\. List order is random\. Tested in twm, flwm, wm2\.
+Fallback, worse than \fI0\fR\. Search for application windows at random nodes of window tree (WM is probably reparenting) and select only those with a name, including non\-viewable (WM is probably iconifying)\. May cause lag\. Tested in twm, flwm, wm2\.
+.
+.TP
+\fB\-d\fR \fINUMBER\fR
+resource: alttab\.desktops
+.
+.br
+default: \fI0\fR
+.
+.IP
+Show windows belonging to desktops (workspaces, groups)\. \fINUMBER\fR must be between 0 and 3:
+.
+.IP
+\fI0\fR: Current desktop\.
+.
+.IP
+This is default, although in non EWMH\-compatible WM, except ratpoison, it\'s effectively the same as \fI1\fR\.
+.
+.IP
+\fI1\fR: All desktops\.
+.
+.IP
+\fI2\fR: All desktops, excluding special (\-1) one\.
+.
+.IP
+In various EWMH WM this desktop may be designed hidden or containing sticky windows\. In i3, it\'s "scratchpad"\.
+.
+.IP
+\fI3\fR: All desktops, excluding current and special\.
+.
+.TP
+\fB\-sc\fR \fINUMBER\fR
+resource: alttab\.screens
+.
+.br
+default: \fI1\fR
+.
+.IP
+Show windows belonging to xrandr/xinerama screens\. \fINUMBER\fR must be 0 or 1:
+.
+.IP
+\fI0\fR: Current screen\.
+.
+.IP
+As defined according to \fB\-vp\fR \fIpointer\fR or \fB\-vp\fR \fIfocus\fR\.
+.
+.IP
+\fI1\fR: All screens\.
+.
+.IP
+This is default\.
+.
+.TP
+\fB\-mk\fR \fIstr\fR
+resource: alttab\.modifier\.keysym
+.
+.br
+default: Alt_L
+.
+.IP
+Keysym of main modifier\. String or number accepted\. Suitable examples: Control_L, Super_L\.
+.
+.TP
+\fB\-kk\fR \fIstr\fR
+resource: alttab\.key\.keysym
+.
+.br
+default: Tab
+.
+.IP
+Keysym of main key\. For example, grave (aka tilde), Escape\.
+.
+.TP
+\fB\-bk\fR \fIstr\fR
+resource: alttab\.backscroll\.keysym
+.
+.br
+default: any Shift, according to ShiftMask
+.
+.IP
+Keysym of backward scroll key\.
 .
 .TP
 \fB\-mm\fR \fINUM\fR
 resource: alttab\.modifier\.mask
 .
-.br
-default: \fI8\fR (Mod1Mask aka left Alt)
-.
 .IP
-Main modifier mask\. See /usr/include/X11/X\.h\.
+OBSOLETED, guessed from \-mk instead\.
 .
 .TP
 \fB\-bm\fR \fINUM\fR
 resource: alttab\.backscroll\.mask
 .
-.br
-default: \fI1\fR (ShiftMask)
-.
 .IP
-Backward scroll modifier mask\.
-.
-.TP
-\fB\-mk\fR \fINUM\fR
-resource: alttab\.modifier\.keysym
-.
-.br
-default: \fI0xffe9\fR (XK_Alt_L aka left Alt)
-.
-.IP
-Keysym of main modifier alone\. See /usr/include/X11/keysymdef\.h\. Keep in sync with \fB\-mm\fR\.
-.
-.TP
-\fB\-kk\fR \fINUM\fR
-resource: alttab\.key\.keysym
-.
-.br
-default: \fI0xff09\fR (XK_Tab)
-.
-.IP
-Keysym of main key\.
+OBSOLETED, guessed from \-bk instead\.
 .
 .TP
 \fB\-t\fR \fINNxMM\fR
@@ -103,7 +157,7 @@ resource: alttab\.tile\.geometry
 default: \fI112x128\fR
 .
 .IP
-Size of a single tile (mini\-window)\. If switcher doesn\'t fit the screen, tile may be thinner\.
+Size of a single tile (mini\-window)\. If switcher doesn\'t fit the viewport (\fB\-vp\fR), tile may be thinner\.
 .
 .TP
 \fB\-i\fR \fINNxMM\fR
@@ -114,6 +168,47 @@ default: \fI32x32\fR
 .
 .IP
 Size of icons\.
+.
+.TP
+\fB\-vp\fR \fIstr\fR
+resource: alttab\.viewport
+.
+.br
+default: \fIfocus\fR
+.
+.IP
+Limit viewport for the switcher\. The switcher always has variable size and position, but tries to never break out of \fB\-vp\fR container, while \fB\-p\fR specifies position relative to this container\. Together these options allow for multi\-monitor support\. Possible values for \fB\-vp\fR:
+.
+.IP
+\fIfocus\fR: in multihead configuration: the monitor which shows largest part of currently focused window\. If this part is shared with other monitors, then the smallest of these monitors is choosen\. In single head configuration: the geometry of default root window\.
+.
+.IP
+\fIpointer\fR: the monitor which has mouse pointer, otherwise the same as \fIfocus\fR\.
+.
+.IP
+The "multihead" above means more than one active XRANDR output\. They are detected at runtime, so hopefully monitors may be attached/detached without restarting alttab\.
+.
+.IP
+\fItotal\fR: the geometry of default root window\.
+.
+.IP
+If you specify this in tiling multihead, then the switcher will be drawn relative to the entire combined screen, crossing monitors\' borders\.
+.
+.IP
+\fIWxH+X+Y\fR: Specific position relative to default root window\.
+.
+.IP
+This allows for static manual bounding if XRANDR detection fails\. Suppose X operates in tiling configuration for two 2560х1440 monitors, resulting in combined screen of 5120x1440 size\. Then the switcher may be positioned at the center of the right monitor with \-vp 2560x1440+2560+0 \-p center\.
+.
+.TP
+\fB\-p\fR \fIstr\fR
+resource: alttab\.position
+.
+.br
+default: center
+.
+.IP
+Position of switcher: "center", "none" or specific position relative to upper left corner of viewport, in the form \fI+X+Y\fR\.
 .
 .TP
 \fB\-s\fR \fINUMBER\fR
@@ -147,7 +242,7 @@ Alttab searches for PNG icons under:
 ~/\.local/share/icons
 .
 .IP
-Directory structure should obey freedesktop standard, but desktop files are ignored, instead file name is expected to be equal to application class\.
+Directory structure should obey freedesktop standard, but desktop files are ignored, instead file name is expected to be equal to application class\. That is, if alttab doesn\'t recognize an icon for window of class foo, as obtained by \'xprop WM_CLASS\', then just drop a 32x32 icon into /usr/local/share/icons/hicolor/32x32/apps/foo\.png\.
 .
 .IP
 \fI2\fR: Prefer icon from file when it matches requested size better (see \fB\-i\fR option)\.
@@ -235,7 +330,7 @@ Verbosity\.
 short help
 .
 .SH "CAVEATS"
-Run alttab after WM, or it will fail to detect it\.
+Run alttab after WM, or autodetection will fail\.
 .
 .SH "AUTHOR"
 Copyright 2017\-2018 Alexander Kulak \fB<sa\-dev AT rainbow POINT by>\fR\.

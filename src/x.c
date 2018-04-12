@@ -61,7 +61,7 @@ Window x_get_leader(Window win)
 // PUBLIC
 
 //
-// set winlist,maxNdx,startNdx recursively using raw Xlib
+// set winlist,maxNdx recursively using raw Xlib
 // first call should be (win=root, reclevel=0)
 //
 int x_initWindowsInfoRecursive(Window win, int reclevel)
@@ -82,7 +82,7 @@ int x_initWindowsInfoRecursive(Window win, int reclevel)
     leader = 0;
     if (g.option_wm == WM_TWM) {
         leader = x_get_leader (win);
-        if (g.debug>1) {fprintf (stderr, "win: 0x%lx leader: 0x%lx\n", win, leader);}
+        msg(1, "win: 0x%lx leader: 0x%lx\n", win, leader);
     }
 */
 // in non-twm, add viewable only
@@ -103,8 +103,9 @@ int x_initWindowsInfoRecursive(Window win, int reclevel)
             && reclevel != 0 
             && (g.option_wm != WM_TWM || winname != NULL)
 //            && (g.option_wm != WM_TWM || leader == win)
+            && ! common_skipWindow(win, DESKTOP_UNKNOWN, DESKTOP_UNKNOWN)
             ) {
-        addWindowInfo(win, reclevel, 0, winname);
+        addWindowInfo(win, reclevel, 0, DESKTOP_UNKNOWN, winname);
 	}
 // skip children if max recursion level reached
     if (g.option_max_reclevel != -1 && reclevel >= g.option_max_reclevel)
@@ -112,9 +113,7 @@ int x_initWindowsInfoRecursive(Window win, int reclevel)
 
 // recursion
 	if (XQueryTree(dpy, win, &root, &parent, &children, &nchildren) == 0) {
-		if (g.debug > 0) {
-            fprintf(stderr, "can't get window tree for 0x%lx\n", win);
-		}
+        msg(0, "can't get window tree for 0x%lx\n", win);
 		return 0;
 	}
 	for (i = 0; i < nchildren; ++i) {
@@ -123,9 +122,6 @@ int x_initWindowsInfoRecursive(Window win, int reclevel)
 
 	if (nchildren > 0 && children) {
 		XFree(children);
-	}
-	if (reclevel == 0) {
-		g.startNdx = 0;
 	}
 	return 1;
 }
@@ -155,3 +151,27 @@ int x_setFocus(int wndx)
 
 	return 1;
 }
+
+//
+// this is where alttab is supposed to set properties or
+// register interest in event for ANY foreign window encountered.
+// warning: this is called only on addition to sortlist.
+//
+void x_setCommonPropertiesForAnyWindow(Window win)
+{
+    long evmask = 0;
+    // root and our window are treated elsewhere
+    if (win == root || win == getUiwin())
+        return;
+    // for delete notification
+    evmask |= StructureNotifyMask;
+    // for focusIn notification
+    if (g.option_wm != WM_EWMH) {
+        msg(0, "using direct focus tracking for 0x%lx\n", win);
+        evmask |= FocusChangeMask;
+    }
+    // warning: this overwrites previous value
+    if (evmask != 0)
+        XSelectInput(dpy, win, evmask);
+}
+
