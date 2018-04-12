@@ -28,6 +28,7 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 #include <time.h>
 #include "alttab.h"
 #include "util.h"
+#include "config.h"
 
 // PUBLIC
 
@@ -44,7 +45,7 @@ Window root;
 //
 void helpexit()
 {
-	msg(-1, "the task switcher.\n\
+	msg(-1, "the task switcher, v%s\n\
 Options:\n\
     -w N      window manager: 0=no, 1=ewmh-compatible, 2=ratpoison, 3=old fashion\n\
     -d N      desktop: 0=current 1=all, 2=all but special, 3=all but current\n\
@@ -66,7 +67,7 @@ Options:\n\
  -font name   font name in the form xft:fontconfig_pattern\n\
   -v|-vv      verbose\n\
     -h        help\n\
-See man alttab for details.\n");
+See man alttab for details.\n", PACKAGE_VERSION);
 	exit(0);
 }
 
@@ -135,6 +136,7 @@ int use_args_and_xrm(int *argc, char **argv)
             remove_arg(argc, argv, arg);
         }
 	}
+    msg(0, "%s\n", PACKAGE_STRING);
     msg(0, "debug level %d\n", g.debug);
 
 	XrmInitialize();
