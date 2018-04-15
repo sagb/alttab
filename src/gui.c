@@ -142,6 +142,103 @@ int pointedTile(int x, int y)
     return (x - (FRAME_W / 2)) / visualTileW;
 }
 
+//
+// combine widgets into wi->tile
+// for uiShow()
+//
+void prepareTile(WindowInfo *wi)
+{
+    wi->tile =
+        XCreatePixmap(dpy, root, tileW, tileH, XDEPTH);
+    if (!wi->tile)
+        die("can't create tile");
+    int fr =
+        XFillRectangle(dpy, wi->tile, g.gcReverse, 0, 0,
+                tileW, tileH);
+    if (!fr) {
+        msg(-1, "can't fill tile\n");
+    }
+    // mini-window content could be drawn here,
+    // but there is no backing store of windows 
+    // in my simple environments (as reported by xwininfo)
+    //
+    // place icons
+    if (wi->icon_drawable) {
+        if (wi->icon_w == iconW &&
+                wi->icon_h == iconH) {
+            // direct copy
+            msg(1, "copying icon onto tile\n");
+            // prepare special GC to copy icon, with clip mask if icon_mask present
+            unsigned long ic_valuemask = 0;
+            XGCValues ic_values;
+            GC ic_gc =
+                XCreateGC(dpy, root, ic_valuemask,
+                        &ic_values);
+            if (ic_gc < 0) {
+                msg(-1, "can't create GC to draw icon\n");
+                goto endIcon;
+            }
+            if (wi->icon_mask != 0) {
+                XSetClipMask(dpy, ic_gc,
+                        wi->icon_mask);
+            }
+            int or = XCopyArea(dpy,
+                    wi->icon_drawable,
+                    wi->tile,
+                    ic_gc, 0, 0,
+                    wi->icon_w, wi->icon_h,	// src
+                    0, 0);	// dst
+            if (!or) {
+                msg(-1, "can't copy icon to tile\n");
+            }
+            XFreeGC (dpy, ic_gc);
+        } else {
+            // scale
+            msg(1, "scaling icon onto tile\n");
+            int sc = pixmapFit(wi->icon_drawable,
+                    wi->icon_mask,
+                    wi->tile,
+                    wi->icon_w,
+                    wi->icon_h,
+                    iconW, iconH);
+            if (!sc) {
+                msg(-1, "can't scale icon to tile\n");
+            }
+        }
+    } else {
+        // draw placeholder or standalone icons from some WM
+        GC gcL = create_gc(0);	// GC for thin line
+        if (!gcL) {
+            msg(-1, "can't create gcL\n");
+        } else {
+            XSetLineAttributes(dpy, gcL, 1, LineSolid,
+                    CapButt, JoinMiter);
+            //XSetForeground (dpy, gcL, pixel);
+            int pr =
+                XDrawRectangle(dpy, wi->tile, gcL,
+                        0, 0, iconW, iconH);
+            if (!pr) {
+                msg(-1, "can't draw placeholder\n");
+            }
+            XFreeGC(dpy, gcL);
+        }
+    }
+endIcon:
+    // draw labels
+    if (wi->name && fontLabel) {
+        int dr =
+            drawMultiLine(wi->tile, fontLabel,
+                    &(g.color[COLFG].xftcolor),
+                    wi->name,
+                    0, (iconH + 5), tileW,
+                    (tileH - iconH - 5));
+        if (dr != 1) {
+            msg(-1, "can't draw label\n");
+        }
+    }
+} // prepareTile
+
+
 // PUBLIC
 
 //
@@ -388,93 +485,12 @@ int uiShow(bool direction)
 	}
 // prepare tiles
 
+    if (!g.winlist) {
+        die("no winlist in uiShow. this shouldn't happen, please report.");
+    }
 	int m;
 	for (m = 0; m < g.maxNdx; m++) {
-		if (!g.winlist)
-			die("no winlist in uiShow. this shouldn't happen, please report.");
-		g.winlist[m].tile =
-		    XCreatePixmap(dpy, root, tileW, tileH, XDEPTH);
-		if (!g.winlist[m].tile)
-			die("can't create tile");
-		int fr =
-		    XFillRectangle(dpy, g.winlist[m].tile, g.gcReverse, 0, 0,
-				   tileW, tileH);
-		if (!fr) {
-			msg(-1, "can't fill tile\n");
-		}
-		// place icons
-		if (g.winlist[m].icon_drawable) {
-			if (g.winlist[m].icon_w == iconW &&
-			    g.winlist[m].icon_h == iconH) {
-				// direct copy
-                msg(1, "%d: copying icon\n", m);
-				// prepare special GC to copy icon, with clip mask if icon_mask present
-				unsigned long ic_valuemask = 0;
-				XGCValues ic_values;
-				GC ic_gc =
-				    XCreateGC(dpy, root, ic_valuemask,
-					      &ic_values);
-				if (ic_gc < 0) {
-					msg(-1, "can't create GC to draw icon\n");
-					return 0;
-				}
-				if (g.winlist[m].icon_mask != 0) {
-					XSetClipMask(dpy, ic_gc,
-						     g.winlist[m].icon_mask);
-				}
-
-				int or = XCopyArea(dpy,
-						   g.winlist[m].icon_drawable,
-						   g.winlist[m].tile,
-						   ic_gc, 0, 0,
-						   g.winlist[m].icon_w, g.winlist[m].icon_h,	// src
-						   0, 0);	// dst
-				if (!or) {
-					msg(-1, "can't copy icon to tile\n");
-				}
-			} else {
-				// scale
-                msg(1, "%d: scaling icon\n", m);
-				int sc = pixmapFit(g.winlist[m].icon_drawable,
-						   g.winlist[m].icon_mask,
-						   g.winlist[m].tile,
-						   g.winlist[m].icon_w,
-						   g.winlist[m].icon_h,
-						   iconW, iconH);
-				if (!sc) {
-                    msg(-1, "can't scale icon to tile\n");
-				}
-			}
-		} else {
-			// draw placeholder or standalone icons from some WM
-			GC gcL = create_gc(0);	// GC for thin line
-			if (!gcL) {
-				msg(-1, "can't create gcL\n");
-			} else {
-				XSetLineAttributes(dpy, gcL, 1, LineSolid,
-						   CapButt, JoinMiter);
-				//XSetForeground (dpy, gcL, pixel);
-				int pr =
-				    XDrawRectangle(dpy, g.winlist[m].tile, gcL,
-						   0, 0, iconW, iconH);
-				if (!pr) {
-					msg(-1, "can't draw placeholder\n");
-				}
-				XFreeGC(dpy, gcL);
-			}
-		}
-		// draw labels
-		if (g.winlist[m].name && fontLabel) {
-			int dr =
-			    drawMultiLine(g.winlist[m].tile, fontLabel,
-					  &(g.color[COLFG].xftcolor),
-					  g.winlist[m].name,
-					  0, (iconH + 5), tileW,
-					  (tileH - iconH - 5));
-			if (dr != 1) {
-				msg(-1, "can't draw label\n");
-			}
-		}
+        prepareTile (&(g.winlist[m]));
 	}
     msg(0, "prepared %d tiles\n", m);
 	if (fontLabel)
