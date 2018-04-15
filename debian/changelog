@@ -1,10 +1,20 @@
-alttab (1.2.0.20180411.58.g699af47-1~1.gbp89943b) jessie; urgency=medium
+alttab (1.3.0.20180415.1.ga475b91-1~1.gbpd8c71a) unstable; urgency=medium
 
-  ** SNAPSHOT build @89943b8182be04b011e4cd65c17edc1141bc61c8 **
+  ** SNAPSHOT build @d8c71add7b3c4b057c38ea092f63a9f67bda39c9 **
 
-  * backport to jessie
+  * separate prepareTile() procedure
 
- -- Alexander Kulak <sa-dev@rainbow.by>  Wed, 11 Apr 2018 23:28:31 +0300
+ -- Alexander Kulak <sa-dev@rainbow.by>  Sun, 15 Apr 2018 14:18:55 +0300
+
+alttab (1.3.0-1) unstable; urgency=medium
+
+  * New upstream release
+  * Bump standards to current
+  * Delete deprecated get-orig-source target
+  * Add bindnow hardening
+  * Add upstream metadata
+
+ -- Alexander Kulak <sa-dev@rainbow.by>  Thu, 12 Apr 2018 11:00:00 +0300
 
 alttab (1.2.0.20180411.58.g699af47-1~1.gbp45e25c) unstable; urgency=medium
 
