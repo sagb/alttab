@@ -1,3 +1,11 @@
+alttab (1.3.0.20180415.1.ga475b91-1~1.gbp46924f) stretch; urgency=medium
+
+  ** SNAPSHOT build @46924f6e980fff10dbfb09ca1ea723b6a2963ae3 **
+
+  * backport to stretch
+
+ -- Alexander Kulak <sa-dev@rainbow.by>  Sun, 15 Apr 2018 14:24:08 +0300
+
 alttab (1.3.0.20180415.1.ga475b91-1~1.gbpd8c71a) unstable; urgency=medium
 
   ** SNAPSHOT build @d8c71add7b3c4b057c38ea092f63a9f67bda39c9 **
