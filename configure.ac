@@ -1,4 +1,4 @@
-AC_INIT([alttab], [1.2.0])
+AC_INIT([alttab], [1.3.0])
 AM_INIT_AUTOMAKE([foreign subdir-objects])
 AC_CONFIG_SRCDIR([configure.ac])
 AC_CONFIG_HEADERS([config.h])

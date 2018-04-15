@@ -1,8 +1,6 @@
 #!/usr/bin/make -f
 
-PKD  = $(abspath $(dir $(MAKEFILE_LIST)))
-PKG  = $(word 2,$(shell dpkg-parsechangelog -l$(PKD)/changelog --show-field=Source))
-VER ?= $(shell dpkg-parsechangelog -l$(PKD)/changelog | perl -ne 'print $$1 if m{^Version:\s+(?:\d+:)?(\d.*)(?:\-\d+.*)};')
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
 
 %:
 	dh $@
@@ -11,10 +9,4 @@ VER ?= $(shell dpkg-parsechangelog -l$(PKD)/changelog | perl -ne 'print $$1 if m
 # important in bootstrap.sh, besides of autotools and man page.
 #override_dh_autoreconf:
 #	dh_autoreconf ./bootstrap.sh -f
-
-.PHONY: get-orig-source
-## http://wiki.debian.org/onlyjob/get-orig-source
-get-orig-source:  $(info I: $(PKG)_$(VER))
-	@echo "# Downloading..."
-	uscan --noconf --verbose --rename --destdir=$(CURDIR) --check-dirname-level=0 --force-download --download-version $(VER) $(PKD)
 
