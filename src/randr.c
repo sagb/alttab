@@ -64,6 +64,8 @@ int randr_update_outputs(Window w, quad **outs)
         if (out_info->connection != RR_Connected)
             continue;
         crtc_info = XRRGetCrtcInfo (dpy, scr_res, out_info->crtc);
+        if (crtc_info == NULL)
+            continue;
         (*outs) = realloc ((*outs), (nout + 1) * sizeof(quad));
         if ((*outs) == NULL) return 0;
         (*outs)[nout].x = crtc_info->x;
