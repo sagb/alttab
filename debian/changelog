@@ -1,3 +1,11 @@
+alttab (1.3.0.20180704.3.g2ecf5f5-1~1.gbp16ff53) unstable; urgency=medium
+
+  ** SNAPSHOT build @16ff53fe299b66cc6328d56066ce3374a4547644 **
+
+  * RANDR output may be connected but without CRTCinfo
+
+ -- Alexander Kulak <sa-dev@rainbow.by>  Wed, 04 Jul 2018 14:40:18 +0300
+
 alttab (1.3.0.20180415.1.ga475b91-1~1.gbpd8c71a) unstable; urgency=medium
 
   ** SNAPSHOT build @d8c71add7b3c4b057c38ea092f63a9f67bda39c9 **
