@@ -232,7 +232,7 @@ int inspectIconFile(FTSENT * pe)
     if (ic == NULL) {
         ic = initIcon();
         strncpy(ic->app, app, MAXAPPLEN);
-        strncpy(ic->src_path, pe->fts_path, MAXICONPATHLEN);
+        strncpy(ic->src_path, pe->fts_path, MAXICONPATHLEN-1);
         ic->src_w = ix;
         ic->src_h = iy;
         HASH_ADD_STR(g.ic, app, ic);
@@ -242,7 +242,7 @@ int inspectIconFile(FTSENT * pe)
         // best value: g.option_iconW, H
         // should we replace the icon?
         if (iconMatchBetter(ix, iy, ic->src_w, ic->src_h)) {
-            strncpy(ic->src_path, pe->fts_path, MAXICONPATHLEN);
+            strncpy(ic->src_path, pe->fts_path, MAXICONPATHLEN-1);
             ic->src_w = ix;
             ic->src_h = iy;
         }

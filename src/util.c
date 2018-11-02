@@ -524,7 +524,7 @@ int drawMultiLine_test()
     char *add = "example of drawMultiLine ";
     int sc;
     for (sc = 0; sc < 4; sc++)
-        strncat(line, add, 25);
+        strncat(line, add, 26);
 
     GC gc = DefaultGC(dpy, 0);
     XSetForeground(dpy, gc, WhitePixel(dpy, 0));

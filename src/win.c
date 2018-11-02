@@ -283,7 +283,7 @@ int addWindowInfo(Window win, int reclevel, int wm_id, unsigned long desktop,
 // 1. get name
 
     if (wm_name) {
-        strncpy(g.winlist[g.maxNdx].name, wm_name, MAXNAMESZ);
+        strncpy(g.winlist[g.maxNdx].name, wm_name, MAXNAMESZ-1);
     } else {
         unsigned char *wn;
         Atom prop = XInternAtom(dpy, "WM_NAME", false), type;
@@ -292,7 +292,7 @@ int addWindowInfo(Window win, int reclevel, int wm_id, unsigned long desktop,
         if (XGetWindowProperty(dpy, win, prop, 0, MAXNAMESZ, false,
                                AnyPropertyType, &type, &form, &len,
                                &remain, &wn) == Success && wn) {
-            strncpy(g.winlist[g.maxNdx].name, (char *)wn, MAXNAMESZ);
+            strncpy(g.winlist[g.maxNdx].name, (char *)wn, MAXNAMESZ-1);
             g.winlist[g.maxNdx].name[MAXNAMESZ - 1] = '\0';
             XFree(wn);
         } else {
