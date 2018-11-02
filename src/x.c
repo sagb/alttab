@@ -27,7 +27,7 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 #include "alttab.h"
 #include "util.h"
 extern Globals g;
-extern Display* dpy;
+extern Display *dpy;
 extern int scr;
 extern Window root;
 
@@ -39,23 +39,22 @@ extern Window root;
 //
 Window x_get_leader(Window win)
 {
-	Window *retprop;
-	XWMHints *h;
-	Window leader = None;
+    Window *retprop;
+    XWMHints *h;
+    Window leader = None;
 
-	retprop =
-	    (Window *) get_x_property(win, XA_WINDOW, "WM_CLIENT_LEADER",
-				      NULL);
-	if (retprop != NULL) {
-		leader = retprop[0];
-		XFree(retprop);
-	} else {
-		if (!(h = XGetWMHints(dpy, win)))
-			return None;
-		if (h->flags & WindowGroupHint)
-			leader = h->window_group;
-	}
-	return leader;
+    retprop =
+        (Window *) get_x_property(win, XA_WINDOW, "WM_CLIENT_LEADER", NULL);
+    if (retprop != NULL) {
+        leader = retprop[0];
+        XFree(retprop);
+    } else {
+        if (!(h = XGetWMHints(dpy, win)))
+            return None;
+        if (h->flags & WindowGroupHint)
+            leader = h->window_group;
+    }
+    return leader;
 }
 
 // PUBLIC
@@ -67,12 +66,12 @@ Window x_get_leader(Window win)
 int x_initWindowsInfoRecursive(Window win, int reclevel)
 {
 
-	Window root, parent;
-	Window *children;
-	unsigned int nchildren, i;
+    Window root, parent;
+    Window *children;
+    unsigned int nchildren, i;
 //    Window leader;
-	XWindowAttributes wa;
-    char* winname;
+    XWindowAttributes wa;
+    char *winname;
 
 // check if window is "leader" or no prop, skip otherwise
 // caveat: in rp, gvim leader has no file name and icon
@@ -90,40 +89,38 @@ int x_initWindowsInfoRecursive(Window win, int reclevel)
 // probably add an option for this in WMs too?
     wa.map_state = 0;
     if (g.option_wm != WM_TWM)
-    	XGetWindowAttributes(dpy, win, &wa);
+        XGetWindowAttributes(dpy, win, &wa);
 
 // in twm-like, add only windows with a name
     winname = NULL;
     if (g.option_wm == WM_TWM) {
         winname = get_x_property(win, XA_STRING, "WM_NAME", NULL);
     }
-
 // insert detailed window data in window list
-    if ( (g.option_wm == WM_TWM || wa.map_state == IsViewable) 
-            && reclevel != 0 
-            && (g.option_wm != WM_TWM || winname != NULL)
+    if ((g.option_wm == WM_TWM || wa.map_state == IsViewable)
+        && reclevel != 0 && (g.option_wm != WM_TWM || winname != NULL)
 //            && (g.option_wm != WM_TWM || leader == win)
-            && ! common_skipWindow(win, DESKTOP_UNKNOWN, DESKTOP_UNKNOWN)
-            ) {
+        && !common_skipWindow(win, DESKTOP_UNKNOWN, DESKTOP_UNKNOWN)
+        ) {
         addWindowInfo(win, reclevel, 0, DESKTOP_UNKNOWN, winname);
-	}
+    }
 // skip children if max recursion level reached
     if (g.option_max_reclevel != -1 && reclevel >= g.option_max_reclevel)
         return 1;
 
 // recursion
-	if (XQueryTree(dpy, win, &root, &parent, &children, &nchildren) == 0) {
+    if (XQueryTree(dpy, win, &root, &parent, &children, &nchildren) == 0) {
         msg(0, "can't get window tree for 0x%lx\n", win);
-		return 0;
-	}
-	for (i = 0; i < nchildren; ++i) {
-		x_initWindowsInfoRecursive(children[i], reclevel + 1);
-	}
+        return 0;
+    }
+    for (i = 0; i < nchildren; ++i) {
+        x_initWindowsInfoRecursive(children[i], reclevel + 1);
+    }
 
-	if (nchildren > 0 && children) {
-		XFree(children);
-	}
-	return 1;
+    if (nchildren > 0 && children) {
+        XFree(children);
+    }
+    return 1;
 }
 
 //
@@ -131,25 +128,25 @@ int x_initWindowsInfoRecursive(Window win, int reclevel)
 //
 int x_setFocus(int wndx)
 {
-	Window w = g.winlist[wndx].id;
+    Window w = g.winlist[wndx].id;
 
 // 1. XWarpPointer
 // If such WMs would be discovered that prevent our focus
 // AND set their own focus via the pointer only.
 
 // 2. XRaiseWindow required, but doesn't make window "Viewable"
-	XRaiseWindow(dpy, w);
+    XRaiseWindow(dpy, w);
 
 // 3. XSetInputFocus
 // "The specified focus window must be viewable at the time 
 // XSetInputFocus is called, or a BadMatch error results."
 // This check is redundant: non-viewable windows isn't added to winlist in raw X anyway
-	XWindowAttributes att;
-	XGetWindowAttributes(dpy, w, &att);
-	if (att.map_state == IsViewable)
-		XSetInputFocus(dpy, w, RevertToParent, CurrentTime);
+    XWindowAttributes att;
+    XGetWindowAttributes(dpy, w, &att);
+    if (att.map_state == IsViewable)
+        XSetInputFocus(dpy, w, RevertToParent, CurrentTime);
 
-	return 1;
+    return 1;
 }
 
 //
@@ -174,4 +171,3 @@ void x_setCommonPropertiesForAnyWindow(Window win)
     if (evmask != 0)
         XSelectInput(dpy, win, evmask);
 }
-
