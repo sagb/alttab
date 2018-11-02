@@ -49,7 +49,7 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 #define DEFCOLFG    "grey"
 #define DEFCOLFRAME "#a0abab"
 
-#define XDEPTH      24		// TODO: get rid of this
+#define XDEPTH      24          // TODO: get rid of this
 
 #define DEFMODMASK  Mod1Mask
 #define DEFBACKMASK ShiftMask
@@ -61,22 +61,24 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef COMTYPES
 #define COMTYPES
 typedef struct {
-    int w; int h;
-    int x; int y;
+    int w;
+    int h;
+    int x;
+    int y;
 } quad;
 #define MAXNAMESZ   256
 #endif
 
 typedef struct {
-	Window id;
-	int wm_id;		// wm's internal window id, when WM has it (ratpoison)
-	char name[MAXNAMESZ];
-	int reclevel;
-	Pixmap icon_drawable;	// Window or Pixmap
+    Window id;
+    int wm_id;                  // wm's internal window id, when WM has it (ratpoison)
+    char name[MAXNAMESZ];
+    int reclevel;
+    Pixmap icon_drawable;       // Window or Pixmap
     Pixmap icon_mask;
-	unsigned int icon_w, icon_h;
-	bool icon_allocated;	// we must free icon, because we created it (placeholder or depth conversion)
-	Pixmap tile;		// ready to display. w/h are all equal and defined in gui.c
+    unsigned int icon_w, icon_h;
+    bool icon_allocated;        // we must free icon, because we created it (placeholder or depth conversion)
+    Pixmap tile;                // ready to display. w/h are all equal and defined in gui.c
 // this constant can't be 0, 1, -1, MAXINT, 
 // because WMs set it to these values incoherently
 #define DESKTOP_UNKNOWN 0xdead
@@ -84,11 +86,11 @@ typedef struct {
 } WindowInfo;
 
 typedef struct {
-	//char name[MAXNAMESZ];
-	char *name;
-	XColor xcolor;
-	XftColor xftcolor;
-	//XRenderColor xrendercolor;
+    //char name[MAXNAMESZ];
+    char *name;
+    XColor xcolor;
+    XftColor xftcolor;
+    //XRenderColor xrendercolor;
 } Color;
 
 typedef struct {
@@ -113,24 +115,24 @@ typedef struct SwitchMoment {
 
 typedef struct {
     int debug;
-	bool uiShowHasRun;	// means: 1. window is ready to Expose, 2. need to call uiHide to free X stuff
-	WindowInfo *winlist;
-	int maxNdx;		// number of items in list above
-	int selNdx;		// current (selected) item
+    bool uiShowHasRun;          // means: 1. window is ready to Expose, 2. need to call uiHide to free X stuff
+    WindowInfo *winlist;
+    int maxNdx;                 // number of items in list above
+    int selNdx;                 // current (selected) item
     /* auxiliary list for sorting
      * head = recently focused
      * display-wide, for all groups/desktops
      * unlike g.winlist, survives uiHide */
-	PermanentWindowInfo *sortlist;
-	// option_* are initialized from command line arguments or X resources or defaults
-	int option_max_reclevel;	// max reclevel. -1 is "everything"
+    PermanentWindowInfo *sortlist;
+    // option_* are initialized from command line arguments or X resources or defaults
+    int option_max_reclevel;    // max reclevel. -1 is "everything"
 #define WM_MIN          0
 #define WM_NO           0
 #define WM_EWMH         1
 #define WM_RATPOISON    2
 #define WM_TWM          3
 #define WM_MAX          3
-	int option_wm;
+    int option_wm;
 #define DESK_MIN        0
 #define DESK_CURRENT    0
 #define DESK_ALL        1
@@ -145,9 +147,9 @@ typedef struct {
 #define SCR_MAX        1
 #define SCR_DEFAULT    SCR_ALL
     int option_screen;
-	char *option_font;
-	int option_tileW, option_tileH;
-	int option_iconW, option_iconH;
+    char *option_font;
+    int option_tileW, option_tileH;
+    int option_iconW, option_iconH;
 #define VP_FOCUS        0
 #define VP_POINTER      1
 #define VP_TOTAL        2
@@ -172,14 +174,14 @@ typedef struct {
 #define ISRC_DEFAULT    ISRC_SIZE
     int option_iconSrc;
     char *option_theme;
-	unsigned int option_modMask, option_backMask;
-	KeyCode option_modCode, option_keyCode;
-	Color color[NCOLORS];
-	GC gcDirect, gcReverse, gcFrame;	// used in both gui.c and win.c
-	unsigned int ignored_modmask;
-    icon_t *ic;  // cache of all icons
-    EwmhFeatures ewmh;  // guessed by ewmh_detectFeatures
-    Atom naw;  // _NET_ACTIVE_WINDOW
+    unsigned int option_modMask, option_backMask;
+    KeyCode option_modCode, option_keyCode;
+    Color color[NCOLORS];
+    GC gcDirect, gcReverse, gcFrame;    // used in both gui.c and win.c
+    unsigned int ignored_modmask;
+    icon_t *ic;                 // cache of all icons
+    EwmhFeatures ewmh;          // guessed by ewmh_detectFeatures
+    Atom naw;                   // _NET_ACTIVE_WINDOW
 //    SwitchMoment last; // for detecting false focus events from WM
 } Globals;
 
@@ -196,9 +198,10 @@ Window getUiwin();
 
 // windows
 int startupWintasks();
-int addIconFromHints (WindowInfo* wi);
-int addIconFromFiles (WindowInfo* wi);
-int addWindowInfo(Window win, int reclevel, int wm_id, unsigned long desktop, char *wm_name);
+int addIconFromHints(WindowInfo * wi);
+int addIconFromFiles(WindowInfo * wi);
+int addWindowInfo(Window win, int reclevel, int wm_id, unsigned long desktop,
+                  char *wm_name);
 int initWinlist(bool direction);
 void freeWinlist();
 int setFocus(int winNdx);
@@ -212,12 +215,13 @@ int pulloutWindowToTop(int winNdx);
 void winPropChangeEvent(XPropertyEvent e);
 void winDestroyEvent(XDestroyWindowEvent e);
 void winFocusChangeEvent(XFocusChangeEvent e);
-bool common_skipWindow(Window w, unsigned long current_desktop, unsigned long window_desktop);
+bool common_skipWindow(Window w, unsigned long current_desktop,
+                       unsigned long window_desktop);
 void x_setCommonPropertiesForAnyWindow(Window win);
 void addToSortlist(Window w, bool to_head, bool move);
 
 /* EWHM */
-bool ewmh_detectFeatures(EwmhFeatures *e);
+bool ewmh_detectFeatures(EwmhFeatures * e);
 Window ewmh_getActiveWindow();
 int ewmh_initWinlist();
 int ewmh_setFocus(int winNdx, Window fwin); // fwin used if non-zero
@@ -227,7 +231,7 @@ bool ewmh_skipWindowInTaskbar(Window w);
 
 /* RANDR */
 bool randrAvailable();
-bool randrGetViewport(quad *res, bool *multihead);
+bool randrGetViewport(quad * res, bool * multihead);
 
 /* autil */
 void die(const char *format, ...);

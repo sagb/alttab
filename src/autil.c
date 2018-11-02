@@ -48,10 +48,9 @@ void msg(int lvl, const char *format, ...)
 void die(const char *format, ...)
 {
     va_list ap;
-    fprintf (stderr, MSGPREFIX);
+    fprintf(stderr, MSGPREFIX);
     va_start(ap, format);
     vfprintf(stderr, format, ap);
     va_end(ap);
     exit(1);
 }
-
