@@ -19,11 +19,20 @@
 ! Ctrl-Tab instead of Alt-Tab
 !alttab.modifier.keysym: Control_L
 
+! Alt-Tab instead of Control-Tab
+!alttab.revmodifier.keysym: Alt_L
+
 ! Ctrl instead of Shift for backscroll
 !alttab.backscroll.keysym: Control_L
 
 ! grave (back apostrophe) instead of Tab
 !alttab.key.keysym:      grave
+
+! Page Up instead of Left
+!alttab.prevkey.keysym:      Page_Up
+
+! Page Down instead of Right
+!alttab.nextkey.keysym:      Page_Down
 
 ! Limit the switcher to this rectangle 
 ! instead of default screen size

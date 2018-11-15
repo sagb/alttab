@@ -53,6 +53,9 @@ Options:\n\
    -kk str    keysym of main key\n\
    -mk str    keysym of main modifier\n\
    -bk str    keysym of backscroll modifier\n\
+   -rk str    keysym of revert modifier\n\
+   -pk str    keysym of prev key\n\
+   -nk str    keysym of next key\n\
    -mm N      (obsoleted) main modifier mask\n\
    -bm N      (obsoleted) backward scroll modifier mask\n\
     -t NxM    tile geometry\n\
@@ -106,6 +109,9 @@ int use_args_and_xrm(int *argc, char **argv)
         {"-mk", "*modifier.keysym", XrmoptionSepArg, NULL},
         {"-kk", "*key.keysym", XrmoptionSepArg, NULL},
         {"-bk", "*backscroll.keysym", XrmoptionSepArg, NULL},
+        {"-rk", "*revmodifier.keysym", XrmoptionSepArg, NULL},
+        {"-pk", "*prevkey.keysym", XrmoptionSepArg, NULL},
+        {"-nk", "*nextkey.keysym", XrmoptionSepArg, NULL},
         {"-t", "*tile.geometry", XrmoptionSepArg, NULL},
         {"-i", "*icon.geometry", XrmoptionSepArg, NULL},
         {"-vp", "*viewport", XrmoptionSepArg, NULL},
@@ -239,16 +245,35 @@ int use_args_and_xrm(int *argc, char **argv)
 #define  KC  g.option_keyCode
 #define  GMM  g.option_modMask
 #define  GBM  g.option_backMask
+#define  RMC  g.option_rModCode
+#define  RMM  g.option_rModMask
+#define  PKC  g.option_prevCode
+#define  NKC  g.option_nextCode
 
     ksi = ksym_option_to_keycode(&db, XRMAPPNAME, "modifier", &errmsg);
     if (ksi == -1)
         die("%s\n", errmsg);
     MC = ksi != 0 ? ksi : XKeysymToKeycode(dpy, DEFMODKS);
 
+    ksi = ksym_option_to_keycode(&db, XRMAPPNAME, "revmodifier", &errmsg);
+    if (ksi == -1)
+        die("%s\n", errmsg);
+    RMC = ksi != 0 ? ksi : XKeysymToKeycode(dpy, DEFRMODKS);
+
     ksi = ksym_option_to_keycode(&db, XRMAPPNAME, "key", &errmsg);
     if (ksi == -1)
         die("%s\n", errmsg);
     KC = ksi != 0 ? ksi : XKeysymToKeycode(dpy, DEFKEYKS);
+
+    ksi = ksym_option_to_keycode(&db, XRMAPPNAME, "prevkey", &errmsg);
+    if (ksi == -1)
+        die("%s\n", errmsg);
+    PKC = ksi != 0 ? ksi : XKeysymToKeycode(dpy, DEFPREVKS);
+
+    ksi = ksym_option_to_keycode(&db, XRMAPPNAME, "nextkey", &errmsg);
+    if (ksi == -1)
+        die("%s\n", errmsg);
+    NKC = ksi != 0 ? ksi : XKeysymToKeycode(dpy, DEFNEXTKS);
 
     switch (xresource_load_int(&db, XRMAPPNAME, "modifier.mask", &(GMM))) {
     case 1:
@@ -285,8 +310,12 @@ int use_args_and_xrm(int *argc, char **argv)
         break;
     }
 
-    msg(0, "modMask %d, backMask %d, modCode %d, keyCode %d\n",
-        GMM, GBM, MC, KC);
+    RMM = keycode_to_modmask(RMC);
+    if (RMM == 0)
+        die(rmb, RMC);
+
+    msg(0, "modMask %d, backMask %d, modCode %d, keyCode %d, rModMask %d, rModCode %d, prevCode %d, nextCode %d\n",
+        GMM, GBM, MC, KC, RMM, RMC, PKC, NKC);
 
     g.option_tileW = DEFTILEW;
     g.option_tileH = DEFTILEH;
@@ -444,6 +473,39 @@ int grabAllKeys(bool grabUngrab)
         die(grabhint, g.option_keyCode,
             g.option_modMask | g.option_backMask, g.ignored_modmask);
     }
+    if (!changeKeygrab
+        (root, grabUngrab, g.option_keyCode, g.option_rModMask,
+         g.ignored_modmask)) {
+        die(grabhint, g.option_keyCode, g.option_rModMask, g.ignored_modmask);
+    }
+    return 1;
+}
+
+int grabNextPrevKeys(bool grabUngrab)
+{
+    g.ignored_modmask = getOffendingModifiersMask(dpy); // or 0 for g.debug
+    char *grabhint =
+        "Error while (un)grabbing key 0x%x with mask 0x%x/0x%x.\nProbably other program already grabbed this combination.\n";
+    if (!changeKeygrab
+        (root, grabUngrab, g.option_prevCode, g.option_modMask,
+         g.ignored_modmask)) {
+        die(grabhint, g.option_prevCode, g.option_modMask, g.ignored_modmask);
+    }
+    if (!changeKeygrab
+        (root, grabUngrab, g.option_nextCode, g.option_modMask,
+         g.ignored_modmask)) {
+        die(grabhint, g.option_nextCode, g.option_modMask, g.ignored_modmask);
+    }
+    if (!changeKeygrab
+        (root, grabUngrab, g.option_prevCode, g.option_rModMask,
+         g.ignored_modmask)) {
+        die(grabhint, g.option_prevCode, g.option_rModMask, g.ignored_modmask);
+    }
+    if (!changeKeygrab
+        (root, grabUngrab, g.option_nextCode, g.option_rModMask,
+         g.ignored_modmask)) {
+        die(grabhint, g.option_nextCode, g.option_rModMask, g.ignored_modmask);
+    }
     return 1;
 }
 
@@ -470,6 +532,10 @@ int main(int argc, char **argv)
         die("startupGUItasks failed");
 
     grabAllKeys(true);
+
+    // just check if possible to grab Prev/Next keys
+    grabNextPrevKeys(true);
+    grabNextPrevKeys(false);
     g.uiShowHasRun = false;
 
     struct timespec nanots;
@@ -478,6 +544,9 @@ int main(int argc, char **argv)
     char keys_pressed[32];
     int octet = g.option_modCode / 8;
     int kmask = 1 << (g.option_modCode - octet * 8);
+    int roctet = g.option_rModCode / 8;
+    int rkmask = 1 << (g.option_rModCode - roctet * 8);
+    unsigned int activeState=0;
 
     while (true) {
         memset(&(ev.xkey), 0, sizeof(ev.xkey));
@@ -485,7 +554,7 @@ int main(int argc, char **argv)
         if (g.uiShowHasRun) {
             // poll: lag and consume cpu, but necessary because of bug #1 and #2
             XQueryKeymap(dpy, keys_pressed);
-            if (!(keys_pressed[octet] & kmask)) {   // Alt released
+            if (!(((activeState & g.option_modMask) && (keys_pressed[octet] & kmask)) || ((activeState & g.option_rModMask) && (keys_pressed[roctet] & rkmask)))) {   // Alt released
                 uiHide();
                 continue;
             }
@@ -502,17 +571,23 @@ int main(int argc, char **argv)
         case KeyPress:
             msg(1, "Press %lx: %d-%d\n",
                 ev.xkey.window, ev.xkey.state, ev.xkey.keycode);
-            if (!((ev.xkey.state & g.option_modMask)
-                  && ev.xkey.keycode == g.option_keyCode)) {
+            if (!((ev.xkey.state & ( g.option_modMask | g.option_rModMask ))
+                  && ((ev.xkey.keycode == g.option_keyCode) || (ev.xkey.keycode == g.option_prevCode) || (ev.xkey.keycode == g.option_nextCode)))) {
                 break;
             }                   // safety redundance
+            activeState = ev.xkey.state;
             if (!g.uiShowHasRun) {
-                uiShow((ev.xkey.state & g.option_backMask));
+                uiShow((ev.xkey.state & ( g.option_backMask | g.option_rModMask )));
             } else {
-                if (ev.xkey.state & g.option_backMask) {
-                    uiPrevWindow();
+                if (ev.xkey.keycode == g.option_keyCode) {
+                    if ((ev.xkey.state & ( g.option_backMask | g.option_rModMask ))) {
+                        uiPrevWindow();
+                    } else {
+                        uiNextWindow();
+                    }
                 } else {
-                    uiNextWindow();
+                    if (ev.xkey.keycode == g.option_prevCode) uiPrevWindow();
+                    else if (ev.xkey.keycode == g.option_nextCode) uiNextWindow();
                 }
             }
             break;
@@ -522,7 +597,8 @@ int main(int argc, char **argv)
                 ev.xkey.window, ev.xkey.state, ev.xkey.keycode);
             // interested only in "final" release
             if (!((ev.xkey.state & g.option_modMask)
-                  && ev.xkey.keycode == g.option_modCode && g.uiShowHasRun)) {
+            if (!(((ev.xkey.state & (g.option_modMask | g.option_rModMask)) == (activeState & (g.option_modMask | g.option_rModMask) ) )
+                  && ( (ev.xkey.keycode == g.option_modCode) || (ev.xkey.keycode == g.option_rModCode) ) && g.uiShowHasRun)) {
                 break;
             }
             uiHide();
