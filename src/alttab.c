@@ -596,7 +596,6 @@ int main(int argc, char **argv)
             msg(1, "Release %lx: %d-%d\n",
                 ev.xkey.window, ev.xkey.state, ev.xkey.keycode);
             // interested only in "final" release
-            if (!((ev.xkey.state & g.option_modMask)
             if (!(((ev.xkey.state & (g.option_modMask | g.option_rModMask)) == (activeState & (g.option_modMask | g.option_rModMask) ) )
                   && ( (ev.xkey.keycode == g.option_modCode) || (ev.xkey.keycode == g.option_rModCode) ) && g.uiShowHasRun)) {
                 break;

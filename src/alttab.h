@@ -57,8 +57,8 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 #define DEFKEYKS    XK_Tab
 #define DEFRMODKS   XK_Control_L
 #define DEFRMODMASK ControlMask
-#define DEFPREVKS   Left
-#define DEFNEXTKS   Right
+#define DEFPREVKS   XK_Left
+#define DEFNEXTKS   XK_Right
 
 #include "icon.h"
 
