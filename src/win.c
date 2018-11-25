@@ -245,12 +245,6 @@ void initWin(int wmindex)
 out:
     msg(0, "WM: %d\n", g.option_wm);
     WmOps = WmOpsVariants[g.option_wm];
-
-// max recursion for searching windows
-// -1 is "everything"
-// in raw X this returns too much windows, "1" is probably sufficient
-// no need for an option
-    g.option_max_reclevel = (g.option_wm == WM_NO) ? 1 : -1;
 }
 
 //

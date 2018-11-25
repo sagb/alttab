@@ -33,6 +33,12 @@ extern Window root;
 
 // PRIVATE
 
+// max recursion for searching windows
+// -1 is "everything"
+// in raw X this returns too much windows, "1" is probably sufficient
+// no need for an option
+static int max_reclevel;
+
 //
 // get window group leader
 // to be used later. rewritten, not tested.
@@ -103,7 +109,7 @@ static int x_initWindowsInfoRecursive(Window win, int reclevel)
         addWindowInfo(win, reclevel, 0, DESKTOP_UNKNOWN, winname);
     }
 // skip children if max recursion level reached
-    if (g.option_max_reclevel != -1 && reclevel >= g.option_max_reclevel)
+    if (max_reclevel != -1 && reclevel >= max_reclevel)
         return 1;
 
 // recursion
@@ -159,14 +165,28 @@ static int xSetFocus(int idx)
     return r;
 }
 
+static int xStartup(void)
+{
+    max_reclevel = 1;
+    return 1;
+}
+
+static int twmStartup(void)
+{
+    max_reclevel = -1;
+    return 1;
+}
+
 // PUBLIC
 
 struct WmOps WmNoOps = {
+    .startup = xStartup,
     .winlist = x_initWindowsInfoRecursive,
     .setFocus = xSetFocus,
 };
 
 struct WmOps WmTwmOps = {
+    .startup = twmStartup,
     .winlist = x_initWindowsInfoRecursive,
     .setFocus = xSetFocus,
 };

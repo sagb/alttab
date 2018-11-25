@@ -141,7 +141,6 @@ typedef struct {
      * unlike g.winlist, survives uiHide */
     PermanentWindowInfo *sortlist;
     // option_* are initialized from command line arguments or X resources or defaults
-    int option_max_reclevel;    // max reclevel. -1 is "everything"
 #define WM_MIN          0
 #define WM_NO           0
 #define WM_EWMH         1
