@@ -94,6 +94,13 @@ static inline bool wmSkipFocusChangeEvent(void)
     return WmOps->skipFocusChangeEvent();
 }
 
+static inline long wmEventMask(Window w)
+{
+    if (WmOps->eventMask == NULL)
+        return 0;
+    return WmOps->eventMask(w);
+}
+
 //
 // helper for windows' qsort
 // CAUSES O(log(N)) OR EVEN WORSE! reintroduce winlist[]->order instead?
@@ -169,10 +176,7 @@ static void winSetCommonPropertiesForAnyWindow(Window win)
     // for delete notification
     evmask |= StructureNotifyMask;
     // for focusIn notification
-    if (g.option_wm != WM_EWMH) {
-        msg(0, "using direct focus tracking for 0x%lx\n", win);
-        evmask |= FocusChangeMask;
-    }
+    evmask |= wmEventMask(win);
     // warning: this overwrites previous value
     if (evmask != 0)
         XSelectInput(dpy, win, evmask);
@@ -219,32 +223,33 @@ void addToSortlist(Window w, bool to_head, bool move)
 }
 
 //
-// initializes g.option_wm
 // wmindex is the already validated option
 void initWin(int wmindex)
 {
+    int wm;
+
     if (wmindex != WM_GUESS) {
-        g.option_wm = wmindex;
+        wm = wmindex;
         goto out;
     }
 
     if (wmProbe(WM_EWMH)) {
         msg(0, "EWMH-compatible WM detected: %s\n", g.ewmh.wmname);
-        g.option_wm = WM_EWMH;
+        wm = WM_EWMH;
         goto out;
     }
 
     if (wmProbe(WM_RATPOISON)) {
-        g.option_wm = WM_RATPOISON;
+        wm = WM_RATPOISON;
         goto out;
     }
 
     msg(0, "unknown WM, using WM_TWM\n");
-    g.option_wm = WM_TWM;
+    wm = WM_TWM;
 
 out:
-    msg(0, "WM: %d\n", g.option_wm);
-    WmOps = WmOpsVariants[g.option_wm];
+    msg(0, "WM: %d\n", wm);
+    WmOps = WmOpsVariants[wm];
 }
 
 //

@@ -58,6 +58,14 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 #define DEFPREVKEYKS    XK_VoidSymbol
 #define DEFNEXTKEYKS    XK_VoidSymbol
 
+#define WM_MIN          0
+#define WM_NO           0
+#define WM_EWMH         1
+#define WM_RATPOISON    2
+#define WM_TWM          3
+#define WM_MAX          3
+#define WM_GUESS        -1
+
 #include "icon.h"
 
 #ifndef COMTYPES
@@ -115,6 +123,7 @@ struct WmOps {
     Window (*getActiveWindow)(void);
     bool (*skipWindowInTaskbar)(Window w);
     bool (*skipFocusChangeEvent)(void);
+    long (*eventMask)(Window w);
 };
 
 extern struct WmOps WmNoOps;
@@ -141,14 +150,6 @@ typedef struct {
      * unlike g.winlist, survives uiHide */
     PermanentWindowInfo *sortlist;
     // option_* are initialized from command line arguments or X resources or defaults
-#define WM_MIN          0
-#define WM_NO           0
-#define WM_EWMH         1
-#define WM_RATPOISON    2
-#define WM_TWM          3
-#define WM_MAX          3
-#define WM_GUESS        -1
-    int option_wm;
 #define DESK_MIN        0
 #define DESK_CURRENT    0
 #define DESK_ALL        1

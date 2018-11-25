@@ -367,6 +367,12 @@ static bool ewmhSkipFocusChangeEvent(void)
     return true;
 }
 
+static long ewmhEventMask(Window w)
+{
+    msg(0, "using direct focus tracking for 0x%lx\n", w);
+    return FocusChangeMask;
+}
+
 // PUBLIC
 
 //
@@ -399,4 +405,5 @@ struct WmOps WmEwmhOps = {
     .getActiveWindow = ewmh_getActiveWindow,
     .skipWindowInTaskbar = ewmh_skipWindowInTaskbar,
     .skipFocusChangeEvent = ewmhSkipFocusChangeEvent,
+    .eventMask = ewmhEventMask,
 };

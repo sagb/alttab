@@ -38,6 +38,7 @@ extern Window root;
 // in raw X this returns too much windows, "1" is probably sufficient
 // no need for an option
 static int max_reclevel;
+static int wm;
 
 //
 // get window group leader
@@ -92,18 +93,18 @@ static int x_initWindowsInfoRecursive(Window win, int reclevel)
 // caveat: in rp, skips anything except of visible window
 // probably add an option for this in WMs too?
     wa.map_state = 0;
-    if (g.option_wm != WM_TWM)
+    if (wm != WM_TWM)
         XGetWindowAttributes(dpy, win, &wa);
 
 // in twm-like, add only windows with a name
     winname = NULL;
-    if (g.option_wm == WM_TWM) {
+    if (wm == WM_TWM) {
         winname = get_x_property(win, XA_STRING, "WM_NAME", NULL);
     }
 // insert detailed window data in window list
-    if ((g.option_wm == WM_TWM || wa.map_state == IsViewable)
-        && reclevel != 0 && (g.option_wm != WM_TWM || winname != NULL)
-//            && (g.option_wm != WM_TWM || leader == win)
+    if ((wm == WM_TWM || wa.map_state == IsViewable)
+        && reclevel != 0 && (wm != WM_TWM || winname != NULL)
+//            && (wm != WM_TWM || leader == win)
         && !common_skipWindow(win, DESKTOP_UNKNOWN, DESKTOP_UNKNOWN)
         ) {
         addWindowInfo(win, reclevel, 0, DESKTOP_UNKNOWN, winname);
@@ -167,12 +168,14 @@ static int xSetFocus(int idx)
 
 static int xStartup(void)
 {
+    wm = WM_NO;
     max_reclevel = 1;
     return 1;
 }
 
 static int twmStartup(void)
 {
+    wm = WM_TWM;
     max_reclevel = -1;
     return 1;
 }
