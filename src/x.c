@@ -138,7 +138,7 @@ int x_setFocus(int wndx)
     XRaiseWindow(dpy, w);
 
 // 3. XSetInputFocus
-// "The specified focus window must be viewable at the time 
+// "The specified focus window must be viewable at the time
 // XSetInputFocus is called, or a BadMatch error results."
 // This check is redundant: non-viewable windows isn't added to winlist in raw X anyway
     XWindowAttributes att;

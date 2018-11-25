@@ -49,7 +49,7 @@ static XftFont *fontLabel;
 
 //
 // allocates GC
-// type is: 
+// type is:
 //   0: normal
 //   1: for bg fill
 //   2: for drawing frame
@@ -153,7 +153,7 @@ static void prepareTile(WindowInfo * wi)
         msg(-1, "can't fill tile\n");
     }
     // mini-window content could be drawn here,
-    // but there is no backing store of windows 
+    // but there is no backing store of windows
     // in my simple environments (as reported by xwininfo)
     //
     // place icons
@@ -232,7 +232,7 @@ static void prepareTile(WindowInfo * wi)
 // early initialization
 // called once per execution
 // mostly initializes g.*
-// TODO: counterpair for freeing X resources, 
+// TODO: counterpair for freeing X resources,
 //   even if called once per execution:
 /*
 int p; for (p=0; p<NCOLORS; p++) {
@@ -534,7 +534,7 @@ int uiShow(bool direction)
 
     // positioning and size hints.
     // centering required in JWM.
-    // should really perform centering when 
+    // should really perform centering when
     //  viewport == wm screen. how would we know the latter?
     long sflags;
     sflags =

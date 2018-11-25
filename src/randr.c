@@ -31,10 +31,10 @@ extern Display *dpy;
 extern int scr;
 extern Window root;
 
-// Documentation: 
+// Documentation:
 // https://cgit.freedesktop.org/xorg/proto/randrproto/tree/randrproto.txt
 
-// version requirements: 
+// version requirements:
 // RRGetScreenResourcesCurrent (1.3)
 #define MAJ_REQ 1
 #define MIN_REQ 3
@@ -226,7 +226,7 @@ bool randrGetViewport(quad * res, bool * multihead)
                 largest_cross_area = area;
             }
             /*
-               // disabled feature: 
+               // disabled feature:
                // total area of CRTCs which have cross-section with focused window
                if (oq[o].x < res->x) res->x = oq[o].x;
                int right_diff = (oq[o].x + oq[o].w) - (res->x + res->w);
@@ -247,7 +247,7 @@ bool randrGetViewport(quad * res, bool * multihead)
         free(oq);
         return true;
     }
-    // if best cross-area is shared with some other monitor, 
+    // if best cross-area is shared with some other monitor,
     // then smallest of these monitors is choosen.
     smallest_2_stage_area =
         oq[best_1_stage_output].w * oq[best_1_stage_output].h;

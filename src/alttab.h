@@ -79,7 +79,7 @@ typedef struct {
     unsigned int icon_w, icon_h;
     bool icon_allocated;        // we must free icon, because we created it (placeholder or depth conversion)
     Pixmap tile;                // ready to display. w/h are all equal and defined in gui.c
-// this constant can't be 0, 1, -1, MAXINT, 
+// this constant can't be 0, 1, -1, MAXINT,
 // because WMs set it to these values incoherently
 #define DESKTOP_UNKNOWN 0xdead
     unsigned long desktop;

@@ -415,7 +415,7 @@ static int use_args_and_xrm(int *argc, char **argv)
     }
 
 // max recursion for searching windows
-// -1 is "everything" 
+// -1 is "everything"
 // in raw X this returns too much windows, "1" is probably sufficient
 // no need for an option
     g.option_max_reclevel = (g.option_wm == WM_NO) ? 1 : -1;

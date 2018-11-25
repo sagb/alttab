@@ -249,7 +249,7 @@ int inspectIconFile(FTSENT * pe)
     }
 
     return 1;
-}                               // inspectIconFile 
+}                               // inspectIconFile
 
 //
 // update drawable

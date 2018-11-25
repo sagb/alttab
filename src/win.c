@@ -225,7 +225,7 @@ int addIconFromHints(WindowInfo * wi)
 //
 // search for "wi" application class in PNG hash.
 // if found, then
-//   if program options don't request size comparison 
+//   if program options don't request size comparison
 //   OR png size match better, then
 //     fill in "wi->icon_pixmap" and "wi->icon_mask"
 //     and return 1
@@ -533,7 +533,7 @@ void winPropChangeEvent(XPropertyEvent e)
         struct timeval ctv;
         int usec_delta;
         gettimeofday(&ctv, NULL);
-        usec_delta = (ctv.tv_sec - g.last.tv.tv_sec) * 1E6 
+        usec_delta = (ctv.tv_sec - g.last.tv.tv_sec) * 1E6
           + (ctv.tv_usec - g.last.tv.tv_usec);
         msg(0, "delta %d\n", usec_delta);
         if (usec_delta < 5E5) {  // half a second
@@ -631,7 +631,7 @@ void winFocusChangeEvent(XFocusChangeEvent e)
 {
     Window w;
     // in non-EWMH only
-    // probably should also maintain _NET_ACTIVE_WINDOW 
+    // probably should also maintain _NET_ACTIVE_WINDOW
     // support flag in EwmhFeatures
     if (g.option_wm == WM_EWMH)
         return;

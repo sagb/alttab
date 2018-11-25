@@ -62,7 +62,7 @@ unsigned int getOffendingModifiersMask()
 //
 // for ignoring X errors
 // https://tronche.com/gui/x/xlib/event-handling/protocol-errors/default-handlers.html#XErrorEvent
-// 
+//
 int zeroErrorHandler(Display * dpy_our, XErrorEvent * theEvent)
 {
     ee_ignored = theEvent;
@@ -379,7 +379,7 @@ char *utf8index(char *s, size_t pos)
 }
 
 //
-// Draw utf-8 string str on window/pixmap d, 
+// Draw utf-8 string str on window/pixmap d,
 // using *font and *xrcolor,
 // splitting and cropping it to fit (x1,y1 - x1+width,y1+height) rectangle.
 // Return 1 if ok.
@@ -737,7 +737,7 @@ int ksym_option_to_keycode(XrmDatabase * db, const char *appname,
 // return first modifier corresponding to given keycode,
 // in the form of modmask,
 // or zero if not found
-// 
+//
 unsigned int keycode_to_modmask(KeyCode kc)
 {
     int mi, ksi;
