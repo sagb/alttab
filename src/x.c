@@ -171,3 +171,25 @@ void x_setCommonPropertiesForAnyWindow(Window win)
     if (evmask != 0)
         XSelectInput(dpy, win, evmask);
 }
+
+static int xSetFocus(int idx)
+{
+    int r;
+
+    // for WM which isn't identified as EWMH compatible
+    // but accepts setting focus (dwm)
+    r = ewmh_setFocus(idx, 0);
+    x_setFocus(idx);
+
+    return r;
+}
+
+struct WmOps WmNoOps = {
+    .winlist = x_initWindowsInfoRecursive,
+    .setFocus = xSetFocus,
+};
+
+struct WmOps WmTwmOps = {
+    .winlist = x_initWindowsInfoRecursive,
+    .setFocus = xSetFocus,
+};

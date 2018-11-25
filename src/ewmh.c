@@ -338,3 +338,62 @@ bool ewmh_skipWindowInTaskbar(Window w)
     free(state);
     return ret;
 }
+
+static bool ewmhProbe(void)
+{
+    return ewmh_detectFeatures(&g.ewmh);
+}
+
+static int ewmhStartup(void)
+{
+    long rootevmask = 0;
+
+    // root: watching for _NET_ACTIVE_WINDOW
+    g.naw = XInternAtom(dpy, "_NET_ACTIVE_WINDOW", true);
+    rootevmask |= PropertyChangeMask;
+
+    // warning: this overwrites any previous value.
+    // note: x_setCommonPropertiesForAnyWindow does the similar thing
+    // for any window other than root and uiwin
+    XSelectInput(dpy, root, rootevmask);
+
+    return 1;
+}
+
+static int ewmhWinlist(Window win, int rec)
+{
+    return ewmh_initWinlist();
+}
+
+static int ewmhSetFocus(int winNdx)
+{
+    int r;
+    XWindowAttributes att;
+
+    r = ewmh_setFocus(winNdx, 0);
+    // XSetInputFocus stuff.
+    // skippy-xd does it and notes that "order is important".
+    // fixes #28.
+    // it must be protected by testing IsViewable in the same way
+    // as in x.c, or BadMatch happens after switching desktops.
+    XGetWindowAttributes(dpy, g.winlist[winNdx].id, &att);
+    if (att.map_state == IsViewable)
+        XSetInputFocus(dpy, g.winlist[winNdx].id, RevertToParent,
+                       CurrentTime);
+    return r;
+}
+
+static bool ewmhSkipFocusChangeEvent(void)
+{
+    return true;
+}
+
+struct WmOps WmEwmhOps = {
+    .probe = ewmhProbe,
+    .startup = ewmhStartup,
+    .winlist = ewmhWinlist,
+    .setFocus = ewmhSetFocus,
+    .getActiveWindow = ewmh_getActiveWindow,
+    .skipWindowInTaskbar = ewmh_skipWindowInTaskbar,
+    .skipFocusChangeEvent = ewmhSkipFocusChangeEvent,
+};

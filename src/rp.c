@@ -30,6 +30,8 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 #include "alttab.h"
 #include "util.h"
 extern Globals g;
+extern Display *dpy;
+extern Window root;
 
 // PRIVATE
 
@@ -236,3 +238,47 @@ int rp_setFocus(int winNdx)
 
     return 1;
 }
+
+static bool ratpoisonProbe(void)
+{
+    unsigned long remain, len;
+    Atom nwm_prop, atype;
+    int form;
+    unsigned char *nwm;
+    bool ret = false;
+
+    nwm_prop = XInternAtom(dpy, "_NET_WM_NAME", false);
+    if (!XGetWindowProperty(dpy, root, nwm_prop, 0, MAXNAMESZ, false,
+                           AnyPropertyType, &atype, &form, &len, &remain,
+                            &nwm) == Success && nwm)
+        return false;
+
+    msg(0, "_NET_WM_NAME root property present: %s\n", nwm);
+    if (strstr((char *)nwm, "ratpoison") != NULL)
+        ret = true;
+
+    XFree(nwm);
+    return ret;
+}
+
+static int ratpoisonStartup(void)
+{
+    return rp_startupWintasks();
+}
+
+static int ratpoisonWinlist(Window win, int rec)
+{
+    return rp_initWinlist();
+}
+
+static int ratpoisonSetFocus(int idx)
+{
+    return rp_setFocus(idx);
+}
+
+struct WmOps WmRatpoisonOps = {
+    .probe = ratpoisonProbe,
+    .startup = ratpoisonStartup,
+    .winlist = ratpoisonWinlist,
+    .setFocus = ratpoisonSetFocus,
+};

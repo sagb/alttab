@@ -107,6 +107,21 @@ typedef struct PermanentWindowInfo {
     struct PermanentWindowInfo *next, *prev;
 } PermanentWindowInfo;
 
+struct WmOps {
+    bool (*probe)(void);
+    int (*startup)(void);
+    int (*winlist)(Window win, int reclevel);
+    int (*setFocus)(int idx);
+    Window (*getActiveWindow)(void);
+    bool (*skipWindowInTaskbar)(Window w);
+    bool (*skipFocusChangeEvent)(void);
+};
+
+extern struct WmOps WmNoOps;
+extern struct WmOps WmEwmhOps;
+extern struct WmOps WmRatpoisonOps;
+extern struct WmOps WmTwmOps;
+
 /*
 typedef struct SwitchMoment {
     Window prev;

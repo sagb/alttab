@@ -38,6 +38,62 @@ extern Window root;
 
 // PRIVATE
 
+static struct WmOps *WmOpsVariants[] = {
+    [WM_NO] = &WmNoOps,
+    [WM_EWMH] = &WmEwmhOps,
+    [WM_RATPOISON] = &WmRatpoisonOps,
+    [WM_TWM] = &WmTwmOps,
+};
+
+static struct WmOps *WmOps;
+
+static inline bool wmProbe(int wm)
+{
+    return (WmOpsVariants[wm]->probe != NULL) && (WmOpsVariants[wm]->probe());
+}
+
+static inline int wmStartup(void)
+{
+    if (WmOps->startup == NULL)
+        return 1;
+    return WmOps->startup();
+}
+
+static inline int wmInitWinlist(Window win, int reclevel)
+{
+    if (WmOps->winlist == NULL)
+        return 0;
+    return WmOps->winlist(win, reclevel);
+}
+
+static inline int wmSetFocus(int idx)
+{
+    if (WmOps->setFocus == NULL)
+        return 0;
+    return WmOps->setFocus(idx);
+}
+
+static inline Window wmGetActiveWindow(void)
+{
+    if (WmOps->getActiveWindow == NULL)
+        return 0;
+    return WmOps->getActiveWindow();
+}
+
+static inline bool wmSkipWindowInTaskbar(Window w)
+{
+    if (WmOps->skipWindowInTaskbar == NULL)
+        return false;
+    return WmOps->skipWindowInTaskbar(w);
+}
+
+static inline bool wmSkipFocusChangeEvent(void)
+{
+    if (WmOps->skipFocusChangeEvent == NULL)
+        return false;
+    return WmOps->skipFocusChangeEvent();
+}
+
 //
 // helper for windows' qsort
 // CAUSES O(log(N)) OR EVEN WORSE! reintroduce winlist[]->order instead?
@@ -144,40 +200,28 @@ void addToSortlist(Window w, bool to_head, bool move)
 // wmindex is the already validated option
 void initWin(int wmindex)
 {
-    unsigned long remain, len;
-    Atom nwm_prop, atype;
-    int form;
-    unsigned char *nwm;
-
     if (wmindex != WM_GUESS) {
         g.option_wm = wmindex;
         goto out;
     }
 
-// EWMH?
-    if (ewmh_detectFeatures(&(g.ewmh))) {
+    if (wmProbe(WM_EWMH)) {
         msg(0, "EWMH-compatible WM detected: %s\n", g.ewmh.wmname);
         g.option_wm = WM_EWMH;
         goto out;
     }
-// ratpoison?
-    nwm_prop = XInternAtom(dpy, "_NET_WM_NAME", false);
-    if (XGetWindowProperty(dpy, root, nwm_prop, 0, MAXNAMESZ, false,
-                           AnyPropertyType, &atype, &form, &len, &remain,
-                           &nwm) == Success && nwm) {
-        msg(0, "_NET_WM_NAME root property present: %s\n", nwm);
-        if (strstr((char *)nwm, "ratpoison") != NULL) {
-            g.option_wm = WM_RATPOISON;
-            XFree(nwm);
-            goto out;
-        }
-        XFree(nwm);
+
+    if (wmProbe(WM_RATPOISON)) {
+        g.option_wm = WM_RATPOISON;
+        goto out;
     }
+
     msg(0, "unknown WM, using WM_TWM\n");
     g.option_wm = WM_TWM;
 
 out:
     msg(0, "WM: %d\n", g.option_wm);
+    WmOps = WmOpsVariants[g.option_wm];
 
 // max recursion for searching windows
 // -1 is "everything"
@@ -192,37 +236,13 @@ out:
 //
 int startupWintasks()
 {
-    long rootevmask = 0;
-
     g.sortlist = NULL;          // utlist head must be initialized to NULL
     g.ic = NULL;                // uthash too
     if (g.option_iconSrc != ISRC_RAM) {
         initIconHash(&(g.ic));
     }
-    // root: watching for _NET_ACTIVE_WINDOW
-    if (g.option_wm == WM_EWMH) {
-        g.naw = XInternAtom(dpy, "_NET_ACTIVE_WINDOW", true);
-        rootevmask |= PropertyChangeMask;
-    }
-    // warning: this overwrites any previous value.
-    // note: x_setCommonPropertiesForAnyWindow does the similar thing
-    // for any window other than root and uiwin
-    if (rootevmask != 0) {
-        XSelectInput(dpy, root, rootevmask);
-    }
 
-    switch (g.option_wm) {
-    case WM_NO:
-        return 1;
-    case WM_RATPOISON:
-        return rp_startupWintasks();
-    case WM_EWMH:
-        return 1;
-    case WM_TWM:
-        return 1;
-    default:
-        return 0;
-    }
+    return wmStartup();
 }
 
 //
@@ -555,23 +575,8 @@ int initWinlist(void)
         msg(1, "before initWinlist\n");
         print_sortlist();
     }
-    switch (g.option_wm) {
-    case WM_NO:
-        r = x_initWindowsInfoRecursive(root, 0);    // note: direction/current window index aren't used
-        break;
-    case WM_RATPOISON:
-        r = rp_initWinlist();
-        break;
-    case WM_EWMH:
-        r = ewmh_initWinlist();
-        break;
-    case WM_TWM:
-        r = x_initWindowsInfoRecursive(root, 0);
-        break;
-    default:
-        r = 0;
-        break;
-    }
+
+    r = wmInitWinlist(root, 0);
 
     if (!r)
         __initWinlist();
@@ -618,34 +623,8 @@ void freeWinlist()
 int setFocus(int winNdx)
 {
     int r;
-    switch (g.option_wm) {
-    case WM_NO:
-        r = ewmh_setFocus(winNdx, 0);   // for WM which isn't identified as EWMH compatible but accepts setting focus (dwm)
-        x_setFocus(winNdx);
-        break;
-    case WM_RATPOISON:
-        r = rp_setFocus(winNdx);
-        break;
-    case WM_EWMH:
-        r = ewmh_setFocus(winNdx, 0);
-        // XSetInputFocus stuff.
-        // skippy-xd does it and notes that "order is important".
-        // fixes #28.
-        // it must be protected by testing IsViewable in the same way
-        // as in x.c, or BadMatch happens after switching desktops.
-        XWindowAttributes att;
-        XGetWindowAttributes(dpy, g.winlist[winNdx].id, &att);
-        if (att.map_state == IsViewable)
-            XSetInputFocus(dpy, g.winlist[winNdx].id, RevertToParent,
-                           CurrentTime);
-        break;
-    case WM_TWM:
-        r = ewmh_setFocus(winNdx, 0);
-        x_setFocus(winNdx);
-        break;
-    default:
-        return 0;
-    }
+
+    r = wmSetFocus(winNdx);
     // pull to head
     addToSortlist(g.winlist[winNdx].id, true, true);
     return r;
@@ -672,7 +651,7 @@ void winPropChangeEvent(XPropertyEvent e)
     if (e.atom != g.naw)
         return;
     // don't check for wm==EWMH, because _NET_ACTIVE_WINDOW changed for sure
-    aw = ewmh_getActiveWindow();
+    aw = wmGetActiveWindow();
     // can't get active window
     if (!aw)
         return;
@@ -683,7 +662,7 @@ void winPropChangeEvent(XPropertyEvent e)
     if (g.sortlist != NULL && aw == g.sortlist->id)
         return;
     // is window hidden in WM?
-    if (ewmh_skipWindowInTaskbar(aw))
+    if (wmSkipWindowInTaskbar(aw))
         return;
 /*
     // the i3 sortlist bug is not here, see ewmh.c init_winlist instead
@@ -792,7 +771,7 @@ void winFocusChangeEvent(XFocusChangeEvent e)
     // in non-EWMH only
     // probably should also maintain _NET_ACTIVE_WINDOW
     // support flag in EwmhFeatures
-    if (g.option_wm == WM_EWMH)
+    if (wmSkipFocusChangeEvent())
         return;
     // focusIn only
     if (e.type != FocusIn)
