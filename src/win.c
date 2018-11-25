@@ -155,6 +155,29 @@ static void print_winlist()
     }
 }
 
+//
+// this is where alttab is supposed to set properties or
+// register interest in event for ANY foreign window encountered.
+// warning: this is called only on addition to sortlist.
+//
+static void winSetCommonPropertiesForAnyWindow(Window win)
+{
+    long evmask = 0;
+    // root and our window are treated elsewhere
+    if (win == root || win == getUiwin())
+        return;
+    // for delete notification
+    evmask |= StructureNotifyMask;
+    // for focusIn notification
+    if (g.option_wm != WM_EWMH) {
+        msg(0, "using direct focus tracking for 0x%lx\n", win);
+        evmask |= FocusChangeMask;
+    }
+    // warning: this overwrites previous value
+    if (evmask != 0)
+        XSelectInput(dpy, win, evmask);
+}
+
 // PUBLIC
 
 //
@@ -191,7 +214,7 @@ void addToSortlist(Window w, bool to_head, bool move)
     if (add && !was) {
         // new window
         // register interest in events
-        x_setCommonPropertiesForAnyWindow(w);
+        winSetCommonPropertiesForAnyWindow(w);
     }
 }
 

@@ -233,7 +233,6 @@ void winDestroyEvent(XDestroyWindowEvent e);
 void winFocusChangeEvent(XFocusChangeEvent e);
 bool common_skipWindow(Window w, unsigned long current_desktop,
                        unsigned long window_desktop);
-void x_setCommonPropertiesForAnyWindow(Window win);
 void addToSortlist(Window w, bool to_head, bool move);
 void shutdownWin(void);
 
