@@ -133,6 +133,7 @@ typedef struct {
 #define WM_RATPOISON    2
 #define WM_TWM          3
 #define WM_MAX          3
+#define WM_GUESS        -1
     int option_wm;
 #define DESK_MIN        0
 #define DESK_CURRENT    0
@@ -200,6 +201,7 @@ Window getUiwin();
 void shutdownGUI(void);
 
 // windows
+void initWin(int wmindex);
 int startupWintasks();
 int addIconFromProperty(WindowInfo * wi);
 int addIconFromHints(WindowInfo * wi);

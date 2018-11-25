@@ -140,6 +140,53 @@ void addToSortlist(Window w, bool to_head, bool move)
 }
 
 //
+// initializes g.option_wm
+// wmindex is the already validated option
+void initWin(int wmindex)
+{
+    unsigned long remain, len;
+    Atom nwm_prop, atype;
+    int form;
+    unsigned char *nwm;
+
+    if (wmindex != WM_GUESS) {
+        g.option_wm = wmindex;
+        goto out;
+    }
+
+// EWMH?
+    if (ewmh_detectFeatures(&(g.ewmh))) {
+        msg(0, "EWMH-compatible WM detected: %s\n", g.ewmh.wmname);
+        g.option_wm = WM_EWMH;
+        goto out;
+    }
+// ratpoison?
+    nwm_prop = XInternAtom(dpy, "_NET_WM_NAME", false);
+    if (XGetWindowProperty(dpy, root, nwm_prop, 0, MAXNAMESZ, false,
+                           AnyPropertyType, &atype, &form, &len, &remain,
+                           &nwm) == Success && nwm) {
+        msg(0, "_NET_WM_NAME root property present: %s\n", nwm);
+        if (strstr((char *)nwm, "ratpoison") != NULL) {
+            g.option_wm = WM_RATPOISON;
+            XFree(nwm);
+            goto out;
+        }
+        XFree(nwm);
+    }
+    msg(0, "unknown WM, using WM_TWM\n");
+    g.option_wm = WM_TWM;
+
+out:
+    msg(0, "WM: %d\n", g.option_wm);
+
+// max recursion for searching windows
+// -1 is "everything"
+// in raw X this returns too much windows, "1" is probably sufficient
+// no need for an option
+    g.option_max_reclevel = (g.option_wm == WM_NO) ? 1 : -1;
+}
+
+//
 // early initialization
 // once per execution
 //
