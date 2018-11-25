@@ -47,7 +47,7 @@ extern Window root;
 //
 // update outs, return nout or 0
 //
-int randr_update_outputs(Window w, quad ** outs)
+static int randr_update_outputs(Window w, quad ** outs)
 {
     XRRScreenResources *scr_res;
     XRROutputInfo *out_info;
@@ -93,7 +93,7 @@ int randr_update_outputs(Window w, quad ** outs)
 // or focus point (depending on vp_mode).
 // res and fw must be allocated by caller.
 //
-bool x_get_activity_area(quad * res, Window * fw)
+static bool x_get_activity_area(quad * res, Window * fw)
 {
 #define VPM  g.option_vp_mode
     int rtr;

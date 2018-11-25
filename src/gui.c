@@ -36,16 +36,16 @@ extern Window root;
 
 // PRIVATE
 
-unsigned int tileW, tileH, iconW, iconH;
-unsigned int visualTileW;
-int lastPressedTile;
-quad scrdim;
-Window uiwin;
-int uiwinW, uiwinH, uiwinX, uiwinY;
-Colormap colormap;
-Visual *visual;
+static unsigned int tileW, tileH, iconW, iconH;
+static unsigned int visualTileW;
+static int lastPressedTile;
+static quad scrdim;
+static Window uiwin;
+static int uiwinW, uiwinH, uiwinX, uiwinY;
+static Colormap colormap;
+static Visual *visual;
 //Font fontLabel;  // Xft instead
-XftFont *fontLabel;
+static XftFont *fontLabel;
 
 //
 // allocates GC
@@ -54,7 +54,7 @@ XftFont *fontLabel;
 //   1: for bg fill
 //   2: for drawing frame
 //
-GC create_gc(int type)
+static GC create_gc(int type)
 {
     GC gc;                      /* handle of newly created GC.  */
     unsigned long valuemask = 0;    /* which values in 'values' to  */
@@ -98,7 +98,7 @@ GC create_gc(int type)
 //
 // single use helper for function below
 //
-void drawFr(GC gc, int f)
+static void drawFr(GC gc, int f)
 {
     int d = XDrawRectangle(dpy, uiwin, gc,
                            f * (tileW + FRAME_W) + (FRAME_W / 2),
@@ -112,7 +112,7 @@ void drawFr(GC gc, int f)
 //
 // draw selected and unselected frames around tiles
 //
-void framesRedraw()
+static void framesRedraw()
 {
     int f;
     for (f = 0; f < g.maxNdx; f++) {
@@ -129,7 +129,7 @@ void framesRedraw()
 // given coordinates relative to our window,
 // return the tile number or -1
 //
-int pointedTile(int x, int y)
+static int pointedTile(int x, int y)
 {
     if (x < (FRAME_W / 2)
         || x > (uiwinW - (FRAME_W / 2))
@@ -142,7 +142,7 @@ int pointedTile(int x, int y)
 // combine widgets into wi->tile
 // for uiShow()
 //
-void prepareTile(WindowInfo * wi)
+static void prepareTile(WindowInfo * wi)
 {
     wi->tile = XCreatePixmap(dpy, root, tileW, tileH, XDEPTH);
     if (!wi->tile)

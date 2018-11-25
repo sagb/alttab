@@ -41,7 +41,7 @@ extern Window root;
 // returns ptr to EWMH client list and client_list_size
 // or NULL
 //
-Window *ewmh_get_client_list(unsigned long *client_list_size)
+static Window *ewmh_get_client_list(unsigned long *client_list_size)
 {
     Window *client_list;
 
@@ -67,7 +67,7 @@ Window *ewmh_get_client_list(unsigned long *client_list_size)
     return 0;
 }
 
-int ewmh_send_wm_evt(Window w, char *atom, unsigned long edata[])
+static int ewmh_send_wm_evt(Window w, char *atom, unsigned long edata[])
 {
     XEvent evt;
     long rn_mask = SubstructureRedirectMask | SubstructureNotifyMask;
@@ -88,7 +88,7 @@ int ewmh_send_wm_evt(Window w, char *atom, unsigned long edata[])
     return 1;
 }
 
-int ewmh_switch_desktop(unsigned long desktop)
+static int ewmh_switch_desktop(unsigned long desktop)
 {
     int evr, elapsed;
     unsigned long edata[] = { desktop, CurrentTime, 0, 0, 0 };
@@ -110,7 +110,7 @@ int ewmh_switch_desktop(unsigned long desktop)
     return evr;
 }
 
-int ewmh_switch_window(unsigned long window)
+static int ewmh_switch_window(unsigned long window)
 {
     unsigned long edata[] = { 2, CurrentTime, 0, 0, 0 };
     msg(1, "ewmh switching window to 0x%lx\n", window);

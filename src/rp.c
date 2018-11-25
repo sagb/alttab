@@ -35,14 +35,14 @@ extern Globals g;
 
 #define RP_MAXGROUPS    64
 
-char *ratpoison_cmd;
+static char *ratpoison_cmd;
 
 //
 // process ratpoison window_group, adding its windows 
 // to winlist/sortlist.
 // window_group must be selected in advance.
 //
-int rp_add_windows_in_group(int current_group, int window_group)
+static int rp_add_windows_in_group(int current_group, int window_group)
 {
     char *args[] = { "ratpoison", "-c", "windows %n %i %s %t", NULL };
     char buf[MAXRPOUT];

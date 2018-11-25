@@ -66,7 +66,7 @@ static int sort_by_order(const void *p1, const void *p2)
 //
 // debug output of sortlist
 //
-void print_sortlist()
+static void print_sortlist()
 {
     PermanentWindowInfo *s;
     msg(0, "sortlist:\n");
@@ -78,7 +78,7 @@ void print_sortlist()
 //
 // debug output of winlist
 //
-void print_winlist()
+static void print_winlist()
 {
     int wi, si;
     PermanentWindowInfo *s;
