@@ -226,11 +226,6 @@ int addWindowInfo(Window win, int reclevel, int wm_id, unsigned long desktop,
 int initWinlist(void);
 void freeWinlist();
 int setFocus(int winNdx);
-int rp_startupWintasks();
-int x_initWindowsInfoRecursive(Window win, int reclevel);
-int rp_initWinlist();
-int x_setFocus(int wndx);
-int rp_setFocus(int winNdx);
 int execAndReadStdout(char *exe, char *args[], char *buf, int bufsize);
 int pulloutWindowToTop(int winNdx);
 void winPropChangeEvent(XPropertyEvent e);
@@ -243,13 +238,7 @@ void addToSortlist(Window w, bool to_head, bool move);
 void shutdownWin(void);
 
 /* EWHM */
-bool ewmh_detectFeatures(EwmhFeatures * e);
-Window ewmh_getActiveWindow();
-int ewmh_initWinlist();
 int ewmh_setFocus(int winNdx, Window fwin); // fwin used if non-zero
-unsigned long ewmh_getCurrentDesktop();
-unsigned long ewmh_getDesktopOfWindow(Window w);
-bool ewmh_skipWindowInTaskbar(Window w);
 
 /* RANDR */
 bool randrAvailable();

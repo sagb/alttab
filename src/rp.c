@@ -101,12 +101,10 @@ static int rp_add_windows_in_group(int current_group, int window_group)
     return 1;
 }
 
-// PUBLIC
-
 //
 // early initialization in ratpoison
 //
-int rp_startupWintasks()
+static int rp_startupWintasks()
 {
 
 // search for ratpoison executable for later execv
@@ -160,7 +158,7 @@ int rp_startupWintasks()
 //
 // initialize winlist/update sortlist from ratpoison output
 //
-int rp_initWinlist()
+static int rp_initWinlist()
 {
 #define  fallback    { msg(-1, "using current rp group\n") ; \
     return rp_add_windows_in_group(DESKTOP_UNKNOWN, DESKTOP_UNKNOWN); }
@@ -219,7 +217,7 @@ int rp_initWinlist()
 //
 // focus window in ratpoison
 //
-int rp_setFocus(int winNdx)
+static int rp_setFocus(int winNdx)
 {
     char selarg[64];
     char *args[] = { "ratpoison", "-c", selarg, NULL };
@@ -275,6 +273,8 @@ static int ratpoisonSetFocus(int idx)
 {
     return rp_setFocus(idx);
 }
+
+// PUBLIC
 
 struct WmOps WmRatpoisonOps = {
     .probe = ratpoisonProbe,

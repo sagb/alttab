@@ -57,13 +57,11 @@ Window x_get_leader(Window win)
     return leader;
 }
 
-// PUBLIC
-
 //
 // set winlist,maxNdx recursively using raw Xlib
 // first call should be (win=root, reclevel=0)
 //
-int x_initWindowsInfoRecursive(Window win, int reclevel)
+static int x_initWindowsInfoRecursive(Window win, int reclevel)
 {
 
     Window root, parent;
@@ -126,7 +124,7 @@ int x_initWindowsInfoRecursive(Window win, int reclevel)
 //
 // set window focus in raw X
 //
-int x_setFocus(int wndx)
+static int x_setFocus(int wndx)
 {
     Window w = g.winlist[wndx].id;
 
@@ -149,6 +147,20 @@ int x_setFocus(int wndx)
     return 1;
 }
 
+static int xSetFocus(int idx)
+{
+    int r;
+
+    // for WM which isn't identified as EWMH compatible
+    // but accepts setting focus (dwm)
+    r = ewmh_setFocus(idx, 0);
+    x_setFocus(idx);
+
+    return r;
+}
+
+// PUBLIC
+
 //
 // this is where alttab is supposed to set properties or
 // register interest in event for ANY foreign window encountered.
@@ -170,18 +182,6 @@ void x_setCommonPropertiesForAnyWindow(Window win)
     // warning: this overwrites previous value
     if (evmask != 0)
         XSelectInput(dpy, win, evmask);
-}
-
-static int xSetFocus(int idx)
-{
-    int r;
-
-    // for WM which isn't identified as EWMH compatible
-    // but accepts setting focus (dwm)
-    r = ewmh_setFocus(idx, 0);
-    x_setFocus(idx);
-
-    return r;
 }
 
 struct WmOps WmNoOps = {
