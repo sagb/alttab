@@ -180,16 +180,21 @@ static int twmStartup(void)
     return 1;
 }
 
+static int xWinlist(void)
+{
+    return x_initWindowsInfoRecursive(root, 0);
+}
+
 // PUBLIC
 
 struct WmOps WmNoOps = {
     .startup = xStartup,
-    .winlist = x_initWindowsInfoRecursive,
+    .winlist = xWinlist,
     .setFocus = xSetFocus,
 };
 
 struct WmOps WmTwmOps = {
     .startup = twmStartup,
-    .winlist = x_initWindowsInfoRecursive,
+    .winlist = xWinlist,
     .setFocus = xSetFocus,
 };

@@ -59,11 +59,11 @@ static inline int wmStartup(void)
     return WmOps->startup();
 }
 
-static inline int wmInitWinlist(Window win, int reclevel)
+static inline int wmInitWinlist(void)
 {
     if (WmOps->winlist == NULL)
         return 0;
-    return WmOps->winlist(win, reclevel);
+    return WmOps->winlist();
 }
 
 static inline int wmSetFocus(int idx)
@@ -598,7 +598,7 @@ int initWinlist(void)
         print_sortlist();
     }
 
-    r = wmInitWinlist(root, 0);
+    r = wmInitWinlist();
 
     if (!r)
         __initWinlist();

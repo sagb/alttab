@@ -339,11 +339,6 @@ static int ewmhStartup(void)
     return 1;
 }
 
-static int ewmhWinlist(Window win, int rec)
-{
-    return ewmh_initWinlist();
-}
-
 static int ewmhSetFocus(int winNdx)
 {
     int r;
@@ -400,7 +395,7 @@ int ewmh_setFocus(int winNdx, Window fwin)
 struct WmOps WmEwmhOps = {
     .probe = ewmhProbe,
     .startup = ewmhStartup,
-    .winlist = ewmhWinlist,
+    .winlist = ewmh_initWinlist,
     .setFocus = ewmhSetFocus,
     .getActiveWindow = ewmh_getActiveWindow,
     .skipWindowInTaskbar = ewmh_skipWindowInTaskbar,

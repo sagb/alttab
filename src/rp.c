@@ -264,7 +264,7 @@ static int ratpoisonStartup(void)
     return rp_startupWintasks();
 }
 
-static int ratpoisonWinlist(Window win, int rec)
+static int ratpoisonWinlist(void)
 {
     return rp_initWinlist();
 }

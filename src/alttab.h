@@ -118,7 +118,7 @@ typedef struct PermanentWindowInfo {
 struct WmOps {
     bool (*probe)(void);
     int (*startup)(void);
-    int (*winlist)(Window win, int reclevel);
+    int (*winlist)(void);
     int (*setFocus)(int idx);
     Window (*getActiveWindow)(void);
     bool (*skipWindowInTaskbar)(Window w);
