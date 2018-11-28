@@ -386,12 +386,12 @@ int addWindowInfo(Window win, int reclevel, int wm_id, unsigned long desktop,
 }                               // addWindowInfo()
 
 //
-// sets g.winlist, g.maxNdx, g.selNdx
+// sets g.winlist, g.maxNdx
 // updates g.sortlist, g.sortNdx
 // n.b.: in heavy WM, use _NET_CLIENT_LIST
 // direction is direction of first press: with shift or without
 //
-int initWinlist(bool direction)
+int initWinlist(void)
 {
     int r;
     if (g.debug > 1) {
@@ -428,11 +428,7 @@ int initWinlist(bool direction)
         print_winlist();
     }
 
-    g.selNdx = direction ? (g.maxNdx - 1) : ((0 >= (g.maxNdx - 1)) ? 0 : 1);
-//if (g.selNdx<0 || g.selNdx>=g.maxNdx) { g.selNdx=0; } // just for case
-    msg(1,
-        "initWinlist ret: number of items in winlist: %d, current (selected) item in winlist: %d\n",
-        g.maxNdx, g.selNdx);
+    msg(1, "initWinlist ret: number of items in winlist: %d\n", g.maxNdx);
 
     return r;
 }
