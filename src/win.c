@@ -385,6 +385,14 @@ int addWindowInfo(Window win, int reclevel, int wm_id, unsigned long desktop,
     return 1;
 }                               // addWindowInfo()
 
+static void __initWinlist(void)
+{
+    free(g.winlist);
+    g.winlist = NULL;
+    g.maxNdx = 0;
+}
+
+
 //
 // sets g.winlist, g.maxNdx
 // updates g.sortlist, g.sortNdx
@@ -415,6 +423,9 @@ int initWinlist(void)
         r = 0;
         break;
     }
+
+    if (!r)
+        __initWinlist();
 
 // sort winlist according to .order
     if (g.debug > 1) {
@@ -449,7 +460,7 @@ void freeWinlist()
         if (g.winlist[y].icon_allocated)
             XFreePixmap(dpy, g.winlist[y].icon_drawable);
     }
-    free(g.winlist);
+    __initWinlist();
 }
 
 //

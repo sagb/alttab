@@ -368,12 +368,8 @@ int uiShow(bool direction)
 // GC,
 // g.vp (for SCR_CURRENT)
 
-    g.winlist = NULL;
-    g.maxNdx = 0;
     if (!initWinlist()) {
         msg(0, "initWinlist failed, skipping ui initialization\n");
-        g.winlist = NULL;
-        g.maxNdx = 0;
         return 0;
     }
 
