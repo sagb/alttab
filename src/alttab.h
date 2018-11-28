@@ -118,7 +118,6 @@ typedef struct {
     bool uiShowHasRun;          // means: 1. window is ready to Expose, 2. need to call uiHide to free X stuff
     WindowInfo *winlist;
     int maxNdx;                 // number of items in list above
-    int selNdx;                 // current (selected) item
     /* auxiliary list for sorting
      * head = recently focused
      * display-wide, for all groups/desktops
@@ -202,7 +201,7 @@ int addIconFromHints(WindowInfo * wi);
 int addIconFromFiles(WindowInfo * wi);
 int addWindowInfo(Window win, int reclevel, int wm_id, unsigned long desktop,
                   char *wm_name);
-int initWinlist(bool direction);
+int initWinlist(void);
 void freeWinlist();
 int setFocus(int winNdx);
 int rp_startupWintasks();

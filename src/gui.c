@@ -46,6 +46,7 @@ Colormap colormap;
 Visual *visual;
 //Font fontLabel;  // Xft instead
 XftFont *fontLabel;
+static int selNdx;                 // current (selected) item
 
 //
 // allocates GC
@@ -116,13 +117,13 @@ void framesRedraw()
 {
     int f;
     for (f = 0; f < g.maxNdx; f++) {
-        if (f == g.selNdx)
+        if (f == selNdx)
             continue;           // skip
         drawFr(g.gcReverse, f); // thick bg
         drawFr(g.gcDirect, f);  // thin frame
     }
 // _after_ unselected draw selected, because they may overlap
-    drawFr(g.gcFrame, g.selNdx);
+    drawFr(g.gcFrame, selNdx);
 }
 
 //
@@ -379,12 +380,13 @@ int uiShow(bool direction)
 
     g.winlist = NULL;
     g.maxNdx = 0;
-    if (!initWinlist(direction)) {
+    if (!initWinlist()) {
         msg(0, "initWinlist failed, skipping ui initialization\n");
         g.winlist = NULL;
         g.maxNdx = 0;
         return 0;
     }
+
     if (!g.winlist) {
         msg(0, "winlist doesn't exist, skipping ui initialization\n");
         return 0;
@@ -393,6 +395,11 @@ int uiShow(bool direction)
         msg(0, "number of windows < 1, skipping ui initialization\n");
         return 0;
     }
+
+    selNdx = direction ? (g.maxNdx - 1) : ((0 >= (g.maxNdx - 1)) ? 0 : 1);
+//if (selNdx<0 || selNdx>=g.maxNdx) { selNdx=0; } // just for case
+    msg(1, "Current (selected) item in winlist: %d\n", selNdx);
+
     if (g.debug > 0) {
         msg(0, "got %d windows\n", g.maxNdx);
         int i;
@@ -623,15 +630,15 @@ int uiHide()
         uiwin = 0;
     }
     if (g.winlist) {
-        msg(0, "changing focus to 0x%lx\n", g.winlist[g.selNdx].id);
+        msg(0, "changing focus to 0x%lx\n", g.winlist[selNdx].id);
         /*
            // save the switch moment for detecting
            // subsequent false focus event from WM
            gettimeofday(&(g.last.tv), NULL);
            g.last.prev = g.winlist[g.startNdx].id;
-           g.last.to = g.winlist[g.selNdx].id;
+           g.last.to = g.winlist[selNdx].id;
          */
-        setFocus(g.selNdx);     // before winlist destruction!
+        setFocus(selNdx);     // before winlist destruction!
     }
     msg(0, "destroying tiles\n");
     int y;
@@ -655,10 +662,10 @@ int uiNextWindow()
 {
     if (!uiwin)
         return 0;               // kb events may trigger it even when no window drawn yet
-    g.selNdx++;
-    if (g.selNdx >= g.maxNdx)
-        g.selNdx = 0;
-    msg(0, "item %d\n", g.selNdx);
+    selNdx++;
+    if (selNdx >= g.maxNdx)
+        selNdx = 0;
+    msg(0, "item %d\n", selNdx);
     framesRedraw();
     return 1;
 }
@@ -670,10 +677,10 @@ int uiPrevWindow()
 {
     if (!uiwin)
         return 0;               // kb events may trigger it even when no window drawn yet
-    g.selNdx--;
-    if (g.selNdx < 0)
-        g.selNdx = g.maxNdx - 1;
-    msg(0, "item %d\n", g.selNdx);
+    selNdx--;
+    if (selNdx < 0)
+        selNdx = g.maxNdx - 1;
+    msg(0, "item %d\n", selNdx);
     framesRedraw();
     return 1;
 }
@@ -688,8 +695,8 @@ int uiSelectWindow(int ndx)
     if (ndx < 0 || ndx >= g.maxNdx) {
         return 0;
     }
-    g.selNdx = ndx;
-    msg(0, "item %d\n", g.selNdx);
+    selNdx = ndx;
+    msg(0, "item %d\n", selNdx);
     framesRedraw();
     return 1;
 }
