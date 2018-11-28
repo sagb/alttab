@@ -382,6 +382,14 @@ int addWindowInfo(Window win, int reclevel, int wm_id, unsigned long desktop,
     return 1;
 }                               // addWindowInfo()
 
+static void __initWinlist(void)
+{
+    free(g.winlist);
+    g.winlist = NULL;
+    g.maxNdx = 0;
+}
+
+
 //
 // sets g.winlist, g.maxNdx
 // updates g.sortlist, g.sortNdx
@@ -395,6 +403,9 @@ int initWinlist(void)
         msg(1, "before initWinlist\n");
         print_sortlist();
     }
+
+    __initWinlist();
+
     switch (g.option_wm) {
     case WM_NO:
         r = x_initWindowsInfoRecursive(root, 0);    // note: direction/current window index aren't used
@@ -412,6 +423,9 @@ int initWinlist(void)
         r = 0;
         break;
     }
+
+    if (!r)
+        __initWinlist();
 
 // sort winlist according to .order
     if (g.debug > 1) {
