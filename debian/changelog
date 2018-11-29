@@ -1,10 +1,14 @@
-alttab (1.3.0.20180704.3.g2ecf5f5-1~1.gbpf72ad0) testing; urgency=medium
+alttab (1.3.0.20181102.6.ge0135ce-1~1.gbpd83476) unstable; urgency=medium
 
-  ** SNAPSHOT build @f72ad035114e3fd65fb52123bdef379ccc2926e7 **
+  ** SNAPSHOT build @d834761bdfd3100b891467fd14e35c72059a1b15 **
 
-  * backport to buster
+  [ Yauheni Kaliuta ]
+  * Automatic indent
 
- -- Alexander Kulak <sa-dev@rainbow.by>  Wed, 04 Jul 2018 14:43:49 +0300
+  [ Alexander Kulak ]
+  * precise bounds for string functions
+
+ -- Alexander Kulak <sa-dev@rainbow.by>  Thu, 29 Nov 2018 23:52:51 +0300
 
 alttab (1.3.0.20180704.3.g2ecf5f5-1~1.gbp16ff53) unstable; urgency=medium
 
