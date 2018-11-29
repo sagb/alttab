@@ -1,5 +1,8 @@
 <!-- This file is solely for github front page.
      For distribution, use doc/README instead. -->
+**Note:** alttab is considered stable, please don't submit new features
+or enhancements. Bug fixes are welcome.
+
 ![Default options, raw X11](doc/screenshots/alttab-default-rawx.png?raw=true)
 
 ![Low DPI](doc/screenshots/alttab-high.png?raw=true)
