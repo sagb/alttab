@@ -39,6 +39,7 @@ int scr;
 Window root;
 
 // PRIVATE
+static XrmDatabase db;
 
 //
 // help and exit
@@ -80,7 +81,6 @@ static int use_args_and_xrm(int *argc, char **argv)
 {
 // set debug level early
     g.debug = 0;
-    XrmDatabase db;
     char *errmsg;
     int ksi;
     KeyCode BC;
@@ -559,6 +559,9 @@ int main(int argc, char **argv)
     }
 
 // this is probably never reached
+    shutdownWin();
+    shutdownGUI();
+    XrmDestroyDatabase(db);
     grabAllKeys(false);
 // not restoring error handler
     XCloseDisplay(dpy);

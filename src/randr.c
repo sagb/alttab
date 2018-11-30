@@ -63,14 +63,16 @@ static int randr_update_outputs(Window w, quad ** outs)
     for (out = 0; out < scr_res->noutput; out++) {
         out_info = XRRGetOutputInfo(dpy, scr_res, scr_res->outputs[out]);
         if (out_info == NULL
-            || out_info->connection != RR_Connected || out_info->crtc == 0)
+            || out_info->connection != RR_Connected || out_info->crtc == 0) {
+            XRRFreeOutputInfo(out_info); // does it neen NULL check?
             continue;
+        }
         crtc_info = XRRGetCrtcInfo(dpy, scr_res, out_info->crtc);
         if (crtc_info == NULL)
             continue;
         (*outs) = realloc((*outs), (nout + 1) * sizeof(quad));
         if ((*outs) == NULL)
-            return 0;
+            return 0; // would be nice to free Infos
         (*outs)[nout].x = crtc_info->x;
         (*outs)[nout].y = crtc_info->y;
         (*outs)[nout].w = crtc_info->width;
@@ -84,7 +86,7 @@ static int randr_update_outputs(Window w, quad ** outs)
         XRRFreeOutputInfo(out_info);
         nout++;
     }
-    //XRRFreeScreenResources(scr_res);  // don't do this for XRRGetScreenResourcesCurrent?
+    XRRFreeScreenResources(scr_res);
     return nout;
 }
 

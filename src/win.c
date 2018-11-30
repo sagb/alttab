@@ -150,7 +150,6 @@ int startupWintasks()
     g.sortlist = NULL;          // utlist head must be initialized to NULL
     g.ic = NULL;                // uthash too
     if (g.option_iconSrc != ISRC_RAM) {
-        g.ic = initIcon();
         initIconHash(&(g.ic));
     }
     // root: watching for _NET_ACTIVE_WINDOW
@@ -237,6 +236,7 @@ int addIconFromFiles(WindowInfo * wi)
     char *appclass, *tryclass;
     long unsigned int class_size;
     icon_t *ic;
+    int ret = 0;
 
     appclass = get_x_property(wi->id, XA_STRING, "WM_CLASS", &class_size);
     if (appclass) {
@@ -258,13 +258,16 @@ int addIconFromFiles(WindowInfo * wi)
                 }
                 wi->icon_drawable = ic->drawable;
                 wi->icon_mask = 0;
-                return 1;
+                ret = 1;
+                goto out;
             }
         }
     } else {
         msg(0, "can't find WM_CLASS for \"%s\"\n", wi->name);
     }
-    return 0;
+out:
+    free(appclass);
+    return ret;
 }
 
 //
@@ -651,4 +654,9 @@ void winFocusChangeEvent(XFocusChangeEvent e)
 
     msg(1, "event focusIn 0x%lx, pull to the head of sortlist\n", w);
     addToSortlist(w, true, true);
+}
+
+void shutdownWin()
+{
+    deleteIconHash(&g.ic);
 }

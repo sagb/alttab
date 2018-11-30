@@ -19,6 +19,7 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <unistd.h>
+#include <X11/Xutil.h>
 #include "pngd.h"
 
 extern Display *dpy;
@@ -62,6 +63,12 @@ int pngInit(FILE * infile, TImage * img)
     img->info_ptr = info_ptr;
 
     return 1;
+}
+
+static void pngFree(TImage *img)
+{
+    png_destroy_read_struct(&img->png_ptr, &img->info_ptr, NULL);
+    free(img->data);
 }
 
 //
@@ -229,6 +236,7 @@ int pngReadToDrawable(char *pngpath, Drawable d, uint8_t bg_red,
     int pad;
     XImage *ximage;
     int depth;
+    int ret;
 
     img.data = NULL;
     img.png_ptr = NULL;
@@ -273,7 +281,10 @@ int pngReadToDrawable(char *pngpath, Drawable d, uint8_t bg_red,
     }
     ximage->byte_order = MSBFirst;
 
-    return pngDraw(&img, d, ximage, visual, bg_red, bg_green, bg_blue);
+    ret = pngDraw(&img, d, ximage, visual, bg_red, bg_green, bg_blue);
+    pngFree(&img);
+    XDestroyImage(ximage);
+    return ret;
 }
 
 //

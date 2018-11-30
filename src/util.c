@@ -743,14 +743,19 @@ unsigned int keycode_to_modmask(KeyCode kc)
     int mi, ksi;
     KeyCode tkc;
     XModifierKeymap *xmk = XGetModifierMapping(dpy);
+    unsigned int ret = 0;
 
     for (mi = 0; mi < 8; mi++) {
         for (ksi = 0; ksi < xmk->max_keypermod; ksi++) {
             tkc = (xmk->modifiermap)[xmk->max_keypermod * mi + ksi];
             if (tkc == kc) {
-                return (1 << mi);
+                ret = (1 << mi);
+                goto out;
             }
         }
     }
-    return 0;
+
+out:
+    XFreeModifiermap(xmk);
+    return ret;
 }

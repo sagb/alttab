@@ -232,17 +232,7 @@ static void prepareTile(WindowInfo * wi)
 // early initialization
 // called once per execution
 // mostly initializes g.*
-// TODO: counterpair for freeing X resources,
-//   even if called once per execution:
-/*
-int p; for (p=0; p<NCOLORS; p++) {
-        XftColorFree (dpy,DefaultVisual(dpy,0),DefaultColormap(dpy,0),g.color[p].xftcolor);
-            // XFreeColors ?
-}
-if (g.gcDirect) XFreeGC (dpy, g.gcDirect);
-if (g.gcReverse) XFreeGC (dpy, g.gcReverse);
-if (g.gcFrame) XFreeGC (dpy, g.gcFrame);
-*/
+
 int startupGUItasks()
 {
 // if viewport is not fixed, then initialize vp* at every show
@@ -728,4 +718,26 @@ void uiButtonEvent(XButtonEvent e)
 Window getUiwin()
 {
     return uiwin;
+}
+
+void shutdownGUI(void)
+{
+    int p;
+
+    for (p=0; p<NCOLORS; p++) {
+        XftColorFree(dpy,
+                     DefaultVisual(dpy,0),
+                     DefaultColormap(dpy,0),
+                     &g.color[p].xftcolor);
+            // XFreeColors ?
+    }
+
+    //XftFontClose(dpy, fontLabel); // actually, not needed
+
+    if (g.gcDirect)
+        XFreeGC(dpy, g.gcDirect);
+    if (g.gcReverse)
+        XFreeGC(dpy, g.gcReverse);
+    if (g.gcFrame)
+        XFreeGC (dpy, g.gcFrame);
 }
