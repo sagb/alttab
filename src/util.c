@@ -607,6 +607,21 @@ char *get_x_property(Window win, Atom prop_type, char *prop_name,
     return r;
 }
 
+char *get_x_property_alt(Window win,
+			 Atom prop_type1, char *prop_name1,
+			 Atom prop_type2, char *prop_name2,
+			 unsigned long *prop_size)
+{
+    char *p;
+
+    p = get_x_property(win, prop_type1, prop_name1, prop_size);
+    if (p != NULL)
+        return p;
+
+    p = get_x_property(win, prop_type2, prop_name2, prop_size);
+    return p;
+}
+
 //
 // do rectangles cross?
 //

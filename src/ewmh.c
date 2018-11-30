@@ -56,15 +56,14 @@ static Window *ewmh_get_client_list(unsigned long *client_list_size)
             g.ewmh.try_stacking_list_first = false;
         }
     }
-    if ((client_list =
-         (Window *) get_x_property(root, XA_WINDOW, "_NET_CLIENT_LIST",
-                                   client_list_size)) != NULL)
-        return client_list;
-    if ((client_list =
-         (Window *) get_x_property(root, XA_CARDINAL, "_WIN_CLIENT_LIST",
-                                   client_list_size)) != NULL)
-        return client_list;
-    return 0;
+
+    client_list =
+        (Window *) get_x_property_alt(root,
+                                      XA_WINDOW, "_NET_CLIENT_LIST",
+                                      XA_CARDINAL, "_WIN_CLIENT_LIST",
+                                      client_list_size);
+
+    return client_list;
 }
 
 static int ewmh_send_wm_evt(Window w, char *atom, unsigned long edata[])
@@ -151,26 +150,21 @@ bool ewmh_detectFeatures(EwmhFeatures * e)
     free(client_list);
 
     // then, guess/devise WM name
-    chld_win = (Window *) NULL;
-    if (!
-        (chld_win =
-         (Window *) get_x_property(root, XA_WINDOW, "_NET_SUPPORTING_WM_CHECK",
-                                   NULL))) {
-        if (!
-            (chld_win =
-             (Window *) get_x_property(root, XA_CARDINAL,
-                                       "_WIN_SUPPORTING_WM_CHECK", NULL))) {
-            e->wmname = default_wm_name;
-            return true;
-        }
+    chld_win = (Window *)get_x_property_alt(root,
+                                            XA_WINDOW, "_NET_SUPPORTING_WM_CHECK",
+                                            XA_CARDINAL, "_WIN_SUPPORTING_WM_CHECK",
+                                            NULL);
+    if (!chld_win) {
+        e->wmname = default_wm_name;
+        return true;
     }
-    r = (char *)NULL;
+
     utf8string = XInternAtom(dpy, "UTF8_STRING", False);
-    if (!(r = get_x_property(*chld_win, utf8string, "_NET_WM_NAME", NULL))) {
-        (r = get_x_property(*chld_win, XA_STRING, "_NET_WM_NAME", NULL));
-    }
-    if (chld_win != NULL)
-        free(chld_win);
+
+    r = get_x_property_alt(*chld_win,
+                       utf8string, "_NET_WM_NAME",
+                       XA_STRING, "_NET_WM_NAME", NULL);
+    free(chld_win);
 
     e->wmname = (r != NULL) ? r : default_wm_name;
 
@@ -282,25 +276,28 @@ int ewmh_setFocus(int winNdx, Window fwin)
     return 1;
 }
 
+static unsigned long ewmh_getDesktopFromProp(Window w, char *prop1, char *prop2)
+{
+    unsigned long *d;
+    unsigned long propsize;
+    unsigned long ret = DESKTOP_UNKNOWN;
+
+    d = (unsigned long *)get_x_property_alt(w,
+                                            XA_CARDINAL, prop1,
+                                            XA_CARDINAL, prop2, &propsize);
+    if (d && (propsize > 0))
+        ret = *d;
+
+    free(d);
+    return ret;
+}
+
 //
 // get current desktop in EWMH WM
 //
 unsigned long ewmh_getCurrentDesktop()
 {
-    unsigned long *cd;
-    unsigned long propsize;
-    unsigned long ret = DESKTOP_UNKNOWN;
-
-    cd = (unsigned long *)get_x_property(root, XA_CARDINAL,
-                                         "_NET_CURRENT_DESKTOP", &propsize);
-    if (!cd)
-        cd = (unsigned long *)get_x_property(root, XA_CARDINAL,
-                                             "_WIN_WORKSPACE", &propsize);
-    if (cd && (propsize > 0))
-        ret = *cd;
-
-    free(cd);
-    return ret;
+    return ewmh_getDesktopFromProp(root, "_NET_CURRENT_DESKTOP", "_WIN_WORKSPACE");
 }
 
 //
@@ -308,20 +305,7 @@ unsigned long ewmh_getCurrentDesktop()
 //
 unsigned long ewmh_getDesktopOfWindow(Window w)
 {
-    unsigned long *d;
-    unsigned long propsize;
-    unsigned long ret = DESKTOP_UNKNOWN;
-
-    d = (unsigned long *)get_x_property(w, XA_CARDINAL,
-                                        "_NET_WM_DESKTOP", &propsize);
-    if (!d)
-        d = (unsigned long *)get_x_property(w, XA_CARDINAL,
-                                            "_WIN_WORKSPACE", &propsize);
-    if (d && (propsize > 0))
-        ret = *d;
-
-    free(d);
-    return ret;
+    return ewmh_getDesktopFromProp(w, "_NET_WM_DESKTOP", "_WIN_WORKSPACE");
 }
 
 //
