@@ -1,7 +1,7 @@
 /*
 Global includes.
 
-Copyright 2017-2018 Alexander Kulak.
+Copyright 2017-2019 Alexander Kulak.
 This file is part of alttab program.
 
 alttab is free software: you can redistribute it and/or modify
@@ -198,6 +198,7 @@ Window getUiwin();
 
 // windows
 int startupWintasks();
+int addIconFromProperty(WindowInfo * wi);
 int addIconFromHints(WindowInfo * wi);
 int addIconFromFiles(WindowInfo * wi);
 int addWindowInfo(Window win, int reclevel, int wm_id, unsigned long desktop,

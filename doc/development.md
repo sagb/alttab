@@ -1,10 +1,15 @@
 
-repository, bug reporting
+Stability
+---------
+
+Alttab is considered stable.
+
+Repository, bug reporting
 -------------------------
 
 [On github](https://github.com/sagb/alttab).
 
-maintainer script
+Maintainer script
 -----------------
 
 To rebuild autotools stuff use bootstrap.sh.
@@ -14,7 +19,7 @@ as ronn(1) (markdown-like) file.
 This is not included in makefiles to not require casual user 
 to install ronn.
 
-coding
+Coding
 ------
 
 Functions return 0 on failure, positive on success.  

@@ -1,7 +1,7 @@
 /*
 Interface with foreign windows common for all WMs.
 
-Copyright 2017-2018 Alexander Kulak.
+Copyright 2017-2019 Alexander Kulak.
 This file is part of alttab program.
 
 alttab is free software: you can redistribute it and/or modify
@@ -180,6 +180,96 @@ int startupWintasks()
 }
 
 //
+// search for suitable icon in NET_WM_ICON window property
+// https://specifications.freedesktop.org/wm-spec/latest/ar01s05.html#_NET_WM_ICON
+// if found, then
+//   fill in "wi->icon_pixmap" and "wi->icon_mask"
+//   and return 1,
+// 0 otherwise.
+//
+#define best_w  pro[best-2]
+#define best_h  pro[best-1]
+//
+int addIconFromProperty(WindowInfo * wi)
+{
+    long *pro;
+    long unsigned n, nelem, best;
+    unsigned int w, h;
+    const char *NWI = "_NET_WM_ICON";
+    uint32_t *image32;
+    uint32_t fg;
+    uint8_t alpha;
+    int x, y;
+    int bitmap_pad;
+    int bytes_per_line;
+    XImage *img;
+    GC gc;
+
+    if ((pro = (long *) get_x_property(wi->id, XA_CARDINAL,
+                    (char*)NWI, &nelem)) == NULL) {
+        msg(1, "Can't find %s (%lx, %s)\n", NWI, wi->id, wi->name);
+        return 0;
+    }
+    nelem = nelem / sizeof(long);
+    msg (1, "Found %lu elements in %s (%lx, %s)\n", nelem, NWI, wi->id, wi->name);
+    best = 0;
+    n = 0;
+    while (n + 2 < nelem) {
+        w = pro[n++];
+        h = pro[n++];
+        if (n + w*h > nelem || w == 0 || h == 0) {
+            msg(1, "Skipping invalid %s icon: element=%lu/%lu w*h=%lux%lu\n", NWI, n, nelem, w, h);
+            n += w*h;
+            continue;
+        }
+        msg(1, "Trying icon at position %lu (%dx%d)\n", n, w, h);
+        if (best == 0 || iconMatchBetter(w, h, best_w, best_h)) {
+            msg(1, "Icon is better\n");
+            best = n;
+        }
+        n += w*h;
+    }
+    if (best == 0) {
+        msg(0, "%s found but no suitable icons in it\n", NWI);
+        //free(prop); better don't
+        return 0;
+    }
+
+    image32 = malloc(best_w * best_h * 4);
+    CompositeConst cc = initCompositeConst(g.color[COLBG].xcolor.pixel);
+    for (y = 0; y < best_h; y++) {
+        for (x = 0; x < best_w; x++) {
+            int ndx = y*best_w + x;
+            // pro is ARGB by definition
+            fg = pro[best + ndx] & 0x00ffffff;
+            alpha = pro[best + ndx] >> 24;
+            image32[ndx] = pixelComposite(fg, alpha, &cc);
+        }
+    }
+    // result: image32
+
+    bitmap_pad = (XDEPTH == 15 || XDEPTH == 16) ? 16 : 32;
+    bytes_per_line = 0;
+    img = XCreateImage(dpy, CopyFromParent, XDEPTH, ZPixmap, 0, (char*)image32, best_w, best_h, bitmap_pad, bytes_per_line);
+    if (!img) {
+        msg(0, "Can't XCreateImage, abort %s search\n", NWI);
+        free(image32);
+        free(pro);
+        return 0;
+    }
+    wi->icon_drawable = XCreatePixmap(dpy, root, best_w, best_h, XDEPTH);
+    gc = DefaultGC(dpy, scr);
+    XPutImage(dpy, wi->icon_drawable, gc, img, 0, 0, 0, 0, best_w, best_h);
+    wi->icon_mask = 0;
+    wi->icon_allocated = true;
+    wi->icon_w = best_w;
+    wi->icon_h = best_h;
+    free(image32);
+    free(pro);
+    return 1;
+}
+
+//
 // search for icon in WM hints of "wi".
 // if found, then
 //   fill in "wi->icon_pixmap" and "wi->icon_mask"
@@ -315,12 +405,15 @@ int addWindowInfo(Window win, int reclevel, int wm_id, unsigned long desktop,
     unsigned int icon_depth = 0;
     g.winlist[g.maxNdx].icon_allocated = false;
 
-    // search for icon in hints or file hash
-    int icon_in_hints = 0;
+    // search for icon in window properties, hints or file hash
     int opt = g.option_iconSrc;
-    if (opt != ISRC_FILES)
-        icon_in_hints = addIconFromHints(&(g.winlist[g.maxNdx]));
-    if ((opt == ISRC_FALLBACK && !icon_in_hints) ||
+    int icon_in_x = 0;
+    if (opt != ISRC_FILES) {
+        icon_in_x = addIconFromProperty(&(g.winlist[g.maxNdx]));
+        if (!icon_in_x)
+            icon_in_x = addIconFromHints(&(g.winlist[g.maxNdx]));
+    }
+    if ((opt == ISRC_FALLBACK && !icon_in_x) ||
         opt == ISRC_SIZE || opt == ISRC_FILES)
         addIconFromFiles(&(g.winlist[g.maxNdx]));
 
@@ -344,8 +437,8 @@ int addWindowInfo(Window win, int reclevel, int wm_id, unsigned long desktop,
 // convert icon with different depth (currently 1 only) into default depth
     if (g.winlist[g.maxNdx].icon_drawable && icon_depth == 1) {
         msg(0,
-            "rebuilding icon from depth 1 to %d (%s)\n",
-            XDEPTH, g.winlist[g.maxNdx].name);
+            "rebuilding icon from depth %d to %d (%s)\n",
+            icon_depth, XDEPTH, g.winlist[g.maxNdx].name);
         Pixmap pswap = XCreatePixmap(dpy, g.winlist[g.maxNdx].icon_drawable,
                                      g.winlist[g.maxNdx].icon_w,
                                      g.winlist[g.maxNdx].icon_h, XDEPTH);

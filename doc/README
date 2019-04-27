@@ -29,10 +29,11 @@ If there are no WM at all, then start alttab in ~/.xsession or elsewhere.
 Source
 ------
 
-Copyright 2017-2018 Alexander Kulak <sa-dev AT rainbow POINT by>.
+Copyright 2017-2019 Alexander Kulak <sa-dev AT odd POINT systems>.
 License: GPLv3 (see COPYING).
 Repository: https://github.com/sagb/alttab
 Chat: #alttab on Freenode
 
 
- -- Alexander Kulak <sa-dev@rainbow.by>  Fri, 28 Apr 2017 13:19:28 +0300
+
+ -- Alexander Kulak <sa-dev AT odd.systems>  Fri, 28 Apr 2017 13:19:28 +0300
