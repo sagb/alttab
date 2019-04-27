@@ -1,10 +1,11 @@
-alttab (1.3.0.20181102.6.ge0135ce-1~1.gbpdcd4a7) testing; urgency=medium
+alttab (1.3.0.20190428.12.g109ada4-1~1.gbp1fbaf9) unstable; urgency=medium
 
-  ** SNAPSHOT build @dcd4a739cd6f20caaf9c7a68159da4c80cb48d6c **
+  ** SNAPSHOT build @1fbaf9fa0fca309565e868024130e75313a267e6 **
 
-  * backport to buster
+  * use _NET_WN_ICON
+  * update email, autotools and copyright years
 
- -- Alexander Kulak <sa-dev@rainbow.by>  Thu, 29 Nov 2018 23:55:29 +0300
+ -- Alexander Kulak <sa-dev@odd.systems>  Sun, 28 Apr 2019 01:44:21 +0300
 
 alttab (1.3.0.20181102.6.ge0135ce-1~1.gbpd83476) unstable; urgency=medium
 
