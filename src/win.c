@@ -436,7 +436,7 @@ int addWindowInfo(Window win, int reclevel, int wm_id, unsigned long desktop,
     }
 // convert icon with different depth (currently 1 only) into default depth
     if (g.winlist[g.maxNdx].icon_drawable && icon_depth == 1) {
-        msg(-1,
+        msg(0,
             "rebuilding icon from depth %d to %d (%s)\n",
             icon_depth, XDEPTH, g.winlist[g.maxNdx].name);
         Pixmap pswap = XCreatePixmap(dpy, g.winlist[g.maxNdx].icon_drawable,
