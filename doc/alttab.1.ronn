@@ -266,7 +266,7 @@ Run alttab after WM, or autodetection will fail.
 
 ##AUTHOR
 
-Copyright 2017-2018 Alexander Kulak `<sa-dev AT rainbow POINT by>`.
+Copyright 2017-2018 Alexander Kulak `<sa-dev AT odd POINT systems>`.
 
 ##REPORTING BUGS
 
