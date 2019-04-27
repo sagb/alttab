@@ -2,9 +2,7 @@
 Stability
 ---------
 
-Alttab is considered stable, please don't submit new features or enhancements.  
-Bug fixes are welcome.
-
+Alttab is considered stable.
 
 Repository, bug reporting
 -------------------------
