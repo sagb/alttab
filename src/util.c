@@ -548,6 +548,7 @@ Bool predproc_true(Display * display, XEvent * event, char *arg)
 
 //
 // obtain X Window property
+// prop_size is returned in bytes
 //
 char *get_x_property(Window win, Atom prop_type, char *prop_name,
                      unsigned long *prop_size)
@@ -558,14 +559,16 @@ char *get_x_property(Window win, Atom prop_type, char *prop_name,
     unsigned char *ret_prop;
     char *r;
     Atom prop_name_x, prop_ret_type_x;
+    int max_prop_len;
 
     int debug = 0;
 
     prop_name_x = XInternAtom(dpy, prop_name, False);
+    max_prop_len = strstr(prop_name, "ICON") == NULL ? MAXPROPLEN : MAXPROPBIG;
 
     ee_complain = false;
     Status propstatus =
-        XGetWindowProperty(dpy, win, prop_name_x, 0, MAXPROPLEN / 4, False,
+        XGetWindowProperty(dpy, win, prop_name_x, 0, max_prop_len / 4, False,
                            prop_type, &prop_ret_type_x, &prop_ret_fmt,
                            &n_prop_ret_items, &ret_bytes_after, &ret_prop);
     XSync(dpy, False);          // for error to "appear"
@@ -754,3 +757,58 @@ unsigned int keycode_to_modmask(KeyCode kc)
     }
     return 0;
 }
+
+//
+// initCompositeConst helper
+//
+int convert_msb(uint32_t in)
+{
+    int out;
+    for (out = 31; out >= 0; --out) {
+        if (in & 0x80000000L)
+            break;
+        in <<= 1;
+    }
+    return out;
+}
+
+//
+// prepare composition transformations
+//
+CompositeConst initCompositeConst(unsigned long bg)
+{
+    CompositeConst cc;
+    Visual *visual = DefaultVisual(dpy, scr);
+    cc.RMask = visual->red_mask;
+    cc.GMask = visual->green_mask;
+    cc.BMask = visual->blue_mask;
+    cc.RShift = convert_msb(cc.RMask) - 7;
+    cc.GShift = convert_msb(cc.GMask) - 7;
+    cc.BShift = convert_msb(cc.BMask) - 7;
+    cc.bg = bg;
+    cc.bg_r = (bg >> cc.RShift) & 0xff;
+    cc.bg_g = (bg >> cc.GShift) & 0xff;
+    cc.bg_b = (bg >> cc.BShift) & 0xff;
+    return cc;
+}
+
+//
+// compose "fg" pixel with background (from "cc") using alpha "a"
+//
+uint32_t pixelComposite(uint32_t fg, uint8_t a, CompositeConst *cc)
+{
+    uint32_t ret;
+    uint8_t r, g, b;
+    if (a == 0) {
+        ret = cc->bg;
+    } else if (a == 255) {
+        ret = fg;
+    } else {
+        alpha_composite(r, (fg >> 16) & 0xff, a, cc->bg_r);
+        alpha_composite(g, (fg >> 8) & 0xff, a, cc->bg_g);
+        alpha_composite(b, fg & 0xff, a, cc->bg_b);
+        ret = (r << cc->RShift) | (g << cc->GShift) | (b << cc->BShift);
+    }
+    return ret;
+}
+

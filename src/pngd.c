@@ -119,17 +119,6 @@ uint8_t *pngLoadData(TImage * img)
     return data;
 }
 
-int convert_msb(uint32_t in)
-{
-    int out;
-    for (out = 31; out >= 0; --out) {
-        if (in & 0x80000000L)
-            break;
-        in <<= 1;
-    }
-    return out;
-}
-
 //
 // combines img onto d
 // using: intermediate ximage, visual, background
@@ -149,6 +138,7 @@ int pngDraw(TImage * img, Drawable d, XImage * ximage, Visual * visual,
     uint32_t i, row, lastrow = 0;
     GC gc = DefaultGC(dpy, scr);
 
+    // TODO: replace this by initCompositeConst/pixelComposite from util
     RMask = visual->red_mask;
     GMask = visual->green_mask;
     BMask = visual->blue_mask;

@@ -26,14 +26,9 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdint.h>
 #include <X11/Xlib.h>
 #include <png.h>
+#include "util.h"
 
 // PUBLIC
-
-#define alpha_composite(composite, fg, alpha, bg) {                            \
-    uint16_t shiftarg = ((uint16_t)(fg) * (uint16_t)(alpha) +                  \
-        (uint16_t)(bg) * (uint16_t)(255 - (uint16_t)(alpha)) + (uint16_t)128); \
-    (composite) = (uint8_t)((shiftarg + (shiftarg >> 8)) >> 8);                \
-}
 
 typedef struct {
     png_structp png_ptr;

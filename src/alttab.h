@@ -198,6 +198,7 @@ Window getUiwin();
 
 // windows
 int startupWintasks();
+int addIconFromProperty(WindowInfo * wi);
 int addIconFromHints(WindowInfo * wi);
 int addIconFromFiles(WindowInfo * wi);
 int addWindowInfo(Window win, int reclevel, int wm_id, unsigned long desktop,
