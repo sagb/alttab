@@ -66,7 +66,7 @@ static int sort_by_order(const void *p1, const void *p2)
 //
 // debug output of sortlist
 //
-void print_sortlist()
+static void print_sortlist()
 {
     PermanentWindowInfo *s;
     msg(0, "sortlist:\n");
@@ -78,7 +78,7 @@ void print_sortlist()
 //
 // debug output of winlist
 //
-void print_winlist()
+static void print_winlist()
 {
     int wi, si;
     PermanentWindowInfo *s;
@@ -150,7 +150,6 @@ int startupWintasks()
     g.sortlist = NULL;          // utlist head must be initialized to NULL
     g.ic = NULL;                // uthash too
     if (g.option_iconSrc != ISRC_RAM) {
-        g.ic = initIcon();
         initIconHash(&(g.ic));
     }
     // root: watching for _NET_ACTIVE_WINDOW
@@ -315,7 +314,7 @@ int addIconFromHints(WindowInfo * wi)
 //
 // search for "wi" application class in PNG hash.
 // if found, then
-//   if program options don't request size comparison 
+//   if program options don't request size comparison
 //   OR png size match better, then
 //     fill in "wi->icon_pixmap" and "wi->icon_mask"
 //     and return 1
@@ -327,6 +326,7 @@ int addIconFromFiles(WindowInfo * wi)
     char *appclass, *tryclass;
     long unsigned int class_size;
     icon_t *ic;
+    int ret = 0;
 
     appclass = get_x_property(wi->id, XA_STRING, "WM_CLASS", &class_size);
     if (appclass) {
@@ -348,13 +348,16 @@ int addIconFromFiles(WindowInfo * wi)
                 }
                 wi->icon_drawable = ic->drawable;
                 wi->icon_mask = 0;
-                return 1;
+                ret = 1;
+                goto out;
             }
         }
     } else {
         msg(0, "can't find WM_CLASS for \"%s\"\n", wi->name);
     }
-    return 0;
+out:
+    free(appclass);
+    return ret;
 }
 
 //
@@ -475,13 +478,21 @@ int addWindowInfo(Window win, int reclevel, int wm_id, unsigned long desktop,
     return 1;
 }                               // addWindowInfo()
 
+static void __initWinlist(void)
+{
+    free(g.winlist);
+    g.winlist = NULL;
+    g.maxNdx = 0;
+}
+
+
 //
-// sets g.winlist, g.maxNdx, g.selNdx
+// sets g.winlist, g.maxNdx
 // updates g.sortlist, g.sortNdx
 // n.b.: in heavy WM, use _NET_CLIENT_LIST
 // direction is direction of first press: with shift or without
 //
-int initWinlist(bool direction)
+int initWinlist(void)
 {
     int r;
     if (g.debug > 1) {
@@ -506,6 +517,9 @@ int initWinlist(bool direction)
         break;
     }
 
+    if (!r)
+        __initWinlist();
+
 // sort winlist according to .order
     if (g.debug > 1) {
         msg(1, "before qsort\n");
@@ -518,11 +532,7 @@ int initWinlist(bool direction)
         print_winlist();
     }
 
-    g.selNdx = direction ? (g.maxNdx - 1) : ((0 >= (g.maxNdx - 1)) ? 0 : 1);
-//if (g.selNdx<0 || g.selNdx>=g.maxNdx) { g.selNdx=0; } // just for case
-    msg(1,
-        "initWinlist ret: number of items in winlist: %d, current (selected) item in winlist: %d\n",
-        g.maxNdx, g.selNdx);
+    msg(1, "initWinlist ret: number of items in winlist: %d\n", g.maxNdx);
 
     return r;
 }
@@ -543,7 +553,7 @@ void freeWinlist()
         if (g.winlist[y].icon_allocated)
             XFreePixmap(dpy, g.winlist[y].icon_drawable);
     }
-    free(g.winlist);
+    __initWinlist();
 }
 
 //
@@ -626,7 +636,7 @@ void winPropChangeEvent(XPropertyEvent e)
         struct timeval ctv;
         int usec_delta;
         gettimeofday(&ctv, NULL);
-        usec_delta = (ctv.tv_sec - g.last.tv.tv_sec) * 1E6 
+        usec_delta = (ctv.tv_sec - g.last.tv.tv_sec) * 1E6
           + (ctv.tv_usec - g.last.tv.tv_usec);
         msg(0, "delta %d\n", usec_delta);
         if (usec_delta < 5E5) {  // half a second
@@ -724,7 +734,7 @@ void winFocusChangeEvent(XFocusChangeEvent e)
 {
     Window w;
     // in non-EWMH only
-    // probably should also maintain _NET_ACTIVE_WINDOW 
+    // probably should also maintain _NET_ACTIVE_WINDOW
     // support flag in EwmhFeatures
     if (g.option_wm == WM_EWMH)
         return;
@@ -744,4 +754,9 @@ void winFocusChangeEvent(XFocusChangeEvent e)
 
     msg(1, "event focusIn 0x%lx, pull to the head of sortlist\n", w);
     addToSortlist(w, true, true);
+}
+
+void shutdownWin()
+{
+    deleteIconHash(&g.ic);
 }
