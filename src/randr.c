@@ -172,7 +172,7 @@ bool randrGetViewport(quad * res, bool * multihead)
 {
     Window fw = 0;
     quad aq;                    // 'activity area': focused window geometry or pointer point
-    quad *oq;                   // outputs geometries
+    quad *oq = NULL;            // outputs geometries
     int o, no;
     int x1, x2, y1, y2, area;
     quad lq;                    // largest cross-section at 1st stage
