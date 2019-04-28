@@ -1,3 +1,20 @@
+alttab (1.3.0.20190429.21.g4997a2a-1~1.gbp62f79d) unstable; urgency=medium
+
+  ** SNAPSHOT build @62f79dc708576c7b71476f52e2f7a7a0863ef2f4 **
+
+  [ Yauheni Kaliuta ]
+  * treewide: make private stuff really private
+  * treewide: delete trailing whitespaces
+  * treewide: fix memory leaks
+  * ewmh: fold window property calls
+  * gui, win: make selected window number local for gui
+  * gui: skip extra winlist initializations
+
+  [ Alexander Kulak ]
+  * fix size limit for _NET_WM_ICON
+
+ -- Alexander Kulak <sa-dev@odd.systems>  Mon, 29 Apr 2019 00:58:44 +0300
+
 alttab (1.3.0.20190428.12.g109ada4-1~1.gbp1fbaf9) unstable; urgency=medium
 
   ** SNAPSHOT build @1fbaf9fa0fca309565e868024130e75313a267e6 **
