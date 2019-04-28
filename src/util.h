@@ -33,7 +33,7 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdint.h>
 
 #define MAXPROPLEN  4096
-#define MAXPROPBIG  256000  // for icon array, for example
+#define MAXPROPBIG  128000 * sizeof(long)  // for icon array, for example
 #define ERRLEN      2048
 
 #ifndef COMTYPES
