@@ -100,6 +100,7 @@ int updateIconsFromFile(icon_t ** ihash)
     int idndx = 0;
     int theme_len = strlen(g.option_theme);
     char *home = getenv("HOME");
+    int ret = 0;
 
     for (hd = 0; icondir[hd] != NULL; hd++) {
         id2len = strlen(icondir[hd]) + 1 + theme_len + 1;
@@ -128,12 +129,12 @@ int updateIconsFromFile(icon_t ** ihash)
 
     if ((ftsp = fts_open(icon_dirs, fts_options, NULL)) == NULL) {
         warn("fts_open");
-        return 0;
+        goto out;
     }
     /* Initialize ftsp with as many icon_dirs as possible. */
     chp = fts_children(ftsp, 0);
     if (chp == NULL) {
-        return 0;               /* no files to traverse */
+        goto out;               /* no files to traverse */
     }
     d_c = f_c = 0;
     while ((p = fts_read(ftsp)) != NULL) {
@@ -162,7 +163,14 @@ int updateIconsFromFile(icon_t ** ihash)
             }
         }
     }
-    return 1;
+
+    ret = 1;
+
+out:
+    for (idndx = 0; icon_dirs[idndx] != NULL; idndx++)
+        free(icon_dirs[idndx]);
+
+    return ret;
 }                               // updateIconsFromFile
 
 //
@@ -249,7 +257,7 @@ int inspectIconFile(FTSENT * pe)
     }
 
     return 1;
-}                               // inspectIconFile 
+}                               // inspectIconFile
 
 //
 // update drawable
@@ -309,4 +317,15 @@ bool iconMatchBetter(int new_w, int new_h, int old_w, int old_h)
                                                     hasdiff) ? true : false)
         ) : ((newdiff >= 0) ? true : ((newdiff > hasdiff) ? true : false)
         );
+}
+
+void deleteIconHash(icon_t **ihash)
+{
+    icon_t *iiter, *tmp;
+
+    HASH_ITER(hh, *ihash, iiter, tmp) {
+        HASH_DEL(*ihash, iiter);
+        if (iiter != NULL)
+            deleteIcon(iiter);
+    }
 }

@@ -39,11 +39,12 @@ int scr;
 Window root;
 
 // PRIVATE
+static XrmDatabase db;
 
 //
 // help and exit
 //
-void helpexit()
+static void helpexit()
 {
     msg(-1, "the task switcher, v%s\n\
 Options:\n\
@@ -76,11 +77,10 @@ See man alttab for details.\n", PACKAGE_VERSION);
 // return 1 if success, 0 otherwise
 // on fatal failure, calls die/exit
 //
-int use_args_and_xrm(int *argc, char **argv)
+static int use_args_and_xrm(int *argc, char **argv)
 {
 // set debug level early
     g.debug = 0;
-    XrmDatabase db;
     char *errmsg;
     int ksi;
     KeyCode BC;
@@ -415,7 +415,7 @@ int use_args_and_xrm(int *argc, char **argv)
     }
 
 // max recursion for searching windows
-// -1 is "everything" 
+// -1 is "everything"
 // in raw X this returns too much windows, "1" is probably sufficient
 // no need for an option
     g.option_max_reclevel = (g.option_wm == WM_NO) ? 1 : -1;
@@ -427,7 +427,7 @@ int use_args_and_xrm(int *argc, char **argv)
 // grab Alt-Tab and Alt-Shift-Tab
 // note: exit() on failure
 //
-int grabAllKeys(bool grabUngrab)
+static int grabAllKeys(bool grabUngrab)
 {
     g.ignored_modmask = getOffendingModifiersMask(dpy); // or 0 for g.debug
     char *grabhint =
@@ -559,6 +559,9 @@ int main(int argc, char **argv)
     }
 
 // this is probably never reached
+    shutdownWin();
+    shutdownGUI();
+    XrmDestroyDatabase(db);
     grabAllKeys(false);
 // not restoring error handler
     XCloseDisplay(dpy);

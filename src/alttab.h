@@ -79,7 +79,7 @@ typedef struct {
     unsigned int icon_w, icon_h;
     bool icon_allocated;        // we must free icon, because we created it (placeholder or depth conversion)
     Pixmap tile;                // ready to display. w/h are all equal and defined in gui.c
-// this constant can't be 0, 1, -1, MAXINT, 
+// this constant can't be 0, 1, -1, MAXINT,
 // because WMs set it to these values incoherently
 #define DESKTOP_UNKNOWN 0xdead
     unsigned long desktop;
@@ -118,7 +118,6 @@ typedef struct {
     bool uiShowHasRun;          // means: 1. window is ready to Expose, 2. need to call uiHide to free X stuff
     WindowInfo *winlist;
     int maxNdx;                 // number of items in list above
-    int selNdx;                 // current (selected) item
     /* auxiliary list for sorting
      * head = recently focused
      * display-wide, for all groups/desktops
@@ -195,6 +194,7 @@ int uiPrevWindow();
 int uiSelectWindow(int ndx);
 void uiButtonEvent(XButtonEvent e);
 Window getUiwin();
+void shutdownGUI(void);
 
 // windows
 int startupWintasks();
@@ -203,7 +203,7 @@ int addIconFromHints(WindowInfo * wi);
 int addIconFromFiles(WindowInfo * wi);
 int addWindowInfo(Window win, int reclevel, int wm_id, unsigned long desktop,
                   char *wm_name);
-int initWinlist(bool direction);
+int initWinlist(void);
 void freeWinlist();
 int setFocus(int winNdx);
 int rp_startupWintasks();
@@ -220,6 +220,7 @@ bool common_skipWindow(Window w, unsigned long current_desktop,
                        unsigned long window_desktop);
 void x_setCommonPropertiesForAnyWindow(Window win);
 void addToSortlist(Window w, bool to_head, bool move);
+void shutdownWin(void);
 
 /* EWHM */
 bool ewmh_detectFeatures(EwmhFeatures * e);
