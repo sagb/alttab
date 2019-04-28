@@ -41,7 +41,7 @@ extern Window root;
 // returns ptr to EWMH client list and client_list_size
 // or NULL
 //
-Window *ewmh_get_client_list(unsigned long *client_list_size)
+static Window *ewmh_get_client_list(unsigned long *client_list_size)
 {
     Window *client_list;
 
@@ -56,18 +56,17 @@ Window *ewmh_get_client_list(unsigned long *client_list_size)
             g.ewmh.try_stacking_list_first = false;
         }
     }
-    if ((client_list =
-         (Window *) get_x_property(root, XA_WINDOW, "_NET_CLIENT_LIST",
-                                   client_list_size)) != NULL)
-        return client_list;
-    if ((client_list =
-         (Window *) get_x_property(root, XA_CARDINAL, "_WIN_CLIENT_LIST",
-                                   client_list_size)) != NULL)
-        return client_list;
-    return 0;
+
+    client_list =
+        (Window *) get_x_property_alt(root,
+                                      XA_WINDOW, "_NET_CLIENT_LIST",
+                                      XA_CARDINAL, "_WIN_CLIENT_LIST",
+                                      client_list_size);
+
+    return client_list;
 }
 
-int ewmh_send_wm_evt(Window w, char *atom, unsigned long edata[])
+static int ewmh_send_wm_evt(Window w, char *atom, unsigned long edata[])
 {
     XEvent evt;
     long rn_mask = SubstructureRedirectMask | SubstructureNotifyMask;
@@ -88,7 +87,7 @@ int ewmh_send_wm_evt(Window w, char *atom, unsigned long edata[])
     return 1;
 }
 
-int ewmh_switch_desktop(unsigned long desktop)
+static int ewmh_switch_desktop(unsigned long desktop)
 {
     int evr, elapsed;
     unsigned long edata[] = { desktop, CurrentTime, 0, 0, 0 };
@@ -110,7 +109,7 @@ int ewmh_switch_desktop(unsigned long desktop)
     return evr;
 }
 
-int ewmh_switch_window(unsigned long window)
+static int ewmh_switch_window(unsigned long window)
 {
     unsigned long edata[] = { 2, CurrentTime, 0, 0, 0 };
     msg(1, "ewmh switching window to 0x%lx\n", window);
@@ -130,6 +129,7 @@ bool ewmh_detectFeatures(EwmhFeatures * e)
     Atom utf8string;
     char *default_wm_name = "unknown_ewmh_compatible";
     unsigned long client_list_size;
+    Window *client_list;
 
     // This function is used in alttab for detection of EWMH compatibility.
     // But there are WM (dwm) that support EWMH subset required for alttab
@@ -142,31 +142,29 @@ bool ewmh_detectFeatures(EwmhFeatures * e)
 
     // first, detect necessary feature: client list
     // also, this resets try_stacking_list_first if necessary
-    if (ewmh_get_client_list(&client_list_size) == NULL) {
+    client_list = ewmh_get_client_list(&client_list_size);
+    if (client_list == NULL) {
         // WM is not usable in EWMH mode
         return false;
     }
+    free(client_list);
+
     // then, guess/devise WM name
-    chld_win = (Window *) NULL;
-    if (!
-        (chld_win =
-         (Window *) get_x_property(root, XA_WINDOW, "_NET_SUPPORTING_WM_CHECK",
-                                   NULL))) {
-        if (!
-            (chld_win =
-             (Window *) get_x_property(root, XA_CARDINAL,
-                                       "_WIN_SUPPORTING_WM_CHECK", NULL))) {
-            e->wmname = default_wm_name;
-            return true;
-        }
+    chld_win = (Window *)get_x_property_alt(root,
+                                            XA_WINDOW, "_NET_SUPPORTING_WM_CHECK",
+                                            XA_CARDINAL, "_WIN_SUPPORTING_WM_CHECK",
+                                            NULL);
+    if (!chld_win) {
+        e->wmname = default_wm_name;
+        return true;
     }
-    r = (char *)NULL;
+
     utf8string = XInternAtom(dpy, "UTF8_STRING", False);
-    if (!(r = get_x_property(*chld_win, utf8string, "_NET_WM_NAME", NULL))) {
-        (r = get_x_property(*chld_win, XA_STRING, "_NET_WM_NAME", NULL));
-    }
-    if (chld_win != NULL)
-        free(chld_win);
+
+    r = get_x_property_alt(*chld_win,
+                       utf8string, "_NET_WM_NAME",
+                       XA_STRING, "_NET_WM_NAME", NULL);
+    free(chld_win);
 
     e->wmname = (r != NULL) ? r : default_wm_name;
 
@@ -215,7 +213,8 @@ int ewmh_initWinlist()
         // continue anyway
     }
 
-    if ((client_list = ewmh_get_client_list(&client_list_size)) == NULL) {
+    client_list = ewmh_get_client_list(&client_list_size);
+    if (client_list == NULL) {
         msg(-1, "can't get client list\n");
         return 0;
     }
@@ -242,6 +241,7 @@ int ewmh_initWinlist()
         if (w == aw) {
             addToSortlist(w, true, true);   // pull to head
         }
+        free(title);
     }
 
     // TODO: BUG? sometimes i3 returns previous active window,
@@ -250,6 +250,7 @@ int ewmh_initWinlist()
     //msg(1, "ewmh active window: %lu name: %s\n",
     //  aw, (g.winlist ? g.winlist[g.startNdx].name : "null"));
 
+    free(client_list);
     return 1;
 }
 
@@ -275,19 +276,28 @@ int ewmh_setFocus(int winNdx, Window fwin)
     return 1;
 }
 
+static unsigned long ewmh_getDesktopFromProp(Window w, char *prop1, char *prop2)
+{
+    unsigned long *d;
+    unsigned long propsize;
+    unsigned long ret = DESKTOP_UNKNOWN;
+
+    d = (unsigned long *)get_x_property_alt(w,
+                                            XA_CARDINAL, prop1,
+                                            XA_CARDINAL, prop2, &propsize);
+    if (d && (propsize > 0))
+        ret = *d;
+
+    free(d);
+    return ret;
+}
+
 //
 // get current desktop in EWMH WM
 //
 unsigned long ewmh_getCurrentDesktop()
 {
-    unsigned long *cd;
-    unsigned long propsize;
-    cd = (unsigned long *)get_x_property(root, XA_CARDINAL,
-                                         "_NET_CURRENT_DESKTOP", &propsize);
-    if (!cd)
-        cd = (unsigned long *)get_x_property(root, XA_CARDINAL,
-                                             "_WIN_WORKSPACE", &propsize);
-    return (cd && (propsize > 0)) ? *cd : DESKTOP_UNKNOWN;
+    return ewmh_getDesktopFromProp(root, "_NET_CURRENT_DESKTOP", "_WIN_WORKSPACE");
 }
 
 //
@@ -295,14 +305,7 @@ unsigned long ewmh_getCurrentDesktop()
 //
 unsigned long ewmh_getDesktopOfWindow(Window w)
 {
-    unsigned long *d;
-    unsigned long propsize;
-    d = (unsigned long *)get_x_property(w, XA_CARDINAL,
-                                        "_NET_WM_DESKTOP", &propsize);
-    if (!d)
-        d = (unsigned long *)get_x_property(w, XA_CARDINAL,
-                                            "_WIN_WORKSPACE", &propsize);
-    return (d && (propsize > 0)) ? *d : DESKTOP_UNKNOWN;
+    return ewmh_getDesktopFromProp(w, "_NET_WM_DESKTOP", "_WIN_WORKSPACE");
 }
 
 //
@@ -314,19 +317,24 @@ bool ewmh_skipWindowInTaskbar(Window w)
     long unsigned int state_propsize;
     Atom a_skip_tb;
     int i;
+    bool ret = false;
 
     state =
         (Atom *) get_x_property(w, XA_ATOM, "_NET_WM_STATE", &state_propsize);
     if (state == NULL || state_propsize == 0) {
         msg(1, "%lx: no _NET_WM_STATE property\n", w);
-        return false;
+        goto out;
     }
     a_skip_tb = XInternAtom(dpy, "_NET_WM_STATE_SKIP_TASKBAR", True);
     for (i = 0; i < state_propsize / sizeof(Atom); i++) {
         if (state[i] == a_skip_tb) {
             msg(1, "%lx: _NET_WM_STATE_SKIP_TASKBAR found\n", w);
-            return true;
+            ret = true;
+            goto out;
         }
     }
-    return false;
+
+ out:
+    free(state);
+    return ret;
 }

@@ -62,7 +62,7 @@ unsigned int getOffendingModifiersMask()
 //
 // for ignoring X errors
 // https://tronche.com/gui/x/xlib/event-handling/protocol-errors/default-handlers.html#XErrorEvent
-// 
+//
 int zeroErrorHandler(Display * dpy_our, XErrorEvent * theEvent)
 {
     ee_ignored = theEvent;
@@ -379,7 +379,7 @@ char *utf8index(char *s, size_t pos)
 }
 
 //
-// Draw utf-8 string str on window/pixmap d, 
+// Draw utf-8 string str on window/pixmap d,
 // using *font and *xrcolor,
 // splitting and cropping it to fit (x1,y1 - x1+width,y1+height) rectangle.
 // Return 1 if ok.
@@ -610,6 +610,21 @@ char *get_x_property(Window win, Atom prop_type, char *prop_name,
     return r;
 }
 
+char *get_x_property_alt(Window win,
+			 Atom prop_type1, char *prop_name1,
+			 Atom prop_type2, char *prop_name2,
+			 unsigned long *prop_size)
+{
+    char *p;
+
+    p = get_x_property(win, prop_type1, prop_name1, prop_size);
+    if (p != NULL)
+        return p;
+
+    p = get_x_property(win, prop_type2, prop_name2, prop_size);
+    return p;
+}
+
 //
 // do rectangles cross?
 //
@@ -740,22 +755,27 @@ int ksym_option_to_keycode(XrmDatabase * db, const char *appname,
 // return first modifier corresponding to given keycode,
 // in the form of modmask,
 // or zero if not found
-// 
+//
 unsigned int keycode_to_modmask(KeyCode kc)
 {
     int mi, ksi;
     KeyCode tkc;
     XModifierKeymap *xmk = XGetModifierMapping(dpy);
+    unsigned int ret = 0;
 
     for (mi = 0; mi < 8; mi++) {
         for (ksi = 0; ksi < xmk->max_keypermod; ksi++) {
             tkc = (xmk->modifiermap)[xmk->max_keypermod * mi + ksi];
             if (tkc == kc) {
-                return (1 << mi);
+                ret = (1 << mi);
+                goto out;
             }
         }
     }
-    return 0;
+
+out:
+    XFreeModifiermap(xmk);
+    return ret;
 }
 
 //

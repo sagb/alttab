@@ -31,10 +31,10 @@ extern Display *dpy;
 extern int scr;
 extern Window root;
 
-// Documentation: 
+// Documentation:
 // https://cgit.freedesktop.org/xorg/proto/randrproto/tree/randrproto.txt
 
-// version requirements: 
+// version requirements:
 // RRGetScreenResourcesCurrent (1.3)
 #define MAJ_REQ 1
 #define MIN_REQ 3
@@ -47,7 +47,7 @@ extern Window root;
 //
 // update outs, return nout or 0
 //
-int randr_update_outputs(Window w, quad ** outs)
+static int randr_update_outputs(Window w, quad ** outs)
 {
     XRRScreenResources *scr_res;
     XRROutputInfo *out_info;
@@ -63,14 +63,16 @@ int randr_update_outputs(Window w, quad ** outs)
     for (out = 0; out < scr_res->noutput; out++) {
         out_info = XRRGetOutputInfo(dpy, scr_res, scr_res->outputs[out]);
         if (out_info == NULL
-            || out_info->connection != RR_Connected || out_info->crtc == 0)
+            || out_info->connection != RR_Connected || out_info->crtc == 0) {
+            XRRFreeOutputInfo(out_info); // does it neen NULL check?
             continue;
+        }
         crtc_info = XRRGetCrtcInfo(dpy, scr_res, out_info->crtc);
         if (crtc_info == NULL)
             continue;
         (*outs) = realloc((*outs), (nout + 1) * sizeof(quad));
         if ((*outs) == NULL)
-            return 0;
+            return 0; // would be nice to free Infos
         (*outs)[nout].x = crtc_info->x;
         (*outs)[nout].y = crtc_info->y;
         (*outs)[nout].w = crtc_info->width;
@@ -84,7 +86,7 @@ int randr_update_outputs(Window w, quad ** outs)
         XRRFreeOutputInfo(out_info);
         nout++;
     }
-    //XRRFreeScreenResources(scr_res);  // don't do this for XRRGetScreenResourcesCurrent?
+    XRRFreeScreenResources(scr_res);
     return nout;
 }
 
@@ -93,7 +95,7 @@ int randr_update_outputs(Window w, quad ** outs)
 // or focus point (depending on vp_mode).
 // res and fw must be allocated by caller.
 //
-bool x_get_activity_area(quad * res, Window * fw)
+static bool x_get_activity_area(quad * res, Window * fw)
 {
 #define VPM  g.option_vp_mode
     int rtr;
@@ -170,7 +172,7 @@ bool randrGetViewport(quad * res, bool * multihead)
 {
     Window fw = 0;
     quad aq;                    // 'activity area': focused window geometry or pointer point
-    quad *oq;                   // outputs geometries
+    quad *oq = NULL;            // outputs geometries
     int o, no;
     int x1, x2, y1, y2, area;
     quad lq;                    // largest cross-section at 1st stage
@@ -226,7 +228,7 @@ bool randrGetViewport(quad * res, bool * multihead)
                 largest_cross_area = area;
             }
             /*
-               // disabled feature: 
+               // disabled feature:
                // total area of CRTCs which have cross-section with focused window
                if (oq[o].x < res->x) res->x = oq[o].x;
                int right_diff = (oq[o].x + oq[o].w) - (res->x + res->w);
@@ -247,7 +249,7 @@ bool randrGetViewport(quad * res, bool * multihead)
         free(oq);
         return true;
     }
-    // if best cross-area is shared with some other monitor, 
+    // if best cross-area is shared with some other monitor,
     // then smallest of these monitors is choosen.
     smallest_2_stage_area =
         oq[best_1_stage_output].w * oq[best_1_stage_output].h;

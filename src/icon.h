@@ -56,5 +56,6 @@ int inspectIconFile(FTSENT * pe);   // check if file pe has better icon than we 
 int loadIconContent(icon_t * ic);   // update drawable
 icon_t *lookupIcon(char *app);  // search app icon in hash
 bool iconMatchBetter(int new_w, int new_h, int old_w, int old_h);
+void deleteIconHash(icon_t **ihash);
 
 #endif
