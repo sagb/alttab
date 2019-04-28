@@ -33,7 +33,7 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdint.h>
 
 #define MAXPROPLEN  4096
-#define MAXPROPBIG  256000  // for icon array, for example
+#define MAXPROPBIG  128000 * sizeof(long)  // for icon array, for example
 #define ERRLEN      2048
 
 #ifndef COMTYPES
@@ -97,6 +97,10 @@ Bool predproc_true(Display * display, XEvent * event, char *arg);
 
 char *get_x_property(Window win, Atom prop_type, char *prop_name,
                      unsigned long *prop_size);
+char *get_x_property_alt(Window win,
+			 Atom prop_type1, char *prop_name1,
+			 Atom prop_type2, char *prop_name2,
+			 unsigned long *prop_size);
 
 bool rectangles_cross(quad a, quad b);
 bool get_absolute_coordinates(Window w, quad * q);
