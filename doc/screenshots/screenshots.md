@@ -11,4 +11,13 @@ Default options, raw X11 session.
 ```
 alttab -font "xft:DejaVu Sans Condensed-10" -bg '#c3c6b7' -frame darkblue -t 100x100 -i 16x16 -s 2
 ```
+&nbsp;  
+![Translucent](doc/screenshots/alttab-jtaala.png?raw=true)
+
+```
+alttab -fg "#d58681" -bg "#4a4a4a" -frame "#eb564d" -t 128x150 -i 127x64
+```
+with `opacity-rule` in `compton`  
+&copy; Jay Ta'ala
+([details](https://confluence.jaytaala.com/display/TKB/My+Manjaro+i3+setup#MyManjaroi3setup-Ricingalttab))
 
