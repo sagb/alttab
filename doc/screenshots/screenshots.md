@@ -1,20 +1,22 @@
 Screenshots of alttab
 =====================
 
-1. Default options, raw X11 session.
+## Default options, raw X11 session.
 
 ![Default options, raw X11](alttab-default-rawx.png?raw=true)
 &nbsp;  
+&nbsp;  
 
-2. Low DPI
+## Low DPI
 
 ![Low DPI](alttab-high.png?raw=true)
 ```
 alttab -font "xft:DejaVu Sans Condensed-10" -bg '#c3c6b7' -frame darkblue -t 100x100 -i 16x16 -s 2
 ```
 &nbsp;  
+&nbsp;  
 
-3. Translucent
+## Translucent
 
 ![Translucent](alttab-jtaala.png?raw=true)
 ```
