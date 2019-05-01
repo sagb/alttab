@@ -1,7 +1,7 @@
 /*
 Helper functions specific to alttab.
 
-Copyright 2017-2018 Alexander Kulak.
+Copyright 2017-2019 Alexander Kulak.
 This file is part of alttab program.
 
 alttab is free software: you can redistribute it and/or modify
@@ -48,10 +48,9 @@ void msg(int lvl, const char *format, ...)
 void die(const char *format, ...)
 {
     va_list ap;
-    fprintf (stderr, MSGPREFIX);
+    fprintf(stderr, MSGPREFIX);
     va_start(ap, format);
     vfprintf(stderr, format, ap);
     va_end(ap);
     exit(1);
 }
-

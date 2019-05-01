@@ -2,7 +2,7 @@
 The source of alttab.1. Read doc/development.md.
 vim:ft=markdown
 
-Copyright 2017-2018 Alexander Kulak.
+Copyright 2017-2019 Alexander Kulak.
 This file is part of alttab program.
 
 Copying and distribution of this file, with or without modification,
@@ -150,7 +150,7 @@ Most command line options have corresponding X resource, see doc/alttab.ad for e
     The switcher always has variable size and position,
     but tries to never break out of `-vp` container,
     while `-p` specifies position relative to this container.
-    Together these options allow for multi-monitor support.
+    Together these options allow for WM-independent multi-monitor support.
     Possible values for `-vp`:
 
       <focus>: in multihead configuration: the monitor which shows
@@ -167,14 +167,14 @@ Most command line options have corresponding X resource, see doc/alttab.ad for e
 
       <total>: the geometry of default root window.
 
-      If you specify this in tiling multihead, then the switcher
-      will be drawn relative to the entire combined screen, crossing
-      monitors' borders.
+      If you specify this in tiling multihead configuration, then
+      the switcher will be drawn relative to the entire combined screen,
+      crossing monitors' borders.
 
       <WxH+X+Y>: Specific position relative to default root window.
 
       This allows for static manual bounding if XRANDR detection fails.
-      Suppose X operates in tiling configuration for two 2560х1440 monitors, 
+      Suppose X root window spans over two 2560х1440 monitors, 
       resulting in combined screen of 5120x1440 size. Then the switcher 
       may be positioned at the center of the right monitor 
       with -vp 2560x1440+2560+0 -p center.
@@ -266,7 +266,7 @@ Run alttab after WM, or autodetection will fail.
 
 ##AUTHOR
 
-Copyright 2017-2018 Alexander Kulak `<sa-dev AT rainbow POINT by>`.
+Copyright 2017-2019 Alexander Kulak `<sa-dev AT odd POINT systems>`.
 
 ##REPORTING BUGS
 

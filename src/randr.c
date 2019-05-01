@@ -1,7 +1,7 @@
 /*
 Interface to XRANDR
 
-Copyright 2017-2018 Alexander Kulak.
+Copyright 2017-2019 Alexander Kulak.
 This file is part of alttab program.
 
 alttab is free software: you can redistribute it and/or modify
@@ -27,14 +27,14 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 #include "alttab.h"
 #include "util.h"
 extern Globals g;
-extern Display* dpy;
+extern Display *dpy;
 extern int scr;
 extern Window root;
 
-// Documentation: 
+// Documentation:
 // https://cgit.freedesktop.org/xorg/proto/randrproto/tree/randrproto.txt
 
-// version requirements: 
+// version requirements:
 // RRGetScreenResourcesCurrent (1.3)
 #define MAJ_REQ 1
 #define MIN_REQ 3
@@ -47,39 +47,46 @@ extern Window root;
 //
 // update outs, return nout or 0
 //
-int randr_update_outputs(Window w, quad **outs)
+static int randr_update_outputs(Window w, quad ** outs)
 {
     XRRScreenResources *scr_res;
     XRROutputInfo *out_info;
     XRRCrtcInfo *crtc_info;
     int nout;
-    int out; // as returned by randr; may include inactive
+    int out;                    // as returned by randr; may include inactive
 
-    scr_res = XRRGetScreenResourcesCurrent (dpy, w);
-    if (scr_res == NULL) return 0;
+    scr_res = XRRGetScreenResourcesCurrent(dpy, w);
+    if (scr_res == NULL)
+        return 0;
     nout = 0;
     (*outs) = NULL;
-    for (out = 0; out < scr_res->noutput; out++ ) {
-        out_info = XRRGetOutputInfo (dpy, scr_res, scr_res->outputs[out]);
-        if (out_info->connection != RR_Connected)
+    for (out = 0; out < scr_res->noutput; out++) {
+        out_info = XRRGetOutputInfo(dpy, scr_res, scr_res->outputs[out]);
+        if (out_info == NULL
+            || out_info->connection != RR_Connected || out_info->crtc == 0) {
+            XRRFreeOutputInfo(out_info); // does it neen NULL check?
             continue;
-        crtc_info = XRRGetCrtcInfo (dpy, scr_res, out_info->crtc);
-        (*outs) = realloc ((*outs), (nout + 1) * sizeof(quad));
-        if ((*outs) == NULL) return 0;
+        }
+        crtc_info = XRRGetCrtcInfo(dpy, scr_res, out_info->crtc);
+        if (crtc_info == NULL)
+            continue;
+        (*outs) = realloc((*outs), (nout + 1) * sizeof(quad));
+        if ((*outs) == NULL)
+            return 0; // would be nice to free Infos
         (*outs)[nout].x = crtc_info->x;
         (*outs)[nout].y = crtc_info->y;
         (*outs)[nout].w = crtc_info->width;
         (*outs)[nout].h = crtc_info->height;
         msg(0,
-          "output %d (%d by randr) crtc: +%d+%d %dx%d noutput %d npossible %d\n", 
-          nout, out,
-          crtc_info->x, crtc_info->y, crtc_info->width, crtc_info->height, 
-          crtc_info->noutput, crtc_info->npossible);
+            "output %d (%d by randr) crtc: +%d+%d %dx%d noutput %d npossible %d\n",
+            nout, out,
+            crtc_info->x, crtc_info->y, crtc_info->width, crtc_info->height,
+            crtc_info->noutput, crtc_info->npossible);
         XRRFreeCrtcInfo(crtc_info);
-        XRRFreeOutputInfo (out_info);
+        XRRFreeOutputInfo(out_info);
         nout++;
     }
-    //XRRFreeScreenResources(scr_res);  // don't do this for XRRGetScreenResourcesCurrent?
+    XRRFreeScreenResources(scr_res);
     return nout;
 }
 
@@ -88,7 +95,7 @@ int randr_update_outputs(Window w, quad **outs)
 // or focus point (depending on vp_mode).
 // res and fw must be allocated by caller.
 //
-bool x_get_activity_area (quad *res, Window *fw)
+static bool x_get_activity_area(quad * res, Window * fw)
 {
 #define VPM  g.option_vp_mode
     int rtr;
@@ -99,23 +106,22 @@ bool x_get_activity_area (quad *res, Window *fw)
     *fw = 0;
 
     if (VPM == VP_FOCUS) {
-        if (XGetInputFocus (dpy, fw, &rtr) == 0 || (*fw) == 0) {
+        if (XGetInputFocus(dpy, fw, &rtr) == 0 || (*fw) == 0) {
             msg(-1, "can't recognize focused window\n");
             return false;
         }
-        if (! get_absolute_coordinates(*fw, res)) {
+        if (!get_absolute_coordinates(*fw, res)) {
             msg(-1, "can't get window 0x%lx absolute coordinates\n", (*fw));
             return false;
         }
         msg(0, "focus in window 0x%lx (%dx%d +%d+%d)\n",
-          (*fw), res->w, res->h,
-          res->x, res->y);
+            (*fw), res->w, res->h, res->x, res->y);
         return true;
     }
 
     if (VPM == VP_POINTER) {
-        if (! XQueryPointer(dpy, root, &root_ret, &child_ret,
-                    &root_x, &root_y, &win_x, &win_y, &mask_ret) ) {
+        if (!XQueryPointer(dpy, root, &root_ret, &child_ret,
+                           &root_x, &root_y, &win_x, &win_y, &mask_ret)) {
             // pointer is not on the same screen as root
             return false;
         }
@@ -126,7 +132,6 @@ bool x_get_activity_area (quad *res, Window *fw)
         msg(0, "pointer: +%d+%d\n", res->x, res->y);
         return true;
     }
-
     // unknown vp_mode
     return false;
 }
@@ -141,12 +146,10 @@ bool randrAvailable()
 {
     int maj, min;
     bool ok;
-    Status s = XRRQueryVersion (dpy, &maj, &min);
+    Status s = XRRQueryVersion(dpy, &maj, &min);
     if (s != 0) {
-        ok = (
-                (maj == MAJ_REQ && min >= MIN_REQ) ||
-                (maj > MAJ_REQ)
-             );
+        ok = ((maj == MAJ_REQ && min >= MIN_REQ) || (maj > MAJ_REQ)
+            );
     } else {
         ok = false;
     }
@@ -155,7 +158,7 @@ bool randrAvailable()
             msg(0, "randr not available\n");
         else
             msg(0, "randr v. %d.%d available (%ssufficient)\n",
-                    maj, min, ok ? "" : "not ");
+                maj, min, ok ? "" : "not ");
     }
     return ok;
 }
@@ -165,50 +168,55 @@ bool randrAvailable()
 // of false if not found.
 // res must be allocated by caller.
 //
-bool randrGetViewport(quad *res, bool *multihead)
+bool randrGetViewport(quad * res, bool * multihead)
 {
     Window fw = 0;
-    quad aq; // 'activity area': focused window geometry or pointer point
-    quad *oq; // outputs geometries
+    quad aq;                    // 'activity area': focused window geometry or pointer point
+    quad *oq = NULL;            // outputs geometries
     int o, no;
     int x1, x2, y1, y2, area;
-    quad lq; // largest cross-section at 1st stage
+    quad lq;                    // largest cross-section at 1st stage
     int largest_cross_area = 0; // its square
     int best_1_stage_output = -1;
     int best_2_stage_output = -1;
     int smallest_2_stage_area;
- 
+
     //no = randr_update_outputs(fw != 0 ? fw : root, &oq); // no fw here
     no = randr_update_outputs(root, &oq);
     if (no < 1) {
         msg(0, "randr didn't detect any output\n");
         *multihead = false;
-        if (oq != NULL) free (oq);
+        if (oq != NULL)
+            free(oq);
         return false;
     }
     if (no == 1) {
         msg(0, "using single randr output as viewport\n");
         *res = oq[0];
         *multihead = false;
-        free (oq); return true;
+        free(oq);
+        return true;
     }
 
     *multihead = true;
 
-    if (! x_get_activity_area (&aq, &fw)) {
+    if (!x_get_activity_area(&aq, &fw)) {
         msg(0, "failed to detect activity area, using first randr output\n");
         *res = oq[0];
-        free (oq); return true;
+        free(oq);
+        return true;
     }
 
     for (o = 0; o < no; o++) {
-        if (rectangles_cross (aq, oq[o])) {
+        if (rectangles_cross(aq, oq[o])) {
             // this output has a common cross-section with activity area,
             // now find this cross-section.
             x1 = aq.x > oq[o].x ? aq.x : oq[o].x;
-            x2 = (aq.x + aq.w) < (oq[o].x + oq[o].w) ? (aq.x + aq.w) :(oq[o].x + oq[o].w);
+            x2 = (aq.x + aq.w) <
+                (oq[o].x + oq[o].w) ? (aq.x + aq.w) : (oq[o].x + oq[o].w);
             y1 = aq.y > oq[o].y ? aq.y : oq[o].y;
-            y2 = (aq.y + aq.h) < (oq[o].y + oq[o].h) ? (aq.y + aq.h) :(oq[o].y + oq[o].h);
+            y2 = (aq.y + aq.h) <
+                (oq[o].y + oq[o].h) ? (aq.y + aq.h) : (oq[o].y + oq[o].h);
             area = (x2 - x1) * (y2 - y1);
             msg(0, "output %d cross-section: %d\n", o, area);
             if (area > largest_cross_area) {
@@ -220,35 +228,37 @@ bool randrGetViewport(quad *res, bool *multihead)
                 largest_cross_area = area;
             }
             /*
-            // disabled feature: 
-            // total area of CRTCs which have cross-section with focused window
-            if (oq[o].x < res->x) res->x = oq[o].x;
-            int right_diff = (oq[o].x + oq[o].w) - (res->x + res->w);
-            if (right_diff > 0) res->w += right_diff;
-            if (oq[o].y < res->y) res->y = oq[o].y;
-            int bot_diff = (oq[o].y + oq[o].h) - (res->y + res->h);
-            if (bot_diff > 0) res->h += bot_diff;
-            */
+               // disabled feature:
+               // total area of CRTCs which have cross-section with focused window
+               if (oq[o].x < res->x) res->x = oq[o].x;
+               int right_diff = (oq[o].x + oq[o].w) - (res->x + res->w);
+               if (right_diff > 0) res->w += right_diff;
+               if (oq[o].y < res->y) res->y = oq[o].y;
+               int bot_diff = (oq[o].y + oq[o].h) - (res->y + res->h);
+               if (bot_diff > 0) res->h += bot_diff;
+             */
         } else {
             msg(0, "output %d doesn't cross with activity area\n", o);
         }
-    } // outputs
+    }                           // outputs
 
     if (best_1_stage_output == -1) {
-        msg(0, 
-          "failed to find largest cross-section, using first randr output\n");
+        msg(0,
+            "failed to find largest cross-section, using first randr output\n");
         *res = oq[0];
-        free (oq); return true;
+        free(oq);
+        return true;
     }
-
-    // if best cross-area is shared with some other monitor, 
+    // if best cross-area is shared with some other monitor,
     // then smallest of these monitors is choosen.
-    smallest_2_stage_area = oq[best_1_stage_output].w * oq[best_1_stage_output].h;
+    smallest_2_stage_area =
+        oq[best_1_stage_output].w * oq[best_1_stage_output].h;
     for (o = 0; o < no; o++) {
-        if (o == best_1_stage_output) continue;
-        if (rectangles_cross (lq, oq[o])) {
+        if (o == best_1_stage_output)
+            continue;
+        if (rectangles_cross(lq, oq[o])) {
             area = oq[o].w * oq[o].h;
-            if (area < smallest_2_stage_area ) {
+            if (area < smallest_2_stage_area) {
                 best_2_stage_output = o;
                 smallest_2_stage_area = area;
             }
@@ -258,17 +268,17 @@ bool randrGetViewport(quad *res, bool *multihead)
     if (best_2_stage_output == -1) {
         best_2_stage_output = best_1_stage_output;
     } else {
-        msg(0, 
-          "found better (smallest output) candidate: %d\n",
-          best_2_stage_output);
+        msg(0,
+            "found better (smallest output) candidate: %d\n",
+            best_2_stage_output);
     }
 
     // the single result here is  best_2_stage_output
 
     *res = oq[best_2_stage_output];
-    msg(0, 
-      "best viewport from randr: %dx%d +%d+%d\n",
-      res->w, res->h, res->x, res->y);
-    free (oq); return true;
+    msg(0,
+        "best viewport from randr: %dx%d +%d+%d\n",
+        res->w, res->h, res->x, res->y);
+    free(oq);
+    return true;
 }
-
