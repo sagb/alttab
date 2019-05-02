@@ -1,8 +1,8 @@
 Source: alttab
 Section: x11
 Priority: optional
-Maintainer: Alexander Kulak <sa-dev@rainbow.by>
-Build-Depends: debhelper (>= 11~),
+Maintainer: Alexander Kulak <sa-dev@odd.systems>
+Build-Depends: debhelper (>= 12~),
                libx11-dev,
                libxmu-dev,
                libxft-dev,
@@ -12,7 +12,7 @@ Build-Depends: debhelper (>= 11~),
                uthash-dev,
                autoconf,
                automake
-Standards-Version: 4.1.4
+Standards-Version: 4.3.0
 Vcs-Git: https://github.com/sagb/alttab.git -b debian/experimental
 Vcs-Browser: https://github.com/sagb/alttab/tree/debian/experimental
 Homepage: https://sagb.github.io/alttab

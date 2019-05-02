@@ -1,3 +1,11 @@
+alttab (1.4.0-1) unstable; urgency=medium
+
+  * New upstream release
+  * Bump debhelper compat to 12
+  * Change maintainer email address
+
+ -- Alexander Kulak <sa-dev@odd.systems>  Wed,  1 May 2019 20:47:47 +0300
+
 alttab (1.3.0.20190429.21.g4997a2a-1~1.gbp62f79d) unstable; urgency=medium
 
   ** SNAPSHOT build @62f79dc708576c7b71476f52e2f7a7a0863ef2f4 **
@@ -346,4 +354,3 @@ alttab (1.1.0-1) unstable; urgency=medium
   * Initial release (Closes: #861533)
 
  -- Alexander Kulak <sa-dev@rainbow.by>  Wed, 25 Oct 2017 11:15:28 +0300
-
