@@ -9,6 +9,7 @@ Build-Depends: debhelper (>= 12~),
                libxrender-dev,
                libxrandr-dev,
                libpng-dev,
+               libxpm-dev,
                uthash-dev,
                autoconf,
                automake
