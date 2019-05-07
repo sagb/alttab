@@ -4,6 +4,8 @@
 
 ![Low DPI](doc/screenshots/alttab-high.png?raw=true)
 
+![Translucent](doc/screenshots/alttab-jtaala.png?raw=true)
+
 [screenshot options](doc/screenshots/screenshots.md)
 
 [![chat on freenode](https://img.shields.io/badge/chat-on%20freenode-brightgreen.svg)](https://webchat.freenode.net/?channels=%23alttab)

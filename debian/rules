@@ -9,4 +9,3 @@ export DEB_BUILD_MAINT_OPTIONS = hardening=+all
 # important in bootstrap.sh, besides of autotools and man page.
 #override_dh_autoreconf:
 #	dh_autoreconf ./bootstrap.sh -f
-
