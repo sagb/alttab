@@ -338,16 +338,16 @@ int addIconFromFiles(WindowInfo * wi)
                  || iconMatchBetter(ic->src_w, ic->src_h,
                                     wi->icon_w, wi->icon_h))
                 ) {
-                msg(0, "using png icon for %s\n", tryclass);
+                msg(0, "using file icon for %s\n", tryclass);
                 if (ic->drawable == None) {
                     msg(1, "loading content for %s\n", ic->app);
                     if (loadIconContent(ic) == 0) {
-                        msg(-1, "can't load png icon content\n");
+                        msg(-1, "can't load file icon content: %s\n", ic->src_path);
                         continue;
                     }
                 }
                 wi->icon_drawable = ic->drawable;
-                wi->icon_mask = 0;
+                wi->icon_mask = ic->mask;
                 ret = 1;
                 goto out;
             }

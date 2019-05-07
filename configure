@@ -628,6 +628,8 @@ GREP
 CPP
 fts_LIBS
 fts_CFLAGS
+xpm_LIBS
+xpm_CFLAGS
 libpng_LIBS
 libpng_CFLAGS
 xrandr_LIBS
@@ -751,6 +753,8 @@ xrandr_CFLAGS
 xrandr_LIBS
 libpng_CFLAGS
 libpng_LIBS
+xpm_CFLAGS
+xpm_LIBS
 CPP'
 
 
@@ -1411,6 +1415,8 @@ Some influential environment variables:
   libpng_CFLAGS
               C compiler flags for libpng, overriding pkg-config
   libpng_LIBS linker flags for libpng, overriding pkg-config
+  xpm_CFLAGS  C compiler flags for xpm, overriding pkg-config
+  xpm_LIBS    linker flags for xpm, overriding pkg-config
   CPP         C preprocessor
 
 Use these variables to override the choices made by `configure' or to help
@@ -4300,6 +4306,97 @@ See \`config.log' for more details" "$LINENO" 5; }
 else
 	libpng_CFLAGS=$pkg_cv_libpng_CFLAGS
 	libpng_LIBS=$pkg_cv_libpng_LIBS
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+fi
+
+pkg_failed=no
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for xpm" >&5
+$as_echo_n "checking for xpm... " >&6; }
+
+if test -n "$xpm_CFLAGS"; then
+    pkg_cv_xpm_CFLAGS="$xpm_CFLAGS"
+ elif test -n "$PKG_CONFIG"; then
+    if test -n "$PKG_CONFIG" && \
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"xpm\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "xpm") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_xpm_CFLAGS=`$PKG_CONFIG --cflags "xpm" 2>/dev/null`
+		      test "x$?" != "x0" && pkg_failed=yes
+else
+  pkg_failed=yes
+fi
+ else
+    pkg_failed=untried
+fi
+if test -n "$xpm_LIBS"; then
+    pkg_cv_xpm_LIBS="$xpm_LIBS"
+ elif test -n "$PKG_CONFIG"; then
+    if test -n "$PKG_CONFIG" && \
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"xpm\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "xpm") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_xpm_LIBS=`$PKG_CONFIG --libs "xpm" 2>/dev/null`
+		      test "x$?" != "x0" && pkg_failed=yes
+else
+  pkg_failed=yes
+fi
+ else
+    pkg_failed=untried
+fi
+
+
+
+if test $pkg_failed = yes; then
+   	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
+        _pkg_short_errors_supported=yes
+else
+        _pkg_short_errors_supported=no
+fi
+        if test $_pkg_short_errors_supported = yes; then
+	        xpm_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "xpm" 2>&1`
+        else
+	        xpm_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "xpm" 2>&1`
+        fi
+	# Put the nasty error message in config.log where it belongs
+	echo "$xpm_PKG_ERRORS" >&5
+
+	as_fn_error $? "Package requirements (xpm) were not met:
+
+$xpm_PKG_ERRORS
+
+Consider adjusting the PKG_CONFIG_PATH environment variable if you
+installed software in a non-standard prefix.
+
+Alternatively, you may set the environment variables xpm_CFLAGS
+and xpm_LIBS to avoid the need to call pkg-config.
+See the pkg-config man page for more details." "$LINENO" 5
+elif test $pkg_failed = untried; then
+     	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+	{ { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error $? "The pkg-config script could not be found or is too old.  Make sure it
+is in your PATH or set the PKG_CONFIG environment variable to the full
+path to pkg-config.
+
+Alternatively, you may set the environment variables xpm_CFLAGS
+and xpm_LIBS to avoid the need to call pkg-config.
+See the pkg-config man page for more details.
+
+To get pkg-config, see <http://pkg-config.freedesktop.org/>.
+See \`config.log' for more details" "$LINENO" 5; }
+else
+	xpm_CFLAGS=$pkg_cv_xpm_CFLAGS
+	xpm_LIBS=$pkg_cv_xpm_LIBS
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 
