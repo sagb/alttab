@@ -8,6 +8,7 @@ PKG_CHECK_MODULES([xft], [xft])
 PKG_CHECK_MODULES([xrender], [xrender])
 PKG_CHECK_MODULES([xrandr], [xrandr])
 PKG_CHECK_MODULES([libpng], [libpng])
+PKG_CHECK_MODULES([xpm], [xpm])
 
 AC_MSG_CHECKING(for standalone fts library)
 if pkg-config --exists libfts ; then

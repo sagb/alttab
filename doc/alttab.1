@@ -1,7 +1,7 @@
 .\" generated with Ronn/v0.7.3
 .\" http://github.com/rtomayko/ronn/tree/0.7.3
 .
-.TH "ALTTAB" "1" "April 2019" "" ""
+.TH "ALTTAB" "1" "May 2019" "" ""
 .
 .SH "NAME"
 \fBalttab\fR \- the task switcher
@@ -227,7 +227,7 @@ Source of icons\. \fINUMBER\fR must be between 0 and 3:
 \fI1\fR: Load icon from file if not found in window attributes\.
 .
 .IP
-Alttab searches for PNG icons under:
+Alttab searches for PNG and XPM icons under:
 .
 .IP
 /usr/share/icons
@@ -243,6 +243,15 @@ Alttab searches for PNG icons under:
 .
 .IP
 Directory structure should obey freedesktop standard, but desktop files are ignored, instead file name is expected to be equal to application class\. That is, if alttab doesn\'t recognize an icon for window of class foo, as obtained by \'xprop WM_CLASS\', then just drop a 32x32 icon into /usr/local/share/icons/hicolor/32x32/apps/foo\.png\.
+.
+.IP
+Also, alttab scans for icons in legacy directories without freedesktop directory structure:
+.
+.IP
+/usr/share/pixmaps
+.
+.br
+~/\.local/share/pixmaps
 .
 .IP
 \fI2\fR: Prefer icon from file when it matches requested size better (see \fB\-i\fR option)\.
