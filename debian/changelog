@@ -1,3 +1,11 @@
+alttab (1.4.0.20190507.1.g1df30b1-1~1.gbp18396d) stretch; urgency=medium
+
+  ** SNAPSHOT build @18396dbec9c801b660da70151fa9eb8483e1cbb3 **
+
+  * backport to stretch
+
+ -- Alexander Kulak <sa-dev@odd.systems>  Tue, 07 May 2019 13:59:31 +0300
+
 alttab (1.4.0.20190507.1.g1df30b1-1~1.gbpfa0323) unstable; urgency=medium
 
   ** SNAPSHOT build @fa0323933790439911cb641ef6308b462f997923 **
