@@ -1,3 +1,28 @@
+2019-05-01  Alexander Kulak  <sa-dev@odd.systems>
+
+	version 1.4.0
+
+	Use icon from _NET_WM_ICON window property.
+
+2018-11-28  Yauheni Kaliuta  <y.kaliuta@gmail.com>
+
+	Code quality patch:
+	gui: skip extra winlist initializations,
+	gui, win: make selected window number local for gui,
+	ewmh: fold window property calls,
+	treewide: fix memory leaks,
+	treewide: delete trailing whitespaces,
+	treewide: make private stuff really private.
+	Automatic indent.
+
+	Closes: #71, #72, #79.
+
+2018-07-04  Alexander Kulak  <sa-dev@rainbow.by>
+
+	Support RANDR output without CRTCinfo.
+
+	Closes: #69.
+
 2018-04-12  Alexander Kulak  <sa-dev@rainbow.by>
 
 	version 1.3.0

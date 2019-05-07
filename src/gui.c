@@ -171,7 +171,7 @@ static void prepareTile(WindowInfo * wi)
                 msg(-1, "can't create GC to draw icon\n");
                 goto endIcon;
             }
-            if (wi->icon_mask != 0) {
+            if (wi->icon_mask != None) {
                 XSetClipMask(dpy, ic_gc, wi->icon_mask);
             }
             int or = XCopyArea(dpy,
