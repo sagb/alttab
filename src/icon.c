@@ -45,8 +45,10 @@ icon_t *initIcon()
     ic->app[0] = '\0';
     ic->src_path[0] = '\0';
     ic->src_w = ic->src_h = 0;
-    ic->drawable = ic->mask = 0;
+    ic->drawable = ic->mask = None;
     ic->drawable_allocated = false;
+    ic->ext = ICON_EXT_UNKNOWN;
+    ic->dir = ICON_DIR_FREEDESKTOP;
 
     return ic;
 }
@@ -58,6 +60,11 @@ void deleteIcon(icon_t * ic)
 {
     if (ic->drawable_allocated) {
         XFreePixmap(dpy, ic->drawable);
+        /*
+        if (ic->mask != None) {
+            XFreePixmap(dpy, ic->mask);
+        }
+        */
     }
     free(ic);
 }
@@ -95,15 +102,21 @@ int updateIconsFromFile(icon_t ** ihash)
         "/usr/local/share/icons",
         "~/.icons",
         "~/.local/share/icons",
+        "/usr/share/pixmaps",
+        "~/.local/share/pixmaps",
         NULL
     };
     int idndx = 0;
     int theme_len = strlen(g.option_theme);
     char *home = getenv("HOME");
     int ret = 0;
+    bool legacy;
 
     for (hd = 0; icondir[hd] != NULL; hd++) {
-        id2len = strlen(icondir[hd]) + 1 + theme_len + 1;
+        legacy = (strstr (icondir[hd], "pixmap") != NULL);
+        id2len = strlen(icondir[hd]) + 1;
+        if (!legacy)
+            id2len += theme_len + 1;
         if (icondir[hd][0] == '~') {
             if (home == NULL)
                 continue;
@@ -113,10 +126,13 @@ int updateIconsFromFile(icon_t ** ihash)
         if (!id2)
             return 0;
         if (icondir[hd][0] == '~')
-            snprintf(id2, id2len, "%s%s/%s", home, icondir[hd] + 1,
-                     g.option_theme);
+            snprintf(id2, id2len, "%s%s", home, icondir[hd] + 1);
         else
-            snprintf(id2, id2len, "%s/%s", icondir[hd], g.option_theme);
+            snprintf(id2, id2len, "%s", icondir[hd]);
+        if (!legacy) {
+            strcat(id2, "/");
+            strncat(id2, g.option_theme, theme_len);
+        }
         id2[id2len - 1] = '\0';
         icon_dirs[idndx] = id2;
         idndx++;
@@ -145,7 +161,7 @@ int updateIconsFromFile(icon_t ** ihash)
             break;
         case FTS_F:
             //msg(1, "f %s\n", p->fts_path);
-            inspectIconFile(p);
+            inspectIconMeta(p);
             f_c++;
             break;
         default:
@@ -171,19 +187,21 @@ out:
         free(icon_dirs[idndx]);
 
     return ret;
-}                               // updateIconsFromFile
+}   // updateIconsFromFile
 
 //
 // check if the file has better icon for given app than in g.ic
 // return 1 if this icon is used, 0 otherwise
 //
-int inspectIconFile(FTSENT * pe)
+int inspectIconMeta(FTSENT * pe)
 {
     char *point;
     char *fname;
     char app[MAXAPPLEN];
     int applen;
     char *xchar;
+    char *uchar;
+    char *endptr;
     char *dim;
     int dimlen;
     char sx[5];
@@ -193,26 +211,59 @@ int inspectIconFile(FTSENT * pe)
     char *suff;
     int sfxn;
     int tl;
+    char *lds;
+    char *digit;
     char *generic_suffixes[] = { "-color", NULL };
+    char *legacy_dim_suffixes[] = { "16", "24", "32", "48", "64", NULL };
+    int dir = ICON_DIR_FREEDESKTOP;
+    int ext = ICON_EXT_UNKNOWN;
+    const char *special_fail_1 = "failed to interpret %s as app_WWxHH at %s\n";
 
-    // skip non-apps icons
-    if (strcmp(pe->fts_parent->fts_name, "apps") != 0)
+    fname = pe->fts_name;
+    point = strrchr(fname, '.');
+    if (point == NULL)
+        return 0;               // no extension?
+    if (strcmp(point + 1, "png") == 0) {
+        ext = ICON_EXT_PNG;
+    } else if (strcmp(point + 1, "xpm") == 0) {
+        ext = ICON_EXT_XPM;
+    }
+    if (ext == ICON_EXT_UNKNOWN)
+        return 0;
+
+    if (strstr(pe->fts_parent->fts_name, "pixmap") != NULL)
+        dir = ICON_DIR_LEGACY;
+
+    // skip non-apps freedesktop icons
+    if (dir == ICON_DIR_FREEDESKTOP && strcmp(pe->fts_parent->fts_name, "apps") != 0)
         return 0;
 
     // guess app
-    fname = pe->fts_name;
-    point = rindex(fname, '.');
-    if (point == NULL)
-        return 0;               // no extension?
-    if (strcmp(point + 1, "png") != 0)
-        return 0;               // going to load png only TODO: mention in doc
     applen = point - fname > (MAXAPPLEN - 1) ? (MAXAPPLEN - 1) : point - fname;
     strncpy(app, fname, applen);
     app[applen] = '\0';
     for (tl = 0; app[tl] != '\0'; tl++)
         app[tl] = tolower(app[tl]);
 
-    // sort of generalization
+    // guess dimensions by directory
+    if (dir == ICON_DIR_FREEDESKTOP) {
+        dim = pe->fts_parent->fts_parent->fts_name;
+        dimlen = pe->fts_parent->fts_parent->fts_namelen;
+        xchar = strchr(dim, 'x');
+        if (xchar == NULL)
+            return 0;               // unknown dimensions
+        strncpy(sx, dim, (xchar - dim));
+        sx[xchar - dim] = '\0';
+        ix = atoi(sx);
+        strncpy(sy, xchar + 1, dim + dimlen - xchar);
+        sy[dim + dimlen - xchar - 1] = '\0';
+        iy = atoi(sy);
+    } else {
+        // icon other than a priory known dimensions has lowest priority
+        ix = iy = 1;
+    }
+
+    // drop known suffix
     sfxn = 0;
     while (generic_suffixes[sfxn] != NULL) {
         suff = strcasestr(app, generic_suffixes[sfxn]);
@@ -222,18 +273,51 @@ int inspectIconFile(FTSENT * pe)
         sfxn++;
     }
 
-    // guess dimensions
-    dim = pe->fts_parent->fts_parent->fts_name;
-    dimlen = pe->fts_parent->fts_parent->fts_namelen;
-    xchar = index(dim, 'x');
-    if (xchar == NULL)
-        return 0;               // unknown dimensions
-    strncpy(sx, dim, (xchar - dim));
-    sx[xchar - dim] = '\0';
-    ix = atoi(sx);
-    strncpy(sy, xchar + 1, dim + dimlen - xchar);
-    sy[dim + dimlen - xchar - 1] = '\0';
-    iy = atoi(sy);
+    // app_48x48 legacy xpm
+    if (dir == ICON_DIR_LEGACY) {
+        uchar = strrchr(app, '_');
+        xchar = strrchr(app, 'x');
+        if (xchar != NULL && uchar != NULL && xchar > uchar) {
+            strncpy(sx, uchar+1, (xchar - uchar - 1));
+            sx[xchar - uchar - 1] = '\0';
+            ix = strtol(sx, &endptr, 10);
+            if (!(*sx != '\0' && *endptr == '\0')) {
+                msg (0, special_fail_1, app, "WW");
+                ix = 0;
+                goto end_special_1;
+            }
+            strncpy(sy, xchar + 1, app + strlen(app) - xchar);
+            sy[app + strlen(app) - xchar] = '\0';
+            iy = strtol(sy, &endptr, 10);
+            if (!(*sy != '\0' && *endptr == '\0')) {
+                msg (0, special_fail_1, app, "HH");
+                iy = 0;
+                goto end_special_1;
+            }
+            *uchar = '\0';
+        }
+    }
+end_special_1:
+
+    // app48 and app-48 legacy xpm
+    if (dir == ICON_DIR_LEGACY) {
+        digit = app + strlen(app) - 2;
+        if (digit > app + 1) {
+            sfxn = 0;
+            while ((lds = legacy_dim_suffixes[sfxn]) != 0) {
+                if (strncasecmp(digit, lds, 3) == 0) {
+                    ix = iy = strtol(lds, &endptr, 10);
+                    if (*(digit-1) == '-') {
+                        *(digit-1) = '\0';
+                    } else {
+                        *digit = '\0';
+                    }
+                    break;
+                }
+                sfxn++;
+            }
+        }
+    }
 
     // is app already in hash?
     HASH_FIND_STR(g.ic, app, ic);
@@ -243,6 +327,8 @@ int inspectIconFile(FTSENT * pe)
         strncpy(ic->src_path, pe->fts_path, MAXICONPATHLEN-1);
         ic->src_w = ix;
         ic->src_h = iy;
+        ic->ext = ext;
+        ic->dir = dir;
         HASH_ADD_STR(g.ic, app, ic);
     } else {
         // we already have icon with dimensions: ic->src_w, h
@@ -257,12 +343,12 @@ int inspectIconFile(FTSENT * pe)
     }
 
     return 1;
-}                               // inspectIconFile
+} // inspectIconMeta
 
 //
-// update drawable
+// update Drawable from png file
 //
-int loadIconContent(icon_t * ic)
+int loadIconContentPNG(icon_t * ic)
 {
 
     if (!ic->drawable_allocated) {
@@ -277,11 +363,47 @@ int loadIconContent(icon_t * ic)
     if (pngReadToDrawable
         (ic->src_path, ic->drawable, g.color[COLBG].xcolor.red,
          g.color[COLBG].xcolor.green, g.color[COLBG].xcolor.blue) == 0) {
-        msg(-1, "can't read png to drawable\n");
+        msg(-1, "can't read png to drawable: %s\n", ic->src_path);
         return 0;
     }
 
     return 1;
+}
+
+//
+// update Drawable from xpm file
+//
+int loadIconContentXPM(icon_t * ic)
+{
+    int ret;
+
+    ret = (XpmReadFileToPixmap(dpy, root, ic->src_path, &(ic->drawable),
+                &(ic->mask), NULL) == XpmSuccess) ? 1 : 0;
+    if (ret == 1) {
+        ic->drawable_allocated = true;
+    } else {
+        msg(-1, "can't read xpm to drawable: %s\n", ic->src_path);
+    }
+
+    return ret;
+}
+
+//
+// update drawable
+//
+int loadIconContent(icon_t * ic)
+{
+    int ret;
+
+    if (ic->ext == ICON_EXT_PNG) {
+        ret = loadIconContentPNG(ic);
+    } else if (ic->ext == ICON_EXT_XPM) {
+        ret = loadIconContentXPM(ic);
+    } else {
+        msg(1, "unknown icon extension: %d\n", ic->ext);
+        ret = 0;
+    }
+    return ret;
 }
 
 //
