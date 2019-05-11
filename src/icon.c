@@ -80,6 +80,35 @@ int initIconHash(icon_t ** ihash)
     return 1;
 }
 
+const char *prefixes[] = {
+    "~/.local/share",
+    "~",
+    ""
+};
+
+typedef enum {
+    LOCAL_SHARE_PREFIX,
+    HOME_PREFIX,
+    NO_PREFIX,
+    N_PREFIXES = sizeof(prefixes) / sizeof(prefixes[0]),
+} prefix_t;
+
+bool prefix(const char * prefix, const char * str)
+{
+    return strncmp(prefix, str, strlen(prefix)) == 0;
+}
+
+prefix_t determine_prefix(const char * s)
+{
+    for (prefix_t p = 0; p < N_PREFIXES; ++p) {
+        if (prefix(prefixes[p], s)) {
+            return p;
+        }
+    }
+    // prefix("", s) is always true
+    __builtin_unreachable();
+}
+
 //
 // load all icons
 // (no pixmaps, just path and dimension)
@@ -96,7 +125,7 @@ int updateIconsFromFile(icon_t ** ihash)
     icon_t *iiter, *tmp;
 
     int fts_options = FTS_COMFOLLOW | FTS_LOGICAL | FTS_NOCHDIR;
-    // XDG_DATA_DIRS ignored
+
     const char *icondir[] = {
         "/usr/share/icons",
         "/usr/local/share/icons",
@@ -109,26 +138,38 @@ int updateIconsFromFile(icon_t ** ihash)
     int idndx = 0;
     int theme_len = strlen(g.option_theme);
     char *home = getenv("HOME");
+    char *xdg = getenv("XDG_DATA_DIR");
+    const char *subst_prefixes[] = {
+        xdg,
+        home,
+        ""
+    };
     int ret = 0;
     bool legacy;
+    prefix_t pref;
 
     for (hd = 0; icondir[hd] != NULL; hd++) {
+        pref = determine_prefix(icondir[hd]);
+        // Special case for XDG_DATA_DIR: When it's not
+        // set, fall back to $HOME/.local/share
+        if (pref == LOCAL_SHARE_PREFIX && xdg == NULL)
+            pref = HOME_PREFIX;
+
+        const char *old = prefixes[pref];
+        const char *new = subst_prefixes[pref];
+        if (new == NULL)
+            continue;
+
+        id2len = strlen(icondir[hd]) + strlen(new) - strlen(old) + 1;
         legacy = (strstr (icondir[hd], "pixmap") != NULL);
-        id2len = strlen(icondir[hd]) + 1;
         if (!legacy)
+            // i.e. "/hicolor"
             id2len += theme_len + 1;
-        if (icondir[hd][0] == '~') {
-            if (home == NULL)
-                continue;
-            id2len += strlen(home);
-        }
+
         id2 = malloc(id2len);
         if (!id2)
             return 0;
-        if (icondir[hd][0] == '~')
-            snprintf(id2, id2len, "%s%s", home, icondir[hd] + 1);
-        else
-            snprintf(id2, id2len, "%s", icondir[hd]);
+        snprintf(id2, id2len, "%s%s", new, icondir[hd] + strlen(old));
         if (!legacy) {
             strcat(id2, "/");
             strncat(id2, g.option_theme, theme_len);

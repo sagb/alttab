@@ -200,8 +200,8 @@ Most command line options have corresponding X resource, see doc/alttab.ad for e
   
       /usr/share/icons  
       /usr/local/share/icons  
-      ~/.icons  
-      ~/.local/share/icons  
+      $HOME/.icons  
+      ${XDG_DATA_DIR:-$HOME/.local/share}/icons  
   
       Directory structure should obey freedesktop standard, but desktop files are ignored,
       instead file name is expected to be equal to application class. 
@@ -213,7 +213,7 @@ Most command line options have corresponding X resource, see doc/alttab.ad for e
       structure:  
   
       /usr/share/pixmaps  
-      ~/.local/share/pixmaps  
+      ${XDG_DATA_DIR:-$HOME/.local/share}/pixmaps  
 
       <2>: Prefer icon from file when it matches requested size better (see `-i` option).
 
