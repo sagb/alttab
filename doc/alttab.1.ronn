@@ -196,7 +196,7 @@ Most command line options have corresponding X resource, see doc/alttab.ad for e
       
       <1>: Load icon from file if not found in window attributes.
 
-      Alttab searches for PNG and XPM icons under:  
+      Alttab searches for PNG and XPM icons in $XDG_DATA_DIRS and also under:  
   
       /usr/share/icons  
       /usr/local/share/icons  
