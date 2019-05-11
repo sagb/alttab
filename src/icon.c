@@ -191,7 +191,7 @@ void destroyIconDirs(char ** icon_dirs)
 //
 int updateIconsFromFile(icon_t ** ihash)
 {
-    char *icon_dirs[MAXICONDIRS];
+    char *icon_dirs[MAXICONDIRS] = { 0 };
     int d_c, f_c;
     FTS *ftsp;
     FTSENT *p, *chp;
