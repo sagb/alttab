@@ -81,22 +81,14 @@ int initIconHash(icon_t ** ihash)
 }
 
 //
-// load all icons
-// (no pixmaps, just path and dimension)
+// build array of icon directories
+// return the number of elements or 0
 //
-int updateIconsFromFile(icon_t ** ihash)
+int allocIconDirs(char ** icon_dirs)
 {
     int hd;
     char *id2;
     int id2len;
-    char *icon_dirs[MAXICONDIRS];
-    int d_c, f_c;
-    FTS *ftsp;
-    FTSENT *p, *chp;
-    icon_t *iiter, *tmp;
-
-    int fts_options = FTS_COMFOLLOW | FTS_LOGICAL | FTS_NOCHDIR;
-    // XDG_DATA_DIRS ignored
     const char *icondir[] = {
         "/usr/share/icons",
         "/usr/local/share/icons",
@@ -109,8 +101,14 @@ int updateIconsFromFile(icon_t ** ihash)
     int idndx = 0;
     int theme_len = strlen(g.option_theme);
     char *home = getenv("HOME");
-    int ret = 0;
+    char *xdgdd = getenv("XDG_DATA_DIRS");
     bool legacy;
+    char *str1;
+    char *xdg;
+    char *saveptr1;
+    int j;
+    char *k;
+    int idsd;
 
     for (hd = 0; icondir[hd] != NULL; hd++) {
         legacy = (strstr (icondir[hd], "pixmap") != NULL);
@@ -137,12 +135,73 @@ int updateIconsFromFile(icon_t ** ihash)
         icon_dirs[idndx] = id2;
         idndx++;
     }
+
+    if (xdgdd != NULL) {
+        for (j = 1, str1 = xdgdd; ; j++, str1 = NULL) {
+            xdg = strtok_r(str1, ":", &saveptr1);
+            if (xdg == NULL)
+                break;
+            msg(1, "xdg dir %d: %s\n", j, xdg);
+            // strip trailing "/"'s
+            for (k = xdg + strlen(xdg) - 1; *k == '/'; k--) {
+                *k = '\0';
+            }
+            id2len = strlen(xdg) + strlen("/icons/") + theme_len + 1;
+            id2 = malloc(id2len);
+            if (!id2)
+                return 0;
+            snprintf(id2, id2len, "%s/icons/%s", xdg, g.option_theme);
+            id2[id2len - 1] = '\0';
+            // search for duplicates
+            for (idsd = 0; idsd < idndx; idsd++) {
+                if (strncmp (icon_dirs[idsd], id2, id2len) == 0) {
+                    msg(1, "skip duplicate icon dir: %s\n", id2);
+                    free(id2); id2 = NULL;
+                    break;
+                }
+            }
+            if (id2 != NULL) {
+                icon_dirs[idndx] = id2;
+                idndx++;
+            }
+        }
+    }
+
     icon_dirs[idndx] = NULL;
     if (g.debug > 1) {
         for (idndx = 0; icon_dirs[idndx] != NULL; idndx++)
             msg(1, "icon dir: %s\n", icon_dirs[idndx]);
     }
+    return idndx;
+}
 
+//
+// free icon_dirs
+//
+void destroyIconDirs(char ** icon_dirs)
+{
+    int idndx;
+    for (idndx = 0; icon_dirs[idndx] != NULL; idndx++)
+        free(icon_dirs[idndx]);
+}
+
+//
+// load all icons
+// (no pixmaps, just path and dimension)
+//
+int updateIconsFromFile(icon_t ** ihash)
+{
+    char *icon_dirs[MAXICONDIRS];
+    int d_c, f_c;
+    FTS *ftsp;
+    FTSENT *p, *chp;
+    icon_t *iiter, *tmp;
+    int fts_options = FTS_COMFOLLOW | FTS_LOGICAL | FTS_NOCHDIR;
+    int ret = 0;
+
+    if (allocIconDirs(icon_dirs) <= 0) {
+        goto out;
+    }
     if ((ftsp = fts_open(icon_dirs, fts_options, NULL)) == NULL) {
         warn("fts_open");
         goto out;
@@ -179,13 +238,10 @@ int updateIconsFromFile(icon_t ** ihash)
             }
         }
     }
-
     ret = 1;
 
 out:
-    for (idndx = 0; icon_dirs[idndx] != NULL; idndx++)
-        free(icon_dirs[idndx]);
-
+    destroyIconDirs(icon_dirs);
     return ret;
 }   // updateIconsFromFile
 
