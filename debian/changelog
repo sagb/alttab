@@ -1,10 +1,12 @@
-alttab (1.4.0.20190507.1.g1df30b1-1~1.gbp195d68) jessie; urgency=medium
+alttab (1.4.0.20190512.3.ge9c9e8b-1~1.gbpf5ab2b) unstable; urgency=medium
 
-  ** SNAPSHOT build @195d6850e7b05657cbc1b796a3983789fdff11d9 **
+  ** SNAPSHOT build @f5ab2b1144d9b18edc20d8fb86d54d0d29740279 **
 
-  * backport to jessie
+  * libxpm dependency
+  * use XDG_DATA_DIRS
+  * fix relying on non-initialized icon_dir
 
- -- Alexander Kulak <sa-dev@odd.systems>  Tue, 07 May 2019 14:09:36 +0300
+ -- Alexander Kulak <sa-dev@odd.systems>  Sun, 12 May 2019 20:41:05 +0300
 
 alttab (1.4.0.20190507.1.g1df30b1-1~1.gbpfa0323) unstable; urgency=medium
 
