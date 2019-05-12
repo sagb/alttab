@@ -559,7 +559,7 @@ char *get_x_property(Window win, Atom prop_type, char *prop_name,
     unsigned char *ret_prop;
     char *r;
     Atom prop_name_x, prop_ret_type_x;
-    int max_prop_len;
+    long max_prop_len;
 
     int debug = 0;
 
@@ -579,6 +579,14 @@ char *get_x_property(Window win, Atom prop_type, char *prop_name,
                 "get_x_property: XGetWindowProperty failed (win %ld, prop %s)\n",
                 win, prop_name);
         return (char *)NULL;
+    }
+
+    if (ret_bytes_after > 0) {
+        if (debug > 0)
+            fprintf(stderr,
+                    "get_x_property: max_prop_len of size %ld was too small, %ld bytes not read",
+                    max_prop_len,
+                    ret_bytes_after);
     }
 
     if (prop_type != prop_ret_type_x) {
