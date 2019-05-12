@@ -59,6 +59,8 @@ typedef struct {
 icon_t *initIcon();
 void deleteIcon(icon_t * ic);
 int initIconHash(icon_t ** ihash);
+int allocIconDirs(char ** icon_dirs);
+void destroyIconDirs(char ** icon_dirs);
 int updateIconsFromFile(icon_t ** ihash);   // load all icons into hash (no pixmaps, just path and dimension)
 int inspectIconMeta(FTSENT * pe);   // check if file pe has better icon than we have in g.ic
 int loadIconContentPNG(icon_t * ic);
