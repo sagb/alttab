@@ -1,3 +1,13 @@
+alttab (1.4.0.20190512.3.ge9c9e8b-1~1.gbpf5ab2b) unstable; urgency=medium
+
+  ** SNAPSHOT build @f5ab2b1144d9b18edc20d8fb86d54d0d29740279 **
+
+  * libxpm dependency
+  * use XDG_DATA_DIRS
+  * fix relying on non-initialized icon_dir
+
+ -- Alexander Kulak <sa-dev@odd.systems>  Sun, 12 May 2019 20:41:05 +0300
+
 alttab (1.4.0.20190507.1.g1df30b1-1~1.gbpfa0323) unstable; urgency=medium
 
   ** SNAPSHOT build @fa0323933790439911cb641ef6308b462f997923 **
