@@ -108,6 +108,7 @@ int allocIconDirs(char ** icon_dirs)
     char *saveptr1;
     int j;
     char *k;
+    int idsd;
 
     for (hd = 0; icondir[hd] != NULL; hd++) {
         legacy = (strstr (icondir[hd], "pixmap") != NULL);
@@ -152,8 +153,7 @@ int allocIconDirs(char ** icon_dirs)
             snprintf(id2, id2len, "%s/icons/%s", xdg, g.option_theme);
             id2[id2len - 1] = '\0';
             // search for duplicates
-            int idsd;
-            for (idsd = 0; icon_dirs[idsd] != NULL; idsd++) {
+            for (idsd = 0; idsd < idndx; idsd++) {
                 if (strncmp (icon_dirs[idsd], id2, id2len) == 0) {
                     msg(1, "skip duplicate icon dir: %s\n", id2);
                     free(id2); id2 = NULL;
