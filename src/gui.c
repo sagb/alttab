@@ -313,6 +313,7 @@ int uiShow(bool direction)
 {
     msg(0, "preparing ui\n");
     g.uiShowHasRun = true;      // begin allocations
+    grabNextPrevKeys(true);
 // screen-related stuff is not at startup but here,
 // because screen configuration may get changed at runtime
 // moreover, DisplayWidth/Height aren't changed without
@@ -609,6 +610,7 @@ int uiHide()
 {
     // order is important: to set focus in Metacity,
     // our window must be destroyed first
+    grabNextPrevKeys(false);
     if (uiwin) {
         msg(0, "destroying our window\n");
         XUnmapWindow(dpy, uiwin);

@@ -107,12 +107,33 @@ Most command line options have corresponding X resource, see doc/alttab.ad for e
     Keysym of main modifier. String or number accepted.
     Suitable examples: Control_L, Super_L.
 
+  * `-rk` <str>:
+    resource: alttab.revmodifier.keysym  
+    default: Control_L
+
+    Keysym of main modifier. String or number accepted.
+    Suitable examples: Control_L, Super_L.
+
   * `-kk` <str>:
     resource: alttab.key.keysym  
     default: Tab
 
     Keysym of main key.
     For example, grave (aka tilde), Escape.
+
+  * `-pk` <str>:
+    resource: alttab.prevkey.keysym  
+    default: Left
+
+    Keysym of prev key.
+    For example, Page_Up.
+
+  * `-nk` <str>:
+    resource: alttab.nextkey.keysym  
+    default: Right
+
+    Keysym of next key.
+    For example, Page_Down.
 
   * `-bk` <str>:
     resource: alttab.backscroll.keysym  

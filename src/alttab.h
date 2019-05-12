@@ -55,6 +55,10 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 #define DEFBACKMASK ShiftMask
 #define DEFMODKS    XK_Alt_L
 #define DEFKEYKS    XK_Tab
+#define DEFRMODKS   XK_Control_L
+#define DEFRMODMASK ControlMask
+#define DEFPREVKS   XK_Left
+#define DEFNEXTKS   XK_Right
 
 #include "icon.h"
 
@@ -175,6 +179,9 @@ typedef struct {
     char *option_theme;
     unsigned int option_modMask, option_backMask;
     KeyCode option_modCode, option_keyCode;
+    KeyCode option_rModCode;
+    unsigned int option_rModMask;
+    KeyCode option_prevCode, option_nextCode;
     Color color[NCOLORS];
     GC gcDirect, gcReverse, gcFrame;    // used in both gui.c and win.c
     unsigned int ignored_modmask;
@@ -183,6 +190,8 @@ typedef struct {
     Atom naw;                   // _NET_ACTIVE_WINDOW
 //    SwitchMoment last; // for detecting false focus events from WM
 } Globals;
+
+int grabNextPrevKeys(bool grabUngrab);
 
 // gui
 int startupGUItasks();
