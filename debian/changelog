@@ -1,10 +1,10 @@
-alttab (1.4.0.20190512.3.ge9c9e8b-1~1.gbp961026) testing; urgency=medium
+alttab (1.4.0.20190516.4.ga83ffbd-1~1.gbp8b4e35) unstable; urgency=medium
 
-  ** SNAPSHOT build @961026e0b9aac49b62e942a4290210a3bbff29b8 **
+  ** SNAPSHOT build @8b4e350778d699d529c638ec8aa3e65059b4c378 **
 
-  * backport to buster
+  * drop "allocated" flag after file icon found
 
- -- Alexander Kulak <sa-dev@odd.systems>  Sun, 12 May 2019 20:44:53 +0300
+ -- Alexander Kulak <sa-dev@odd.systems>  Fri, 17 May 2019 00:10:18 +0300
 
 alttab (1.4.0.20190512.3.ge9c9e8b-1~1.gbpf5ab2b) unstable; urgency=medium
 
