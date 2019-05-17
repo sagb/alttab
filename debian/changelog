@@ -1,10 +1,10 @@
-alttab (1.4.0.20190512.3.ge9c9e8b-1~1.gbp9fe7c8) jessie; urgency=medium
+alttab (1.4.0.20190516.4.ga83ffbd-1~1.gbp8b4e35) unstable; urgency=medium
 
-  ** SNAPSHOT build @9fe7c8ab148e72ce4fda85a66dd3df251f2e8410 **
+  ** SNAPSHOT build @8b4e350778d699d529c638ec8aa3e65059b4c378 **
 
-  * backport to jessie
+  * drop "allocated" flag after file icon found
 
- -- Alexander Kulak <sa-dev@odd.systems>  Sun, 12 May 2019 20:49:55 +0300
+ -- Alexander Kulak <sa-dev@odd.systems>  Fri, 17 May 2019 00:10:18 +0300
 
 alttab (1.4.0.20190512.3.ge9c9e8b-1~1.gbpf5ab2b) unstable; urgency=medium
 

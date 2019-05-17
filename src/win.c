@@ -221,9 +221,7 @@ int addIconFromProperty(WindowInfo * wi)
             n += w*h;
             continue;
         }
-        msg(1, "Trying icon at position %lu (%dx%d)\n", n, w, h);
         if (best == 0 || iconMatchBetter(w, h, best_w, best_h)) {
-            msg(1, "Icon is better\n");
             best = n;
         }
         n += w*h;
@@ -233,6 +231,7 @@ int addIconFromProperty(WindowInfo * wi)
         //free(prop); better don't
         return 0;
     }
+    msg(1, "using %dx%d %s icon for %lx\n", w, h, NWI, wi->id);
 
     image32 = malloc(best_w * best_h * 4);
     CompositeConst cc = initCompositeConst(g.color[COLBG].xcolor.pixel);
@@ -345,6 +344,16 @@ int addIconFromFiles(WindowInfo * wi)
                         msg(-1, "can't load file icon content: %s\n", ic->src_path);
                         continue;
                     }
+                }
+                // for the case when icon was already found in window props
+                if (wi->icon_allocated) {
+                    XFreePixmap(dpy, wi->icon_drawable);
+                    /*
+                    if (wi->icon_mask != None) {
+                       XFreePixmap(dpy, wi->icon_mask);
+                    }
+                    */
+                    wi->icon_allocated = false;
                 }
                 wi->icon_drawable = ic->drawable;
                 wi->icon_mask = ic->mask;
