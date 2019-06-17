@@ -27,6 +27,13 @@ Binaries
 
 * In Alpine Linux, alttab is in _aports/testing_ repository.
 
+* In openSUSE, alttab is available in Tumbleweed and from the [X11:Utilities](https://build.opensuse.org/package/show/X11:Utilities/alttab) repository:
+
+    ```
+    zypper ar -f obs://X11:Utilities x11utils
+    zypper ref
+    zypper in alttab
+    ```
 
 Building from source
 --------------------
