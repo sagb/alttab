@@ -41,6 +41,12 @@ Window root;
 // PRIVATE
 static XrmDatabase db;
 
+// define extra next/prev keys here (used in grabAllKeys)
+#define PREV_EXTRA_KC0  43 // "h"
+#define PREV_EXTRA_KC1  113 // "left arrow"
+#define NEXT_EXTRA_KC0  46 // "l"
+#define NEXT_EXTRA_KC1  114 // "right arrow"
+
 //
 // help and exit
 //
@@ -444,6 +450,13 @@ static int grabAllKeys(bool grabUngrab)
         die(grabhint, g.option_keyCode,
             g.option_modMask | g.option_backMask, g.ignored_modmask);
     }
+
+    // grab extra keycodes (defined at top of file)
+    changeKeygrab(root, grabUngrab, PREV_EXTRA_KC0, g.option_modMask, g.ignored_modmask);
+    changeKeygrab(root, grabUngrab, PREV_EXTRA_KC1, g.option_modMask, g.ignored_modmask);
+    changeKeygrab(root, grabUngrab, NEXT_EXTRA_KC0, g.option_modMask, g.ignored_modmask);
+    changeKeygrab(root, grabUngrab, NEXT_EXTRA_KC1, g.option_modMask, g.ignored_modmask);
+
     return 1;
 }
 
@@ -502,18 +515,27 @@ int main(int argc, char **argv)
         case KeyPress:
             msg(1, "Press %lx: %d-%d\n",
                 ev.xkey.window, ev.xkey.state, ev.xkey.keycode);
-            if (!((ev.xkey.state & g.option_modMask)
-                  && ev.xkey.keycode == g.option_keyCode)) {
-                break;
-            }                   // safety redundance
+
             if (!g.uiShowHasRun) {
                 uiShow((ev.xkey.state & g.option_backMask));
             } else {
+
+                // if prev/next extra keys
+                if (ev.xkey.keycode == PREV_EXTRA_KC0 || ev.xkey.keycode == PREV_EXTRA_KC1) {
+                    uiPrevWindow();
+                    break;
+                }
+                if (ev.xkey.keycode == NEXT_EXTRA_KC0 || ev.xkey.keycode == NEXT_EXTRA_KC1) {
+                    uiNextWindow();
+                    break;
+                }
+                
                 if (ev.xkey.state & g.option_backMask) {
                     uiPrevWindow();
                 } else {
                     uiNextWindow();
                 }
+
             }
             break;
 
