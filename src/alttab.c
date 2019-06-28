@@ -460,6 +460,23 @@ static int grabAllKeys(bool grabUngrab)
     return 1;
 }
 
+/*
+Returns 0 if not an extra prev/next keycode, 1 if extra prev keycode, and 2 if extra next keycode.
+ */
+static int isPrevNextKey(unsigned int *keycode) {
+
+    if (keycode == PREV_EXTRA_KC0 || keycode == PREV_EXTRA_KC1) {
+        return 1;
+    }
+
+    if (keycode == NEXT_EXTRA_KC0 || keycode == NEXT_EXTRA_KC1) {
+        return 2;
+    }
+
+    // if here then is neither
+    return 0;
+}
+
 int main(int argc, char **argv)
 {
 
@@ -517,15 +534,22 @@ int main(int argc, char **argv)
                 ev.xkey.window, ev.xkey.state, ev.xkey.keycode);
 
             if (!g.uiShowHasRun) {
+
+                // if not showing uiShow and prev/next extra keys are used (i.e. without first doing alt-tab) then break
+                if (isPrevNextKey(ev.xkey.keycode) > 0) {
+                    break;
+                }
+
                 uiShow((ev.xkey.state & g.option_backMask));
+
             } else {
 
                 // if prev/next extra keys
-                if (ev.xkey.keycode == PREV_EXTRA_KC0 || ev.xkey.keycode == PREV_EXTRA_KC1) {
+                if (isPrevNextKey(ev.xkey.keycode) == 1) {
                     uiPrevWindow();
                     break;
                 }
-                if (ev.xkey.keycode == NEXT_EXTRA_KC0 || ev.xkey.keycode == NEXT_EXTRA_KC1) {
+                if (isPrevNextKey(ev.xkey.keycode) == 2) {
                     uiNextWindow();
                     break;
                 }
@@ -588,4 +612,4 @@ int main(int argc, char **argv)
 // not restoring error handler
     XCloseDisplay(dpy);
     return 0;
-}                               // main
+} // main
