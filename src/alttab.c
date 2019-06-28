@@ -451,19 +451,25 @@ static int grabAllKeys(bool grabUngrab)
             g.option_modMask | g.option_backMask, g.ignored_modmask);
     }
 
+    return 1;
+}
+
+/*
+Grabs (or releases) extra prev/next keycodes.
+ */
+void grabExtraNextPrevKeys(bool grabUngrab) {
+
     // grab extra keycodes (defined at top of file)
     changeKeygrab(root, grabUngrab, PREV_EXTRA_KC0, g.option_modMask, g.ignored_modmask);
     changeKeygrab(root, grabUngrab, PREV_EXTRA_KC1, g.option_modMask, g.ignored_modmask);
     changeKeygrab(root, grabUngrab, NEXT_EXTRA_KC0, g.option_modMask, g.ignored_modmask);
     changeKeygrab(root, grabUngrab, NEXT_EXTRA_KC1, g.option_modMask, g.ignored_modmask);
-
-    return 1;
 }
 
 /*
 Returns 0 if not an extra prev/next keycode, 1 if extra prev keycode, and 2 if extra next keycode.
  */
-static int isPrevNextKey(unsigned int *keycode) {
+static int isPrevNextKey(unsigned int keycode) {
 
     if (keycode == PREV_EXTRA_KC0 || keycode == PREV_EXTRA_KC1) {
         return 1;
@@ -517,6 +523,7 @@ int main(int argc, char **argv)
             XQueryKeymap(dpy, keys_pressed);
             if (!(keys_pressed[octet] & kmask)) {   // Alt released
                 uiHide();
+                grabExtraNextPrevKeys(false);
                 continue;
             }
             if (!XCheckIfEvent(dpy, &ev, *predproc_true, NULL)) {
@@ -540,6 +547,7 @@ int main(int argc, char **argv)
                     break;
                 }
 
+                grabExtraNextPrevKeys(true);
                 uiShow((ev.xkey.state & g.option_backMask));
 
             } else {
@@ -571,6 +579,7 @@ int main(int argc, char **argv)
                   && ev.xkey.keycode == g.option_modCode && g.uiShowHasRun)) {
                 break;
             }
+
             uiHide();
             break;
 
