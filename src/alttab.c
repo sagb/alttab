@@ -457,7 +457,7 @@ static int grabAllKeys(bool grabUngrab)
 /*
 Grabs (or releases) extra prev/next keycodes.
  */
-void grabExtraNextPrevKeys(bool grabUngrab) {
+static void grabExtraNextPrevKeys(bool grabUngrab) {
 
     // grab extra keycodes (defined at top of file)
     changeKeygrab(root, grabUngrab, PREV_EXTRA_KC0, g.option_modMask, g.ignored_modmask);
@@ -541,17 +541,10 @@ int main(int argc, char **argv)
                 ev.xkey.window, ev.xkey.state, ev.xkey.keycode);
 
             if (!g.uiShowHasRun) {
-
-                // if not showing uiShow and prev/next extra keys are used (i.e. without first doing alt-tab) then break
-                if (isPrevNextKey(ev.xkey.keycode) > 0) {
-                    break;
-                }
-
                 grabExtraNextPrevKeys(true);
                 uiShow((ev.xkey.state & g.option_backMask));
 
             } else {
-
                 // if prev/next extra keys
                 if (isPrevNextKey(ev.xkey.keycode) == 1) {
                     uiPrevWindow();
@@ -567,7 +560,6 @@ int main(int argc, char **argv)
                 } else {
                     uiNextWindow();
                 }
-
             }
             break;
 
