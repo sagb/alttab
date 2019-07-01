@@ -41,12 +41,6 @@ Window root;
 // PRIVATE
 static XrmDatabase db;
 
-// define extra next/prev keys here (used in grabAllKeys)
-#define PREV_EXTRA_KC0  43 // "h"
-#define PREV_EXTRA_KC1  113 // "left arrow"
-#define NEXT_EXTRA_KC0  46 // "l"
-#define NEXT_EXTRA_KC1  114 // "right arrow"
-
 //
 // help and exit
 //
@@ -433,7 +427,7 @@ static int use_args_and_xrm(int *argc, char **argv)
 // grab Alt-Tab and Alt-Shift-Tab
 // note: exit() on failure
 //
-static int grabAllKeys(bool grabUngrab)
+static int grabKeysAtStartup(bool grabUngrab)
 {
     g.ignored_modmask = getOffendingModifiersMask(dpy); // or 0 for g.debug
     char *grabhint =
@@ -454,34 +448,21 @@ static int grabAllKeys(bool grabUngrab)
     return 1;
 }
 
-/*
-Grabs (or releases) extra prev/next keycodes.
- */
-static void grabExtraNextPrevKeys(bool grabUngrab) {
-
-    // grab extra keycodes (defined at top of file)
-    changeKeygrab(root, grabUngrab, PREV_EXTRA_KC0, g.option_modMask, g.ignored_modmask);
-    changeKeygrab(root, grabUngrab, PREV_EXTRA_KC1, g.option_modMask, g.ignored_modmask);
-    changeKeygrab(root, grabUngrab, NEXT_EXTRA_KC0, g.option_modMask, g.ignored_modmask);
-    changeKeygrab(root, grabUngrab, NEXT_EXTRA_KC1, g.option_modMask, g.ignored_modmask);
-}
-
-/*
-Returns 0 if not an extra prev/next keycode, 1 if extra prev keycode, and 2 if extra next keycode.
- */
-static int isPrevNextKey(unsigned int keycode) {
-
+//
+// Returns 0 if not an extra prev/next keycode, 1 if extra prev keycode, and 2 if extra next keycode.
+//
+static int isPrevNextKey(unsigned int keycode)
+{
     if (keycode == PREV_EXTRA_KC0 || keycode == PREV_EXTRA_KC1) {
         return 1;
     }
-
     if (keycode == NEXT_EXTRA_KC0 || keycode == NEXT_EXTRA_KC1) {
         return 2;
     }
-
     // if here then is neither
     return 0;
 }
+
 
 int main(int argc, char **argv)
 {
@@ -505,7 +486,7 @@ int main(int argc, char **argv)
     if (!startupGUItasks())
         die("startupGUItasks failed");
 
-    grabAllKeys(true);
+    grabKeysAtStartup(true);
     g.uiShowHasRun = false;
 
     struct timespec nanots;
@@ -523,7 +504,6 @@ int main(int argc, char **argv)
             XQueryKeymap(dpy, keys_pressed);
             if (!(keys_pressed[octet] & kmask)) {   // Alt released
                 uiHide();
-                grabExtraNextPrevKeys(false);
                 continue;
             }
             if (!XCheckIfEvent(dpy, &ev, *predproc_true, NULL)) {
@@ -539,26 +519,26 @@ int main(int argc, char **argv)
         case KeyPress:
             msg(1, "Press %lx: %d-%d\n",
                 ev.xkey.window, ev.xkey.state, ev.xkey.keycode);
-
-            if (!g.uiShowHasRun) {
-                grabExtraNextPrevKeys(true);
-                uiShow((ev.xkey.state & g.option_backMask));
-
-            } else {
-                // if prev/next extra keys
-                if (isPrevNextKey(ev.xkey.keycode) == 1) {
-                    uiPrevWindow();
-                    break;
-                }
-                if (isPrevNextKey(ev.xkey.keycode) == 2) {
-                    uiNextWindow();
-                    break;
-                }
-                
-                if (ev.xkey.state & g.option_backMask) {
-                    uiPrevWindow();
-                } else {
-                    uiNextWindow();
+            if (ev.xkey.state & g.option_modMask) {  // alt
+                if (ev.xkey.keycode == g.option_keyCode) {  // tab
+                    if (!g.uiShowHasRun) {
+                        uiShow((ev.xkey.state & g.option_backMask));
+                    } else {
+                        if (ev.xkey.state & g.option_backMask) {
+                            uiPrevWindow();
+                        } else {
+                            uiNextWindow();
+                        }
+                    }
+                } else {  // non-tab
+                    switch (isPrevNextKey(ev.xkey.keycode)) {
+                    case 1:
+                        uiPrevWindow();
+                        break;
+                    case 2:
+                        uiNextWindow();
+                        break;
+                    }
                 }
             }
             break;
@@ -571,7 +551,6 @@ int main(int argc, char **argv)
                   && ev.xkey.keycode == g.option_modCode && g.uiShowHasRun)) {
                 break;
             }
-
             uiHide();
             break;
 
@@ -609,7 +588,7 @@ int main(int argc, char **argv)
     shutdownWin();
     shutdownGUI();
     XrmDestroyDatabase(db);
-    grabAllKeys(false);
+    grabKeysAtStartup(false);
 // not restoring error handler
     XCloseDisplay(dpy);
     return 0;

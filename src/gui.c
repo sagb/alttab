@@ -227,6 +227,27 @@ static void prepareTile(WindowInfo * wi)
     }
 }                               // prepareTile
 
+//
+// grab auxiliary keys: arrows
+// rely on pre-calculated g.ignored_modmask and g.option_modMask
+//
+static int grabKeysAtUiShow(bool grabUngrab)
+{
+    char *grabhint =
+        "Error while (un)grabbing key 0x%x with mask 0x%x/0x%x.\n";
+    changeKeygrab(root, grabUngrab, PREV_EXTRA_KC0, g.option_modMask, g.ignored_modmask);
+    changeKeygrab(root, grabUngrab, PREV_EXTRA_KC1, g.option_modMask, g.ignored_modmask);
+    changeKeygrab(root, grabUngrab, NEXT_EXTRA_KC0, g.option_modMask, g.ignored_modmask);
+    changeKeygrab(root, grabUngrab, NEXT_EXTRA_KC1, g.option_modMask, g.ignored_modmask);
+    if (!changeKeygrab
+        (root, grabUngrab, 114, g.option_modMask,
+         g.ignored_modmask)) {
+        msg(0, grabhint, 114, g.option_modMask, g.ignored_modmask);
+        return 0;
+    }
+    return 1;
+}
+
 // PUBLIC
 
 //
@@ -490,6 +511,7 @@ int uiShow(bool direction)
 // note: x_setCommonPropertiesForAnyWindow does the same thing for any window
     XSelectInput(dpy, uiwin, ExposureMask | KeyPressMask | KeyReleaseMask
                  | ButtonPressMask | ButtonReleaseMask);
+    grabKeysAtUiShow(true);
 // set window type so that WM will hopefully not resize it
 // before mapping: https://specifications.freedesktop.org/wm-spec/1.3/ar01s05.html
     Atom at = XInternAtom(dpy, "ATOM", True);
@@ -607,6 +629,7 @@ void uiExpose()
 //
 int uiHide()
 {
+    grabKeysAtUiShow(false);
     // order is important: to set focus in Metacity,
     // our window must be destroyed first
     if (uiwin) {

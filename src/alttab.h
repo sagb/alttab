@@ -175,6 +175,10 @@ typedef struct {
     char *option_theme;
     unsigned int option_modMask, option_backMask;
     KeyCode option_modCode, option_keyCode;
+#define PREV_EXTRA_KC0  43 // "h"
+#define PREV_EXTRA_KC1  113 // "left arrow"
+#define NEXT_EXTRA_KC0  46 // "l"
+#define NEXT_EXTRA_KC1  114 // "right arrow"
     Color color[NCOLORS];
     GC gcDirect, gcReverse, gcFrame;    // used in both gui.c and win.c
     unsigned int ignored_modmask;
