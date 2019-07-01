@@ -1,10 +1,10 @@
-alttab (1.4.0.20190701.14.gb01008b-1~1.gbp8d9247) testing; urgency=medium
+alttab (1.4.0.20190701.15.g4a8c40c-1~1.gbpbbad6b) unstable; urgency=medium
 
-  ** SNAPSHOT build @8d924721d52deda491c3f90ac527d9be785c43d8 **
+  ** SNAPSHOT build @bbad6b1cf272b56c27e8261b1f4c60868e9aeece **
 
-  * backport to buster
+  * bugfix: use prev/next keysym, not keycode
 
- -- Alexander Kulak <sa-dev@odd.systems>  Mon, 01 Jul 2019 20:40:33 +0300
+ -- Alexander Kulak <sa-dev@odd.systems>  Mon, 01 Jul 2019 21:02:36 +0300
 
 alttab (1.4.0.20190701.14.gb01008b-1~1.gbpf7bcd7) unstable; urgency=medium
 
