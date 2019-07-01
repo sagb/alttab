@@ -1,10 +1,18 @@
-alttab (1.4.0.20190516.4.ga83ffbd-1~1.gbpa4fe0d) testing; urgency=medium
+alttab (1.4.0.20190701.14.gb01008b-1~1.gbpf7bcd7) unstable; urgency=medium
 
-  ** SNAPSHOT build @a4fe0dc3ede10db12c78136bb3312f0dfeb5bba7 **
+  ** SNAPSHOT build @f7bcd724fe38e208c6db2ffd95bdf27ce5c0bf73 **
 
-  * backport to buster
+  [ Jay Ta'ala ]
+  * add extra next/prev keycodes
 
- -- Alexander Kulak <sa-dev@odd.systems>  Fri, 17 May 2019 00:16:25 +0300
+  [ Alexander Kulak ]
+  * optimize main event cycle
+  * command line option for prev/next key
+
+  [ Michael Vetter ]
+  * add openSUSE instructions
+
+ -- Alexander Kulak <sa-dev@odd.systems>  Mon, 01 Jul 2019 20:30:43 +0300
 
 alttab (1.4.0.20190516.4.ga83ffbd-1~1.gbp8b4e35) unstable; urgency=medium
 

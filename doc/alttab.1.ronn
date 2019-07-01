@@ -120,6 +120,20 @@ Most command line options have corresponding X resource, see doc/alttab.ad for e
 
     Keysym of backward scroll key.
 
+  * `-pk` <str>:
+    resource: alttab.prevkey.keysym  
+    default: no key assigned
+
+    Keysym of auxiliary 'previous' key.
+    For example, Left, H.
+
+  * `-nk` <str>:
+    resource: alttab.nextkey.keysym  
+    default: no key assigned
+
+    Keysym of auxiliary 'next' key.
+    For example, Right, L.
+
   * `-mm` <NUM>:
     resource: alttab.modifier.mask  
 
