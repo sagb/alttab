@@ -1,3 +1,11 @@
+alttab (1.4.0.20190701.14.gb01008b-1~1.gbp8d9247) testing; urgency=medium
+
+  ** SNAPSHOT build @8d924721d52deda491c3f90ac527d9be785c43d8 **
+
+  * backport to buster
+
+ -- Alexander Kulak <sa-dev@odd.systems>  Mon, 01 Jul 2019 20:40:33 +0300
+
 alttab (1.4.0.20190701.14.gb01008b-1~1.gbpf7bcd7) unstable; urgency=medium
 
   ** SNAPSHOT build @f7bcd724fe38e208c6db2ffd95bdf27ce5c0bf73 **
