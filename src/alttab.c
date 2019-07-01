@@ -54,6 +54,8 @@ Options:\n\
    -kk str    keysym of main key\n\
    -mk str    keysym of main modifier\n\
    -bk str    keysym of backscroll modifier\n\
+   -pk str    keysym of 'prev' key\n\
+   -nk str    keysym of 'next' key\n\
    -mm N      (obsoleted) main modifier mask\n\
    -bm N      (obsoleted) backward scroll modifier mask\n\
     -t NxM    tile geometry\n\
@@ -106,6 +108,8 @@ static int use_args_and_xrm(int *argc, char **argv)
         {"-mk", "*modifier.keysym", XrmoptionSepArg, NULL},
         {"-kk", "*key.keysym", XrmoptionSepArg, NULL},
         {"-bk", "*backscroll.keysym", XrmoptionSepArg, NULL},
+        {"-pk", "*prevkey.keysym", XrmoptionSepArg, NULL},
+        {"-nk", "*nextkey.keysym", XrmoptionSepArg, NULL},
         {"-t", "*tile.geometry", XrmoptionSepArg, NULL},
         {"-i", "*icon.geometry", XrmoptionSepArg, NULL},
         {"-vp", "*viewport", XrmoptionSepArg, NULL},
@@ -237,6 +241,8 @@ static int use_args_and_xrm(int *argc, char **argv)
 
 #define  MC  g.option_modCode
 #define  KC  g.option_keyCode
+#define  prevC  g.option_prevCode
+#define  nextC  g.option_nextCode
 #define  GMM  g.option_modMask
 #define  GBM  g.option_backMask
 
@@ -249,6 +255,16 @@ static int use_args_and_xrm(int *argc, char **argv)
     if (ksi == -1)
         die("%s\n", errmsg);
     KC = ksi != 0 ? ksi : XKeysymToKeycode(dpy, DEFKEYKS);
+
+    ksi = ksym_option_to_keycode(&db, XRMAPPNAME, "prevkey", &errmsg);
+    if (ksi == -1)
+        die("%s\n", errmsg);
+    prevC = ksi != 0 ? ksi : XKeysymToKeycode(dpy, DEFPREVKEYKS);
+
+    ksi = ksym_option_to_keycode(&db, XRMAPPNAME, "nextkey", &errmsg);
+    if (ksi == -1)
+        die("%s\n", errmsg);
+    nextC = ksi != 0 ? ksi : XKeysymToKeycode(dpy, DEFNEXTKEYKS);
 
     switch (xresource_load_int(&db, XRMAPPNAME, "modifier.mask", &(GMM))) {
     case 1:
@@ -453,10 +469,10 @@ static int grabKeysAtStartup(bool grabUngrab)
 //
 static int isPrevNextKey(unsigned int keycode)
 {
-    if (keycode == PREV_EXTRA_KC0 || keycode == PREV_EXTRA_KC1) {
+    if (keycode == g.option_prevCode) {
         return 1;
     }
-    if (keycode == NEXT_EXTRA_KC0 || keycode == NEXT_EXTRA_KC1) {
+    if (keycode == g.option_nextCode) {
         return 2;
     }
     // if here then is neither
