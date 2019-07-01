@@ -235,7 +235,7 @@ static int grabKeysAtUiShow(bool grabUngrab)
 {
     char *grabhint =
         "Error while (un)grabbing key 0x%x with mask 0x%x/0x%x.\n";
-    if (g.option_prevCode != XK_VoidSymbol) {
+    if (g.option_prevCode != 0) {
         if (!changeKeygrab
             (root, grabUngrab, g.option_prevCode, g.option_modMask,
              g.ignored_modmask)) {
@@ -243,7 +243,7 @@ static int grabKeysAtUiShow(bool grabUngrab)
             return 0;
         }
     }
-    if (g.option_nextCode != XK_VoidSymbol) {
+    if (g.option_nextCode != 0) {
         if (!changeKeygrab
             (root, grabUngrab, g.option_nextCode, g.option_modMask,
              g.ignored_modmask)) {
