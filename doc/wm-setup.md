@@ -34,7 +34,7 @@ xfwm4/xfce   | 1 (auto)                    | see "xfce" section below       |
 metacity/MATE| 1 (auto)                    | see "MATE" section below       | 
 jwm          | 1 (auto)                    | comment A-Tab entry in .jwmrc  | see "jwm" section below
 openbox      | 1 (auto)                    | see "openbox" section below    |
-fluxbox      | 1 (auto)                    | see "fluxbox" section below    | `alttab &` in ~/.fluxbox/startup
+fluxbox      | 1 (auto)                    | see "fluxbox" section below    | see "fluxbox" section below
 icewm        | 1 (auto)                    | ?                              | ?
 matchbox     | 1 (auto, partial support)   | doesn't grab                   | ?
 enlightenment| 1 (auto)                    | ?                              | ?
@@ -129,9 +129,16 @@ Disable/comment built-in non-GUI Alt-Tab in /etc/X11/fluxbox/keys or ~/.fluxbox/
     #Mod1 Shift Tab :PrevWindow {groups} (workspace=[current])
 
 ### startup
-In ~/.fluxbox/startup:
+To start alttab _after_ fluxbox, in `~/.fluxbox/startup` replace `exec fluxbox` with:
 
-    ...other apps...
-    alttab &
-    exec fluxbox
+    fluxbox &
+    fbpid=$!
+    sleep 3
+    {
+        alttab &
+        # ...other apps to run after fluxbox startup...
+    } &
+    wait $fbpid
+
+Details [here](http://fluxbox-wiki.org/Editing_the_startup_file.html).
 
