@@ -186,8 +186,7 @@ bool randrGetViewport(quad * res, bool * multihead)
     if (no < 1) {
         msg(0, "randr didn't detect any output\n");
         *multihead = false;
-        if (oq != NULL)
-            free(oq);
+        free(oq);
         return false;
     }
     if (no == 1) {
