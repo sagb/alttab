@@ -1,10 +1,16 @@
-alttab (1.4.0.20190701.15.g4a8c40c-1~1.gbpc3e630) testing; urgency=medium
+alttab (1.4.0.20191018.21.g7e4fc4c-1~1.gbp79b723) unstable; urgency=medium
 
-  ** SNAPSHOT build @c3e630b4f74780b90d76a0008fc949396d5378a1 **
+  ** SNAPSHOT build @79b7234f1bd5e61a0ab6b85001b9df3cfb735283 **
 
-  * backport to buster
+  [ Alexander Kulak ]
+  * man page synopsis fix
+  * instruction for startup in fluxbox
 
- -- Alexander Kulak <sa-dev@odd.systems>  Mon, 01 Jul 2019 21:04:47 +0300
+  [ Michael Vetter ]
+  * Remove check around free()
+  * Fix memleaks in error case
+
+ -- Alexander Kulak <sa-dev@odd.systems>  Fri, 17 Apr 2020 04:01:19 +0300
 
 alttab (1.4.0.20190701.15.g4a8c40c-1~1.gbpbbad6b) unstable; urgency=medium
 
