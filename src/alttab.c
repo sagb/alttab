@@ -537,6 +537,12 @@ int main(int argc, char **argv)
                 ev.xkey.window, ev.xkey.state, ev.xkey.keycode);
             if (ev.xkey.state & g.option_modMask) {  // alt
                 if (ev.xkey.keycode == g.option_keyCode) {  // tab
+                    // additional check, see #97
+                    XQueryKeymap(dpy, keys_pressed);
+                    if (!(keys_pressed[octet] & kmask)) {
+                        msg(1, "Wrong modifier, skip event\n");
+                        continue;
+                    }
                     if (!g.uiShowHasRun) {
                         uiShow((ev.xkey.state & g.option_backMask));
                     } else {
