@@ -57,6 +57,7 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 #define DEFKEYKS    XK_Tab
 #define DEFPREVKEYKS    XK_VoidSymbol
 #define DEFNEXTKEYKS    XK_VoidSymbol
+#define DEFCANCELKS XK_Escape
 
 #include "icon.h"
 
@@ -178,6 +179,7 @@ typedef struct {
     unsigned int option_modMask, option_backMask;
     KeyCode option_modCode, option_keyCode;
     KeyCode option_prevCode, option_nextCode;
+    KeyCode option_cancelCode;
     Color color[NCOLORS];
     GC gcDirect, gcReverse, gcFrame;    // used in both gui.c and win.c
     unsigned int ignored_modmask;
