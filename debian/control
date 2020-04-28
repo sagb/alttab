@@ -12,7 +12,7 @@ Build-Depends: debhelper-compat (= 12),
                uthash-dev,
                autoconf,
                automake
-Standards-Version: 4.3.0
+Standards-Version: 4.5.0
 Vcs-Git: https://github.com/sagb/alttab.git -b debian/unstable
 Vcs-Browser: https://github.com/sagb/alttab/tree/debian/unstable
 Homepage: https://sagb.github.io/alttab
