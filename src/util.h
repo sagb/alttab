@@ -47,8 +47,8 @@ typedef struct {
 #define MAXNAMESZ   256
 #endif
 
-XErrorEvent *ee_ignored;
-bool ee_complain;
+extern XErrorEvent *ee_ignored;
+extern bool ee_complain;
 
 // values for pixel composite transformations
 // which are constant per entire image
