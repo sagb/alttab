@@ -269,6 +269,7 @@ int inspectIconMeta(FTSENT * pe)
     int tl;
     char *lds;
     char *digit;
+    char *minus;
     char *generic_suffixes[] = { "-color", NULL };
     char *legacy_dim_suffixes[] = { "16", "24", "32", "48", "64", NULL };
     int dir = ICON_DIR_FREEDESKTOP;
@@ -358,13 +359,14 @@ end_special_1:
     // app48 and app-48 legacy xpm
     if (dir == ICON_DIR_LEGACY) {
         digit = app + strlen(app) - 2;
+        minus = app + strlen(app) - 3; // trick for gcc-10 pseudo-intelligence
         if (digit > app + 1) {
             sfxn = 0;
             while ((lds = legacy_dim_suffixes[sfxn]) != 0) {
                 if (strncasecmp(digit, lds, 3) == 0) {
                     ix = iy = strtol(lds, &endptr, 10);
-                    if (*(digit-1) == '-') {
-                        *(digit-1) = '\0';
+                    if (*(minus) == '-') {
+                        *(minus) = '\0';
                     } else {
                         *digit = '\0';
                     }
