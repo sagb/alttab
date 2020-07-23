@@ -1,4 +1,4 @@
-AC_INIT([alttab], [1.4.0])
+AC_INIT([alttab], [1.5.0])
 AM_INIT_AUTOMAKE([foreign subdir-objects])
 AC_CONFIG_SRCDIR([configure.ac])
 AC_CONFIG_HEADERS([config.h])
@@ -8,6 +8,7 @@ PKG_CHECK_MODULES([xft], [xft])
 PKG_CHECK_MODULES([xrender], [xrender])
 PKG_CHECK_MODULES([xrandr], [xrandr])
 PKG_CHECK_MODULES([libpng], [libpng])
+PKG_CHECK_MODULES([xpm], [xpm])
 
 AC_MSG_CHECKING(for standalone fts library)
 if pkg-config --exists libfts ; then

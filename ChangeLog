@@ -1,3 +1,14 @@
+2020-07-23  Alexander Kulak  <sa-dev@odd.systems>
+
+	version 1.5.0
+
+	Use xpm icons and pixmap directories.
+	Use XDG_DATA_DIRS.
+	Add extra keys: next/prev, cancel.
+	Optimize main event loop.
+	Fix numerous memleaks and overflows.
+	Satisfy gcc 10 requirements.
+
 2019-05-01  Alexander Kulak  <sa-dev@odd.systems>
 
 	version 1.4.0

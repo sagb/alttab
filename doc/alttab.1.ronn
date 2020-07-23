@@ -2,7 +2,7 @@
 The source of alttab.1. Read doc/development.md.
 vim:ft=markdown
 
-Copyright 2017-2019 Alexander Kulak.
+Copyright 2017-2020 Alexander Kulak.
 This file is part of alttab program.
 
 Copying and distribution of this file, with or without modification,
@@ -16,7 +16,7 @@ alttab(1) -- the task switcher
 
 ## SYNOPSIS
 
-`alttab` [`-w` <N>] [`-d` <N>] [`-sc` <N>] [`-mk` <str>] [`-kk` <str>] [`-bk` <str>] [`-mm` <N>] [`-bm` <N>] [`-t` <NxM>] [`-i` <NxM>] [`-vp` <str>] [`-p` <str>] [`-s` <N>] [`-theme` <name>] [`-bg` <color>] [`-fg` <color>] [`-frame` <color>] [`-font` <name>] [`-v`|`-vv`]
+`alttab` [`-w` <N>] [`-d` <N>] [`-sc` <N>] [`-mk` <str>] [`-kk` <str>] [`-bk` <str>] [`-pk` <str>] [`-nk` <str>] [`-mm` <N>] [`-bm` <N>] [`-t` <NxM>] [`-i` <NxM>] [`-vp` <str>] [`-p` <str>] [`-s` <N>] [`-theme` <name>] [`-bg` <color>] [`-fg` <color>] [`-frame` <color>] [`-font` <name>] [`-v`|`-vv`]
 
 ## DESCRIPTION
 
@@ -120,6 +120,26 @@ Most command line options have corresponding X resource, see doc/alttab.ad for e
 
     Keysym of backward scroll key.
 
+  * `-pk` <str>:
+    resource: alttab.prevkey.keysym  
+    default: no key assigned
+
+    Keysym of auxiliary 'previous' key.
+    For example, Left, H.
+
+  * `-nk` <str>:
+    resource: alttab.nextkey.keysym  
+    default: no key assigned
+
+    Keysym of auxiliary 'next' key.
+    For example, Right, L.
+
+  * `-ck` <str>:
+    resource: alttab.cancelkey.keysym  
+    default: Escape
+
+    Keysym of auxiliary 'cancel' key.
+
   * `-mm` <NUM>:
     resource: alttab.modifier.mask  
 
@@ -196,7 +216,7 @@ Most command line options have corresponding X resource, see doc/alttab.ad for e
       
       <1>: Load icon from file if not found in window attributes.
 
-      Alttab searches for PNG icons under:  
+      Alttab searches for PNG and XPM icons in $XDG_DATA_DIRS and also under:  
   
       /usr/share/icons  
       /usr/local/share/icons  
@@ -208,6 +228,12 @@ Most command line options have corresponding X resource, see doc/alttab.ad for e
       That is, if alttab doesn't recognize an icon for window of class foo,
       as obtained by 'xprop WM_CLASS', then just drop a 32x32 icon into
       /usr/local/share/icons/hicolor/32x32/apps/foo.png.
+  
+      Also, alttab scans for icons in legacy directories without freedesktop directory
+      structure:  
+  
+      /usr/share/pixmaps  
+      ~/.local/share/pixmaps  
 
       <2>: Prefer icon from file when it matches requested size better (see `-i` option).
 
@@ -266,7 +292,7 @@ Run alttab after WM, or autodetection will fail.
 
 ##AUTHOR
 
-Copyright 2017-2019 Alexander Kulak `<sa-dev AT odd POINT systems>`.
+Copyright 2017-2020 Alexander Kulak `<sa-dev AT odd POINT systems>`.
 
 ##REPORTING BUGS
 

@@ -1,7 +1,7 @@
 /*
 Draw and interface with our switcher window.
 
-Copyright 2017-2019 Alexander Kulak.
+Copyright 2017-2020 Alexander Kulak.
 This file is part of alttab program.
 
 alttab is free software: you can redistribute it and/or modify
@@ -171,7 +171,7 @@ static void prepareTile(WindowInfo * wi)
                 msg(-1, "can't create GC to draw icon\n");
                 goto endIcon;
             }
-            if (wi->icon_mask != 0) {
+            if (wi->icon_mask != None) {
                 XSetClipMask(dpy, ic_gc, wi->icon_mask);
             }
             int or = XCopyArea(dpy,
@@ -226,6 +226,41 @@ static void prepareTile(WindowInfo * wi)
         }
     }
 }                               // prepareTile
+
+//
+// grab auxiliary keys: arrows
+// rely on pre-calculated g.ignored_modmask and g.option_modMask
+//
+static int grabKeysAtUiShow(bool grabUngrab)
+{
+    char *grabhint =
+        "Error while (un)grabbing key 0x%x with mask 0x%x/0x%x.\n";
+    if (g.option_prevCode != 0) {
+        if (!changeKeygrab
+            (root, grabUngrab, g.option_prevCode, g.option_modMask,
+             g.ignored_modmask)) {
+            msg(0, grabhint, g.option_prevCode, g.option_modMask, g.ignored_modmask);
+            return 0;
+        }
+    }
+    if (g.option_nextCode != 0) {
+        if (!changeKeygrab
+            (root, grabUngrab, g.option_nextCode, g.option_modMask,
+             g.ignored_modmask)) {
+            msg(0, grabhint, g.option_nextCode, g.option_modMask, g.ignored_modmask);
+            return 0;
+        }
+    }
+    if (g.option_cancelCode != 0) {
+        if (!changeKeygrab
+            (root, grabUngrab, g.option_cancelCode, g.option_modMask,
+             g.ignored_modmask)) {
+            msg(0, grabhint, g.option_cancelCode, g.option_modMask, g.ignored_modmask);
+            return 0;
+        }
+    }
+    return 1;
+}
 
 // PUBLIC
 
@@ -490,6 +525,7 @@ int uiShow(bool direction)
 // note: x_setCommonPropertiesForAnyWindow does the same thing for any window
     XSelectInput(dpy, uiwin, ExposureMask | KeyPressMask | KeyReleaseMask
                  | ButtonPressMask | ButtonReleaseMask);
+    grabKeysAtUiShow(true);
 // set window type so that WM will hopefully not resize it
 // before mapping: https://specifications.freedesktop.org/wm-spec/1.3/ar01s05.html
     Atom at = XInternAtom(dpy, "ATOM", True);
@@ -607,6 +643,7 @@ void uiExpose()
 //
 int uiHide()
 {
+    grabKeysAtUiShow(false);
     // order is important: to set focus in Metacity,
     // our window must be destroyed first
     if (uiwin) {

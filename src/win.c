@@ -1,7 +1,7 @@
 /*
 Interface with foreign windows common for all WMs.
 
-Copyright 2017-2019 Alexander Kulak.
+Copyright 2017-2020 Alexander Kulak.
 This file is part of alttab program.
 
 alttab is free software: you can redistribute it and/or modify
@@ -221,9 +221,7 @@ int addIconFromProperty(WindowInfo * wi)
             n += w*h;
             continue;
         }
-        msg(1, "Trying icon at position %lu (%dx%d)\n", n, w, h);
         if (best == 0 || iconMatchBetter(w, h, best_w, best_h)) {
-            msg(1, "Icon is better\n");
             best = n;
         }
         n += w*h;
@@ -233,6 +231,7 @@ int addIconFromProperty(WindowInfo * wi)
         //free(prop); better don't
         return 0;
     }
+    msg(1, "using %dx%d %s icon for %lx\n", w, h, NWI, wi->id);
 
     image32 = malloc(best_w * best_h * 4);
     CompositeConst cc = initCompositeConst(g.color[COLBG].xcolor.pixel);
@@ -338,16 +337,26 @@ int addIconFromFiles(WindowInfo * wi)
                  || iconMatchBetter(ic->src_w, ic->src_h,
                                     wi->icon_w, wi->icon_h))
                 ) {
-                msg(0, "using png icon for %s\n", tryclass);
+                msg(0, "using file icon for %s\n", tryclass);
                 if (ic->drawable == None) {
                     msg(1, "loading content for %s\n", ic->app);
                     if (loadIconContent(ic) == 0) {
-                        msg(-1, "can't load png icon content\n");
+                        msg(-1, "can't load file icon content: %s\n", ic->src_path);
                         continue;
                     }
                 }
+                // for the case when icon was already found in window props
+                if (wi->icon_allocated) {
+                    XFreePixmap(dpy, wi->icon_drawable);
+                    /*
+                    if (wi->icon_mask != None) {
+                       XFreePixmap(dpy, wi->icon_mask);
+                    }
+                    */
+                    wi->icon_allocated = false;
+                }
                 wi->icon_drawable = ic->drawable;
-                wi->icon_mask = 0;
+                wi->icon_mask = ic->mask;
                 ret = 1;
                 goto out;
             }

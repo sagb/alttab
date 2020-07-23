@@ -1,7 +1,7 @@
 /*
 Reading PNG into Drawable.
 
-Copyright 2017-2019 Alexander Kulak.
+Copyright 2017-2020 Alexander Kulak.
 This file is part of alttab program.
 
 alttab is free software: you can redistribute it and/or modify
@@ -250,6 +250,7 @@ int pngReadToDrawable(char *pngpath, Drawable d, uint8_t bg_red,
     fclose(infile);
     if (!img.data || img.width == 0 || img.height == 0) {
         fprintf(stderr, "error loading png data\n");
+        pngFree(&img);
         return 0;
     }
     if (debug > 0)
@@ -259,6 +260,7 @@ int pngReadToDrawable(char *pngpath, Drawable d, uint8_t bg_red,
     pad = 32;
     if (!xdata) {
         fprintf(stderr, "xdata malloc error\n");
+        pngFree(&img);
         return 0;
     }
     ximage =
@@ -267,6 +269,7 @@ int pngReadToDrawable(char *pngpath, Drawable d, uint8_t bg_red,
     if (!ximage) {
         fprintf(stderr, "error creating ximage\n");
         free(xdata);
+        pngFree(&img);
         return 0;
     }
     ximage->byte_order = MSBFirst;

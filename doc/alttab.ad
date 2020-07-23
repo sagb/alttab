@@ -25,6 +25,14 @@
 ! grave (back apostrophe) instead of Tab
 !alttab.key.keysym:      grave
 
+! auxiliary 'previous' key
+!alttab.prevkey.keysym:      Left
+! auxiliary 'next' key
+!alttab.nextkey.keysym:      Right
+
+! auxiliary 'cancel' key
+!alttab.cancelkey.keysym:    Escape
+
 ! Limit the switcher to this rectangle 
 ! instead of default screen size
 !alttab.viewport:        1280x1024+1280+0

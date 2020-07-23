@@ -1,7 +1,7 @@
 /*
 Parsing options/resources, top-level keygrab functions and main().
 
-Copyright 2017-2019 Alexander Kulak.
+Copyright 2017-2020 Alexander Kulak.
 This file is part of alttab program.
 
 alttab is free software: you can redistribute it and/or modify
@@ -54,6 +54,8 @@ Options:\n\
    -kk str    keysym of main key\n\
    -mk str    keysym of main modifier\n\
    -bk str    keysym of backscroll modifier\n\
+   -pk str    keysym of 'prev' key\n\
+   -nk str    keysym of 'next' key\n\
    -mm N      (obsoleted) main modifier mask\n\
    -bm N      (obsoleted) backward scroll modifier mask\n\
     -t NxM    tile geometry\n\
@@ -106,6 +108,9 @@ static int use_args_and_xrm(int *argc, char **argv)
         {"-mk", "*modifier.keysym", XrmoptionSepArg, NULL},
         {"-kk", "*key.keysym", XrmoptionSepArg, NULL},
         {"-bk", "*backscroll.keysym", XrmoptionSepArg, NULL},
+        {"-pk", "*prevkey.keysym", XrmoptionSepArg, NULL},
+        {"-nk", "*nextkey.keysym", XrmoptionSepArg, NULL},
+        {"-ck", "*cancelkey.keysym", XrmoptionSepArg, NULL},
         {"-t", "*tile.geometry", XrmoptionSepArg, NULL},
         {"-i", "*icon.geometry", XrmoptionSepArg, NULL},
         {"-vp", "*viewport", XrmoptionSepArg, NULL},
@@ -237,6 +242,9 @@ static int use_args_and_xrm(int *argc, char **argv)
 
 #define  MC  g.option_modCode
 #define  KC  g.option_keyCode
+#define  prevC  g.option_prevCode
+#define  nextC  g.option_nextCode
+#define  cancelC  g.option_cancelCode
 #define  GMM  g.option_modMask
 #define  GBM  g.option_backMask
 
@@ -249,6 +257,21 @@ static int use_args_and_xrm(int *argc, char **argv)
     if (ksi == -1)
         die("%s\n", errmsg);
     KC = ksi != 0 ? ksi : XKeysymToKeycode(dpy, DEFKEYKS);
+
+    ksi = ksym_option_to_keycode(&db, XRMAPPNAME, "prevkey", &errmsg);
+    if (ksi == -1)
+        die("%s\n", errmsg);
+    prevC = ksi != 0 ? ksi : XKeysymToKeycode(dpy, DEFPREVKEYKS);
+
+    ksi = ksym_option_to_keycode(&db, XRMAPPNAME, "nextkey", &errmsg);
+    if (ksi == -1)
+        die("%s\n", errmsg);
+    nextC = ksi != 0 ? ksi : XKeysymToKeycode(dpy, DEFNEXTKEYKS);
+
+    ksi = ksym_option_to_keycode(&db, XRMAPPNAME, "cancelkey", &errmsg);
+    if (ksi == -1)
+        die("%s\n", errmsg);
+    cancelC = ksi != 0 ? ksi : XKeysymToKeycode(dpy, DEFCANCELKS);
 
     switch (xresource_load_int(&db, XRMAPPNAME, "modifier.mask", &(GMM))) {
     case 1:
@@ -427,7 +450,7 @@ static int use_args_and_xrm(int *argc, char **argv)
 // grab Alt-Tab and Alt-Shift-Tab
 // note: exit() on failure
 //
-static int grabAllKeys(bool grabUngrab)
+static int grabKeysAtStartup(bool grabUngrab)
 {
     g.ignored_modmask = getOffendingModifiersMask(dpy); // or 0 for g.debug
     char *grabhint =
@@ -444,8 +467,25 @@ static int grabAllKeys(bool grabUngrab)
         die(grabhint, g.option_keyCode,
             g.option_modMask | g.option_backMask, g.ignored_modmask);
     }
+
     return 1;
 }
+
+//
+// Returns 0 if not an extra prev/next keycode, 1 if extra prev keycode, and 2 if extra next keycode.
+//
+static int isPrevNextKey(unsigned int keycode)
+{
+    if (keycode == g.option_prevCode) {
+        return 1;
+    }
+    if (keycode == g.option_nextCode) {
+        return 2;
+    }
+    // if here then is neither
+    return 0;
+}
+
 
 int main(int argc, char **argv)
 {
@@ -469,7 +509,7 @@ int main(int argc, char **argv)
     if (!startupGUItasks())
         die("startupGUItasks failed");
 
-    grabAllKeys(true);
+    grabKeysAtStartup(true);
     g.uiShowHasRun = false;
 
     struct timespec nanots;
@@ -502,17 +542,40 @@ int main(int argc, char **argv)
         case KeyPress:
             msg(1, "Press %lx: %d-%d\n",
                 ev.xkey.window, ev.xkey.state, ev.xkey.keycode);
-            if (!((ev.xkey.state & g.option_modMask)
-                  && ev.xkey.keycode == g.option_keyCode)) {
-                break;
-            }                   // safety redundance
-            if (!g.uiShowHasRun) {
-                uiShow((ev.xkey.state & g.option_backMask));
-            } else {
-                if (ev.xkey.state & g.option_backMask) {
-                    uiPrevWindow();
-                } else {
-                    uiNextWindow();
+            if (ev.xkey.state & g.option_modMask) {  // alt
+                if (ev.xkey.keycode == g.option_keyCode) {  // tab
+                    // additional check, see #97
+                    XQueryKeymap(dpy, keys_pressed);
+                    if (!(keys_pressed[octet] & kmask)) {
+                        msg(1, "Wrong modifier, skip event\n");
+                        continue;
+                    }
+                    if (!g.uiShowHasRun) {
+                        uiShow((ev.xkey.state & g.option_backMask));
+                    } else {
+                        if (ev.xkey.state & g.option_backMask) {
+                            uiPrevWindow();
+                        } else {
+                            uiNextWindow();
+                        }
+                    }
+                } else if (ev.xkey.keycode == g.option_cancelCode) { // escape
+                    // additional check, see #97
+                    XQueryKeymap(dpy, keys_pressed);
+                    if (!(keys_pressed[octet] & kmask)) {
+                        msg(1, "Wrong modifier, skip event\n");
+                        continue;
+                    }
+                    uiSelectWindow(0);
+                } else {  // non-tab
+                    switch (isPrevNextKey(ev.xkey.keycode)) {
+                    case 1:
+                        uiPrevWindow();
+                        break;
+                    case 2:
+                        uiNextWindow();
+                        break;
+                    }
                 }
             }
             break;
@@ -562,8 +625,8 @@ int main(int argc, char **argv)
     shutdownWin();
     shutdownGUI();
     XrmDestroyDatabase(db);
-    grabAllKeys(false);
+    grabKeysAtStartup(false);
 // not restoring error handler
     XCloseDisplay(dpy);
     return 0;
-}                               // main
+} // main
