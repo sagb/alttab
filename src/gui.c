@@ -251,6 +251,14 @@ static int grabKeysAtUiShow(bool grabUngrab)
             return 0;
         }
     }
+    if (g.option_cancelCode != 0) {
+        if (!changeKeygrab
+            (root, grabUngrab, g.option_cancelCode, g.option_modMask,
+             g.ignored_modmask)) {
+            msg(0, grabhint, g.option_cancelCode, g.option_modMask, g.ignored_modmask);
+            return 0;
+        }
+    }
     return 1;
 }
 
