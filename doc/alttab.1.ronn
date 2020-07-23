@@ -2,7 +2,7 @@
 The source of alttab.1. Read doc/development.md.
 vim:ft=markdown
 
-Copyright 2017-2019 Alexander Kulak.
+Copyright 2017-2020 Alexander Kulak.
 This file is part of alttab program.
 
 Copying and distribution of this file, with or without modification,
@@ -292,7 +292,7 @@ Run alttab after WM, or autodetection will fail.
 
 ##AUTHOR
 
-Copyright 2017-2019 Alexander Kulak `<sa-dev AT odd POINT systems>`.
+Copyright 2017-2020 Alexander Kulak `<sa-dev AT odd POINT systems>`.
 
 ##REPORTING BUGS
 
