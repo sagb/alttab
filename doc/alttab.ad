@@ -30,6 +30,9 @@
 ! auxiliary 'next' key
 !alttab.nextkey.keysym:      Right
 
+! auxiliary 'cancel' key
+!alttab.cancelkey.keysym:    Escape
+
 ! Limit the switcher to this rectangle 
 ! instead of default screen size
 !alttab.viewport:        1280x1024+1280+0

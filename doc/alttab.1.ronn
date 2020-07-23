@@ -134,6 +134,12 @@ Most command line options have corresponding X resource, see doc/alttab.ad for e
     Keysym of auxiliary 'next' key.
     For example, Right, L.
 
+  * `-ck` <str>:
+    resource: alttab.cancelkey.keysym  
+    default: Escape
+
+    Keysym of auxiliary 'cancel' key.
+
   * `-mm` <NUM>:
     resource: alttab.modifier.mask  
 
