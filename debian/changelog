@@ -1,3 +1,22 @@
+alttab (1.5.0.20200727.1.g3949559-1~1.gbpcba0d3) unstable; urgency=medium
+
+  ** SNAPSHOT build @cba0d304efcfbabcd6731643fe16945a15fa9074 **
+
+  [ Alexander Kulak ]
+  * additional check for modifier before showing gui
+  * bump automake to 1.16.2
+  * update docs for -ck
+  * update copyright year
+  * fix readme format
+
+  [ Andreas Kohn ]
+  * Allow canceling the selection of another window through a `cancel` key
+
+  [ John Beard ]
+  * Extern ee_ignored and ee_complain (for gcc10)
+
+ -- Alexander Kulak <sa-dev@odd.systems>  Mon, 27 Jul 2020 14:06:03 +0300
+
 alttab (1.4.0.20191018.21.g7e4fc4c-1~1.gbp79b723) unstable; urgency=medium
 
   ** SNAPSHOT build @79b7234f1bd5e61a0ab6b85001b9df3cfb735283 **
