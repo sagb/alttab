@@ -1,7 +1,7 @@
 /*
 Draw and interface with our switcher window.
 
-Copyright 2017-2019 Alexander Kulak.
+Copyright 2017-2020 Alexander Kulak.
 This file is part of alttab program.
 
 alttab is free software: you can redistribute it and/or modify
@@ -248,6 +248,14 @@ static int grabKeysAtUiShow(bool grabUngrab)
             (root, grabUngrab, g.option_nextCode, g.option_modMask,
              g.ignored_modmask)) {
             msg(0, grabhint, g.option_nextCode, g.option_modMask, g.ignored_modmask);
+            return 0;
+        }
+    }
+    if (g.option_cancelCode != 0) {
+        if (!changeKeygrab
+            (root, grabUngrab, g.option_cancelCode, g.option_modMask,
+             g.ignored_modmask)) {
+            msg(0, grabhint, g.option_cancelCode, g.option_modMask, g.ignored_modmask);
             return 0;
         }
     }
