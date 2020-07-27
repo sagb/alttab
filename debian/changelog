@@ -1,3 +1,11 @@
+alttab (1.5.0.20200727.1.g3949559-1~1.gbpb421a5) jessie; urgency=medium
+
+  ** SNAPSHOT build @b421a5564253294e88d0ad47a66eac5f9eeb506f **
+
+  * backport to jessie
+
+ -- Alexander Kulak <sa-dev@odd.systems>  Mon, 27 Jul 2020 15:17:30 +0300
+
 alttab (1.5.0.20200727.1.g3949559-1~1.gbpcba0d3) unstable; urgency=medium
 
   ** SNAPSHOT build @cba0d304efcfbabcd6731643fe16945a15fa9074 **
