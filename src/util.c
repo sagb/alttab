@@ -1,7 +1,7 @@
 /*
 Helper functions.
 
-Copyright 2017-2019 Alexander Kulak.
+Copyright 2017-2020 Alexander Kulak.
 This file is part of alttab program.
 
 alttab is free software: you can redistribute it and/or modify
@@ -24,6 +24,9 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 extern Display *dpy;
 extern int scr;
 extern Window root;
+
+XErrorEvent *ee_ignored;
+bool ee_complain;
 
 // PUBLIC:
 
