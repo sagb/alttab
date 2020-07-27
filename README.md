@@ -13,10 +13,10 @@
 **alttab** is X11 window switcher designed for minimalistic window managers
 or standalone X11 session.
 ```
-  alttab  [-w N] [-d N] [-sc N] [`-mk` <str>] [`-kk` <str>] [`-bk` <str>]
-  [`-pk` <str>] [`-nk` <str>] [`-mm` <N>] [`-bm` <N>] [-t NxM] [-i NxM]
-  [-vp str] [-p str] [-s N] [-theme name] [-bg color] [-fg color]
-  [-frame color] [-font name] [-v|-vv]
+  alttab  [-w N] [-d N] [-sc N] [-mk <str>] [-kk <str>] [-bk <str>]
+  [-pk <str>] [-nk <str>] [-ck <str>] [-mm <N>] [-bm <N>]
+  [-t NxM] [-i NxM] [-vp str] [-p str] [-s N] [-theme name] [-bg color]
+  [-fg color] [-frame color] [-font name] [-v|-vv]
 ```
 (see man page for details)
 <!-- ronn page has elements invalid for github markdown, don't link to it -->
@@ -44,5 +44,5 @@ Usually it should run fully functional without any argument: `alttab`.
 [no-wm](https://github.com/patrickhaller/no-wm): use X11 without a window manager  
    
    
-alttab (C) Alexander Kulak &lt;sa-dev AT odd POINT systems&gt; 2016-2019
+alttab (C) Alexander Kulak &lt;sa-dev AT odd POINT systems&gt; 2016-2020
 

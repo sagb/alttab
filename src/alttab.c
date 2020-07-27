@@ -1,7 +1,7 @@
 /*
 Parsing options/resources, top-level keygrab functions and main().
 
-Copyright 2017-2019 Alexander Kulak.
+Copyright 2017-2020 Alexander Kulak.
 This file is part of alttab program.
 
 alttab is free software: you can redistribute it and/or modify
@@ -110,6 +110,7 @@ static int use_args_and_xrm(int *argc, char **argv)
         {"-bk", "*backscroll.keysym", XrmoptionSepArg, NULL},
         {"-pk", "*prevkey.keysym", XrmoptionSepArg, NULL},
         {"-nk", "*nextkey.keysym", XrmoptionSepArg, NULL},
+        {"-ck", "*cancelkey.keysym", XrmoptionSepArg, NULL},
         {"-t", "*tile.geometry", XrmoptionSepArg, NULL},
         {"-i", "*icon.geometry", XrmoptionSepArg, NULL},
         {"-vp", "*viewport", XrmoptionSepArg, NULL},
@@ -243,6 +244,7 @@ static int use_args_and_xrm(int *argc, char **argv)
 #define  KC  g.option_keyCode
 #define  prevC  g.option_prevCode
 #define  nextC  g.option_nextCode
+#define  cancelC  g.option_cancelCode
 #define  GMM  g.option_modMask
 #define  GBM  g.option_backMask
 
@@ -265,6 +267,11 @@ static int use_args_and_xrm(int *argc, char **argv)
     if (ksi == -1)
         die("%s\n", errmsg);
     nextC = ksi != 0 ? ksi : XKeysymToKeycode(dpy, DEFNEXTKEYKS);
+
+    ksi = ksym_option_to_keycode(&db, XRMAPPNAME, "cancelkey", &errmsg);
+    if (ksi == -1)
+        die("%s\n", errmsg);
+    cancelC = ksi != 0 ? ksi : XKeysymToKeycode(dpy, DEFCANCELKS);
 
     switch (xresource_load_int(&db, XRMAPPNAME, "modifier.mask", &(GMM))) {
     case 1:
@@ -537,6 +544,12 @@ int main(int argc, char **argv)
                 ev.xkey.window, ev.xkey.state, ev.xkey.keycode);
             if (ev.xkey.state & g.option_modMask) {  // alt
                 if (ev.xkey.keycode == g.option_keyCode) {  // tab
+                    // additional check, see #97
+                    XQueryKeymap(dpy, keys_pressed);
+                    if (!(keys_pressed[octet] & kmask)) {
+                        msg(1, "Wrong modifier, skip event\n");
+                        continue;
+                    }
                     if (!g.uiShowHasRun) {
                         uiShow((ev.xkey.state & g.option_backMask));
                     } else {
@@ -546,6 +559,14 @@ int main(int argc, char **argv)
                             uiNextWindow();
                         }
                     }
+                } else if (ev.xkey.keycode == g.option_cancelCode) { // escape
+                    // additional check, see #97
+                    XQueryKeymap(dpy, keys_pressed);
+                    if (!(keys_pressed[octet] & kmask)) {
+                        msg(1, "Wrong modifier, skip event\n");
+                        continue;
+                    }
+                    uiSelectWindow(0);
                 } else {  // non-tab
                     switch (isPrevNextKey(ev.xkey.keycode)) {
                     case 1:
