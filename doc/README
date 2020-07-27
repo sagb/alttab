@@ -1,10 +1,10 @@
 alttab is X11 window switcher designed for minimalistic window managers
 or standalone X11 session.
 
-  alttab  [-w N] [-d N] [-sc N] [`-mk` <str>] [`-kk` <str>] [`-bk` <str>]
-  [`-pk` <str>] [`-nk` <str>] [`-mm` <N>] [`-bm` <N>] [-t NxM] [-i NxM]
-  [-vp str] [-p str] [-s N] [-theme name] [-bg color] [-fg color]
-  [-frame color] [-font name] [-v|-vv]
+  alttab  [-w N] [-d N] [-sc N] [-mk <str>] [-kk <str>] [-bk <str>]
+  [-pk <str>] [-nk <str>] [-ck <str>] [-mm <N>] [-bm <N>]
+  [-t NxM] [-i NxM] [-vp str] [-p str] [-s N] [-theme name] [-bg color]
+  [-fg color] [-frame color] [-font name] [-v|-vv]
 
 (see man page for details)
 
@@ -30,7 +30,7 @@ If there are no WM at all, then start alttab in ~/.xsession or elsewhere.
 Source
 ------
 
-Copyright 2017-2019 Alexander Kulak <sa-dev AT odd POINT systems>.
+Copyright 2017-2020 Alexander Kulak <sa-dev AT odd POINT systems>.
 License: GPLv3 (see COPYING).
 Repository: https://github.com/sagb/alttab
 Chat: #alttab on Freenode
