@@ -71,6 +71,7 @@ Building from source
     ./configure  
     make  
     make install
+    make check  # optional
     ```
     See README for usage notes.
 
