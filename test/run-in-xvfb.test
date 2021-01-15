@@ -25,23 +25,20 @@ NUMTEST=3
 
 install_software()
 {
-    packs=""
+    packs="" ; progs=""
     for pair in "cnee xnee" "Xvfb xvfb" "xeyes x11-apps" "xprop x11-utils" ; do
         prog=`echo $pair | cut -d \  -f 1`
         pack=`echo $pair | cut -d \  -f 2`
         if ! which "$prog" >/dev/null ; then
             packs="${packs} ${pack}"
+            progs="${progs} ${prog}"
         fi
     done
     if [ -n "$packs" ] ; then
-        echo "Installing $packs"
-        echo "Installing $packs" >&3
-        if ! which apt-get >/dev/null ; then
-            echo "No apt-get found, please install $packs manually. Bail out!" >&2
-            exit 1
-        fi
-        sudo apt-get -y install $packs
-        for prog in cnee Xvfb xeyes xprop ; do
+        echo "Installing: $packs"
+        icmd="sudo --non-interactive apt-get -y install $packs"
+        $icmd || echo -e "Failed: $icmd\nThis script runs apt-get via passwordless sudo, otherwise install manually: $progs" >&2
+        for prog in $progs ; do
             if ! which "$prog" >/dev/null ; then
                 echo "Can't find $prog. Bail out!" >&2
                 exit 1
@@ -52,8 +49,9 @@ install_software()
 
 start_x()
 {
-    sudo mkdir -p /tmp/.X11-unix
-    sudo chmod 1777 /tmp/.X11-unix
+    # not required, only to silent Xvfb
+    sudo --non-interactive \
+        sh -c "mkdir -p /tmp/.X11-unix ; chmod 1777 /tmp/.X11-unix" >/dev/null
     Xvfb :200 -ac &
     export xvfb=$!
     for ms100 in `seq 1 50` ; do
