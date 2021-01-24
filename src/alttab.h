@@ -243,5 +243,6 @@ bool randrGetViewport(quad * res, bool * multihead);
 /* autil */
 void die(const char *format, ...);
 void msg(int lvl, const char *format, ...);
+void sighandler(int signum);
 
 #endif
