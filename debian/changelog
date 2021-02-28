@@ -1,10 +1,24 @@
-alttab (1.5.0.20200727.1.g3949559-1~1.gbp827692) testing; urgency=medium
+alttab (1.5.0.20210228.10.g61bcb93-1~1.gbp30117e) unstable; urgency=medium
 
-  ** SNAPSHOT build @8276926caf55f7bb803b6f5a2893deba7c6f66fd **
+  ** SNAPSHOT build @30117e17748b87a551ab6f5d3dc28aef6cd06f59 **
 
-  * backport to bullseye
+  * ps dep for test suite
 
- -- Alexander Kulak <sa-dev@odd.systems>  Mon, 27 Jul 2020 15:03:47 +0300
+ -- Alexander Kulak <sa-dev@odd.systems>  Sun, 28 Feb 2021 14:25:11 +0000
+
+alttab (1.5.0.20210124.9.g2f85433-1~1.gbp060fcf) UNRELEASED; urgency=medium
+
+  ** SNAPSHOT build @060fcfaf53234e2bc8b92760fd3abb80876f4e03 **
+
+  [ Alexander Kulak ]
+  * fix possible strncpy overflows
+  * add test suite: running in Xvfb headless server
+  * add github's C/C++ CI
+  * debug by SIGUSR1
+  * docs: arch linux package is actually maintained
+  * docs: bspwm
+
+ -- Alexander Kulak <sa-dev@odd.systems>  Sun, 28 Feb 2021 10:08:59 +0000
 
 alttab (1.5.0.20200727.1.g3949559-1~1.gbpcba0d3) unstable; urgency=medium
 
