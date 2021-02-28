@@ -7,11 +7,11 @@ workaround for ancient libpng
  src/pngd.h | 1 +
  1 file changed, 1 insertion(+)
 
-Index: alttab/src/pngd.h
-===================================================================
---- alttab.orig/src/pngd.h
-+++ alttab/src/pngd.h
-@@ -25,6 +25,7 @@ along with alttab.  If not, see <http://
+diff --git a/src/pngd.h b/src/pngd.h
+index 3026308..36d73e7 100644
+--- a/src/pngd.h
++++ b/src/pngd.h
+@@ -25,6 +25,7 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
  #include <stdlib.h>
  #include <stdint.h>
  #include <X11/Xlib.h>

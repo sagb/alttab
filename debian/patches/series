@@ -1,1 +1,2 @@
 0001-disable-setjmp-check.patch
+0002-avoid-dl_count-not-found-error.patch

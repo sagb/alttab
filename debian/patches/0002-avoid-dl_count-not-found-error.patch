@@ -1,0 +1,30 @@
+From: Alexander Kulak <sa-dev@odd.systems>
+Date: Sun, 28 Feb 2021 17:01:58 +0000
+Subject: avoid dl_count not found error
+
+---
+ src/autil.c | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
+
+diff --git a/src/autil.c b/src/autil.c
+index 1b3e49d..d369d19 100644
+--- a/src/autil.c
++++ b/src/autil.c
+@@ -64,16 +64,12 @@ void die(const char *format, ...)
+ //
+ void sighandler(int signum)
+ {
+-    PermanentWindowInfo *pwi;
+-    int sln, in;
++    int in;
+     switch (signum) {
+         case SIGUSR1:
+             fprintf(stderr, "debug information:\n");
+             fprintf(stderr, "winlist: %d elements of %ld bytes, %ld total\n",
+                     g.maxNdx, sizeof(WindowInfo), g.maxNdx*sizeof(WindowInfo) );
+-            DL_COUNT(g.sortlist, pwi, sln);
+-            fprintf(stderr, "sortlist: %d elements of %ld bytes, %ld total\n",
+-                    sln, sizeof(PermanentWindowInfo), sln*sizeof(PermanentWindowInfo) );
+             in = HASH_COUNT(g.ic);
+             fprintf(stderr, "icons: %d elements of %ld bytes, %ld total\n",
+                     in, sizeof(icon_t), in*sizeof(icon_t) );
