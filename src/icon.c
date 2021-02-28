@@ -260,8 +260,9 @@ int inspectIconMeta(FTSENT * pe)
     char *endptr;
     char *dim;
     int dimlen;
-    char sx[5];
-    char sy[5];
+    char sx[MAXICONDIMLEN];
+    char sy[MAXICONDIMLEN];
+    int sx_size, sy_size;
     int ix, iy;
     icon_t *ic;
     char *suff;
@@ -309,11 +310,17 @@ int inspectIconMeta(FTSENT * pe)
         xchar = strchr(dim, 'x');
         if (xchar == NULL)
             return 0;               // unknown dimensions
-        strncpy(sx, dim, (xchar - dim));
-        sx[xchar - dim] = '\0';
+        sx_size = xchar - dim;
+        if (sx_size > MAXICONDIMLEN - 1)
+            return 0;
+        strncpy(sx, dim, sx_size);
+        sx[sx_size] = '\0';
         ix = atoi(sx);
-        strncpy(sy, xchar + 1, dim + dimlen - xchar);
-        sy[dim + dimlen - xchar - 1] = '\0';
+        sy_size = dim + dimlen - xchar;
+        if (sy_size > MAXICONDIMLEN - 1)
+            return 0;
+        strncpy(sy, xchar + 1, sy_size);
+        sy[sy_size] = '\0';
         iy = atoi(sy);
     } else {
         // icon other than a priory known dimensions has lowest priority
@@ -335,16 +342,28 @@ int inspectIconMeta(FTSENT * pe)
         uchar = strrchr(app, '_');
         xchar = strrchr(app, 'x');
         if (xchar != NULL && uchar != NULL && xchar > uchar) {
-            strncpy(sx, uchar+1, (xchar - uchar - 1));
-            sx[xchar - uchar - 1] = '\0';
+            sx_size = xchar - uchar - 1;
+            if (sx_size > MAXICONDIMLEN - 1) {
+                msg (0, special_fail_1, app, "WW");
+                ix = 0;
+                goto end_special_1;
+            }
+            strncpy(sx, uchar+1, sx_size);
+            sx[sx_size] = '\0';
             ix = strtol(sx, &endptr, 10);
             if (!(*sx != '\0' && *endptr == '\0')) {
                 msg (0, special_fail_1, app, "WW");
                 ix = 0;
                 goto end_special_1;
             }
-            strncpy(sy, xchar + 1, app + strlen(app) - xchar);
-            sy[app + strlen(app) - xchar] = '\0';
+            sy_size = app + strlen(app) - xchar;
+            if (sy_size > MAXICONDIMLEN - 1) {
+                msg (0, special_fail_1, app, "HH");
+                iy = 0;
+                goto end_special_1;
+            }
+            strncpy(sy, xchar + 1, sy_size);
+            sy[sy_size] = '\0';
             iy = strtol(sy, &endptr, 10);
             if (!(*sy != '\0' && *endptr == '\0')) {
                 msg (0, special_fail_1, app, "HH");

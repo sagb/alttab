@@ -26,6 +26,7 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+#include <signal.h>
 #include "alttab.h"
 #include "util.h"
 #include "config.h"
@@ -501,6 +502,8 @@ int main(int argc, char **argv)
     //hnd = (XErrorHandler)0;
     XErrorHandler hnd = XSetErrorHandler(zeroErrorHandler); // for entire program
     if (hnd) ;;                 // make -Wunused happy
+
+    signal(SIGUSR1, sighandler);
 
     if (!use_args_and_xrm(&argc, argv))
         die("use_args_and_xrm failed");
