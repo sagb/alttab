@@ -15,8 +15,10 @@ jobs:
     - uses: actions/checkout@v2
     - name: install build dependencies
       run: sudo apt-get -y install libx11-dev libxmu-dev libxft-dev libxrender-dev libxrandr-dev libpng-dev libxpm-dev uthash-dev autoconf automake
-    - name: avoid missing autotools
+    - name: avoid missing autotools step 1
       run: touch aclocal.m4 configure
+    - name: avoid missing autotools step 2
+      run: find . -name 'Makefile.??' -exec touch {} \;
     - name: configure
       run: ./configure
     - name: make
