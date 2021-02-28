@@ -1,3 +1,11 @@
+alttab (1.5.0.20210228.10.g61bcb93-1~1.gbp2224c7) testing; urgency=medium
+
+  ** SNAPSHOT build @2224c79e4ca12e8e60a11ce04005787264607c22 **
+
+  * backport to bullseye
+
+ -- Alexander Kulak <sa-dev@odd.systems>  Sun, 28 Feb 2021 14:51:15 +0000
+
 alttab (1.5.0.20210228.10.g61bcb93-1~1.gbp30117e) unstable; urgency=medium
 
   ** SNAPSHOT build @30117e17748b87a551ab6f5d3dc28aef6cd06f59 **
