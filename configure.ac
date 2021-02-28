@@ -30,5 +30,6 @@ AC_CHECK_HEADERS([uthash.h],
   [],
   [AC_MSG_ERROR([Cannot find uthash.h, please install uthash])]
   )
-AC_CONFIG_FILES([Makefile src/Makefile doc/Makefile])
+AC_CONFIG_FILES([Makefile src/Makefile doc/Makefile test/Makefile])
+AC_REQUIRE_AUX_FILE([tap-driver.sh])
 AC_OUTPUT

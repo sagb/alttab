@@ -12,7 +12,12 @@ Build-Depends: debhelper (>= 9~),
                libxpm-dev,
                uthash-dev,
                autoconf,
-               automake
+               automake,
+               xnee,
+               xvfb,
+               x11-apps,
+               x11-utils,
+               procps
 Standards-Version: 4.3.0
 Vcs-Git: https://github.com/sagb/alttab.git -b debian/jessie
 Vcs-Browser: https://github.com/sagb/alttab/tree/debian/jessie
@@ -23,7 +28,7 @@ Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Suggests: fonts-dejavu-core
 Enhances: jwm, twm, evilwm, ratpoison, fluxbox, matchbox, blackbox,
- cwm, wm2, aewm, ctwm, lwm, sawfish, awesome, i3-wm
+ cwm, wm2, aewm, ctwm, lwm, sawfish, awesome, i3-wm, bspwm
 Description: task switcher for minimalistic WMs or standalone X session
  alttab provides convenient visual interface and switching on releasing
  Alt, not on pressing Tab key. Being lightweight and depending only on
