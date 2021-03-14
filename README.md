@@ -6,9 +6,9 @@
 
 ![Translucent](doc/screenshots/alttab-jtaala.png?raw=true)
 
-[screenshot options](doc/screenshots/screenshots.md)
+How these screenshots were [obtained](doc/screenshots/screenshots.md)
 
-[![chat on freenode](https://img.shields.io/badge/chat-on%20freenode-brightgreen.svg)](https://webchat.freenode.net/?channels=%23alttab)
+![CI status](https://github.com/sagb/alttab/actions/workflows/c-cpp.yml/badge.svg)
 
 **alttab** is X11 window switcher designed for minimalistic window managers
 or standalone X11 session.
@@ -44,5 +44,5 @@ Usually it should run fully functional without any argument: `alttab`.
 [no-wm](https://github.com/patrickhaller/no-wm): use X11 without a window manager  
    
    
-alttab (C) Alexander Kulak &lt;sa-dev AT odd POINT systems&gt; 2016-2020
+alttab (C) Alexander Kulak &lt;sa-dev AT odd POINT systems&gt; 2016-2021
 
