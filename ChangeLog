@@ -1,3 +1,16 @@
+2021-03-14  Alexander Kulak  <sa-dev@odd.systems>
+
+	version 1.6.0
+
+	Fix major memory leak when huge icons are not used.
+	Debug by SIGUSR1.
+	Add test suite: running in headless X server.
+	Add github CI pipeline.
+	Bspwm documentation.
+	Fix possible strncpy overflows.
+
+	Closes: #96, #107, #109.
+
 2020-07-23  Alexander Kulak  <sa-dev@odd.systems>
 
 	version 1.5.0
