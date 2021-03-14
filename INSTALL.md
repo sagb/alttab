@@ -50,7 +50,7 @@ Building from source
     Maintainer or packager may also install autotools and ronn:
 
     ```
-    apt install autoconf automake ruby-ronn
+    apt install autoconf automake ronn
     ```
 
 2. Download:
