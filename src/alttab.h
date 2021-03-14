@@ -1,7 +1,7 @@
 /*
 Global includes.
 
-Copyright 2017-2020 Alexander Kulak.
+Copyright 2017-2021 Alexander Kulak.
 This file is part of alttab program.
 
 alttab is free software: you can redistribute it and/or modify
@@ -243,5 +243,6 @@ bool randrGetViewport(quad * res, bool * multihead);
 /* autil */
 void die(const char *format, ...);
 void msg(int lvl, const char *format, ...);
+void sighandler(int signum);
 
 #endif

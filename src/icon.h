@@ -1,7 +1,7 @@
 /*
 icon.c definitions.
 
-Copyright 2017-2020 Alexander Kulak.
+Copyright 2017-2021 Alexander Kulak.
 This file is part of alttab program.
 
 alttab is free software: you can redistribute it and/or modify
@@ -38,6 +38,7 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 #define MAXICONDIRS     64
 #define MAXAPPLEN       64
 #define MAXICONPATHLEN  1024
+#define MAXICONDIMLEN   5
 
 typedef struct {
     char app[MAXAPPLEN];        // application name; uthash key

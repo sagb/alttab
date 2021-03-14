@@ -1,4 +1,4 @@
-AC_INIT([alttab], [1.5.0])
+AC_INIT([alttab], [1.6.0])
 AM_INIT_AUTOMAKE([foreign subdir-objects])
 AC_CONFIG_SRCDIR([configure.ac])
 AC_CONFIG_HEADERS([config.h])
@@ -30,5 +30,6 @@ AC_CHECK_HEADERS([uthash.h],
   [],
   [AC_MSG_ERROR([Cannot find uthash.h, please install uthash])]
   )
-AC_CONFIG_FILES([Makefile src/Makefile doc/Makefile])
+AC_CONFIG_FILES([Makefile src/Makefile doc/Makefile test/Makefile])
+AC_REQUIRE_AUX_FILE([tap-driver.sh])
 AC_OUTPUT

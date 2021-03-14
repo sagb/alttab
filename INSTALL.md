@@ -23,7 +23,7 @@ Binaries
     pkg install alttab
     ```
 
-* In Arch Linux, alttab is available in [AUR](https://aur.archlinux.org/packages/?O=0&K=alttab) (outdated version at Mar 2018).
+* In Arch Linux, alttab is available in [AUR](https://aur.archlinux.org/packages/?O=0&K=alttab).
 
 * In Alpine Linux, alttab is in _aports/testing_ repository.
 
@@ -50,7 +50,7 @@ Building from source
     Maintainer or packager may also install autotools and ronn:
 
     ```
-    apt install autoconf automake ruby-ronn
+    apt install autoconf automake ronn
     ```
 
 2. Download:
@@ -71,6 +71,7 @@ Building from source
     ./configure  
     make  
     make install
+    make check  # optional
     ```
     See README for usage notes.
 
