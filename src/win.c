@@ -228,7 +228,7 @@ int addIconFromProperty(WindowInfo * wi)
     }
     if (best == 0) {
         msg(0, "%s found but no suitable icons in it\n", NWI);
-        //free(prop); better don't
+        free(pro);
         return 0;
     }
     msg(1, "using %dx%d %s icon for %lx\n", w, h, NWI, wi->id);
@@ -262,6 +262,7 @@ int addIconFromProperty(WindowInfo * wi)
     wi->icon_allocated = true;
     wi->icon_w = best_w;
     wi->icon_h = best_h;
+    XFree(img);
     free(image32);
     free(pro);
     return 1;
