@@ -1,3 +1,13 @@
+alttab (1.5.0.20210314.15.g534da74-1~1.gbp98e09a) unstable; urgency=medium
+
+  ** SNAPSHOT build @98e09a2522ebaad5855246044f3eabcf5d2a3ce5 **
+
+  * prepare 1.6.0
+  * free icon memory if it doesn't contain usable icon
+  * avoid missing autotools
+
+ -- Alexander Kulak <sa-dev@odd.systems>  Sun, 14 Mar 2021 15:06:17 +0000
+
 alttab (1.5.0.20210228.10.g61bcb93-1~1.gbp30117e) unstable; urgency=medium
 
   ** SNAPSHOT build @30117e17748b87a551ab6f5d3dc28aef6cd06f59 **
