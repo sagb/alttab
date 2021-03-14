@@ -16,7 +16,7 @@ alttab(1) -- the task switcher
 
 ## SYNOPSIS
 
-`alttab` [`-w` <N>] [`-d` <N>] [`-sc` <N>] [`-mk` <str>] [`-kk` <str>] [`-bk` <str>] [`-pk` <str>] [`-nk` <str>] [`-mm` <N>] [`-bm` <N>] [`-t` <NxM>] [`-i` <NxM>] [`-vp` <str>] [`-p` <str>] [`-s` <N>] [`-theme` <name>] [`-bg` <color>] [`-fg` <color>] [`-frame` <color>] [`-font` <name>] [`-v`|`-vv`]
+`alttab` [`-w` <N>] [`-d` <N>] [`-sc` <N>] [`-mk` <str>] [`-kk` <str>] [`-bk` <str>] [`-pk` <str>] [`-nk` <str>] [`-mm` <N>] [`-bm` <N>] [`-t` <NxM>] [`-i` <NxM>] [`-vp` <str>] [`-p` <str>] [`-s` <N>] [`-theme` <name>] [`-bg` <color>] [`-fg` <color>] [`-frame` <color>] [`-font` <name>] [`-v`\|`-vv`]
 
 ## DESCRIPTION
 
@@ -245,7 +245,7 @@ Most command line options have corresponding X resource, see doc/alttab.ad for e
 
     Desktop theme for application icons. Used when `-s` is 1, 2 or 3.
 
-The following three options accept color names or <#rrggbb>. Special value <\_rnd_low> or <\_rnd_high> produce random color from lower or upper RGB space respectively.
+The following three options accept color names or <#rrggbb>. Special value <&#95;rnd_low> or <&#95;rnd_high> produce random color from lower or upper RGB space respectively.
 
   * `-bg` <color>:
     resource: alttab.background  
