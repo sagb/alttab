@@ -40,6 +40,11 @@ Test suite
 
 `make check` should work.
 
+Debug
+-----
+
+On USR1 signal alttab dumps some debug information on STDERR.
+
 /* vim:tabstop=4:shiftwidth=4:smarttab:expandtab:smartindent  
 */
 
