@@ -1,7 +1,7 @@
 /*
 Parsing options/resources, top-level keygrab functions and main().
 
-Copyright 2017-2020 Alexander Kulak.
+Copyright 2017-2021 Alexander Kulak.
 This file is part of alttab program.
 
 alttab is free software: you can redistribute it and/or modify
