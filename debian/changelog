@@ -1,3 +1,12 @@
+alttab (1.5.0.20210314.16.g1c0754e-1~1.gbp5aaf50) unstable; urgency=medium
+
+  ** SNAPSHOT build @5aaf501bc269c03214f429c863ff1e108d95ed73 **
+
+  * bump to Debian standards
+  * build man with new ronn
+
+ -- Alexander Kulak <sa-dev@odd.systems>  Sun, 14 Mar 2021 16:15:15 +0000
+
 alttab (1.5.0.20210314.15.g534da74-1~1.gbp98e09a) unstable; urgency=medium
 
   ** SNAPSHOT build @98e09a2522ebaad5855246044f3eabcf5d2a3ce5 **
