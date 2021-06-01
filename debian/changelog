@@ -1,8 +1,13 @@
 alttab (1.6.0-1) unstable; urgency=medium
 
-  * New upstream release
+  * New upstream release.
+    No new features introduced.
+    Severe bug fixed: The memory that is being allocated for each icon
+    is limited for speed. When X application had huge icon (1024x1024
+    or more), the memory was instead being allocated but not freed.
+    Closes: 964357
 
- -- Alexander Kulak <sa-dev@odd.systems>  Sun, 14 Mar 2021 21:37:11 +0300
+ -- Alexander Kulak <sa-dev@odd.systems>  Tue,  1 Jun 2021 21:50:32 +0300
 
 alttab (1.5.0-1) unstable; urgency=medium
 
