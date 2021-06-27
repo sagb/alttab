@@ -1,7 +1,7 @@
 Source: alttab
 Section: x11
 Priority: optional
-Maintainer: Alexander Kulak <sa-dev@odd.systems>
+Maintainer: Peter Pentchev <roam@debian.org>
 Build-Depends: debhelper-compat (= 13),
                libx11-dev,
                libxmu-dev,
@@ -14,8 +14,8 @@ Build-Depends: debhelper-compat (= 13),
                autoconf,
                automake
 Standards-Version: 4.5.0
-Vcs-Git: https://github.com/sagb/alttab.git -b debian/unstable
-Vcs-Browser: https://github.com/sagb/alttab/tree/debian/unstable
+Vcs-Git: https://salsa.debian.org/debian/alttab.git
+Vcs-Browser: https://salsa.debian.org/debian/alttab
 Homepage: https://sagb.github.io/alttab
 Rules-Requires-Root: no
 
