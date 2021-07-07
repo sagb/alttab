@@ -30,6 +30,8 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 #include "alttab.h"
 #include "util.h"
 extern Globals g;
+extern Display *dpy;
+extern Window root;
 
 // PRIVATE
 
@@ -99,12 +101,10 @@ static int rp_add_windows_in_group(int current_group, int window_group)
     return 1;
 }
 
-// PUBLIC
-
 //
 // early initialization in ratpoison
 //
-int rp_startupWintasks()
+static int rp_startupWintasks()
 {
 
 // search for ratpoison executable for later execv
@@ -158,7 +158,7 @@ int rp_startupWintasks()
 //
 // initialize winlist/update sortlist from ratpoison output
 //
-int rp_initWinlist()
+static int rp_initWinlist()
 {
 #define  fallback    { msg(-1, "using current rp group\n") ; \
     return rp_add_windows_in_group(DESKTOP_UNKNOWN, DESKTOP_UNKNOWN); }
@@ -217,7 +217,7 @@ int rp_initWinlist()
 //
 // focus window in ratpoison
 //
-int rp_setFocus(int winNdx)
+static int rp_setFocus(int winNdx)
 {
     char selarg[64];
     char *args[] = { "ratpoison", "-c", selarg, NULL };
@@ -236,3 +236,49 @@ int rp_setFocus(int winNdx)
 
     return 1;
 }
+
+static bool ratpoisonProbe(void)
+{
+    unsigned long remain, len;
+    Atom nwm_prop, atype;
+    int form;
+    unsigned char *nwm;
+    bool ret = false;
+
+    nwm_prop = XInternAtom(dpy, "_NET_WM_NAME", false);
+    if (!XGetWindowProperty(dpy, root, nwm_prop, 0, MAXNAMESZ, false,
+                           AnyPropertyType, &atype, &form, &len, &remain,
+                            &nwm) == Success && nwm)
+        return false;
+
+    msg(0, "_NET_WM_NAME root property present: %s\n", nwm);
+    if (strstr((char *)nwm, "ratpoison") != NULL)
+        ret = true;
+
+    XFree(nwm);
+    return ret;
+}
+
+static int ratpoisonStartup(void)
+{
+    return rp_startupWintasks();
+}
+
+static int ratpoisonWinlist(void)
+{
+    return rp_initWinlist();
+}
+
+static int ratpoisonSetFocus(int idx)
+{
+    return rp_setFocus(idx);
+}
+
+// PUBLIC
+
+struct WmOps WmRatpoisonOps = {
+    .probe = ratpoisonProbe,
+    .startup = ratpoisonStartup,
+    .winlist = ratpoisonWinlist,
+    .setFocus = ratpoisonSetFocus,
+};

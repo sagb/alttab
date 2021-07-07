@@ -59,6 +59,14 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 #define DEFNEXTKEYKS    XK_VoidSymbol
 #define DEFCANCELKS XK_Escape
 
+#define WM_MIN          0
+#define WM_NO           0
+#define WM_EWMH         1
+#define WM_RATPOISON    2
+#define WM_TWM          3
+#define WM_MAX          3
+#define WM_GUESS        -1
+
 #include "icon.h"
 
 #ifndef COMTYPES
@@ -108,6 +116,22 @@ typedef struct PermanentWindowInfo {
     struct PermanentWindowInfo *next, *prev;
 } PermanentWindowInfo;
 
+struct WmOps {
+    bool (*probe)(void);
+    int (*startup)(void);
+    int (*winlist)(void);
+    int (*setFocus)(int idx);
+    Window (*getActiveWindow)(void);
+    bool (*skipWindowInTaskbar)(Window w);
+    bool (*skipFocusChangeEvent)(void);
+    long (*eventMask)(Window w);
+};
+
+extern struct WmOps WmNoOps;
+extern struct WmOps WmEwmhOps;
+extern struct WmOps WmRatpoisonOps;
+extern struct WmOps WmTwmOps;
+
 /*
 typedef struct SwitchMoment {
     Window prev;
@@ -127,14 +151,6 @@ typedef struct {
      * unlike g.winlist, survives uiHide */
     PermanentWindowInfo *sortlist;
     // option_* are initialized from command line arguments or X resources or defaults
-    int option_max_reclevel;    // max reclevel. -1 is "everything"
-#define WM_MIN          0
-#define WM_NO           0
-#define WM_EWMH         1
-#define WM_RATPOISON    2
-#define WM_TWM          3
-#define WM_MAX          3
-    int option_wm;
 #define DESK_MIN        0
 #define DESK_CURRENT    0
 #define DESK_ALL        1
@@ -202,6 +218,7 @@ Window getUiwin();
 void shutdownGUI(void);
 
 // windows
+void initWin(int wmindex);
 int startupWintasks();
 int addIconFromProperty(WindowInfo * wi);
 int addIconFromHints(WindowInfo * wi);
@@ -211,11 +228,6 @@ int addWindowInfo(Window win, int reclevel, int wm_id, unsigned long desktop,
 int initWinlist(void);
 void freeWinlist();
 int setFocus(int winNdx);
-int rp_startupWintasks();
-int x_initWindowsInfoRecursive(Window win, int reclevel);
-int rp_initWinlist();
-int x_setFocus(int wndx);
-int rp_setFocus(int winNdx);
 int execAndReadStdout(char *exe, char *args[], char *buf, int bufsize);
 int pulloutWindowToTop(int winNdx);
 void winPropChangeEvent(XPropertyEvent e);
@@ -223,18 +235,11 @@ void winDestroyEvent(XDestroyWindowEvent e);
 void winFocusChangeEvent(XFocusChangeEvent e);
 bool common_skipWindow(Window w, unsigned long current_desktop,
                        unsigned long window_desktop);
-void x_setCommonPropertiesForAnyWindow(Window win);
 void addToSortlist(Window w, bool to_head, bool move);
 void shutdownWin(void);
 
 /* EWHM */
-bool ewmh_detectFeatures(EwmhFeatures * e);
-Window ewmh_getActiveWindow();
-int ewmh_initWinlist();
 int ewmh_setFocus(int winNdx, Window fwin); // fwin used if non-zero
-unsigned long ewmh_getCurrentDesktop();
-unsigned long ewmh_getDesktopOfWindow(Window w);
-bool ewmh_skipWindowInTaskbar(Window w);
 
 /* RANDR */
 bool randrAvailable();

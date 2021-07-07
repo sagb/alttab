@@ -33,6 +33,13 @@ extern Window root;
 
 // PRIVATE
 
+// max recursion for searching windows
+// -1 is "everything"
+// in raw X this returns too much windows, "1" is probably sufficient
+// no need for an option
+static int max_reclevel;
+static int wm;
+
 //
 // get window group leader
 // to be used later. rewritten, not tested.
@@ -57,13 +64,11 @@ Window x_get_leader(Window win)
     return leader;
 }
 
-// PUBLIC
-
 //
 // set winlist,maxNdx recursively using raw Xlib
 // first call should be (win=root, reclevel=0)
 //
-int x_initWindowsInfoRecursive(Window win, int reclevel)
+static int x_initWindowsInfoRecursive(Window win, int reclevel)
 {
 
     Window root, parent;
@@ -88,24 +93,24 @@ int x_initWindowsInfoRecursive(Window win, int reclevel)
 // caveat: in rp, skips anything except of visible window
 // probably add an option for this in WMs too?
     wa.map_state = 0;
-    if (g.option_wm != WM_TWM)
+    if (wm != WM_TWM)
         XGetWindowAttributes(dpy, win, &wa);
 
 // in twm-like, add only windows with a name
     winname = NULL;
-    if (g.option_wm == WM_TWM) {
+    if (wm == WM_TWM) {
         winname = get_x_property(win, XA_STRING, "WM_NAME", NULL);
     }
 // insert detailed window data in window list
-    if ((g.option_wm == WM_TWM || wa.map_state == IsViewable)
-        && reclevel != 0 && (g.option_wm != WM_TWM || winname != NULL)
-//            && (g.option_wm != WM_TWM || leader == win)
+    if ((wm == WM_TWM || wa.map_state == IsViewable)
+        && reclevel != 0 && (wm != WM_TWM || winname != NULL)
+//            && (wm != WM_TWM || leader == win)
         && !common_skipWindow(win, DESKTOP_UNKNOWN, DESKTOP_UNKNOWN)
         ) {
         addWindowInfo(win, reclevel, 0, DESKTOP_UNKNOWN, winname);
     }
 // skip children if max recursion level reached
-    if (g.option_max_reclevel != -1 && reclevel >= g.option_max_reclevel)
+    if (max_reclevel != -1 && reclevel >= max_reclevel)
         return 1;
 
 // recursion
@@ -126,7 +131,7 @@ int x_initWindowsInfoRecursive(Window win, int reclevel)
 //
 // set window focus in raw X
 //
-int x_setFocus(int wndx)
+static int x_setFocus(int wndx)
 {
     Window w = g.winlist[wndx].id;
 
@@ -149,25 +154,47 @@ int x_setFocus(int wndx)
     return 1;
 }
 
-//
-// this is where alttab is supposed to set properties or
-// register interest in event for ANY foreign window encountered.
-// warning: this is called only on addition to sortlist.
-//
-void x_setCommonPropertiesForAnyWindow(Window win)
+static int xSetFocus(int idx)
 {
-    long evmask = 0;
-    // root and our window are treated elsewhere
-    if (win == root || win == getUiwin())
-        return;
-    // for delete notification
-    evmask |= StructureNotifyMask;
-    // for focusIn notification
-    if (g.option_wm != WM_EWMH) {
-        msg(0, "using direct focus tracking for 0x%lx\n", win);
-        evmask |= FocusChangeMask;
-    }
-    // warning: this overwrites previous value
-    if (evmask != 0)
-        XSelectInput(dpy, win, evmask);
+    int r;
+
+    // for WM which isn't identified as EWMH compatible
+    // but accepts setting focus (dwm)
+    r = ewmh_setFocus(idx, 0);
+    x_setFocus(idx);
+
+    return r;
 }
+
+static int xStartup(void)
+{
+    wm = WM_NO;
+    max_reclevel = 1;
+    return 1;
+}
+
+static int twmStartup(void)
+{
+    wm = WM_TWM;
+    max_reclevel = -1;
+    return 1;
+}
+
+static int xWinlist(void)
+{
+    return x_initWindowsInfoRecursive(root, 0);
+}
+
+// PUBLIC
+
+struct WmOps WmNoOps = {
+    .startup = xStartup,
+    .winlist = xWinlist,
+    .setFocus = xSetFocus,
+};
+
+struct WmOps WmTwmOps = {
+    .startup = twmStartup,
+    .winlist = xWinlist,
+    .setFocus = xSetFocus,
+};

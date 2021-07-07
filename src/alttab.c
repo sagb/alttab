@@ -96,10 +96,6 @@ static int use_args_and_xrm(int *argc, char **argv)
     char *rm;
     char *empty = "";
     int uo;
-    Atom nwm_prop, atype;
-    unsigned char *nwm;
-    int form;
-    unsigned long remain, len;
     XrmOptionDescRec xrmTable[] = {
         {"-w", "*windowmanager", XrmoptionSepArg, NULL},
         {"-d", "*desktops", XrmoptionSepArg, NULL},
@@ -171,43 +167,20 @@ static int use_args_and_xrm(int *argc, char **argv)
 
     switch (xresource_load_int(&db, XRMAPPNAME, "windowmanager", &wmindex)) {
     case 1:
-        if (wmindex >= WM_MIN && wmindex <= WM_MAX) {
-            g.option_wm = wmindex;
-            goto wmDone;
-        } else {
+        if (wmindex < WM_MIN || wmindex > WM_MAX) {
             die(inv, "windowmanager argument range");
         }
         break;
     case 0:
         msg(0, "no WM index or unknown, guessing\n");
+        wmindex = WM_GUESS;
         break;
     case -1:
         die(inv, "windowmanager argument");
         break;
     }
-// EWMH?
-    if (ewmh_detectFeatures(&(g.ewmh))) {
-        msg(0, "EWMH-compatible WM detected: %s\n", g.ewmh.wmname);
-        g.option_wm = WM_EWMH;
-        goto wmDone;
-    }
-// ratpoison?
-    nwm_prop = XInternAtom(dpy, "_NET_WM_NAME", false);
-    if (XGetWindowProperty(dpy, root, nwm_prop, 0, MAXNAMESZ, false,
-                           AnyPropertyType, &atype, &form, &len, &remain,
-                           &nwm) == Success && nwm) {
-        msg(0, "_NET_WM_NAME root property present: %s\n", nwm);
-        if (strstr((char *)nwm, "ratpoison") != NULL) {
-            g.option_wm = WM_RATPOISON;
-            XFree(nwm);
-            goto wmDone;
-        }
-        XFree(nwm);
-    }
-    msg(0, "unknown WM, using WM_TWM\n");
-    g.option_wm = WM_TWM;
- wmDone:
-    msg(0, "WM: %d\n", g.option_wm);
+
+    initWin(wmindex);
 
     switch (xresource_load_int(&db, XRMAPPNAME, "desktops", &dsindex)) {
     case 1:
@@ -437,12 +410,6 @@ static int use_args_and_xrm(int *argc, char **argv)
     } else {
         g.option_font = DEFFONT + 4;
     }
-
-// max recursion for searching windows
-// -1 is "everything"
-// in raw X this returns too much windows, "1" is probably sufficient
-// no need for an option
-    g.option_max_reclevel = (g.option_wm == WM_NO) ? 1 : -1;
 
     return 1;
 }

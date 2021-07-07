@@ -36,6 +36,9 @@ extern int scr;
 extern Window root;
 
 // PRIVATE
+static unsigned long ewmh_getCurrentDesktop();
+static unsigned long ewmh_getDesktopOfWindow(Window w);
+static bool ewmh_skipWindowInTaskbar(Window w);
 
 //
 // returns ptr to EWMH client list and client_list_size
@@ -116,13 +119,11 @@ static int ewmh_switch_window(unsigned long window)
     return ewmh_send_wm_evt(window, "_NET_ACTIVE_WINDOW", edata);
 }
 
-// PUBLIC
-
 //
 // initialize EwmhFeatures
 // return true if usable at all
 //
-bool ewmh_detectFeatures(EwmhFeatures * e)
+static bool ewmh_detectFeatures(EwmhFeatures * e)
 {
     Window *chld_win;
     char *r;
@@ -178,7 +179,7 @@ bool ewmh_detectFeatures(EwmhFeatures * e)
 //
 // active window or 0
 //
-Window ewmh_getActiveWindow()
+static Window ewmh_getActiveWindow()
 {
     Window w = (Window) 0;
     char *awp;
@@ -196,7 +197,7 @@ Window ewmh_getActiveWindow()
 // initialize winlist, correcting sortlist
 // return 1 if ok
 //
-int ewmh_initWinlist()
+static int ewmh_initWinlist()
 {
     Window *client_list;
     unsigned long client_list_size;
@@ -254,28 +255,6 @@ int ewmh_initWinlist()
     return 1;
 }
 
-//
-// focus window in EWMH WM
-// fwin used if non-zero, winNdx otherwise
-//
-int ewmh_setFocus(int winNdx, Window fwin)
-{
-    Window win = (fwin != 0) ? fwin : g.winlist[winNdx].id;
-    msg(1, "ewmh_setFocus win 0x%lx\n", win);
-    if (fwin == 0 && g.option_desktop != DESK_CURRENT) {
-        unsigned long wdesk = g.winlist[winNdx].desktop;
-        unsigned long cdesk = ewmh_getCurrentDesktop();
-        msg(1, "ewmh_setFocus fwin 0x%lx opt %d wdesk %lu cdesk %lu\n",
-            fwin, g.option_desktop, wdesk, cdesk);
-        if (cdesk != wdesk && wdesk != DESKTOP_UNKNOWN) {
-            ewmh_switch_desktop(wdesk);
-        }
-    }
-    ewmh_switch_window(win);
-    XMapRaised(dpy, win);
-    return 1;
-}
-
 static unsigned long ewmh_getDesktopFromProp(Window w, char *prop1, char *prop2)
 {
     unsigned long *d;
@@ -295,7 +274,7 @@ static unsigned long ewmh_getDesktopFromProp(Window w, char *prop1, char *prop2)
 //
 // get current desktop in EWMH WM
 //
-unsigned long ewmh_getCurrentDesktop()
+static unsigned long ewmh_getCurrentDesktop()
 {
     return ewmh_getDesktopFromProp(root, "_NET_CURRENT_DESKTOP", "_WIN_WORKSPACE");
 }
@@ -303,7 +282,7 @@ unsigned long ewmh_getCurrentDesktop()
 //
 // get desktop of window w in EWMH WM
 //
-unsigned long ewmh_getDesktopOfWindow(Window w)
+static unsigned long ewmh_getDesktopOfWindow(Window w)
 {
     return ewmh_getDesktopFromProp(w, "_NET_WM_DESKTOP", "_WIN_WORKSPACE");
 }
@@ -311,7 +290,7 @@ unsigned long ewmh_getDesktopOfWindow(Window w)
 //
 // does window have _NET_WM_STATE_SKIP_TASKBAR
 //
-bool ewmh_skipWindowInTaskbar(Window w)
+static bool ewmh_skipWindowInTaskbar(Window w)
 {
     Atom *state;
     long unsigned int state_propsize;
@@ -338,3 +317,88 @@ bool ewmh_skipWindowInTaskbar(Window w)
     free(state);
     return ret;
 }
+
+static bool ewmhProbe(void)
+{
+    return ewmh_detectFeatures(&g.ewmh);
+}
+
+static int ewmhStartup(void)
+{
+    long rootevmask = 0;
+
+    // root: watching for _NET_ACTIVE_WINDOW
+    g.naw = XInternAtom(dpy, "_NET_ACTIVE_WINDOW", true);
+    rootevmask |= PropertyChangeMask;
+
+    // warning: this overwrites any previous value.
+    // note: x_setCommonPropertiesForAnyWindow does the similar thing
+    // for any window other than root and uiwin
+    XSelectInput(dpy, root, rootevmask);
+
+    return 1;
+}
+
+static int ewmhSetFocus(int winNdx)
+{
+    int r;
+    XWindowAttributes att;
+
+    r = ewmh_setFocus(winNdx, 0);
+    // XSetInputFocus stuff.
+    // skippy-xd does it and notes that "order is important".
+    // fixes #28.
+    // it must be protected by testing IsViewable in the same way
+    // as in x.c, or BadMatch happens after switching desktops.
+    XGetWindowAttributes(dpy, g.winlist[winNdx].id, &att);
+    if (att.map_state == IsViewable)
+        XSetInputFocus(dpy, g.winlist[winNdx].id, RevertToParent,
+                       CurrentTime);
+    return r;
+}
+
+static bool ewmhSkipFocusChangeEvent(void)
+{
+    return true;
+}
+
+static long ewmhEventMask(Window w)
+{
+    msg(0, "using direct focus tracking for 0x%lx\n", w);
+    return FocusChangeMask;
+}
+
+// PUBLIC
+
+//
+// focus window in EWMH WM
+// fwin used if non-zero, winNdx otherwise
+//
+int ewmh_setFocus(int winNdx, Window fwin)
+{
+    Window win = (fwin != 0) ? fwin : g.winlist[winNdx].id;
+    msg(1, "ewmh_setFocus win 0x%lx\n", win);
+    if (fwin == 0 && g.option_desktop != DESK_CURRENT) {
+        unsigned long wdesk = g.winlist[winNdx].desktop;
+        unsigned long cdesk = ewmh_getCurrentDesktop();
+        msg(1, "ewmh_setFocus fwin 0x%lx opt %d wdesk %lu cdesk %lu\n",
+            fwin, g.option_desktop, wdesk, cdesk);
+        if (cdesk != wdesk && wdesk != DESKTOP_UNKNOWN) {
+            ewmh_switch_desktop(wdesk);
+        }
+    }
+    ewmh_switch_window(win);
+    XMapRaised(dpy, win);
+    return 1;
+}
+
+struct WmOps WmEwmhOps = {
+    .probe = ewmhProbe,
+    .startup = ewmhStartup,
+    .winlist = ewmh_initWinlist,
+    .setFocus = ewmhSetFocus,
+    .getActiveWindow = ewmh_getActiveWindow,
+    .skipWindowInTaskbar = ewmh_skipWindowInTaskbar,
+    .skipFocusChangeEvent = ewmhSkipFocusChangeEvent,
+    .eventMask = ewmhEventMask,
+};
