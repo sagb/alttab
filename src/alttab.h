@@ -150,6 +150,8 @@ typedef struct {
 #define SCR_DEFAULT    SCR_ALL
     int option_screen;
     char *option_font;
+#define VERTICAL_DEFAULT false
+    bool option_vertical;
     int option_tileW, option_tileH;
     int option_iconW, option_iconH;
 #define VP_FOCUS        0
