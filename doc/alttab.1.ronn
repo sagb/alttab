@@ -16,7 +16,7 @@ alttab(1) -- the task switcher
 
 ## SYNOPSIS
 
-`alttab` [`-w` <N>] [`-d` <N>] [`-sc` <N>] [`-mk` <str>] [`-kk` <str>] [`-bk` <str>] [`-pk` <str>] [`-nk` <str>] [`-mm` <N>] [`-bm` <N>] [`-t` <NxM>] [`-i` <NxM>] [`-vp` <str>] [`-p` <str>] [`-s` <N>] [`-theme` <name>] [`-bg` <color>] [`-fg` <color>] [`-frame` <color>] [`-font` <name>] [`-v`\|`-vv`]
+`alttab` [`-w` <N>] [`-d` <N>] [`-sc` <N>] [`-mk` <str>] [`-kk` <str>] [`-bk` <str>] [`-pk` <str>] [`-nk` <str>] [`-mm` <N>] [`-bm` <N>] [`-t` <NxM>] [`-i` <NxM>] [`-vp` <str>] [`-p` <str>] [`-s` <N>] [`-theme` <name>] [`-bg` <color>] [`-fg` <color>] [`-frame` <color>] [`-border` <color>] [`-borderw` <N>] [`-font` <name>] [`-v`\|`-vv`]
 
 ## DESCRIPTION
 
@@ -264,6 +264,18 @@ The following three options accept color names or <#rrggbb>. Special value <&#95
     default: <#a0abab>
 
     Color of frame around selected tile.
+
+  * `-border` <color>:
+    resource: alttab.bordercolor
+    default: <black>
+
+    Color of border around alttab-window.
+
+  * `-borderw` <N>:
+    resource: alttab.borderwidth
+    default: <0>
+
+    Width of border around alttab-window.
 
   * `-font` <name>:
     resource: alttab.font  
