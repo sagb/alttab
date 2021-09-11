@@ -234,9 +234,9 @@ static void prepareTile(WindowInfo * wi)
         int x, y, w, h;
         if (g.option_vertical) {
             x = iconW + 5;
-            y = 0;
+            y = FRAME_W; // avoids overlapping with frames
             w = tileW - iconW - 5;
-            h = tileH;
+            h = tileH - FRAME_W;
         } else {
             x = 0;
             y = iconH + 5;
