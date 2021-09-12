@@ -122,6 +122,7 @@ static int use_args_and_xrm(int *argc, char **argv)
         {"-fg", "*foreground", XrmoptionSepArg, NULL},
         {"-frame", "*framecolor", XrmoptionSepArg, NULL},
         {"-font", "*font", XrmoptionSepArg, NULL},
+        {"-vertical", "*vertical", XrmoptionIsArg, NULL}
     };
     const char *inv = "invalid %s, use -h for help\n";
     const char *rmb = "can't figure out modmask from keycode 0x%x\n";
@@ -437,6 +438,10 @@ static int use_args_and_xrm(int *argc, char **argv)
     } else {
         g.option_font = DEFFONT + 4;
     }
+
+    s = xresource_load_string(&db, XRMAPPNAME, "vertical");
+    g.option_vertical = (s != NULL);
+    msg(0, "vertical: %d\n", g.option_vertical);
 
 // max recursion for searching windows
 // -1 is "everything"
