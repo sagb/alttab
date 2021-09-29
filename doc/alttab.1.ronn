@@ -16,7 +16,7 @@ alttab(1) -- the task switcher
 
 ## SYNOPSIS
 
-`alttab` [`-w` <N>] [`-d` <N>] [`-sc` <N>] [`-mk` <str>] [`-kk` <str>] [`-bk` <str>] [`-pk` <str>] [`-nk` <str>] [`-mm` <N>] [`-bm` <N>] [`-t` <NxM>] [`-i` <NxM>] [`-vp` <str>] [`-p` <str>] [`-s` <N>] [`-theme` <name>] [`-bg` <color>] [`-fg` <color>] [`-frame` <color>] [`-border` <color>] [`-borderw` <N>] [`-font` <name>] [`-v`\|`-vv`]
+`alttab` [`-w` <N>] [`-d` <N>] [`-sc` <N>] [`-mk` <str>] [`-kk` <str>] [`-bk` <str>] [`-pk` <str>] [`-nk` <str>] [`-mm` <N>] [`-bm` <N>] [`-t` <NxM>] [`-i` <NxM>] [`-vp` <str>] [`-p` <str>] [`-s` <N>] [`-theme` <name>] [`-bg` <color>] [`-fg` <color>] [`-frame` <color>] [`-border` <color>] [`-borderw` <N>] [`-font` <name>] [`-vertical`] [`-v`\|`-vv`]
 
 ## DESCRIPTION
 
@@ -288,6 +288,12 @@ Your Xresources database probably already has \*background, \*foreground or \*fo
    alttab.font resource,  
    `-font` option,  
    wildcard resource like \*font in xfd: format.
+
+  * `-vertical`:
+    resource: alttab.vertical  
+    default: no
+
+    Vertical layout (experimental).
 
   * `-v`, `-vv`:
     resource: no  

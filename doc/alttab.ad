@@ -75,3 +75,6 @@ alttab.framecolor:      _rnd_low
 ! Bigger font
 !alttab.font:           xft:DejaVu Sans Condensed-18
 
+! Vertical layout
+!alttab.vertical:       anything
+
