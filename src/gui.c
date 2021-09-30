@@ -555,9 +555,9 @@ int uiShow(bool direction)
     unsigned long valuemask = CWBackPixel | CWBorderPixel | CWOverrideRedirect;
     XSetWindowAttributes attributes;
     attributes.background_pixel = g.color[COLBG].xcolor.pixel;
-    attributes.border_pixel = g.color[COLFRAME].xcolor.pixel;
+    attributes.border_pixel = g.color[COLBORDER].xcolor.pixel;
     attributes.override_redirect = 1;
-    uiwin = XCreateWindow(dpy, root, uiwinX, uiwinY, uiwinW, uiwinH, 0, // border_width
+    uiwin = XCreateWindow(dpy, root, uiwinX, uiwinY, uiwinW, uiwinH, g.option_borderW, // border_width
                           CopyFromParent,   // depth
                           InputOutput,  // class
                           CopyFromParent,   // visual
