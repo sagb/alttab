@@ -69,7 +69,7 @@ Options:\n\
    -fg color  foreground color\n\
 -frame color  active frame color\n\
 -border color border color\n\
--borderw N    border color\n\
+-borderw N    border width\n\
  -font name   font name in the form xft:fontconfig_pattern\n\
   -v|-vv      verbose\n\
     -h        help\n\

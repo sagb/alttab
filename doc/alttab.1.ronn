@@ -266,16 +266,16 @@ The following three options accept color names or <#rrggbb>. Special value <&#95
     Color of frame around selected tile.
 
   * `-border` <color>:
-    resource: alttab.bordercolor
+    resource: alttab.bordercolor  
     default: <black>
 
-    Color of border around alttab-window.
+    Color of additional border around the entire switcher.
 
   * `-borderw` <N>:
-    resource: alttab.borderwidth
-    default: <0>
+    resource: alttab.borderwidth  
+    default: <0> (no border)
 
-    Width of border around alttab-window.
+    Width of border above.
 
   * `-font` <name>:
     resource: alttab.font  

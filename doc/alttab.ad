@@ -66,11 +66,11 @@ alttab.foreground:      #600000
 ! Random dark frame
 alttab.framecolor:      _rnd_low
 
-! Blue border
-! alttab.bordercolor:     #0000FF
+! Show X11 window border around the switcher
+!alttab.borderwidth:     4
 
-! Show a border with specified width. Set to 0 to disable border.
-! alttab.borderwidth:     4
+! Blue border
+!alttab.bordercolor:     #0000FF
 
 ! Bigger font
 !alttab.font:           xft:DejaVu Sans Condensed-18
