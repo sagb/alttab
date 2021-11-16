@@ -35,6 +35,16 @@ The only global variables are: g, dpy, scr, root, ee\_complain.
 X error handler doesn't abort on error. To disable even the error message,
 temporary set ee\_complain to false.
 
+Test suite
+----------
+
+`make check` should work.
+
+Debug
+-----
+
+On USR1 signal alttab dumps some debug information on STDERR.
+
 /* vim:tabstop=4:shiftwidth=4:smarttab:expandtab:smartindent  
 */
 

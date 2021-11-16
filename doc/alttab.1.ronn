@@ -2,7 +2,7 @@
 The source of alttab.1. Read doc/development.md.
 vim:ft=markdown
 
-Copyright 2017-2020 Alexander Kulak.
+Copyright 2017-2021 Alexander Kulak.
 This file is part of alttab program.
 
 Copying and distribution of this file, with or without modification,
@@ -16,7 +16,7 @@ alttab(1) -- the task switcher
 
 ## SYNOPSIS
 
-`alttab` [`-w` <N>] [`-d` <N>] [`-sc` <N>] [`-mk` <str>] [`-kk` <str>] [`-bk` <str>] [`-pk` <str>] [`-nk` <str>] [`-mm` <N>] [`-bm` <N>] [`-t` <NxM>] [`-i` <NxM>] [`-vp` <str>] [`-p` <str>] [`-s` <N>] [`-theme` <name>] [`-bg` <color>] [`-fg` <color>] [`-frame` <color>] [`-font` <name>] [`-v`|`-vv`]
+`alttab` [`-w` <N>] [`-d` <N>] [`-sc` <N>] [`-mk` <str>] [`-kk` <str>] [`-bk` <str>] [`-pk` <str>] [`-nk` <str>] [`-mm` <N>] [`-bm` <N>] [`-t` <NxM>] [`-i` <NxM>] [`-vp` <str>] [`-p` <str>] [`-s` <N>] [`-theme` <name>] [`-bg` <color>] [`-fg` <color>] [`-frame` <color>] [`-font` <name>] [`-v`\|`-vv`]
 
 ## DESCRIPTION
 
@@ -49,7 +49,7 @@ Most command line options have corresponding X resource, see doc/alttab.ad for e
 
       Compatible WM list is in [SEE ALSO] below. alttab functions in xmonad (EWMH must be
       allowed, details in doc/wm-setup.md), i3, evilwm, xfwm4, metacity, jwm, openbox, fluxbox,
-      icewm, enlightenment, blackbox, aewm, fvwm, sawfish.
+      icewm, enlightenment, blackbox, aewm, fvwm, sawfish, bspwm.
       The following WMs support EWMH partially but work in **-w 1** mode too:
       dwm (issue #9), matchbox (issue #34), windowmaker (issue #9),
       xpra (issue #37), cwm (issue #35), ctwm (issue #39), lwm (issue #40),
@@ -245,7 +245,7 @@ Most command line options have corresponding X resource, see doc/alttab.ad for e
 
     Desktop theme for application icons. Used when `-s` is 1, 2 or 3.
 
-The following three options accept color names or <#rrggbb>. Special value <\_rnd_low> or <\_rnd_high> produce random color from lower or upper RGB space respectively.
+The following three options accept color names or <#rrggbb>. Special value <&#95;rnd_low> or <&#95;rnd_high> produce random color from lower or upper RGB space respectively.
 
   * `-bg` <color>:
     resource: alttab.background  
@@ -292,7 +292,7 @@ Run alttab after WM, or autodetection will fail.
 
 ##AUTHOR
 
-Copyright 2017-2020 Alexander Kulak `<sa-dev AT odd POINT systems>`.
+Copyright 2017-2021 Alexander Kulak `<sa-dev AT odd POINT systems>`.
 
 ##REPORTING BUGS
 
