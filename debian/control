@@ -12,7 +12,8 @@ Build-Depends: debhelper-compat (= 13),
                libxpm-dev,
                uthash-dev,
                autoconf,
-               automake
+               automake,
+               ronn,
 Standards-Version: 4.6.0
 Vcs-Git: https://salsa.debian.org/debian/alttab.git
 Vcs-Browser: https://salsa.debian.org/debian/alttab
