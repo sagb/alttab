@@ -1,8 +1,12 @@
 alttab (1.5.0-3) UNRELEASED; urgency=medium
 
   * Declare compliance with Debian Policy 4.6.0 with no changes.
+  * Rebuild the manual page from the ronn source.
+  * Convert the watch file to version 4 of the format and use the new
+    substitution variables.
+  * Add a trivial git-buildpackage config file.
 
- -- Peter Pentchev <roam@debian.org>  Mon, 15 Nov 2021 23:53:41 +0200
+ -- Peter Pentchev <roam@debian.org>  Tue, 16 Nov 2021 16:17:55 +0200
 
 alttab (1.5.0-2) unstable; urgency=medium
 
