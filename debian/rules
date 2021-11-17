@@ -12,3 +12,8 @@ export DEB_BUILD_MAINT_OPTIONS = hardening=+all
 
 execute_before_dh_auto_build:
 	ronn --roff doc/alttab.1.ronn
+
+# The upstream test suite does too little and too much at the same time,
+# at least for the purposes of the Debian package. We will use our own,
+# based on the upstream one, but disable it for now.
+override_dh_auto_test:

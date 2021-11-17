@@ -1,10 +1,14 @@
-alttab (1.5.0-3) UNRELEASED; urgency=medium
+alttab (1.6.0-1) UNRELEASED; urgency=medium
 
   * Declare compliance with Debian Policy 4.6.0 with no changes.
   * Rebuild the manual page from the ronn source.
   * Convert the watch file to version 4 of the format and use the new
     substitution variables.
   * Add a trivial git-buildpackage config file.
+  * New upstream version:
+    - drop the strncpy patch, it was taken from upstream
+    - disable the upstream test suite, we will replace it with our own
+    - update the upstream copyright years
 
  -- Peter Pentchev <roam@debian.org>  Tue, 16 Nov 2021 16:17:55 +0200
 
