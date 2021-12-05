@@ -318,8 +318,6 @@ Please [report issues on github](https://github.com/sagb/alttab/issues).
 
 ##SEE ALSO
 
-skippy-xd(1)
-
 [EWMH compatible WM list](https://en.wikipedia.org/wiki/Extended_Window_Manager_Hints#List_of_window_managers_that_support_Extended_Window_Manager_Hints).
 
 [Description of fontconfig pattern](https://www.freedesktop.org/software/fontconfig/fontconfig-user.html).
