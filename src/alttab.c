@@ -68,8 +68,8 @@ Options:\n\
    -bg color  background color\n\
    -fg color  foreground color\n\
 -frame color  active frame color\n\
--border color border color\n\
--borderw N    border width\n\
+   -bc color  extra border color\n\
+   -bw N      extra border width\n\
  -font name   font name in the form xft:fontconfig_pattern\n\
   -v|-vv      verbose\n\
     -h        help\n\
@@ -123,8 +123,8 @@ static int use_args_and_xrm(int *argc, char **argv)
         {"-bg", "*background", XrmoptionSepArg, NULL},
         {"-fg", "*foreground", XrmoptionSepArg, NULL},
         {"-frame", "*framecolor", XrmoptionSepArg, NULL},
-        {"-border", "*bordercolor", XrmoptionSepArg, NULL},
-        {"-borderw", "*borderwidth", XrmoptionSepArg, NULL},
+        {"-bc", "*bordercolor", XrmoptionSepArg, NULL},
+        {"-bw", "*borderwidth", XrmoptionSepArg, NULL},
         {"-font", "*font", XrmoptionSepArg, NULL},
         {"-vertical", "*vertical", XrmoptionIsArg, NULL}
     };
@@ -355,16 +355,16 @@ static int use_args_and_xrm(int *argc, char **argv)
         if (bw >= BORDER_MIN)
           g.option_borderW = bw;
         else
-          die(inv, "borderw argument range");
+          die(inv, "bw argument range");
         break;
     case 0:
         g.option_borderW = DEFBORDERW;
         break;
     case -1:
-        die(inv, "borderw argument");
+        die(inv, "bw argument");
         break;
     }
-    msg(0, "borderw: %d\n", g.option_borderW);
+    msg(0, "bw: %d\n", g.option_borderW);
 
     bzero(&(g.option_vp), sizeof(g.option_vp));
     g.option_vp_mode = VP_DEFAULT;

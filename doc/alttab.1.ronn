@@ -16,7 +16,7 @@ alttab(1) -- the task switcher
 
 ## SYNOPSIS
 
-`alttab` [`-w` <N>] [`-d` <N>] [`-sc` <N>] [`-mk` <str>] [`-kk` <str>] [`-bk` <str>] [`-pk` <str>] [`-nk` <str>] [`-mm` <N>] [`-bm` <N>] [`-t` <NxM>] [`-i` <NxM>] [`-vp` <str>] [`-p` <str>] [`-s` <N>] [`-theme` <name>] [`-bg` <color>] [`-fg` <color>] [`-frame` <color>] [`-border` <color>] [`-borderw` <N>] [`-font` <name>] [`-vertical`] [`-v`\|`-vv`]
+`alttab` [`-w` <N>] [`-d` <N>] [`-sc` <N>] [`-mk` <str>] [`-kk` <str>] [`-bk` <str>] [`-pk` <str>] [`-nk` <str>] [`-mm` <N>] [`-bm` <N>] [`-t` <NxM>] [`-i` <NxM>] [`-vp` <str>] [`-p` <str>] [`-s` <N>] [`-theme` <name>] [`-bg` <color>] [`-fg` <color>] [`-frame` <color>] [`-bc` <color>] [`-bw` <N>] [`-font` <name>] [`-vertical`] [`-v`\|`-vv`]
 
 ## DESCRIPTION
 
@@ -265,17 +265,17 @@ The following three options accept color names or <#rrggbb>. Special value <&#95
 
     Color of frame around selected tile.
 
-  * `-border` <color>:
+  * `-bc` <color>:
     resource: alttab.bordercolor  
     default: <black>
 
-    Color of additional border around the entire switcher.
+    Color of extra border around the entire switcher. This border may look redundant. Do not confuse with `-frame`.
 
-  * `-borderw` <N>:
+  * `-bw` <N>:
     resource: alttab.borderwidth  
-    default: <0> (no border)
+    default: <0> (no extra border)
 
-    Width of border above.
+    Width of extra border above.
 
   * `-font` <name>:
     resource: alttab.font  
