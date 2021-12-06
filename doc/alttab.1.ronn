@@ -16,7 +16,7 @@ alttab(1) -- the task switcher
 
 ## SYNOPSIS
 
-`alttab` [`-w` <N>] [`-d` <N>] [`-sc` <N>] [`-mk` <str>] [`-kk` <str>] [`-bk` <str>] [`-pk` <str>] [`-nk` <str>] [`-mm` <N>] [`-bm` <N>] [`-t` <NxM>] [`-i` <NxM>] [`-vp` <str>] [`-p` <str>] [`-s` <N>] [`-theme` <name>] [`-bg` <color>] [`-fg` <color>] [`-frame` <color>] [`-font` <name>] [`-v`\|`-vv`]
+`alttab` [`-w` <N>] [`-d` <N>] [`-sc` <N>] [`-mk` <str>] [`-kk` <str>] [`-bk` <str>] [`-pk` <str>] [`-nk` <str>] [`-mm` <N>] [`-bm` <N>] [`-t` <NxM>] [`-i` <NxM>] [`-vp` <str>] [`-p` <str>] [`-s` <N>] [`-theme` <name>] [`-bg` <color>] [`-fg` <color>] [`-frame` <color>] [`-bc` <color>] [`-bw` <N>] [`-font` <name>] [`-vertical`] [`-v`\|`-vv`]
 
 ## DESCRIPTION
 
@@ -265,6 +265,18 @@ The following three options accept color names or <#rrggbb>. Special value <&#95
 
     Color of frame around selected tile.
 
+  * `-bc` <color>:
+    resource: alttab.bordercolor  
+    default: <black>
+
+    Color of extra border around the entire switcher. This border may look redundant. Do not confuse with `-frame`.
+
+  * `-bw` <N>:
+    resource: alttab.borderwidth  
+    default: <0> (no extra border)
+
+    Width of extra border above.
+
   * `-font` <name>:
     resource: alttab.font  
     default: *xft:sans-10*
@@ -276,6 +288,12 @@ Your Xresources database probably already has \*background, \*foreground or \*fo
    alttab.font resource,  
    `-font` option,  
    wildcard resource like \*font in xfd: format.
+
+  * `-vertical`:
+    resource: alttab.vertical  
+    default: no
+
+    Vertical layout (experimental).
 
   * `-v`, `-vv`:
     resource: no  
@@ -299,8 +317,6 @@ Copyright 2017-2021 Alexander Kulak `<sa-dev AT odd POINT systems>`.
 Please [report issues on github](https://github.com/sagb/alttab/issues).
 
 ##SEE ALSO
-
-skippy-xd(1)
 
 [EWMH compatible WM list](https://en.wikipedia.org/wiki/Extended_Window_Manager_Hints#List_of_window_managers_that_support_Extended_Window_Manager_Hints).
 
