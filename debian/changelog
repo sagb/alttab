@@ -1,3 +1,18 @@
+alttab (1.6.1-20211206-g0fca02d-1~1.gbp626bbd) unstable; urgency=medium
+
+  ** SNAPSHOT build @626bbd307406e3b1c90b8ac2002690e1ed980328 **
+
+  [ Alexander Kulak ]
+  * prepare 1.6.1
+
+  [ Aleksandrs Stier ]
+  * Extra border around alttab window
+
+  [ Futa Miyachi ]
+  * Vertical layout
+
+ -- Alexander Kulak <sa-dev@odd.systems>  Mon, 06 Dec 2021 00:32:41 +0000
+
 alttab (1.5.0.20210314.16.g1c0754e-1~1.gbp5aaf50) unstable; urgency=medium
 
   ** SNAPSHOT build @5aaf501bc269c03214f429c863ff1e108d95ed73 **
