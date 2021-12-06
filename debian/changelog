@@ -1,3 +1,11 @@
+alttab (1.6.1.20211206.g0fca02d-1~1.gbp089d34) unstable; urgency=medium
+
+  ** SNAPSHOT build @089d34617a2ed20d4eb1a5649083b97884267d51 **
+
+  * snapshot in experimental
+
+ -- Alexander Kulak <sa-dev@odd.systems>  Mon, 06 Dec 2021 01:16:22 +0000
+
 alttab (1.6.1-20211206-g0fca02d-1~1.gbp626bbd) unstable; urgency=medium
 
   ** SNAPSHOT build @626bbd307406e3b1c90b8ac2002690e1ed980328 **
