@@ -2,8 +2,7 @@ Source: alttab
 Section: x11
 Priority: optional
 Maintainer: Alexander Kulak <sa-dev@odd.systems>
-Build-Depends: debhelper-compat,
-               libx11-dev,
+Build-Depends: libx11-dev,
                libxmu-dev,
                libxft-dev,
                libxrender-dev,
