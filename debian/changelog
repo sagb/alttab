@@ -1,3 +1,11 @@
+alttab (1.6.1.20211206.g0fca02d-1~1.gbpf30c3d) buster; urgency=medium
+
+  ** SNAPSHOT build @f30c3d0681512c3cd16f603e52410e77634a6730 **
+
+  * backport to buster
+
+ -- Alexander Kulak <sa-dev@odd.systems>  Mon, 06 Dec 2021 02:32:04 +0000
+
 alttab (1.6.1.20211206.g0fca02d-1~1.gbp089d34) unstable; urgency=medium
 
   ** SNAPSHOT build @089d34617a2ed20d4eb1a5649083b97884267d51 **
