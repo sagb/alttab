@@ -19,8 +19,8 @@ Build-Depends: debhelper-compat (= 13),
                x11-utils,
                procps
 Standards-Version: 4.5.1
-Vcs-Git: https://github.com/sagb/alttab.git -b debian/experimental
-Vcs-Browser: https://github.com/sagb/alttab/tree/debian/experimental
+Vcs-Git: https://github.com/sagb/alttab.git -b debian/bullseye
+Vcs-Browser: https://github.com/sagb/alttab/tree/debian/bullseye
 Homepage: https://sagb.github.io/alttab
 Rules-Requires-Root: binary-targets
 
