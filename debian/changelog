@@ -1,10 +1,34 @@
-alttab (1.5.0.20210314.15.g534da74-1~1.gbp061fe5) testing; urgency=medium
+alttab (1.6.1.20211206.g0fca02d-1~1.gbp089d34) unstable; urgency=medium
 
-  ** SNAPSHOT build @061fe5e841c0b22284f7d52b5a8b61a346257b34 **
+  ** SNAPSHOT build @089d34617a2ed20d4eb1a5649083b97884267d51 **
 
-  * backport to bullseye
+  * snapshot in experimental
 
- -- Alexander Kulak <sa-dev@odd.systems>  Sun, 14 Mar 2021 15:18:17 +0000
+ -- Alexander Kulak <sa-dev@odd.systems>  Mon, 06 Dec 2021 01:16:22 +0000
+
+alttab (1.6.1-20211206-g0fca02d-1~1.gbp626bbd) unstable; urgency=medium
+
+  ** SNAPSHOT build @626bbd307406e3b1c90b8ac2002690e1ed980328 **
+
+  [ Alexander Kulak ]
+  * prepare 1.6.1
+
+  [ Aleksandrs Stier ]
+  * Extra border around alttab window
+
+  [ Futa Miyachi ]
+  * Vertical layout
+
+ -- Alexander Kulak <sa-dev@odd.systems>  Mon, 06 Dec 2021 00:32:41 +0000
+
+alttab (1.5.0.20210314.16.g1c0754e-1~1.gbp5aaf50) unstable; urgency=medium
+
+  ** SNAPSHOT build @5aaf501bc269c03214f429c863ff1e108d95ed73 **
+
+  * bump to Debian standards
+  * build man with new ronn
+
+ -- Alexander Kulak <sa-dev@odd.systems>  Sun, 14 Mar 2021 16:15:15 +0000
 
 alttab (1.5.0.20210314.15.g534da74-1~1.gbp98e09a) unstable; urgency=medium
 
