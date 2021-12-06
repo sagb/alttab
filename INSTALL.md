@@ -39,18 +39,18 @@ Building from source
 --------------------
 
 1. Install build dependencies.
-    Basic Xlib, Xft, Xrender, Xrandr, libpng libraries
+    Basic Xlib, Xft, Xrender, Xrandr, libpng, libxpm libraries
     and [uthash macros](http://troydhanson.github.io/uthash/) are required.
     In Debian or Ubuntu:
 
     ```
-    apt install libx11-dev libxmu-dev libxft-dev libxrender-dev libxrandr-dev libpng-dev uthash-dev
+    apt install libx11-dev libxmu-dev libxft-dev libxrender-dev libxrandr-dev libpng-dev libxpm-dev uthash-dev
     ```
 
     Maintainer or packager may also install autotools and ronn:
 
     ```
-    apt install autoconf automake ruby-ronn
+    apt install autoconf automake ronn
     ```
 
 2. Download:

@@ -2,7 +2,7 @@ Source: alttab
 Section: x11
 Priority: optional
 Maintainer: Alexander Kulak <sa-dev@odd.systems>
-Build-Depends: debhelper (>= 12~),
+Build-Depends: debhelper-compat (= 13),
                libx11-dev,
                libxmu-dev,
                libxft-dev,
@@ -18,10 +18,11 @@ Build-Depends: debhelper (>= 12~),
                x11-apps,
                x11-utils,
                procps
-Standards-Version: 4.3.0
-Vcs-Git: https://github.com/sagb/alttab.git -b debian/buster
-Vcs-Browser: https://github.com/sagb/alttab/tree/debian/buster
+Standards-Version: 4.5.1
+Vcs-Git: https://github.com/sagb/alttab.git -b debian/experimental
+Vcs-Browser: https://github.com/sagb/alttab/tree/debian/experimental
 Homepage: https://sagb.github.io/alttab
+Rules-Requires-Root: binary-targets
 
 Package: alttab
 Architecture: any
