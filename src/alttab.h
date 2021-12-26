@@ -74,7 +74,7 @@ typedef struct {
     int x;
     int y;
 } quad;
-#define MAXNAMESZ   256
+#define MAXNAMESZ   1024
 #endif
 
 typedef struct {
