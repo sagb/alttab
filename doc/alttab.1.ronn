@@ -265,6 +265,12 @@ The following three options accept color names or <#rrggbb>. Special value <&#95
 
     Color of frame around selected tile.
 
+  * `-inact` <color>:
+    resource: alttab.inactcolor  
+    default: <#6b6b6b>
+
+    Color of frame around non-selected tiles.
+
   * `-bc` <color>:
     resource: alttab.bordercolor  
     default: <black>
