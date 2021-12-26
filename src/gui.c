@@ -246,7 +246,7 @@ static void prepareTile(WindowInfo * wi)
         int dr = drawMultiLine(wi->tile, fontLabel,
                                &(g.color[COLFG].xftcolor),
                                wi->name,
-                               x, y, w, h);
+                               x, y, w, h, !g.option_vertical);
         if (dr != 1) {
             msg(-1, "can't draw label\n");
         }

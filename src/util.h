@@ -90,7 +90,7 @@ char *utf8index(char *s, size_t pos);
 
 int drawMultiLine(Drawable d, XftFont * font, XftColor * xftcolor, char *str,
                   unsigned int x1, unsigned int y1, unsigned int width,
-                  unsigned int height);
+                  unsigned int height, bool center);
 int drawMultiLine_test();
 
 Bool predproc_true(Display * display, XEvent * event, char *arg);

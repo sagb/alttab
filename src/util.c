@@ -389,7 +389,8 @@ char *utf8index(char *s, size_t pos)
 //
 int drawMultiLine(Drawable d, XftFont * font,
                   XftColor * xftcolor, char *str, unsigned int x1,
-                  unsigned int y1, unsigned int width, unsigned int height)
+                  unsigned int y1, unsigned int width, unsigned int height,
+                  bool center)
 {
     int debug = 0;
     XftDraw *xftdraw;
@@ -479,7 +480,9 @@ int drawMultiLine(Drawable d, XftFont * font,
             }
             break;
         }
-        x += (width - ext.width) / 2;   // center
+        if (center) {
+            x += (width - ext.width) / 2;   // center
+        }
         XftDrawStringUtf8(xftdraw, xftcolor, font, x + ext.x, y + ext.y,
                           (unsigned char *)line, line_clen);
         if (debug > 0) {
@@ -532,7 +535,7 @@ int drawMultiLine_test()
     GC gc = DefaultGC(dpy, 0);
     XSetForeground(dpy, gc, WhitePixel(dpy, 0));
     XDrawRectangle(dpy, win, gc, 100, 100, 500, 400);
-    int r = drawMultiLine(win, font, &xftcolor, line, 100, 100, 500, 400);
+    int r = drawMultiLine(win, font, &xftcolor, line, 100, 100, 500, 400, true);
 
     XFlush(dpy);
     sleep(2);
