@@ -68,6 +68,7 @@ Options:\n\
    -bg color  background color\n\
    -fg color  foreground color\n\
 -frame color  active frame color\n\
+-inact color  inactive frame color\n\
    -bc color  extra border color\n\
    -bw N      extra border width\n\
  -font name   font name in the form xft:fontconfig_pattern\n\
@@ -125,6 +126,7 @@ static int use_args_and_xrm(int *argc, char **argv)
         {"-bg", "*background", XrmoptionSepArg, NULL},
         {"-fg", "*foreground", XrmoptionSepArg, NULL},
         {"-frame", "*framecolor", XrmoptionSepArg, NULL},
+        {"-inact", "*inactcolor", XrmoptionSepArg, NULL},
         {"-bc", "*bordercolor", XrmoptionSepArg, NULL},
         {"-bw", "*borderwidth", XrmoptionSepArg, NULL},
         {"-font", "*font", XrmoptionSepArg, NULL},
@@ -447,6 +449,8 @@ static int use_args_and_xrm(int *argc, char **argv)
     g.color[COLFG].name = s ? s : DEFCOLFG;
     s = xresource_load_string(&db, XRMAPPNAME, "framecolor");
     g.color[COLFRAME].name = s ? s : DEFCOLFRAME;
+    s = xresource_load_string(&db, XRMAPPNAME, "inactcolor");
+    g.color[COLINACT].name = s ? s : DEFCOLINACT;
     s = xresource_load_string(&db, XRMAPPNAME, "bordercolor");
     g.color[COLBORDER].name = s ? s : DEFCOLBORDER;
 
