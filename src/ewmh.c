@@ -226,7 +226,7 @@ int ewmh_initWinlist()
             continue;
 
         window_desktop = ewmh_getDesktopOfWindow(w);
-        if (common_skipWindow(w, current_desktop, window_desktop))
+        if (common_skipWindow(w, current_desktop, window_desktop) && window_desktop < LONG_MAX)
             continue;
 
         // build title
@@ -329,6 +329,21 @@ bool ewmh_skipWindowInTaskbar(Window w)
     for (i = 0; i < state_propsize / sizeof(Atom); i++) {
         if (state[i] == a_skip_tb) {
             msg(1, "%lx: _NET_WM_STATE_SKIP_TASKBAR found\n", w);
+            ret = true;
+            goto out;
+        }
+    }
+
+    state =
+        (Atom *) get_x_property(w, XA_ATOM, "_NET_WM_WINDOW_TYPE", &state_propsize);
+    if (state == NULL || state_propsize == 0) {
+        msg(1, "%lx: no _NET_WM_WINDOW_TYPE property\n", w);
+        goto out;
+    }
+    a_skip_tb = XInternAtom(dpy, "_NET_WM_WINDOW_TYPE_DOCK", True);
+    for (i = 0; i < state_propsize / sizeof(Atom); i++) {
+        if (state[i] == a_skip_tb) {
+            msg(1, "%lx: _NET_WM_WINDOW_TYPE_DOCK found\n", w);
             ret = true;
             goto out;
         }
