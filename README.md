@@ -35,8 +35,9 @@ git clone https://github.com/sagb/alttab.git
 cd alttab
 ./configure && sudo make install
 ```
-See [INSTALL.md](INSTALL.md) for details and [doc/wm-setup.md](doc/wm-setup.md)
-for window manager settings.
+See [INSTALL.md](INSTALL.md) for details, [doc/wm-setup.md](doc/wm-setup.md)
+for window manager settings,
+[doc/mobile.md](doc/mobile.md) for usage on mobile devices.
 
 Usually it should run fully functional without any argument: `alttab`.  
 
