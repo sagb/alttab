@@ -194,6 +194,7 @@ typedef struct {
     EwmhFeatures ewmh;          // guessed by ewmh_detectFeatures
     Atom naw;                   // _NET_ACTIVE_WINDOW
 //    SwitchMoment last; // for detecting false focus events from WM
+    bool option_keep_ui;
 } Globals;
 
 // gui

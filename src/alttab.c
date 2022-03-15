@@ -71,6 +71,8 @@ Options:\n\
    -bc color  extra border color\n\
    -bw N      extra border width\n\
  -font name   font name in the form xft:fontconfig_pattern\n\
+ -vertical    verticat layout\n\
+    -e        keep switcher after keys release\n\
   -v|-vv      verbose\n\
     -h        help\n\
 See man alttab for details.\n", PACKAGE_VERSION);
@@ -126,7 +128,8 @@ static int use_args_and_xrm(int *argc, char **argv)
         {"-bc", "*bordercolor", XrmoptionSepArg, NULL},
         {"-bw", "*borderwidth", XrmoptionSepArg, NULL},
         {"-font", "*font", XrmoptionSepArg, NULL},
-        {"-vertical", "*vertical", XrmoptionIsArg, NULL}
+        {"-vertical", "*vertical", XrmoptionIsArg, NULL},
+        {"-e", "*keep", XrmoptionIsArg, NULL}
     };
     const char *inv = "invalid %s, use -h for help\n";
     const char *rmb = "can't figure out modmask from keycode 0x%x\n";
@@ -471,6 +474,10 @@ static int use_args_and_xrm(int *argc, char **argv)
 // no need for an option
     g.option_max_reclevel = (g.option_wm == WM_NO) ? 1 : -1;
 
+    s = xresource_load_string(&db, XRMAPPNAME, "keep");
+    g.option_keep_ui = (s != NULL);
+    msg(0, "keep_ui: %d\n", g.option_keep_ui);
+
     return 1;
 }
 
@@ -552,7 +559,7 @@ int main(int argc, char **argv)
     while (true) {
         memset(&(ev.xkey), 0, sizeof(ev.xkey));
 
-        if (g.uiShowHasRun) {
+        if (g.uiShowHasRun && ! g.option_keep_ui) {
             // poll: lag and consume cpu, but necessary because of bug #1 and #2
             XQueryKeymap(dpy, keys_pressed);
             if (!(keys_pressed[octet] & kmask)) {   // Alt released
@@ -616,6 +623,9 @@ int main(int argc, char **argv)
             // interested only in "final" release
             if (!((ev.xkey.state & g.option_modMask)
                   && ev.xkey.keycode == g.option_modCode && g.uiShowHasRun)) {
+                break;
+            }
+            if (g.option_keep_ui) {
                 break;
             }
             uiHide();

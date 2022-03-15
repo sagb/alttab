@@ -76,5 +76,8 @@ alttab.framecolor:      _rnd_low
 !alttab.font:           xft:DejaVu Sans Condensed-18
 
 ! Vertical layout
-!alttab.vertical:       anything
+!alttab.vertical:       true
+
+! Keep switcher after Alt-Tab release
+!alttab.keep:           true
 

@@ -16,7 +16,7 @@ alttab(1) -- the task switcher
 
 ## SYNOPSIS
 
-`alttab` [`-w` <N>] [`-d` <N>] [`-sc` <N>] [`-mk` <str>] [`-kk` <str>] [`-bk` <str>] [`-pk` <str>] [`-nk` <str>] [`-mm` <N>] [`-bm` <N>] [`-t` <NxM>] [`-i` <NxM>] [`-vp` <str>] [`-p` <str>] [`-s` <N>] [`-theme` <name>] [`-bg` <color>] [`-fg` <color>] [`-frame` <color>] [`-bc` <color>] [`-bw` <N>] [`-font` <name>] [`-vertical`] [`-v`\|`-vv`]
+`alttab` [`-w` <N>] [`-d` <N>] [`-sc` <N>] [`-mk` <str>] [`-kk` <str>] [`-bk` <str>] [`-pk` <str>] [`-nk` <str>] [`-mm` <N>] [`-bm` <N>] [`-t` <NxM>] [`-i` <NxM>] [`-vp` <str>] [`-p` <str>] [`-s` <N>] [`-theme` <name>] [`-bg` <color>] [`-fg` <color>] [`-frame` <color>] [`-bc` <color>] [`-bw` <N>] [`-font` <name>] [`-vertical`] [`-e`] [`-v`\|`-vv`]
 
 ## DESCRIPTION
 
@@ -293,7 +293,13 @@ Your Xresources database probably already has \*background, \*foreground or \*fo
     resource: alttab.vertical  
     default: no
 
-    Vertical layout (experimental).
+    Vertical layout.
+
+  * `-e`:
+    resource: alttab.keep  
+    default: no
+
+    On release of Alt, don't switch, keep showing the switcher. This allows for external call: xdotool key alt+Tab .
 
   * `-v`, `-vv`:
     resource: no  
