@@ -299,7 +299,7 @@ Your Xresources database probably already has \*background, \*foreground or \*fo
     resource: alttab.keep  
     default: no
 
-    On release of Alt, don't switch, keep showing the switcher. This allows for external call: xdotool key alt+Tab .
+    On release of Alt, don't switch, keep showing the switcher. This allows for external call: xdotool key alt+Tab . See doc/mobile.md for possible usage.
 
   * `-v`, `-vv`:
     resource: no  
