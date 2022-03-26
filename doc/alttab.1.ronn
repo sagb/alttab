@@ -267,7 +267,7 @@ The following five options accept color names or <#rrggbb>. Special value <&#95;
 
   * `-inact` <color>:
     resource: alttab.inactcolor  
-    default: <#6b6b6b>
+    default: foreground color
 
     Color of frame around non-selected tiles.
 
