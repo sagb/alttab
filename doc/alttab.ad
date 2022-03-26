@@ -63,8 +63,11 @@ alttab.background:      #c9c9c9
 ! Red letters
 alttab.foreground:      #600000
 
-! Random dark frame
+! Random dark frame around selected tile
 alttab.framecolor:      _rnd_low
+
+! Gray42 frame around deselected tiles
+!alttab.framecolor:      #6b6b6b
 
 ! Show X11 window border around the switcher
 !alttab.borderwidth:     4
