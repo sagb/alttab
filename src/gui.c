@@ -74,11 +74,11 @@ static GC create_gc(int type)
     switch (type) {
     case 1:
         XSetForeground(dpy, gc, g.color[COLBG].xcolor.pixel);
-        XSetBackground(dpy, gc, g.color[COLFG].xcolor.pixel);
+        XSetBackground(dpy, gc, g.color[COLINACT].xcolor.pixel);
         XSetLineAttributes(dpy, gc, FRAME_W, line_style, cap_style, join_style);
         break;
     case 0:
-        XSetForeground(dpy, gc, g.color[COLFG].xcolor.pixel);
+        XSetForeground(dpy, gc, g.color[COLINACT].xcolor.pixel);
         XSetBackground(dpy, gc, g.color[COLBG].xcolor.pixel);
         XSetLineAttributes(dpy, gc, 1, line_style, cap_style, join_style);
         break;
