@@ -20,8 +20,8 @@ Usage
 -----
 
 Usually it should run fully functional without any argument.
-Start alttab after WM, to let it auto-recognize the WM. For examples, add
-the following to ~/.ratpoisonrc:
+Start alttab after WM, to let it automatically recognize the WM. 
+For example, add the following to ~/.ratpoisonrc:
 
   exec alttab
 
