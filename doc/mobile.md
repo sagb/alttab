@@ -1,7 +1,7 @@
 Alttab on mobile devices
 ========================
 
-Alttab displays on every device that can run X11.
+Alttab runs on every device that can run X11.
 
 It's trivial with Linux phone (Pinephone, Librem, Pro1-X, Volla).
 
