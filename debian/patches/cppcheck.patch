@@ -1,0 +1,130 @@
+Description: Fix some problems reported by cppcheck.
+Forwarded: no
+Author: Peter Pentchev <roam@ringlet.net>
+Last-Update: 2022-08-11
+
+--- a/src/icon.c
++++ b/src/icon.c
+@@ -493,7 +493,7 @@
+     char appl[MAXAPPLEN];
+     int l;
+ 
+-    for (l = 0; (*(app + l)) != '\0' && l < MAXAPPLEN; l++)
++    for (l = 0; (*(app + l)) != '\0' && l < MAXAPPLEN - 1; l++)
+         appl[l] = tolower(*(app + l));
+     appl[l] = '\0';
+ 
+--- a/src/win.c
++++ b/src/win.c
+@@ -83,7 +83,7 @@
+     int wi, si;
+     PermanentWindowInfo *s;
+ 
+-    if (g.winlist == NULL && g.maxNdx == 0)
++    if (g.winlist == NULL || g.maxNdx == 0)
+         return;                 // safety
+     msg(0, "winlist:\n");
+     for (wi = 0; wi < g.maxNdx; wi++) {
+@@ -707,12 +707,12 @@
+             window_desktop, current_desktop);
+         return true;
+     }
+-    if (g.option_desktop == DESK_NOSPECIAL && window_desktop == -1) {
++    if (g.option_desktop == DESK_NOSPECIAL && window_desktop == (unsigned long)-1) {
+         msg(1, "window on -1 desktop, skipped\n");
+         return true;
+     }
+     if (g.option_desktop == DESK_NOCURRENT &&
+-        (window_desktop == current_desktop || window_desktop == -1)) {
++        (window_desktop == current_desktop || window_desktop == (unsigned long)-1)) {
+         msg(1, "window on current or -1 desktop, skipped\n");
+         return true;
+     }
+--- a/src/autil.c
++++ b/src/autil.c
+@@ -69,13 +69,13 @@
+     switch (signum) {
+         case SIGUSR1:
+             fprintf(stderr, "debug information:\n");
+-            fprintf(stderr, "winlist: %d elements of %ld bytes, %ld total\n",
++            fprintf(stderr, "winlist: %d elements of %zu bytes, %zu total\n",
+                     g.maxNdx, sizeof(WindowInfo), g.maxNdx*sizeof(WindowInfo) );
+             DL_COUNT(g.sortlist, pwi, sln);
+-            fprintf(stderr, "sortlist: %d elements of %ld bytes, %ld total\n",
++            fprintf(stderr, "sortlist: %d elements of %zu bytes, %zu total\n",
+                     sln, sizeof(PermanentWindowInfo), sln*sizeof(PermanentWindowInfo) );
+             in = HASH_COUNT(g.ic);
+-            fprintf(stderr, "icons: %d elements of %ld bytes, %ld total\n",
++            fprintf(stderr, "icons: %d elements of %zu bytes, %zu total\n",
+                     in, sizeof(icon_t), in*sizeof(icon_t) );
+             fprintf(stderr, "option_wm: %d, option_desktop: %d, option_screen: %d\n",
+                     g.option_wm, g.option_desktop, g.option_screen);
+--- a/src/ewmh.c
++++ b/src/ewmh.c
+@@ -91,7 +91,7 @@
+ {
+     int evr, elapsed;
+     unsigned long edata[] = { desktop, CurrentTime, 0, 0, 0 };
+-    if (desktop == -1 && g.ewmh.minus1_desktop_unusable)
++    if (desktop == (unsigned long)-1 && g.ewmh.minus1_desktop_unusable)
+         return 0;
+     msg(1, "ewmh switching desktop to %ld\n", desktop);
+     evr = ewmh_send_wm_evt(root, "_NET_CURRENT_DESKTOP", edata);
+--- a/src/gui.c
++++ b/src/gui.c
+@@ -286,7 +286,7 @@
+         if (g.color[p].name[0]) {
+             if (strncmp(g.color[p].name, "_rnd_", 5) == 0) {
+                 // replace in-place: 8 chars is sufficient for #rrggbb
+-                char r[3];
++                unsigned char r[3];
+                 short int rc;
+                 for (rc = 0; rc <= 2; rc++) {
+                     r[rc] = rand() / (RAND_MAX / 0x80);
+--- a/src/util.c
++++ b/src/util.c
+@@ -101,7 +101,7 @@
+         }
+         if (grab) {
+             if (debug > 1) {
+-                fprintf(stderr, "grabbing %d with mask %d\n",
++                fprintf(stderr, "grabbing %d with mask %u\n",
+                         keycode, (modmask | mask));
+             }
+             ee_ignored = NULL;  // to detect X error event
+@@ -115,7 +115,7 @@
+             }
+         } else {
+             if (debug > 1) {
+-                fprintf(stderr, "ungrabbing %d with mask %d\n",
++                fprintf(stderr, "ungrabbing %d with mask %u\n",
+                         keycode, (modmask | mask));
+             }
+             XUngrabKey(dpy, keycode, modmask | mask, win);
+@@ -452,7 +452,7 @@
+         XftTextExtentsUtf8(dpy, font, (unsigned char *)line, line_clen, &ext);
+         if (debug > 0) {
+             fprintf(stderr,
+-                    "first cut approximation: \"%s\" ulen=%zu clen=%zu width=%d px, x2-x1=%d px\n",
++                    "first cut approximation: \"%s\" ulen=%zu clen=%zu width=%d px, x2-x1=%u px\n",
+                     line, line_ulen, line_clen, ext.width, width);
+         }
+         while (ext.width > width) {
+@@ -466,7 +466,7 @@
+                                line_clen, &ext);
+             if (debug > 0) {
+                 fprintf(stderr,
+-                        "cut correction: \"%s\" ulen=%zu clen=%zu width=%d px, x2-x1=%d px\n",
++                        "cut correction: \"%s\" ulen=%zu clen=%zu width=%d px, x2-x1=%u px\n",
+                         line, line_ulen, line_clen, ext.width, width);
+             }
+         }
+@@ -474,7 +474,7 @@
+         if ((y + ext.height) > (y1 + height)) {
+             if (debug > 0) {
+                 fprintf(stderr,
+-                        "y+ext.height=%d, y2=%d - breaking\n",
++                        "y+ext.height=%d, y2=%u - breaking\n",
+                         y + ext.height, (y1 + height));
+             }
+             break;
