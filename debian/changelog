@@ -1,6 +1,5 @@
 alttab (1.6.0-1) UNRELEASED; urgency=medium
 
-  * Declare compliance with Debian Policy 4.6.0 with no changes.
   * Rebuild the manual page from the ronn source.
   * Convert the watch file to version 4 of the format and use the new
     substitution variables.
@@ -9,8 +8,13 @@ alttab (1.6.0-1) UNRELEASED; urgency=medium
     - drop the strncpy patch, it was taken from upstream
     - disable the upstream test suite, we will replace it with our own
     - update the upstream copyright years
+  * Add my debian/* copyright notice.
+  * Declare compliance with Policy 4.6.1 with no changes.
+  * Explicitly build-depend on dh-sequence-single-binary.
+  * Add the cppcheck patch to fix some minor issues.
+  * Add the typos patch to fix some typographical errors.
 
- -- Peter Pentchev <roam@debian.org>  Tue, 16 Nov 2021 16:17:55 +0200
+ -- Peter Pentchev <roam@debian.org>  Thu, 11 Aug 2022 23:42:08 +0300
 
 alttab (1.5.0-2) unstable; urgency=medium
 
