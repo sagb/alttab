@@ -1,0 +1,40 @@
+Description: Tweak the upstream test suite a bit.
+ - do not install any packages
+ - do not invoke anything as root via sudo
+Forwarded: not-needed
+Author: Peter Pentchev <roam@ringlet.net>
+Last-Update: 2022-08-12
+
+--- a/test/run-in-xvfb.test
++++ b/test/run-in-xvfb.test
+@@ -20,9 +20,20 @@
+ # along with alttab.  If not, see <http://www.gnu.org/licenses/>.
+ 
+ 
+-ALTTAB=../src/alttab
++: "${ALTTAB:=../src/alttab}"
+ NUMTEST=3
+ 
++sudo()
++{
++    if [ "$1" != '--non-interactive' ] || ! expr "x$2" : 'x[^-].*' > /dev/null; then
++        echo "Testsuite internal error: sudo invoked with unexpected arguments: $*" 1>&2
++        exit 1
++    fi
++    shift
++    echo "Invoking '$*' without sudo"
++    "$@"
++}
++
+ install_software()
+ {
+     packs="" ; progs=""
+@@ -36,7 +47,7 @@
+     done
+     if [ -n "$packs" ] ; then
+         echo "Installing: $packs"
+-        icmd="sudo --non-interactive apt-get -y install $packs"
++        icmd="sudo --non-interactive false apt-get -y install $packs"
+         $icmd || echo -e "Failed: $icmd\nThis script runs apt-get via passwordless sudo, otherwise install manually: $progs" >&2
+         for prog in $progs ; do
+             if ! which "$prog" >/dev/null ; then
