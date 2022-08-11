@@ -27,7 +27,7 @@ Last-Update: 2022-08-11
  Applications -> Settings -> Session and Startup -> Application Autostart -> Add
 --- a/src/alttab.c
 +++ b/src/alttab.c
-@@ -76,7 +76,7 @@
+@@ -78,7 +78,7 @@
  }
  
  //
@@ -38,7 +38,7 @@ Last-Update: 2022-08-11
  //
 --- a/src/gui.c
 +++ b/src/gui.c
-@@ -364,7 +364,7 @@
+@@ -390,7 +390,7 @@
          scrdim.w = DisplayWidth(dpy, scr);
          scrdim.h = DisplayHeight(dpy, scr);
      }

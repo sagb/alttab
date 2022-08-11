@@ -1,4 +1,4 @@
-alttab (1.6.0-1) UNRELEASED; urgency=medium
+alttab (1.6.1-1) UNRELEASED; urgency=medium
 
   * Rebuild the manual page from the ronn source.
   * Convert the watch file to version 4 of the format and use the new

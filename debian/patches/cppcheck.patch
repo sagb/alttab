@@ -72,7 +72,7 @@ Last-Update: 2022-08-11
      evr = ewmh_send_wm_evt(root, "_NET_CURRENT_DESKTOP", edata);
 --- a/src/gui.c
 +++ b/src/gui.c
-@@ -286,7 +286,7 @@
+@@ -312,7 +312,7 @@
          if (g.color[p].name[0]) {
              if (strncmp(g.color[p].name, "_rnd_", 5) == 0) {
                  // replace in-place: 8 chars is sufficient for #rrggbb
