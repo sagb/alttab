@@ -1,4 +1,4 @@
-alttab (1.6.1-1) UNRELEASED; urgency=medium
+alttab (1.6.1-1) unstable; urgency=medium
 
   * Rebuild the manual page from the ronn source.
   * Convert the watch file to version 4 of the format and use the new
@@ -19,7 +19,7 @@ alttab (1.6.1-1) UNRELEASED; urgency=medium
     - run it during the package build
     - run it as an autopkgtest
 
- -- Peter Pentchev <roam@debian.org>  Fri, 12 Aug 2022 00:56:23 +0300
+ -- Peter Pentchev <roam@debian.org>  Fri, 12 Aug 2022 01:44:49 +0300
 
 alttab (1.5.0-2) unstable; urgency=medium
 
