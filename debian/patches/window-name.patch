@@ -1,0 +1,16 @@
+Description: Fix an "empty window name" check.
+Forwarded: no
+Author: Peter Pentchev <roam@ringlet.net>
+Last-Update: 2022-08-11
+
+--- a/src/gui.c
++++ b/src/gui.c
+@@ -230,7 +230,7 @@
+     }
+  endIcon:
+     // draw labels
+-    if (wi->name && fontLabel) {
++    if (wi->name[0] && fontLabel) {
+         int x, y, w, h;
+         if (g.option_vertical) {
+             x = iconW + 5;
