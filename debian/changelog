@@ -6,15 +6,20 @@ alttab (1.6.1-1) UNRELEASED; urgency=medium
   * Add a trivial git-buildpackage config file.
   * New upstream version:
     - drop the strncpy patch, it was taken from upstream
-    - disable the upstream test suite, we will replace it with our own
     - update the upstream copyright years
   * Add my debian/* copyright notice.
   * Declare compliance with Policy 4.6.1 with no changes.
   * Explicitly build-depend on dh-sequence-single-binary.
   * Add the cppcheck patch to fix some minor issues.
   * Add the typos patch to fix some typographical errors.
+  * Add the window-name patch to fix an emptiness check.
+  * Tweak the upstream test suite a bit:
+    - add the test-tweaks patch to block it from installing any packages
+      or running any commands as root via 'sudo'
+    - run it during the package build
+    - run it as an autopkgtest
 
- -- Peter Pentchev <roam@debian.org>  Thu, 11 Aug 2022 23:42:08 +0300
+ -- Peter Pentchev <roam@debian.org>  Fri, 12 Aug 2022 00:56:23 +0300
 
 alttab (1.5.0-2) unstable; urgency=medium
 
