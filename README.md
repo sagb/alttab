@@ -16,7 +16,8 @@ or standalone X11 session.
   alttab  [-w N] [-d N] [-sc N] [-mk <str>] [-kk <str>] [-bk <str>]
   [-pk <str>] [-nk <str>] [-ck <str>] [-mm <N>] [-bm <N>]
   [-t NxM] [-i NxM] [-vp str] [-p str] [-s N] [-theme name] [-bg color]
-  [-fg color] [-frame color] [-font name] [-v|-vv]
+  [-fg color] [-frame color] [-bc color] [-bw <N>] [-font name]
+  [-vertical] [-v|-vv]
 ```
 (see man page for details)
 <!-- ronn page has elements invalid for github markdown, don't link to it -->

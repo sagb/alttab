@@ -68,6 +68,8 @@ Options:\n\
    -bg color  background color\n\
    -fg color  foreground color\n\
 -frame color  active frame color\n\
+   -bc color  extra border color\n\
+   -bw N      extra border width\n\
  -font name   font name in the form xft:fontconfig_pattern\n\
   -v|-vv      verbose\n\
     -h        help\n\
@@ -90,7 +92,7 @@ static int use_args_and_xrm(int *argc, char **argv)
     unsigned int wmindex, dsindex, scindex, isrc;
     char *gtile, *gicon, *gview, *gpos;
     int x, y;
-    unsigned int w, h;
+    unsigned int w, h, bw;
     int xpg;
     char *s;
     char *rm;
@@ -121,7 +123,10 @@ static int use_args_and_xrm(int *argc, char **argv)
         {"-bg", "*background", XrmoptionSepArg, NULL},
         {"-fg", "*foreground", XrmoptionSepArg, NULL},
         {"-frame", "*framecolor", XrmoptionSepArg, NULL},
+        {"-bc", "*bordercolor", XrmoptionSepArg, NULL},
+        {"-bw", "*borderwidth", XrmoptionSepArg, NULL},
         {"-font", "*font", XrmoptionSepArg, NULL},
+        {"-vertical", "*vertical", XrmoptionIsArg, NULL}
     };
     const char *inv = "invalid %s, use -h for help\n";
     const char *rmb = "can't figure out modmask from keycode 0x%x\n";
@@ -345,6 +350,22 @@ static int use_args_and_xrm(int *argc, char **argv)
     msg(0, "%dx%d tile, %dx%d icon\n",
         g.option_tileW, g.option_tileH, g.option_iconW, g.option_iconH);
 
+    switch (xresource_load_int(&db, XRMAPPNAME, "borderwidth", &bw)) {
+    case 1:
+        if (bw >= BORDER_MIN)
+          g.option_borderW = bw;
+        else
+          die(inv, "bw argument range");
+        break;
+    case 0:
+        g.option_borderW = DEFBORDERW;
+        break;
+    case -1:
+        die(inv, "bw argument");
+        break;
+    }
+    msg(0, "bw: %d\n", g.option_borderW);
+
     bzero(&(g.option_vp), sizeof(g.option_vp));
     g.option_vp_mode = VP_DEFAULT;
     gview = xresource_load_string(&db, XRMAPPNAME, "viewport");
@@ -423,6 +444,8 @@ static int use_args_and_xrm(int *argc, char **argv)
     g.color[COLFG].name = s ? s : DEFCOLFG;
     s = xresource_load_string(&db, XRMAPPNAME, "framecolor");
     g.color[COLFRAME].name = s ? s : DEFCOLFRAME;
+    s = xresource_load_string(&db, XRMAPPNAME, "bordercolor");
+    g.color[COLBORDER].name = s ? s : DEFCOLBORDER;
 
     s = xresource_load_string(&db, XRMAPPNAME, "font");
     if (s) {
@@ -437,6 +460,10 @@ static int use_args_and_xrm(int *argc, char **argv)
     } else {
         g.option_font = DEFFONT + 4;
     }
+
+    s = xresource_load_string(&db, XRMAPPNAME, "vertical");
+    g.option_vertical = (s != NULL);
+    msg(0, "vertical: %d\n", g.option_vertical);
 
 // max recursion for searching windows
 // -1 is "everything"

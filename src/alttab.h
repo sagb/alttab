@@ -36,6 +36,7 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 #define DEFTILEH    128
 #define DEFICONW    32
 #define DEFICONH    32
+#define DEFBORDERW  0
 #define DEFTHEME    "hicolor"
 #define FRAME_W     8
 //#define DEFFONT   "xft:DejaVu Sans Condensed-10"
@@ -44,10 +45,12 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 #define COLBG       0
 #define COLFG       1
 #define COLFRAME    2
-#define NCOLORS     3
+#define COLBORDER   3
+#define NCOLORS     4
 #define DEFCOLBG    "black"
 #define DEFCOLFG    "grey"
 #define DEFCOLFRAME "#a0abab"
+#define DEFCOLBORDER "black"
 
 #define XDEPTH      24          // TODO: get rid of this
 
@@ -150,8 +153,12 @@ typedef struct {
 #define SCR_DEFAULT    SCR_ALL
     int option_screen;
     char *option_font;
+#define VERTICAL_DEFAULT false
+    bool option_vertical;
     int option_tileW, option_tileH;
     int option_iconW, option_iconH;
+#define BORDER_MIN      0
+    int option_borderW;
 #define VP_FOCUS        0
 #define VP_POINTER      1
 #define VP_TOTAL        2

@@ -37,7 +37,7 @@ extern Window root;
 // PRIVATE
 
 static unsigned int tileW, tileH, iconW, iconH;
-static unsigned int visualTileW;
+static unsigned int visualTileW, visualTileH;
 static int lastPressedTile;
 static quad scrdim;
 static Window uiwin;
@@ -101,9 +101,16 @@ static GC create_gc(int type)
 //
 static void drawFr(GC gc, int f)
 {
+    int x, y;
+    if (g.option_vertical) {
+        x = 0 + (FRAME_W / 2);
+        y = f * (tileH + FRAME_W) + (FRAME_W / 2);
+    } else {
+        x = f * (tileW + FRAME_W) + (FRAME_W / 2);
+        y = 0 + (FRAME_W / 2);
+    }
     int d = XDrawRectangle(dpy, uiwin, gc,
-                           f * (tileW + FRAME_W) + (FRAME_W / 2),
-                           0 + (FRAME_W / 2),
+                           x, y,
                            tileW + FRAME_W, tileH + FRAME_W);
     if (!d) {
         msg(-1, "can't draw frame\n");
@@ -132,11 +139,19 @@ static void framesRedraw()
 //
 static int pointedTile(int x, int y)
 {
-    if (x < (FRAME_W / 2)
-        || x > (uiwinW - (FRAME_W / 2))
-        || y < 0 || y > uiwinH)
-        return -1;
-    return (x - (FRAME_W / 2)) / visualTileW;
+    if (g.option_vertical) {
+        if (y < (FRAME_W / 2)
+            || y > (uiwinH - (FRAME_W / 2))
+            || x < 0 || x > uiwinW)
+            return -1;
+        return (y - (FRAME_W / 2)) / visualTileH;
+    } else {
+        if (x < (FRAME_W / 2)
+            || x > (uiwinW - (FRAME_W / 2))
+            || y < 0 || y > uiwinH)
+            return -1;
+        return (x - (FRAME_W / 2)) / visualTileW;
+    }
 }
 
 //
@@ -216,11 +231,22 @@ static void prepareTile(WindowInfo * wi)
  endIcon:
     // draw labels
     if (wi->name && fontLabel) {
+        int x, y, w, h;
+        if (g.option_vertical) {
+            x = iconW + 5;
+            y = FRAME_W; // avoids overlapping with frames
+            w = tileW - iconW - 5;
+            h = tileH - FRAME_W;
+        } else {
+            x = 0;
+            y = iconH + 5;
+            w = tileW;
+            h = tileH - iconH - 5;
+        }
         int dr = drawMultiLine(wi->tile, fontLabel,
                                &(g.color[COLFG].xftcolor),
                                wi->name,
-                               0, (iconH + 5), tileW,
-                               (tileH - iconH - 5));
+                               x, y, w, h);
         if (dr != 1) {
             msg(-1, "can't draw label\n");
         }
@@ -439,19 +465,30 @@ int uiShow(bool direction)
     iconW = g.option_iconW;
     iconH = g.option_iconH;
     float rt = 1.0;
-// for subsequent calculation of width(s), use 'avail_w'
+// for subsequent calculation of width(s), use 'avail_w'/'avail_h'
 // instead of g.vp.w, because they don't match for POS_SPECIFIC
     int avail_w = g.vp.w;
-    if (g.option_positioning == POS_SPECIFIC)
+    int avail_h = g.vp.h;
+    if (g.option_positioning == POS_SPECIFIC) {
         avail_w -= g.option_posX;
+        avail_h -= g.option_posY;
+    }
 // tiles may be smaller if they don't fit viewport
     uiwinW = (tileW + FRAME_W) * g.maxNdx + FRAME_W;
-    if (uiwinW > avail_w) {
+    if (uiwinW > avail_w && !g.option_vertical) {
         int frames = FRAME_W * g.maxNdx + FRAME_W;
         rt = ((float)(avail_w - frames)) / ((float)(tileW * g.maxNdx));
         tileW = (float)tileW *rt;
         tileH = (float)tileH *rt;
         uiwinW = tileW * g.maxNdx + frames;
+    }
+    uiwinH = (tileH + FRAME_W) * g.maxNdx + FRAME_W;
+    if (uiwinH > avail_h && g.option_vertical) {
+        int frames = FRAME_W * g.maxNdx + FRAME_W;
+        rt = ((float)(avail_h - frames)) / ((float)(tileH * g.maxNdx));
+        tileW = (float)tileW *rt;
+        tileH = (float)tileH *rt;
+        uiwinH = tileH * g.maxNdx + frames;
     }
 // icon may be smaller if it doesn't fit tile
     if (iconW > tileW) {
@@ -464,7 +501,11 @@ int uiShow(bool direction)
         iconH = tileH;
         iconW = rt * iconW;
     }
-    uiwinH = tileH + 2 * FRAME_W;
+    if (g.option_vertical)
+        uiwinW = tileW + 2 * FRAME_W;
+    else
+        uiwinH = tileH + 2 * FRAME_W;
+
     if (g.option_positioning == POS_CENTER) {
         uiwinX = (g.vp.w - uiwinW) / 2 + g.vp.x;
         uiwinY = (g.vp.h - uiwinH) / 2 + g.vp.y;
@@ -472,7 +513,14 @@ int uiShow(bool direction)
         uiwinX = g.option_posX + g.vp.x;
         uiwinY = g.option_posY + g.vp.y;
     }
-    visualTileW = (uiwinW - FRAME_W) / g.maxNdx;
+
+    if (g.option_vertical) {
+        visualTileW = uiwinW - FRAME_W;
+        visualTileH = (uiwinH - FRAME_W) / g.maxNdx;
+    } else {
+        visualTileH = uiwinH - FRAME_W;
+        visualTileW = (uiwinW - FRAME_W) / g.maxNdx;
+    }
     if (g.debug > 0) {
         msg(0, "tile w=%d h=%d\n", tileW, tileH);
         msg(0, "uiwin %dx%d +%d+%d", uiwinW, uiwinH, uiwinX, uiwinY);
@@ -507,9 +555,9 @@ int uiShow(bool direction)
     unsigned long valuemask = CWBackPixel | CWBorderPixel | CWOverrideRedirect;
     XSetWindowAttributes attributes;
     attributes.background_pixel = g.color[COLBG].xcolor.pixel;
-    attributes.border_pixel = g.color[COLFRAME].xcolor.pixel;
+    attributes.border_pixel = g.color[COLBORDER].xcolor.pixel;
     attributes.override_redirect = 1;
-    uiwin = XCreateWindow(dpy, root, uiwinX, uiwinY, uiwinW, uiwinH, 0, // border_width
+    uiwin = XCreateWindow(dpy, root, uiwinX, uiwinY, uiwinW, uiwinH, g.option_borderW, // border_width
                           CopyFromParent,   // depth
                           InputOutput,  // class
                           CopyFromParent,   // visual
@@ -627,9 +675,17 @@ void uiExpose()
         if (g.winlist[j].tile) {
             msg(1, "copying tile %d to canvas\n", j);
             //XSync (dpy, false);
+            int dest_x, dest_y;
+            if (g.option_vertical) {
+                dest_x = FRAME_W;
+                dest_y = j * (tileH + FRAME_W) + FRAME_W;
+            } else {
+                dest_x = j * (tileW + FRAME_W) + FRAME_W;
+                dest_y = FRAME_W;
+            }
             int r = XCopyArea(dpy, g.winlist[j].tile, uiwin,
                               g.gcDirect, 0, 0, tileW, tileH,   // src
-                              j * (tileW + FRAME_W) + FRAME_W, FRAME_W);    // dst
+                              dest_x, dest_y);    // dst
             //XSync (dpy, false);
             msg(1, "XCopyArea returned %d\n", r);
         }
