@@ -83,7 +83,7 @@ Building from source
 
     ```
     # may omit autoconf-2.69 as it is pulled in as a dependency of automake-1.16.5
-    pkg_add png uthash automake-1.16.5
+    pkg_add git png uthash automake-1.16.5
     ```
     
     If you intend to run `make check`, then also:
