@@ -99,20 +99,16 @@ Building from source
     ```
 
 3. Update autotools stuff. Mandatory step.  
-    Pay attention:  
-    `automake` package version is `1.16.5`  
-    but for environment variable `AUTOMAKE_VERSION` we specify `1.16`  
-    in order to match `/usr/local/bin/automake-1.16` executable
 
     ```
-    AUTOCONF_VERSION=2.69 AUTOMAKE_VERSION=1.16 ./bootstrap.sh
+    ./bootstrap.sh
     ```
 
 4. Build:
 
     ```
     CPATH=/usr/local/include ./configure
-    CPATH=/usr/local/include AUTOCONF_VERSION=2.69 make
+    CPATH=/usr/local/include make
     make install
     make check  # optional
     ```
