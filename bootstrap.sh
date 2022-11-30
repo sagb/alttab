@@ -22,7 +22,7 @@ if [ "$1" \= "-f" ] ; then
     ac_flag="-f"
 fi
 
-if [ "`uname`" == "OpenBSD" ] ; then
+if [ "`uname`" '=' "OpenBSD" ] ; then
     _arc=`ls -1 /usr/local/bin/autoreconf-* 2>/dev/null | sort | tail -n 1`
     if [ -n "$_arc" ] ; then
         export autoreconf="$_arc"
