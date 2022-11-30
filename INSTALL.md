@@ -73,5 +73,51 @@ Building from source
     make install
     make check  # optional
     ```
-    See README for usage notes.
 
+### In OpenBSD (as of November 2022 and OpenBSD 7.2 amd64):
+
+1. Install build dependencies.  
+    `Xlib`, `Xft`, `Xrender`, `Xrandr` and `libxpm` come from [`xbase` file set](https://www.openbsd.org/faq/faq4.html#FilesNeeded)  
+    `perl` is part of `base` file set.  
+    In order to install others:
+
+    ```
+    # may omit autoconf-2.69 as it is pulled in as a dependency of automake-1.16.5
+    pkg_add png uthash automake-1.16.5
+    ```
+    
+    If you intend to run `make check`, then also:
+    
+    ```
+    pkg_add gawk
+    ```
+
+2. Download:
+
+    ```
+    git clone https://github.com/sagb/alttab.git && cd alttab
+    ```
+
+3. Update autotools stuff. Mandatory step.  
+    Pay attention:  
+    `automake` package version is `1.16.5`  
+    but for environment variable `AUTOMAKE_VERSION` we specify `1.16`  
+    in order to match `/usr/local/bin/automake-1.16` executable
+
+    ```
+    AUTOCONF_VERSION=2.69 AUTOMAKE_VERSION=1.16 ./bootstrap.sh
+    ```
+
+4. Build:
+
+    ```
+    CPATH=/usr/local/include ./configure
+    CPATH=/usr/local/include AUTOCONF_VERSION=2.69 make
+    make install
+    make check  # optional
+    ```
+
+Usage notes
+-----------
+
+See `README.md`
