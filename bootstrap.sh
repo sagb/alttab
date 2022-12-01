@@ -26,11 +26,11 @@ if [ "`uname`" '=' "OpenBSD" ] ; then
     _arc=`ls -1 /usr/local/bin/autoreconf-* 2>/dev/null | sort | tail -n 1`
     if [ -n "$_arc" ] ; then
         export autoreconf="$_arc"
- ￼      export AUTOCONF_VERSION="${_arc##*-}"
+        export AUTOCONF_VERSION="${_arc##*-}"
     fi
     _am=`ls -1 /usr/local/bin/automake-* 2>/dev/null | sort | tail -n 1`
     if [ -n "$_am" ] ; then
- ￼      export AUTOMAKE_VERSION="${_am##*-}"
+        export AUTOMAKE_VERSION="${_am##*-}"
     fi
 fi
 
