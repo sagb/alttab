@@ -6,8 +6,7 @@
 # To be run by maintainers and packagers.
 
 autoreconf=autoreconf
-automake=automake
-project=`dirname $0`
+project="$(dirname "$0")"
 
 
 if [ "$1" \= "-h" ] ; then
@@ -22,24 +21,24 @@ if [ "$1" \= "-f" ] ; then
     ac_flag="-f"
 fi
 
-if [ "`uname`" '=' "OpenBSD" ] ; then
-    _arc=`ls -1 /usr/local/bin/autoreconf-* 2>/dev/null | sort | tail -n 1`
+if [ "$(uname)" '=' "OpenBSD" ] ; then
+    _arc="$(find /usr/local/bin -name 'autoreconf-*' 2>/dev/null | sort | tail -n 1)"
     if [ -n "$_arc" ] ; then
         export autoreconf="$_arc"
         export AUTOCONF_VERSION="${_arc##*-}"
     fi
-    _am=`ls -1 /usr/local/bin/automake-* 2>/dev/null | sort | tail -n 1`
+    _am="$(find /usr/local/bin -name 'automake-*' 2>/dev/null | sort | tail -n 1)"
     if [ -n "$_am" ] ; then
         export AUTOMAKE_VERSION="${_am##*-}"
     fi
 fi
 
-cd "$project"
+cd "$project" || { echo 'Error: Can not `cd '"$project"'`'; exit 1 ;}
 "$autoreconf" -vi $ac_flag
 
 if which ronn >/dev/null 2>&1 ; then
-    cd doc
-    if [ alttab.1.ronn -nt alttab.1 -o "$force" \= "yes" ] ; then
+    cd doc || { echo 'Error: Can not `cd ''doc''`'; exit 1 ;}
+    if [ alttab.1.ronn -nt alttab.1 ] || [ "$force" \= "yes" ] ; then
         ronn --roff alttab.1.ronn
     fi
 fi
