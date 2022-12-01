@@ -37,7 +37,7 @@ fi
 cd "$project"
 "$autoreconf" -vi $ac_flag
 
-if which ronn>/dev/null ; then
+if which ronn >/dev/null 2>&1 ; then
     cd doc
     if [ alttab.1.ronn -nt alttab.1 -o "$force" \= "yes" ] ; then
         ronn --roff alttab.1.ronn
