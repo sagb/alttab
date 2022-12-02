@@ -10,10 +10,10 @@ project="$(dirname "$0")"
 
 
 if [ "$1" \= "-h" ] ; then
-    echo "Update autotools stuff and documentation. To be run by maintainers and packagers." >&2
-    echo "Use: $0 [-f]" >&2
-    echo "  -f : force regenerate everything" >&2
-    exit 1
+    echo "Update autotools stuff and documentation. To be run by maintainers and packagers."
+    echo "Use: $0 [-f]"
+    echo "  -f : force regenerate everything"
+    exit 0
 fi
 
 if [ "$1" \= "-f" ] ; then
