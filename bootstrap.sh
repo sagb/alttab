@@ -33,11 +33,11 @@ if [ "$(uname)" '=' "OpenBSD" ] ; then
     fi
 fi
 
-cd "$project" || { echo 'Error: Can not `cd '"$project"'`'; exit 1 ;}
+cd "$project" || { >&2 echo 'Error: Can not `cd '"$project"'`'; exit 1 ;}
 "$autoreconf" -vi $ac_flag
 
 if which ronn >/dev/null 2>&1 ; then
-    cd doc || { echo 'Error: Can not `cd ''doc''`'; exit 1 ;}
+    cd doc || { >&2 echo 'Error: Can not `cd ''doc''`'; exit 1 ;}
     if [ alttab.1.ronn -nt alttab.1 ] || [ "$force" \= "yes" ] ; then
         ronn --roff alttab.1.ronn
     fi
