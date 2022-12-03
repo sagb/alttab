@@ -101,7 +101,7 @@ Building from source
 3. Update autotools stuff. Mandatory step.  
 
     ```
-    ./bootstrap.sh
+    ./bootstrap.sh -f
     ```
 
 4. Build:
