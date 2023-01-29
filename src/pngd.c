@@ -234,8 +234,8 @@ int pngReadToDrawable(char *pngpath, Drawable d, uint8_t bg_red,
     visual = DefaultVisual(dpy, scr);
     depth = DisplayPlanes(dpy, scr);
 
-    if (!(depth == 24 || depth == 32)) {
-        fprintf(stderr, "X11 depth must be 24 or 32, we have %d\n", depth);
+    if (!(depth == 24 || depth == 30 || depth == 32)) {
+        fprintf(stderr, "X11 depth must be 24, 30 or 32, we have %d\n", depth);
         return 0;
     }
     if (!(infile = fopen(pngpath, "rb"))) {
