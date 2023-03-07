@@ -254,39 +254,60 @@ static void prepareTile(WindowInfo * wi)
 }                               // prepareTile
 
 //
-// grab auxiliary keys: arrows
+// grab auxiliary keys: arrows, cancel, kill
 // rely on pre-calculated g.ignored_modmask and g.option_modMask
 //
 static int grabKeysAtUiShow(bool grabUngrab)
 {
     char *grabhint =
         "Error while (un)grabbing key 0x%x with mask 0x%x/0x%x.\n";
-    if (g.option_prevCode != 0) {
-        if (!changeKeygrab
-            (root, grabUngrab, g.option_prevCode, g.option_modMask,
-             g.ignored_modmask)) {
-            msg(0, grabhint, g.option_prevCode, g.option_modMask, g.ignored_modmask);
-            return 0;
-        }
-    }
-    if (g.option_nextCode != 0) {
-        if (!changeKeygrab
-            (root, grabUngrab, g.option_nextCode, g.option_modMask,
-             g.ignored_modmask)) {
-            msg(0, grabhint, g.option_nextCode, g.option_modMask, g.ignored_modmask);
-            return 0;
-        }
-    }
-    if (g.option_cancelCode != 0) {
-        if (!changeKeygrab
-            (root, grabUngrab, g.option_cancelCode, g.option_modMask,
-             g.ignored_modmask)) {
-            msg(0, grabhint, g.option_cancelCode, g.option_modMask, g.ignored_modmask);
-            return 0;
+#define nkeys 4
+    KeyCode key[nkeys] = {
+        g.option_prevCode,
+        g.option_nextCode,
+        g.option_cancelCode,
+        g.option_killCode
+    };
+    int k;
+
+    for (k = 0; k < nkeys; k++) {
+        if (key[k] != 0) {
+            if (!changeKeygrab
+                (root, grabUngrab, key[k], g.option_modMask,
+                 g.ignored_modmask)) {
+                msg(0, grabhint, key[k], g.option_modMask, g.ignored_modmask);
+                return 0;
+            }
         }
     }
     return 1;
 }
+
+//
+// copy single tile to canvas
+//
+static int placeSingleTile (int j) {
+    int dest_x, dest_y, r;
+
+    if (! g.winlist[j].tile)
+        return -1;
+    msg(1, "copying tile %d to canvas\n", j);
+    //XSync (dpy, false);
+    if (g.option_vertical) {
+        dest_x = FRAME_W;
+        dest_y = j * (tileH + FRAME_W) + FRAME_W;
+    } else {
+        dest_x = j * (tileW + FRAME_W) + FRAME_W;
+        dest_y = FRAME_W;
+    }
+    r = XCopyArea(dpy, g.winlist[j].tile, uiwin,
+            g.gcDirect, 0, 0, tileW, tileH,   // src
+            dest_x, dest_y);    // dst
+    //XSync (dpy, false);
+    msg(1, "XCopyArea returned %d\n", r);
+    return r;
+}
+
 
 // PUBLIC
 
@@ -672,23 +693,7 @@ void uiExpose()
 // icons
     int j;
     for (j = 0; j < g.maxNdx; j++) {
-        if (g.winlist[j].tile) {
-            msg(1, "copying tile %d to canvas\n", j);
-            //XSync (dpy, false);
-            int dest_x, dest_y;
-            if (g.option_vertical) {
-                dest_x = FRAME_W;
-                dest_y = j * (tileH + FRAME_W) + FRAME_W;
-            } else {
-                dest_x = j * (tileW + FRAME_W) + FRAME_W;
-                dest_y = FRAME_W;
-            }
-            int r = XCopyArea(dpy, g.winlist[j].tile, uiwin,
-                              g.gcDirect, 0, 0, tileW, tileH,   // src
-                              dest_x, dest_y);    // dst
-            //XSync (dpy, false);
-            msg(1, "XCopyArea returned %d\n", r);
-        }
+        placeSingleTile(j);
     }
 // frame
     framesRedraw();
@@ -761,6 +766,37 @@ int uiPrevWindow()
         selNdx = g.maxNdx - 1;
     msg(0, "item %d\n", selNdx);
     framesRedraw();
+    return 1;
+}
+
+//
+// kill X client of current window
+//
+int uiKillWindow()
+{
+    Window w;
+    char *n;
+
+    if (!uiwin)
+        return 0;
+    WindowInfo wi = g.winlist[selNdx];
+    w = wi.id;
+    n = wi.name;
+    msg(0, "killing client of window %d, %s\n", w, n);
+    if (XKillClient(dpy, w) == BadValue) {
+        msg(-1, "can't kill X client\n");
+        return 0;
+    }
+    msg(1, "blanking tile %d\n", selNdx);
+    if (! XFillRectangle(dpy, wi.tile, g.gcReverse, 0, 0,
+                            tileW, tileH)) {
+        msg(-1, "can't fill tile\n");
+        return 0;
+    }
+    if (! placeSingleTile(selNdx)) {
+        msg(-1, "can't copy tile to canvas\n");
+        return 0;
+    }
     return 1;
 }
 

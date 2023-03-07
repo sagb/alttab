@@ -33,6 +33,9 @@
 ! auxiliary 'cancel' key
 !alttab.cancelkey.keysym:    Escape
 
+! auxiliary 'kill' key
+!alttab.killkey.keysym:      k
+
 ! Limit the switcher to this rectangle 
 ! instead of default screen size
 !alttab.viewport:        1280x1024+1280+0

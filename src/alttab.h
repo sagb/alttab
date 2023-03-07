@@ -62,6 +62,7 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 #define DEFPREVKEYKS    XK_VoidSymbol
 #define DEFNEXTKEYKS    XK_VoidSymbol
 #define DEFCANCELKS XK_Escape
+#define DEFKILLKS   XK_k
 
 #include "icon.h"
 
@@ -187,7 +188,7 @@ typedef struct {
     unsigned int option_modMask, option_backMask;
     KeyCode option_modCode, option_keyCode;
     KeyCode option_prevCode, option_nextCode;
-    KeyCode option_cancelCode;
+    KeyCode option_cancelCode, option_killCode;
     Color color[NCOLORS];
     GC gcDirect, gcReverse, gcFrame;    // used in both gui.c and win.c
     unsigned int ignored_modmask;
@@ -205,6 +206,7 @@ void uiExpose();
 int uiHide();
 int uiNextWindow();
 int uiPrevWindow();
+int uiKillWindow();
 int uiSelectWindow(int ndx);
 void uiButtonEvent(XButtonEvent e);
 Window getUiwin();

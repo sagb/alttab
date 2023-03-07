@@ -57,6 +57,8 @@ Options:\n\
    -bk str    keysym of backscroll modifier\n\
    -pk str    keysym of 'prev' key\n\
    -nk str    keysym of 'next' key\n\
+   -ck str    keysym of 'cancel' key\n\
+   -dk str    keysym of 'kill' key\n\
    -mm N      (obsoleted) main modifier mask\n\
    -bm N      (obsoleted) backward scroll modifier mask\n\
     -t NxM    tile geometry\n\
@@ -117,6 +119,7 @@ static int use_args_and_xrm(int *argc, char **argv)
         {"-pk", "*prevkey.keysym", XrmoptionSepArg, NULL},
         {"-nk", "*nextkey.keysym", XrmoptionSepArg, NULL},
         {"-ck", "*cancelkey.keysym", XrmoptionSepArg, NULL},
+        {"-dk", "*killkey.keysym", XrmoptionSepArg, NULL},
         {"-t", "*tile.geometry", XrmoptionSepArg, NULL},
         {"-i", "*icon.geometry", XrmoptionSepArg, NULL},
         {"-vp", "*viewport", XrmoptionSepArg, NULL},
@@ -256,6 +259,7 @@ static int use_args_and_xrm(int *argc, char **argv)
 #define  prevC  g.option_prevCode
 #define  nextC  g.option_nextCode
 #define  cancelC  g.option_cancelCode
+#define  killC  g.option_killCode
 #define  GMM  g.option_modMask
 #define  GBM  g.option_backMask
 
@@ -283,6 +287,11 @@ static int use_args_and_xrm(int *argc, char **argv)
     if (ksi == -1)
         die("%s\n", errmsg);
     cancelC = ksi != 0 ? ksi : XKeysymToKeycode(dpy, DEFCANCELKS);
+
+    ksi = ksym_option_to_keycode(&db, XRMAPPNAME, "killkey", &errmsg);
+    if (ksi == -1)
+        die("%s\n", errmsg);
+    killC = ksi != 0 ? ksi : XKeysymToKeycode(dpy, DEFKILLKS);
 
     switch (xresource_load_int(&db, XRMAPPNAME, "modifier.mask", &(GMM))) {
     case 1:
@@ -321,6 +330,8 @@ static int use_args_and_xrm(int *argc, char **argv)
 
     msg(0, "modMask %d, backMask %d, modCode %d, keyCode %d\n",
         GMM, GBM, MC, KC);
+    msg(0, "cancelCode %d, killCode %d\n",
+        cancelC, killC);
 
     g.option_tileW = DEFTILEW;
     g.option_tileH = DEFTILEH;
@@ -525,6 +536,13 @@ static int isPrevNextKey(unsigned int keycode)
     return 0;
 }
 
+// see #97
+#define CHECK_97 \
+    XQueryKeymap(dpy, keys_pressed); \
+    if (!(keys_pressed[octet] & kmask)) { \
+        msg(1, "Wrong modifier, skip event\n"); \
+        continue; \
+    }
 
 int main(int argc, char **argv)
 {
@@ -585,12 +603,7 @@ int main(int argc, char **argv)
                 ev.xkey.window, ev.xkey.state, ev.xkey.keycode);
             if (ev.xkey.state & g.option_modMask) {  // alt
                 if (ev.xkey.keycode == g.option_keyCode) {  // tab
-                    // additional check, see #97
-                    XQueryKeymap(dpy, keys_pressed);
-                    if (!(keys_pressed[octet] & kmask)) {
-                        msg(1, "Wrong modifier, skip event\n");
-                        continue;
-                    }
+                    CHECK_97;
                     if (!g.uiShowHasRun) {
                         uiShow((ev.xkey.state & g.option_backMask));
                     } else {
@@ -601,13 +614,11 @@ int main(int argc, char **argv)
                         }
                     }
                 } else if (ev.xkey.keycode == g.option_cancelCode) { // escape
-                    // additional check, see #97
-                    XQueryKeymap(dpy, keys_pressed);
-                    if (!(keys_pressed[octet] & kmask)) {
-                        msg(1, "Wrong modifier, skip event\n");
-                        continue;
-                    }
+                    CHECK_97;
                     uiSelectWindow(0);
+                } else if (ev.xkey.keycode == g.option_killCode) { // k
+                    CHECK_97;
+                    uiKillWindow();
                 } else {  // non-tab
                     switch (isPrevNextKey(ev.xkey.keycode)) {
                     case 1:
