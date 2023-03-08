@@ -1,10 +1,10 @@
 .\" generated with Ronn-NG/v0.9.1
 .\" http://github.com/apjanke/ronn-ng/tree/0.9.1
-.TH "ALTTAB" "1" "December 2021" ""
+.TH "ALTTAB" "1" "March 2023" ""
 .SH "NAME"
 \fBalttab\fR \- the task switcher
 .SH "SYNOPSIS"
-\fBalttab\fR [\fB\-w\fR \fIN\fR] [\fB\-d\fR \fIN\fR] [\fB\-sc\fR \fIN\fR] [\fB\-mk\fR \fIstr\fR] [\fB\-kk\fR \fIstr\fR] [\fB\-bk\fR \fIstr\fR] [\fB\-pk\fR \fIstr\fR] [\fB\-nk\fR \fIstr\fR] [\fB\-mm\fR \fIN\fR] [\fB\-bm\fR \fIN\fR] [\fB\-t\fR \fINxM\fR] [\fB\-i\fR \fINxM\fR] [\fB\-vp\fR \fIstr\fR] [\fB\-p\fR \fIstr\fR] [\fB\-s\fR \fIN\fR] [\fB\-theme\fR \fIname\fR] [\fB\-bg\fR \fIcolor\fR] [\fB\-fg\fR \fIcolor\fR] [\fB\-frame\fR \fIcolor\fR] [\fB\-bc\fR \fIcolor\fR] [\fB\-bw\fR \fIN\fR] [\fB\-font\fR \fIname\fR] [\fB\-vertical\fR] [\fB\-v\fR|\fB\-vv\fR]
+\fBalttab\fR [\fB\-w\fR \fIN\fR] [\fB\-d\fR \fIN\fR] [\fB\-sc\fR \fIN\fR] [\fB\-mk\fR \fIstr\fR] [\fB\-kk\fR \fIstr\fR] [\fB\-bk\fR \fIstr\fR] [\fB\-pk\fR \fIstr\fR] [\fB\-nk\fR \fIstr\fR] [\fB\-ck\fR \fIstr\fR] [\fB\-dk\fR \fIstr\fR] [\fB\-mm\fR \fIN\fR] [\fB\-bm\fR \fIN\fR] [\fB\-t\fR \fINxM\fR] [\fB\-i\fR \fINxM\fR] [\fB\-vp\fR \fIstr\fR] [\fB\-p\fR \fIstr\fR] [\fB\-s\fR \fIN\fR] [\fB\-theme\fR \fIname\fR] [\fB\-bg\fR \fIcolor\fR] [\fB\-fg\fR \fIcolor\fR] [\fB\-frame\fR \fIcolor\fR] [\fB\-inact\fR \fIcolor\fR] [\fB\-bc\fR \fIcolor\fR] [\fB\-bw\fR \fIN\fR] [\fB\-font\fR \fIname\fR] [\fB\-vertical\fR] [\fB\-e\fR] [\fB\-b\fR \fIN\fR] [\fB\-v\fR|\fB\-vv\fR]
 .SH "DESCRIPTION"
 The task switcher designed for minimalistic window managers or standalone X11 session\.
 .P
@@ -42,7 +42,7 @@ resource: alttab\.desktops
 .br
 default: \fI0\fR
 .IP
-Show windows belonging to desktops (workspaces, groups)\. \fINUMBER\fR must be between 0 and 3:
+Show windows belonging to desktops (workspaces, groups)\. \fINUMBER\fR must be between 0 and 4:
 .IP
 \fI0\fR: Current desktop\.
 .IP
@@ -55,6 +55,8 @@ This is default, although in non EWMH\-compatible WM, except ratpoison, it's eff
 In various EWMH WM this desktop may be designed hidden or containing sticky windows\. In i3, it's "scratchpad"\.
 .IP
 \fI3\fR: All desktops, excluding current and special\.
+.IP
+\fI4\fR: Special (\-1) desktop only\.
 .TP
 \fB\-sc\fR \fINUMBER\fR
 resource: alttab\.screens
@@ -113,6 +115,13 @@ default: Escape
 .IP
 Keysym of auxiliary 'cancel' key\.
 .TP
+\fB\-dk\fR \fIstr\fR
+resource: alttab\.killkey\.keysym
+.br
+default: k
+.IP
+Keysym of key for killing X client to which currently selected window belongs\.
+.TP
 \fB\-mm\fR \fINUM\fR
 resource: alttab\.modifier\.mask
 .IP
@@ -170,7 +179,7 @@ resource: alttab\.icon\.source
 .br
 default: 2
 .IP
-Source of icons\. \fINUMBER\fR must be between 0 and 3:
+Source of icons\. \fINUMBER\fR must be between 0 and 4:
 .IP
 \fI0\fR: Use icons from X11 window attributes only\.
 .IP
@@ -197,6 +206,8 @@ Also, alttab scans for icons in legacy directories without freedesktop directory
 \fI2\fR: Prefer icon from file when it matches requested size better (see \fB\-i\fR option)\.
 .IP
 \fI3\fR: Use icons from files only\.
+.IP
+\fI4\fR: Don't draw icons\.
 .TP
 \fB\-theme\fR \fIname\fR
 resource: alttab\.theme
@@ -205,7 +216,7 @@ default: \fIhicolor\fR
 .IP
 Desktop theme for application icons\. Used when \fB\-s\fR is 1, 2 or 3\.
 .P
-The following three options accept color names or \fI#rrggbb\fR\. Special value \fI_rnd_low\fR or \fI_rnd_high\fR produce random color from lower or upper RGB space respectively\.
+The following five options accept color names or \fI#rrggbb\fR\. Special value \fI_rnd_low\fR or \fI_rnd_high\fR produce random color from lower or upper RGB space respectively\.
 .TP
 \fB\-bg\fR \fIcolor\fR
 resource: alttab\.background
@@ -227,6 +238,13 @@ resource: alttab\.framecolor
 default: \fI#a0abab\fR
 .IP
 Color of frame around selected tile\.
+.TP
+\fB\-inact\fR \fIcolor\fR
+resource: alttab\.inactcolor
+.br
+default: foreground color
+.IP
+Color of frame around non\-selected tiles\.
 .TP
 \fB\-bc\fR \fIcolor\fR
 resource: alttab\.bordercolor
@@ -262,7 +280,25 @@ resource: alttab\.vertical
 .br
 default: no
 .IP
-Vertical layout (experimental)\.
+Vertical layout\.
+.TP
+\fB\-e\fR
+resource: alttab\.keep
+.br
+default: no
+.IP
+On release of Alt, don't switch, keep showing the switcher\. This allows for external call: xdotool key alt+Tab \. See doc/mobile\.md for possible usage\.
+.TP
+\fB\-b\fR \fINUMBER\fR
+resource: alttab\.bottomline
+.br
+default: \fI0\fR in single\-desktop mode, \fI1\fR otherwise
+.IP
+Content of auxiliary line at the bottom of each tile\. \fINUMBER\fR must be 0 or 1:
+.IP
+\fI0\fR: Empty\.
+.IP
+\fI1\fR: Desktop to which the window belongs\.
 .TP
 \fB\-v\fR, \fB\-vv\fR
 resource: no
@@ -276,7 +312,7 @@ short help
 .SH "CAVEATS"
 Run alttab after WM, or autodetection will fail\.
 .SH "AUTHOR"
-Copyright 2017\-2021 Alexander Kulak \fB<sa\-dev AT odd POINT systems>\fR\.
+Copyright 2017\-2023 Alexander Kulak \fB<sa\-dev AT odd POINT systems>\fR\.
 .SH "REPORTING BUGS"
 Please report issues on github \fIhttps://github\.com/sagb/alttab/issues\fR\.
 .SH "SEE ALSO"
