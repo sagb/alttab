@@ -79,7 +79,7 @@ alttab (1.5.0.20210228.10.g61bcb93-1~1.gbp30117e) unstable; urgency=medium
 
  -- Alexander Kulak <sa-dev@odd.systems>  Sun, 28 Feb 2021 14:25:11 +0000
 
-alttab (1.5.0.20210124.9.g2f85433-1~1.gbp060fcf) UNRELEASED; urgency=medium
+alttab (1.5.0.20210124.9.g2f85433-1~1.gbp060fcf) unstable; urgency=medium
 
   ** SNAPSHOT build @060fcfaf53234e2bc8b92760fd3abb80876f4e03 **
 
