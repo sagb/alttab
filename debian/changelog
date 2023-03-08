@@ -3,15 +3,7 @@ alttab (1.7.0.20230308.g9a7bc56-1~1.gbp29fe61) unstable; urgency=medium
   ** SNAPSHOT build @29fe61a7c22b6988e61eb30160b205bfa628a8cc **
 
   [ Alexander Kulak ]
-  * prepare 1.7.0
-  * option -e to keep the switcher
-  * document usage on mobile devices
-  * bugfix: update metadata for replaced icon
-  * feature: kill window by pressing 'k'
-  * feature: bottom line
-  * feature: show only special desktop (i3 scratchpad)
-  * option to disable icons: -s 4
-  * filter user input: disable zero size tile or icon
+  * backport to buster
 
   [ inkeso ]
   * ability to change inactive/unselected item bordercolor
@@ -71,7 +63,7 @@ alttab (1.5.0.20210228.10.g61bcb93-1~1.gbp30117e) unstable; urgency=medium
 
  -- Alexander Kulak <sa-dev@odd.systems>  Sun, 28 Feb 2021 14:25:11 +0000
 
-alttab (1.5.0.20210124.9.g2f85433-1~1.gbp060fcf) UNRELEASED; urgency=medium
+alttab (1.5.0.20210124.9.g2f85433-1~1.gbp060fcf) buster; urgency=medium
 
   ** SNAPSHOT build @060fcfaf53234e2bc8b92760fd3abb80876f4e03 **
 
