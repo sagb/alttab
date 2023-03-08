@@ -1,3 +1,11 @@
+alttab (1.7.0.20230308.1.g2a14f1c-1~1.gbp0b5aa5) unstable; urgency=medium
+
+  ** SNAPSHOT build @0b5aa54c17e8f4aabdaa43000557b81099159d3d **
+
+  * snapshot in experimental
+
+ -- Alexander Kulak <sa-dev@odd.systems>  Wed, 08 Mar 2023 19:23:21 +0000
+
 alttab (1.7.0.20230308.1.g2a14f1c-1~1.gbpd63dc9) unstable; urgency=medium
 
   ** SNAPSHOT build @d63dc9b8cf4207dbec1302890d7bed726daec62b **
@@ -71,7 +79,7 @@ alttab (1.5.0.20210228.10.g61bcb93-1~1.gbp30117e) unstable; urgency=medium
 
  -- Alexander Kulak <sa-dev@odd.systems>  Sun, 28 Feb 2021 14:25:11 +0000
 
-alttab (1.5.0.20210124.9.g2f85433-1~1.gbp060fcf) bullseye; urgency=medium
+alttab (1.5.0.20210124.9.g2f85433-1~1.gbp060fcf) unstable; urgency=medium
 
   ** SNAPSHOT build @060fcfaf53234e2bc8b92760fd3abb80876f4e03 **
 
