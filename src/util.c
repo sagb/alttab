@@ -1,7 +1,7 @@
 /*
 Helper functions.
 
-Copyright 2017-2021 Alexander Kulak.
+Copyright 2017-2023 Alexander Kulak.
 This file is part of alttab program.
 
 alttab is free software: you can redistribute it and/or modify
@@ -539,6 +539,34 @@ int drawMultiLine_test()
 
     XftFontClose(dpy, font);
     return r;
+}
+
+//
+// Draw single utf-8 string str on window/pixmap d,
+// using *font and *xftcolor, at (x1,y1,width*height).
+// Return 1 if ok.
+//
+int drawSingleLine(Drawable d, XftFont * font,
+            XftColor * xftcolor, char *str, unsigned int x1,
+            unsigned int y1, unsigned int width, unsigned int height)
+{
+    int debug = 0;
+    XftDraw *xftdraw;
+    int line_clen;
+
+    if ((*str) == '\0')
+        return 1;
+    xftdraw = XftDrawCreate(dpy, d, DefaultVisual(dpy, 0), 
+            DefaultColormap(dpy, scr));
+    line_clen = strlen(str);
+    XftDrawStringUtf8(xftdraw, xftcolor, font, x1, y1+height,
+            (unsigned char *)str, line_clen);
+    if (debug > 0) {
+        GC gc = DefaultGC(dpy, scr);
+        XSetForeground(dpy, gc, WhitePixel(dpy, scr));
+        XDrawRectangle(dpy, d, gc, x1, y1, x1 + width, y1 + height);
+    }
+    return 1;
 }
 
 //
