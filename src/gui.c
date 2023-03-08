@@ -176,6 +176,8 @@ static void prepareTile(WindowInfo * wi)
     // in my simple environments (as reported by xwininfo)
     //
     // place icons
+    if (g.option_iconSrc == ISRC_NONE)
+        goto endIcon;
     if (wi->icon_drawable) {
         if (wi->icon_w == iconW && wi->icon_h == iconH) {
             // direct copy
@@ -515,8 +517,12 @@ int uiShow(bool direction)
 // calculate dimensions
     tileW = g.option_tileW;
     tileH = g.option_tileH;
-    iconW = g.option_iconW;
-    iconH = g.option_iconH;
+    if (g.option_iconSrc != ISRC_NONE) {
+        iconW = g.option_iconW;
+        iconH = g.option_iconH;
+    } else {
+        iconW = iconH = 0;
+    }
     float rt = 1.0;
 // for subsequent calculation of width(s), use 'avail_w'/'avail_h'
 // instead of g.vp.w, because they don't match for POS_SPECIFIC

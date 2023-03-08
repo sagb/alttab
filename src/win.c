@@ -149,7 +149,7 @@ int startupWintasks()
 
     g.sortlist = NULL;          // utlist head must be initialized to NULL
     g.ic = NULL;                // uthash too
-    if (g.option_iconSrc != ISRC_RAM) {
+    if (g.option_iconSrc != ISRC_RAM && g.option_iconSrc != ISRC_NONE) {
         initIconHash(&(g.ic));
     }
     // root: watching for _NET_ACTIVE_WINDOW
@@ -422,6 +422,8 @@ int addWindowInfo(Window win, int reclevel, int wm_id, unsigned long desktop,
     // search for icon in window properties, hints or file hash
     int opt = g.option_iconSrc;
     int icon_in_x = 0;
+    if (opt == ISRC_NONE)
+        goto endIcon;
     if (opt != ISRC_FILES) {
         icon_in_x = addIconFromProperty(&(WI));
         if (!icon_in_x)
@@ -475,6 +477,8 @@ int addWindowInfo(Window win, int reclevel, int wm_id, unsigned long desktop,
         WI.icon_drawable = WI.icon_w =
             WI.icon_h = 0;
     }
+endIcon:
+
 // 3. sort
 
     addToSortlist(win, false, false);

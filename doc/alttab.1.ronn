@@ -218,7 +218,7 @@ Most command line options have corresponding X resource, see doc/alttab.ad for e
     resource: alttab.icon.source  
     default: 2
 
-    Source of icons. <NUMBER> must be between 0 and 3:
+    Source of icons. <NUMBER> must be between 0 and 4:
 
       <0>: Use icons from X11 window attributes only.
       
@@ -246,6 +246,8 @@ Most command line options have corresponding X resource, see doc/alttab.ad for e
       <2>: Prefer icon from file when it matches requested size better (see `-i` option).
 
       <3>: Use icons from files only.
+
+      <4>: Don't draw icons.
 
   * `-theme` <name>:
     resource: alttab.theme  

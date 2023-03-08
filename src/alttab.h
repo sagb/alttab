@@ -183,7 +183,8 @@ typedef struct {
 #define ISRC_FALLBACK   1
 #define ISRC_SIZE       2
 #define ISRC_FILES      3
-#define ISRC_MAX        3
+#define ISRC_NONE       4
+#define ISRC_MAX        4
 #define ISRC_DEFAULT    ISRC_SIZE
     int option_iconSrc;
     char *option_theme;

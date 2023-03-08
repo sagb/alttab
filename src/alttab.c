@@ -65,7 +65,7 @@ Options:\n\
     -i NxM    icon geometry\n\
    -vp str    switcher viewport: focus, pointer, total, WxH+X+Y\n\
     -p str    switcher position: center, none, +X+Y\n\
-    -s N      icon source: 0=X11 only, 1=fallback to files, 2=best size, 3=files only\n\
+    -s N      icon source: 0=X11, 1=fallback to files, 2=best size, 3=files only, 4=no\n\
 -theme name   icon theme\n\
    -bg color  background color\n\
    -fg color  foreground color\n\
