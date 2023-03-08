@@ -81,6 +81,7 @@ typedef struct {
     Window id;
     int wm_id;                  // wm's internal window id, when WM has it (ratpoison)
     char name[MAXNAMESZ];
+    char bottom_line[MAXNAMESZ];
     int reclevel;
     Pixmap icon_drawable;       // Window or Pixmap
     Pixmap icon_mask;
@@ -189,6 +190,11 @@ typedef struct {
     KeyCode option_modCode, option_keyCode;
     KeyCode option_prevCode, option_nextCode;
     KeyCode option_cancelCode, option_killCode;
+#define BL_MIN          0
+#define BL_NONE         0
+#define BL_DESKTOP      1
+#define BL_MAX          1
+    int option_bottom_line;
     Color color[NCOLORS];
     GC gcDirect, gcReverse, gcFrame;    // used in both gui.c and win.c
     unsigned int ignored_modmask;

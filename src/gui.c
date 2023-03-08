@@ -160,6 +160,9 @@ static int pointedTile(int x, int y)
 //
 static void prepareTile(WindowInfo * wi)
 {
+    XGlyphInfo ext;
+    int bottW = 0, bottH = 0, bottX = 0, bottY = 0;
+
     wi->tile = XCreatePixmap(dpy, root, tileW, tileH, XDEPTH);
     if (!wi->tile)
         die("can't create tile");
@@ -229,19 +232,48 @@ static void prepareTile(WindowInfo * wi)
         }
     }
  endIcon:
-    // draw labels
+
+    // draw bottom line if there at least the same
+    // space for main label as for bottom line
+    if (wi->bottom_line[0] == '\0')
+        goto endBottomLine;
+    XftTextExtentsUtf8(dpy, fontLabel, 
+            (unsigned char *)(wi->bottom_line), strlen(wi->bottom_line), &ext);
+    msg(1, "bottom line of size %dx%d requested\n", ext.width, ext.height);
+    if ((!g.option_vertical && (tileH - iconH - 5) / 2 >= ext.height + 1) 
+     || ( g.option_vertical && (tileW - iconW - 5) / 2 >= ext.width + 5)) {
+        bottW = ext.width;
+        bottH = ext.height;
+        bottX = tileW - bottW - 5; // 5 to avoid overlap with frame
+        bottY = tileH - bottH - 1;
+        int dr = drawSingleLine(wi->tile, fontLabel,
+                 &(g.color[COLFG].xftcolor),
+                 wi->bottom_line,
+                 bottX, bottY, bottW, bottH);
+        if (dr != 1) {
+            msg(-1, "can't draw bottom line '%s'\n", wi->bottom_line);
+        }
+        msg(1, "bottom line '%s' drawn at %dx%d+%d+%d\n",
+                wi->bottom_line, bottW, bottH, bottX, bottY);
+    } else {
+        msg(1, "bottom line skipped\n");
+    }
+endBottomLine:
+
+    // draw label
     if (wi->name && fontLabel) {
         int x, y, w, h;
         if (g.option_vertical) {
             x = iconW + 5;
             y = FRAME_W; // avoids overlapping with frames
-            w = tileW - iconW - 5;
+            w = tileW - iconW - 5 - bottW;
+            if (bottW > 0) w = w - 5 - 5; // avoids label too close to bottom line
             h = tileH - FRAME_W;
         } else {
             x = 0;
             y = iconH + 5;
             w = tileW;
-            h = tileH - iconH - 5;
+            h = tileH - iconH - 5 - bottH;
         }
         int dr = drawMultiLine(wi->tile, fontLabel,
                                &(g.color[COLFG].xftcolor),

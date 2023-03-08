@@ -87,3 +87,6 @@ alttab.framecolor:      _rnd_low
 ! Keep switcher after Alt-Tab release
 !alttab.keep:           true
 
+! Force showing desktop number at the bottom of each tile
+!alttab.bottomline:     1
+

@@ -375,18 +375,19 @@ out:
 // used by x, rp, ...
 // only dpy and win are mandatory
 //
+#define WI g.winlist[g.maxNdx]  // current WindowInfo
 int addWindowInfo(Window win, int reclevel, int wm_id, unsigned long desktop,
                   char *wm_name)
 {
     if (!(g.winlist = realloc(g.winlist, (g.maxNdx + 1) * sizeof(WindowInfo))))
         return 0;
-    g.winlist[g.maxNdx].id = win;
-    g.winlist[g.maxNdx].wm_id = wm_id;
+    WI.id = win;
+    WI.wm_id = wm_id;
 
 // 1. get name
 
     if (wm_name) {
-        strncpy(g.winlist[g.maxNdx].name, wm_name, MAXNAMESZ-1);
+        strncpy(WI.name, wm_name, MAXNAMESZ-1);
     } else {
         unsigned char *wn;
         Atom prop = XInternAtom(dpy, "WM_NAME", false), type;
@@ -395,11 +396,11 @@ int addWindowInfo(Window win, int reclevel, int wm_id, unsigned long desktop,
         if (XGetWindowProperty(dpy, win, prop, 0, MAXNAMESZ, false,
                                AnyPropertyType, &type, &form, &len,
                                &remain, &wn) == Success && wn) {
-            strncpy(g.winlist[g.maxNdx].name, (char *)wn, MAXNAMESZ-1);
-            g.winlist[g.maxNdx].name[MAXNAMESZ - 1] = '\0';
+            strncpy(WI.name, (char *)wn, MAXNAMESZ-1);
+            WI.name[MAXNAMESZ - 1] = '\0';
             XFree(wn);
         } else {
-            g.winlist[g.maxNdx].name[0] = '\0';
+            WI.name[0] = '\0';
         }
     }                           // guessing name without WM hints
 
@@ -412,76 +413,88 @@ int addWindowInfo(Window win, int reclevel, int wm_id, unsigned long desktop,
 //      it's more sophisticated than icon_drawable=win, because hidden window contents aren't available.
 // * understand hints->icon_window (twm concept, xterm).
 
-    g.winlist[g.maxNdx].icon_drawable =
-        g.winlist[g.maxNdx].icon_mask =
-        g.winlist[g.maxNdx].icon_w = g.winlist[g.maxNdx].icon_h = 0;
+    WI.icon_drawable =
+        WI.icon_mask =
+        WI.icon_w = WI.icon_h = 0;
     unsigned int icon_depth = 0;
-    g.winlist[g.maxNdx].icon_allocated = false;
+    WI.icon_allocated = false;
 
     // search for icon in window properties, hints or file hash
     int opt = g.option_iconSrc;
     int icon_in_x = 0;
     if (opt != ISRC_FILES) {
-        icon_in_x = addIconFromProperty(&(g.winlist[g.maxNdx]));
+        icon_in_x = addIconFromProperty(&(WI));
         if (!icon_in_x)
-            icon_in_x = addIconFromHints(&(g.winlist[g.maxNdx]));
+            icon_in_x = addIconFromHints(&(WI));
     }
     if ((opt == ISRC_FALLBACK && !icon_in_x) ||
         opt == ISRC_SIZE || opt == ISRC_FILES)
-        addIconFromFiles(&(g.winlist[g.maxNdx]));
+        addIconFromFiles(&(WI));
 
     // extract icon width/height/depth
     Window root_return;
     int x_return, y_return;
     unsigned int border_width_return;
-    if (g.winlist[g.maxNdx].icon_drawable) {
-        if (XGetGeometry(dpy, g.winlist[g.maxNdx].icon_drawable,
+    if (WI.icon_drawable) {
+        if (XGetGeometry(dpy, WI.icon_drawable,
                          &root_return, &x_return, &y_return,
-                         &(g.winlist[g.maxNdx].icon_w),
-                         &(g.winlist[g.maxNdx].icon_h),
+                         &(WI.icon_w),
+                         &(WI.icon_h),
                          &border_width_return, &icon_depth) == 0) {
-            msg(0, "icon dimensions unknown (%s)\n", g.winlist[g.maxNdx].name);
+            msg(0, "icon dimensions unknown (%s)\n", WI.name);
             // probably draw placeholder?
-            g.winlist[g.maxNdx].icon_drawable = 0;
+            WI.icon_drawable = 0;
         } else {
             msg(1, "depth=%d\n", icon_depth);
         }
     }
 // convert icon with different depth (currently 1 only) into default depth
-    if (g.winlist[g.maxNdx].icon_drawable && icon_depth == 1) {
+    if (WI.icon_drawable && icon_depth == 1) {
         msg(0,
             "rebuilding icon from depth %d to %d (%s)\n",
-            icon_depth, XDEPTH, g.winlist[g.maxNdx].name);
-        Pixmap pswap = XCreatePixmap(dpy, g.winlist[g.maxNdx].icon_drawable,
-                                     g.winlist[g.maxNdx].icon_w,
-                                     g.winlist[g.maxNdx].icon_h, XDEPTH);
+            icon_depth, XDEPTH, WI.name);
+        Pixmap pswap = XCreatePixmap(dpy, WI.icon_drawable,
+                                     WI.icon_w,
+                                     WI.icon_h, XDEPTH);
         if (!pswap)
             die("can't create pixmap");
         // GC should be already prepared in uiShow
         if (!XCopyPlane
-            (dpy, g.winlist[g.maxNdx].icon_drawable, pswap, g.gcDirect,
-             0, 0, g.winlist[g.maxNdx].icon_w,
-             g.winlist[g.maxNdx].icon_h, 0, 0, 1))
+            (dpy, WI.icon_drawable, pswap, g.gcDirect,
+             0, 0, WI.icon_w,
+             WI.icon_h, 0, 0, 1))
             die("can't copy plane");    // plane #1?
-        g.winlist[g.maxNdx].icon_drawable = pswap;
-        g.winlist[g.maxNdx].icon_allocated = true;  // for subsequent free()
+        WI.icon_drawable = pswap;
+        WI.icon_allocated = true;  // for subsequent free()
         icon_depth = XDEPTH;
     }
-    if (g.winlist[g.maxNdx].icon_drawable && icon_depth != XDEPTH) {
+    if (WI.icon_drawable && icon_depth != XDEPTH) {
         msg(-1,
             "can't handle icon depth other than %d or 1 (%d, %s). Please report this condition.\n",
-            XDEPTH, icon_depth, g.winlist[g.maxNdx].name);
-        g.winlist[g.maxNdx].icon_drawable = g.winlist[g.maxNdx].icon_w =
-            g.winlist[g.maxNdx].icon_h = 0;
+            XDEPTH, icon_depth, WI.name);
+        WI.icon_drawable = WI.icon_w =
+            WI.icon_h = 0;
     }
 // 3. sort
 
     addToSortlist(win, false, false);
 
-// 4. other window data
+// 4. bottom line
 
-    g.winlist[g.maxNdx].reclevel = reclevel;
-    g.winlist[g.maxNdx].desktop = desktop;
+    WI.bottom_line[0] = '\0';
+    switch(g.option_bottom_line) {
+        case BL_DESKTOP:
+            if (desktop != DESKTOP_UNKNOWN)
+                snprintf(WI.bottom_line, MAXNAMESZ, "%ld", desktop);
+            else
+                strncpy(WI.bottom_line, "?", 2);
+            break;
+    }
+
+// 5. other window data
+
+    WI.reclevel = reclevel;
+    WI.desktop = desktop;
 
     g.maxNdx++;
     msg(1, "window %d, id %lx added to list\n", g.maxNdx, win);

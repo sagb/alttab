@@ -313,6 +313,17 @@ Your Xresources database probably already has \*background, \*foreground or \*fo
 
     On release of Alt, don't switch, keep showing the switcher. This allows for external call: xdotool key alt+Tab . See doc/mobile.md for possible usage.
 
+  * `-b` <NUMBER>:
+    resource: alttab.bottomline  
+    default: <0> in single-desktop mode, <1> otherwise
+
+    Content of auxiliary line at the bottom of each tile.
+    <NUMBER> must be 0 or 1:
+
+      <0>: Empty.
+
+      <1>: Desktop to which the window belongs.
+
   * `-v`, `-vv`:
     resource: no  
     default: silent

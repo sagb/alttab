@@ -17,7 +17,7 @@ or standalone X11 session.
   [-pk <str>] [-nk <str>] [-ck <str>] [-dk <str>] [-mm <N>] [-bm <N>]
   [-t NxM] [-i NxM] [-vp str] [-p str] [-s N] [-theme name] [-bg color]
   [-fg color] [-frame color] [-inact color] [-bc color] [-bw <N>]
-  [-font name] [-vertical] [-e] [-v|-vv]
+  [-font name] [-vertical] [-e] [-b N] [-v|-vv]
 ```
 (see man page for details)
 <!-- ronn page has elements invalid for github markdown, don't link to it -->

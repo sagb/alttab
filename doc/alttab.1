@@ -285,6 +285,17 @@ default: no
 .IP
 On release of Alt, don't switch, keep showing the switcher\. This allows for external call: xdotool key alt+Tab \. See doc/mobile\.md for possible usage\.
 .TP
+\fB\-b\fR \fINUMBER\fR
+resource: alttab\.bottomline
+.br
+default: \fI0\fR in single\-desktop mode, \fI1\fR otherwise
+.IP
+Content of auxiliary line at the bottom of each tile\. \fINUMBER\fR must be 0 or 1:
+.IP
+\fI0\fR: Empty\.
+.IP
+\fI1\fR: Desktop to which the window belong\.
+.TP
 \fB\-v\fR, \fB\-vv\fR
 resource: no
 .br

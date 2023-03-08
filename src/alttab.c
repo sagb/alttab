@@ -76,6 +76,7 @@ Options:\n\
  -font name   font name in the form xft:fontconfig_pattern\n\
  -vertical    verticat layout\n\
     -e        keep switcher after keys release\n\
+    -b N      bottom line: 0=no, 1=desktop\n\
   -v|-vv      verbose\n\
     -h        help\n\
 See man alttab for details.\n", PACKAGE_VERSION);
@@ -94,7 +95,7 @@ static int use_args_and_xrm(int *argc, char **argv)
     char *errmsg;
     int ksi;
     KeyCode BC;
-    unsigned int wmindex, dsindex, scindex, isrc;
+    unsigned int wmindex, dsindex, scindex, isrc, bindex;
     char *gtile, *gicon, *gview, *gpos;
     int x, y;
     unsigned int w, h, bw;
@@ -134,7 +135,8 @@ static int use_args_and_xrm(int *argc, char **argv)
         {"-bw", "*borderwidth", XrmoptionSepArg, NULL},
         {"-font", "*font", XrmoptionSepArg, NULL},
         {"-vertical", "*vertical", XrmoptionIsArg, NULL},
-        {"-e", "*keep", XrmoptionIsArg, NULL}
+        {"-e", "*keep", XrmoptionIsArg, NULL},
+        {"-b", "*bottomline", XrmoptionSepArg, NULL}
     };
     const char *inv = "invalid %s, use -h for help\n";
     const char *rmb = "can't figure out modmask from keycode 0x%x\n";
@@ -492,6 +494,23 @@ static int use_args_and_xrm(int *argc, char **argv)
     s = xresource_load_string(&db, XRMAPPNAME, "keep");
     g.option_keep_ui = (s != NULL);
     msg(0, "keep_ui: %d\n", g.option_keep_ui);
+
+    switch (xresource_load_int(&db, XRMAPPNAME, "bottomline", &bindex)) {
+    case 1:
+        if (bindex >= BL_MIN && bindex <= BL_MAX)
+            g.option_bottom_line = bindex;
+        else
+            die(inv, "bottomline argument range");
+        break;
+    case 0:
+        g.option_bottom_line = 
+            (g.option_desktop == DESK_CURRENT) ? BL_NONE : BL_DESKTOP;
+        break;
+    case -1:
+        die(inv, "bottomline argument");
+        break;
+    }
+    msg(0, "bottomline: %d\n", g.option_bottom_line);
 
     return 1;
 }

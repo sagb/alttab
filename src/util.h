@@ -92,6 +92,9 @@ int drawMultiLine(Drawable d, XftFont * font, XftColor * xftcolor, char *str,
                   unsigned int x1, unsigned int y1, unsigned int width,
                   unsigned int height);
 int drawMultiLine_test();
+int drawSingleLine(Drawable d, XftFont * font, XftColor * xftcolor, char *str,
+                  unsigned int x1, unsigned int y1, unsigned int width,
+                  unsigned int height);
 
 Bool predproc_true(Display * display, XEvent * event, char *arg);
 
