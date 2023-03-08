@@ -1,7 +1,7 @@
 /*
 Icon object.
 
-Copyright 2017-2021 Alexander Kulak.
+Copyright 2017-2023 Alexander Kulak.
 This file is part of alttab program.
 
 alttab is free software: you can redistribute it and/or modify
@@ -416,6 +416,8 @@ end_special_1:
             strncpy(ic->src_path, pe->fts_path, MAXICONPATHLEN-1);
             ic->src_w = ix;
             ic->src_h = iy;
+            ic->ext = ext;
+            ic->dir = dir;
         }
     }
 

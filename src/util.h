@@ -1,7 +1,7 @@
 /*
 util.c definitions.
 
-Copyright 2017-2021 Alexander Kulak.
+Copyright 2017-2023 Alexander Kulak.
 This file is part of alttab program.
 
 alttab is free software: you can redistribute it and/or modify
@@ -92,6 +92,9 @@ int drawMultiLine(Drawable d, XftFont * font, XftColor * xftcolor, char *str,
                   unsigned int x1, unsigned int y1, unsigned int width,
                   unsigned int height);
 int drawMultiLine_test();
+int drawSingleLine(Drawable d, XftFont * font, XftColor * xftcolor, char *str,
+                  unsigned int x1, unsigned int y1, unsigned int width,
+                  unsigned int height);
 
 Bool predproc_true(Display * display, XEvent * event, char *arg);
 

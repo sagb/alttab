@@ -33,6 +33,9 @@
 ! auxiliary 'cancel' key
 !alttab.cancelkey.keysym:    Escape
 
+! auxiliary 'kill' key
+!alttab.killkey.keysym:      k
+
 ! Limit the switcher to this rectangle 
 ! instead of default screen size
 !alttab.viewport:        1280x1024+1280+0
@@ -63,8 +66,11 @@ alttab.background:      #c9c9c9
 ! Red letters
 alttab.foreground:      #600000
 
-! Random dark frame
+! Random dark frame around selected tile
 alttab.framecolor:      _rnd_low
+
+! Gray42 frame around deselected tiles
+!alttab.framecolor:      #6b6b6b
 
 ! Show X11 window border around the switcher
 !alttab.borderwidth:     4
@@ -76,5 +82,11 @@ alttab.framecolor:      _rnd_low
 !alttab.font:           xft:DejaVu Sans Condensed-18
 
 ! Vertical layout
-!alttab.vertical:       anything
+!alttab.vertical:       true
+
+! Keep switcher after Alt-Tab release
+!alttab.keep:           true
+
+! Force showing desktop number at the bottom of each tile
+!alttab.bottomline:     1
 
