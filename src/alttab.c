@@ -50,7 +50,7 @@ static void helpexit()
     msg(-1, "the task switcher, v%s\n\
 Options:\n\
     -w N      window manager: 0=no, 1=ewmh-compatible, 2=ratpoison, 3=old fashion\n\
-    -d N      desktop: 0=current 1=all, 2=all but special, 3=all but current\n\
+    -d N      desktop: 0=current 1=all, 2=all but special, 3=all but current, 4=special\n\
    -sc N      screen: 0=current 1=all\n\
    -kk str    keysym of main key\n\
    -mk str    keysym of main modifier\n\
@@ -503,8 +503,10 @@ static int use_args_and_xrm(int *argc, char **argv)
             die(inv, "bottomline argument range");
         break;
     case 0:
-        g.option_bottom_line = 
-            (g.option_desktop == DESK_CURRENT) ? BL_NONE : BL_DESKTOP;
+        g.option_bottom_line =
+            (g.option_desktop == DESK_CURRENT 
+             || g.option_desktop == DESK_SPECIAL) ?
+            BL_NONE : BL_DESKTOP;
         break;
     case -1:
         die(inv, "bottomline argument");

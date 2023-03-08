@@ -42,7 +42,7 @@ resource: alttab\.desktops
 .br
 default: \fI0\fR
 .IP
-Show windows belonging to desktops (workspaces, groups)\. \fINUMBER\fR must be between 0 and 3:
+Show windows belonging to desktops (workspaces, groups)\. \fINUMBER\fR must be between 0 and 4:
 .IP
 \fI0\fR: Current desktop\.
 .IP
@@ -55,6 +55,8 @@ This is default, although in non EWMH\-compatible WM, except ratpoison, it's eff
 In various EWMH WM this desktop may be designed hidden or containing sticky windows\. In i3, it's "scratchpad"\.
 .IP
 \fI3\fR: All desktops, excluding current and special\.
+.IP
+\fI4\fR: Special (\-1) desktop only\.
 .TP
 \fB\-sc\fR \fINUMBER\fR
 resource: alttab\.screens
@@ -294,7 +296,7 @@ Content of auxiliary line at the bottom of each tile\. \fINUMBER\fR must be 0 or
 .IP
 \fI0\fR: Empty\.
 .IP
-\fI1\fR: Desktop to which the window belong\.
+\fI1\fR: Desktop to which the window belongs\.
 .TP
 \fB\-v\fR, \fB\-vv\fR
 resource: no

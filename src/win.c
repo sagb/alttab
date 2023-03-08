@@ -729,6 +729,10 @@ bool common_skipWindow(Window w,
         msg(1, "window on current or -1 desktop, skipped\n");
         return true;
     }
+    if (g.option_desktop == DESK_SPECIAL && window_desktop != -1) {
+        msg(1, "window not on -1 desktop, skipped\n");
+        return true;
+    }
     // man page: -sc 0: Screen is defined according to -vp pointer or -vp focus.
     // assuming g.vp already calculated in gui.c
     if (g.option_screen == SCR_CURRENT &&

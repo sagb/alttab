@@ -146,7 +146,8 @@ typedef struct {
 #define DESK_ALL        1
 #define DESK_NOSPECIAL  2
 #define DESK_NOCURRENT  3
-#define DESK_MAX        3
+#define DESK_SPECIAL    4
+#define DESK_MAX        4
 #define DESK_DEFAULT    DESK_CURRENT
     int option_desktop;
 #define SCR_MIN        0
