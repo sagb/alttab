@@ -349,6 +349,8 @@ static int use_args_and_xrm(int *argc, char **argv)
         else
             die(inv, "tile height");
     }
+    if (g.option_tileW == 0 || g.option_tileH == 0)
+        die(inv, "tile width or height: can't be zero");
 
     g.option_iconW = DEFICONW;
     g.option_iconH = DEFICONH;
@@ -364,6 +366,8 @@ static int use_args_and_xrm(int *argc, char **argv)
         else
             die(inv, "icon height");
     }
+    if (g.option_iconW == 0 || g.option_iconH == 0)
+        die(inv, "icon width or height: can't be zero");
 
     msg(0, "%dx%d tile, %dx%d icon\n",
         g.option_tileW, g.option_tileH, g.option_iconW, g.option_iconH);
