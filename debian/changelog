@@ -2,7 +2,7 @@ alttab (1.7.0.20230308.1.g2a14f1c-1~1.gbpd63dc9) unstable; urgency=medium
 
   ** SNAPSHOT build @d63dc9b8cf4207dbec1302890d7bed726daec62b **
 
-  * update copyright year
+  * backport to bullseye
 
  -- Alexander Kulak <sa-dev@odd.systems>  Wed, 08 Mar 2023 18:42:03 +0000
 
