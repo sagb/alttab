@@ -8,6 +8,7 @@ nohup.out
 
 src/.deps
 src/tags
+tags
 config.h
 *~
 *.swo
@@ -20,4 +21,3 @@ Makefile
 stamp-h1
 
 src/alttab
-
