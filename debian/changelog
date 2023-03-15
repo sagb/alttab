@@ -1,10 +1,10 @@
-alttab (1.7.0.20230308.1.g2a14f1c-1~1.gbpa94e73) bullseye; urgency=medium
+alttab (1.7.0.20230316.2.g2ecfd0e-1~1.gbp0793fd) unstable; urgency=medium
 
-  ** SNAPSHOT build @a94e739f690cba4eabc325e0871d6b7df8e3be2c **
+  ** SNAPSHOT build @0793fdfa3c0f6b3634a34eaed1f617542f5d55b5 **
 
-  * backport to bullseye
+  * show username in bottom line: -b 2
 
- -- Alexander Kulak <sa-dev@odd.systems>  Wed, 08 Mar 2023 19:34:28 +0000
+ -- Alexander Kulak <sa-dev@odd.systems>  Wed, 15 Mar 2023 22:42:07 +0000
 
 alttab (1.7.0.20230308.1.g2a14f1c-1~1.gbp0b5aa5) unstable; urgency=medium
 
