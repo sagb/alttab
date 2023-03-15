@@ -22,6 +22,9 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 #include <X11/Xutil.h>
 #include <X11/Xft/Xft.h>
 #include <X11/Xatom.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <pwd.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -486,12 +489,37 @@ endIcon:
 // 4. bottom line
 
     WI.bottom_line[0] = '\0';
+    long unsigned int nws, *pid;
+    char procd[32];
+    int sr;
+    struct stat st;
+    struct passwd *gu;
     switch(g.option_bottom_line) {
         case BL_DESKTOP:
             if (desktop != DESKTOP_UNKNOWN)
                 snprintf(WI.bottom_line, MAXNAMESZ, "%ld", desktop);
             else
                 strncpy(WI.bottom_line, "?", 2);
+            break;
+        case BL_USER:
+            pid = (long unsigned int*)get_x_property(WI.id,
+                    XA_CARDINAL, "_NET_WM_PID", &nws);
+            if (!pid) {
+                strncpy(WI.bottom_line, "[no pid]", 9);
+                break;
+            }
+            snprintf(procd, 32, "/proc/%ld", *pid);
+            sr = stat(procd, &st);
+            if (sr == -1) {
+                strncpy(WI.bottom_line, "[no /proc]", 11);
+                break;
+            }
+            gu = getpwuid(st.st_uid);
+            if (gu == NULL) {
+                strncpy(WI.bottom_line, "[no name]", 10);
+                break;
+            }
+            snprintf(WI.bottom_line, MAXNAMESZ, "%s", gu->pw_name);
             break;
     }
 
