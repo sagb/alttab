@@ -77,6 +77,7 @@ Options:\n\
  -vertical    verticat layout\n\
     -e        keep switcher after keys release\n\
     -b N      bottom line: 0=no, 1=desktop, 2=user\n\
+   -ns        ignore window request to skip it in taskbar\n\
   -v|-vv      verbose\n\
     -h        help\n\
 See man alttab for details.\n", PACKAGE_VERSION);
@@ -136,7 +137,8 @@ static int use_args_and_xrm(int *argc, char **argv)
         {"-font", "*font", XrmoptionSepArg, NULL},
         {"-vertical", "*vertical", XrmoptionIsArg, NULL},
         {"-e", "*keep", XrmoptionIsArg, NULL},
-        {"-b", "*bottomline", XrmoptionSepArg, NULL}
+        {"-b", "*bottomline", XrmoptionSepArg, NULL},
+        {"-ns", "*noskiptaskbar", XrmoptionIsArg, NULL}
     };
     const char *inv = "invalid %s, use -h for help\n";
     const char *rmb = "can't figure out modmask from keycode 0x%x\n";
@@ -517,6 +519,10 @@ static int use_args_and_xrm(int *argc, char **argv)
         break;
     }
     msg(0, "bottomline: %d\n", g.option_bottom_line);
+
+    s = xresource_load_string(&db, XRMAPPNAME, "noskiptaskbar");
+    g.option_no_skip_taskbar = (s != NULL);
+    msg(0, "no_skip_taskbar: %d\n", g.option_no_skip_taskbar);
 
     return 1;
 }

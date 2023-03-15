@@ -90,3 +90,5 @@ alttab.framecolor:      _rnd_low
 ! Force showing desktop number at the bottom of each tile
 !alttab.bottomline:     1
 
+! Ignore _NET_WM_STATE_SKIP_TASKBAR
+!alttab.noskiptaskbar:  true

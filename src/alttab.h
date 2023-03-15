@@ -198,6 +198,7 @@ typedef struct {
 #define BL_USER         2
 #define BL_MAX          2
     int option_bottom_line;
+    bool option_no_skip_taskbar;
     Color color[NCOLORS];
     GC gcDirect, gcReverse, gcFrame;    // used in both gui.c and win.c
     unsigned int ignored_modmask;
