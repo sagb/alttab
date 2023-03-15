@@ -328,6 +328,8 @@ Your Xresources database probably already has \*background, \*foreground or \*fo
 
       <1>: Desktop to which the window belongs.
 
+      <2>: User name. Requires _NET_WM_PID freedesktop property and /proc file system.
+
   * `-v`, `-vv`:
     resource: no  
     default: silent

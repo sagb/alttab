@@ -76,7 +76,7 @@ Options:\n\
  -font name   font name in the form xft:fontconfig_pattern\n\
  -vertical    verticat layout\n\
     -e        keep switcher after keys release\n\
-    -b N      bottom line: 0=no, 1=desktop\n\
+    -b N      bottom line: 0=no, 1=desktop, 2=user\n\
   -v|-vv      verbose\n\
     -h        help\n\
 See man alttab for details.\n", PACKAGE_VERSION);
