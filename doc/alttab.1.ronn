@@ -57,7 +57,7 @@ Most command line options have corresponding X resource, see doc/alttab.ad for e
 
       <2>: Ratpoison.
 
-      Alttab uses ratpoison own remote control capability. Additionally, alttab registers itself in its "unmanaged list" automatically.
+      Alttab uses ratpoison own remote control capability. Also, alttab registers itself in its "unmanaged list" automatically.
 
       <3>: Ancient WM.
 
@@ -104,7 +104,7 @@ Most command line options have corresponding X resource, see doc/alttab.ad for e
 
   * `-mk` <str>:
     resource: alttab.modifier.keysym  
-    default: Alt_L
+    default: Alt_L (i.e. Left Alt)
 
     Keysym of main modifier. String or number accepted.
     Suitable examples: Control_L, Super_L.
@@ -322,7 +322,7 @@ Your Xresources database probably already has \*background, \*foreground or \*fo
     default: <0> in single-desktop mode, <1> otherwise
 
     Content of auxiliary line at the bottom of each tile.
-    <NUMBER> must be 0 or 1:
+    <NUMBER> must be between 0 and 2:
 
       <0>: Empty.
 

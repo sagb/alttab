@@ -31,7 +31,7 @@ Compatible WM list is in [SEE ALSO] below\. alttab functions in xmonad (EWMH mus
 .IP
 \fI2\fR: Ratpoison\.
 .IP
-Alttab uses ratpoison own remote control capability\. Additionally, alttab registers itself in its "unmanaged list" automatically\.
+Alttab uses ratpoison own remote control capability\. Also, alttab registers itself in its "unmanaged list" automatically\.
 .IP
 \fI3\fR: Ancient WM\.
 .IP
@@ -76,7 +76,7 @@ This is default\.
 \fB\-mk\fR \fIstr\fR
 resource: alttab\.modifier\.keysym
 .br
-default: Alt_L
+default: Alt_L (i\.e\. Left Alt)
 .IP
 Keysym of main modifier\. String or number accepted\. Suitable examples: Control_L, Super_L\.
 .TP
@@ -294,7 +294,7 @@ resource: alttab\.bottomline
 .br
 default: \fI0\fR in single\-desktop mode, \fI1\fR otherwise
 .IP
-Content of auxiliary line at the bottom of each tile\. \fINUMBER\fR must be 0 or 1:
+Content of auxiliary line at the bottom of each tile\. \fINUMBER\fR must be between 0 and 2:
 .IP
 \fI0\fR: Empty\.
 .IP
