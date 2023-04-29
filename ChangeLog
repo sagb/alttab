@@ -1,3 +1,16 @@
+2023-04-29  Alexander Kulak  <sa-dev@odd.systems>
+
+	version 1.7.1
+
+	Show username in bottom line: -b 2.
+	Option -ns to ignore _NET_WM_STATE_SKIP_TASKBAR.
+	Better man page.
+	Patches from Debian by Peter Pentchev:
+	Fix an "empty window name" check,
+	Fix typographical errors.
+
+	Closes: #147.
+
 2023-03-08  Alexander Kulak  <sa-dev@odd.systems>
 
 	version 1.7.0
