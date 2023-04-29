@@ -263,7 +263,7 @@ static void prepareTile(WindowInfo * wi)
 endBottomLine:
 
     // draw label
-    if (wi->name && fontLabel) {
+    if (wi->name[0] && fontLabel) {
         int x, y, w, h;
         if (g.option_vertical) {
             x = iconW + 5;
@@ -445,7 +445,7 @@ int uiShow(bool direction)
         scrdim.w = DisplayWidth(dpy, scr);
         scrdim.h = DisplayHeight(dpy, scr);
     }
-// caculate viewport.
+// calculate viewport.
 #define VPM  g.option_vp_mode
     switch (VPM) {
     case VP_SPECIFIC:

@@ -697,10 +697,10 @@ void winPropChangeEvent(XPropertyEvent e)
         if (usec_delta < 5E5) {  // half a second
             return;
         }
-        msg(0, PREF"pulling 'prev' 0x%lx supressed\n", aw);
+        msg(0, PREF"pulling 'prev' 0x%lx suppressed\n", aw);
     }
     if (aw == g.last.to) {
-        msg(0, PREF"pulling 'to' 0x%lx supressed\n", aw);
+        msg(0, PREF"pulling 'to' 0x%lx suppressed\n", aw);
         return;
     }
 */

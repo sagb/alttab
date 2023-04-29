@@ -183,7 +183,7 @@ Most command line options have corresponding X resource, see doc/alttab.ad for e
 
       <focus>: in multihead configuration: the monitor which shows
       largest part of currently focused window. If this part is shared
-      with other monitors, then the smallest of these monitors is choosen.
+      with other monitors, then the smallest of these monitors is chosen.
       In single head configuration: the geometry of default root window.
 
       <pointer>: the monitor which has mouse pointer, otherwise

@@ -85,7 +85,7 @@ See man alttab for details.\n", PACKAGE_VERSION);
 }
 
 //
-// initialize globals based on executable agruments and Xresources
+// initialize globals based on executable arguments and Xresources
 // return 1 if success, 0 otherwise
 // on fatal failure, calls die/exit
 //
