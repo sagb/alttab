@@ -1,3 +1,9 @@
+alttab (1.6.1-2) UNRELEASED; urgency=medium
+
+  * Declare compliance with Policy 4.6.2 with no changes.
+
+ -- Peter Pentchev <roam@debian.org>  Sun, 11 Jun 2023 02:54:56 +0300
+
 alttab (1.6.1-1) unstable; urgency=medium
 
   * Rebuild the manual page from the ronn source.
