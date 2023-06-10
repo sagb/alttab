@@ -33,7 +33,7 @@ License: permissive
 Files: debian/*
 Copyright:
  2017-2021 Alexander Kulak <sa-dev@odd.systems>
- 2021, 2022 Peter Pentchev <roam@debian.org>
+ 2021-2023 Peter Pentchev <roam@debian.org>
 License: GPL-3.0+
 
 License: GPL-3.0+
