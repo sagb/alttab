@@ -509,10 +509,7 @@ static int use_args_and_xrm(int *argc, char **argv)
             die(inv, "bottomline argument range");
         break;
     case 0:
-        g.option_bottom_line =
-            (g.option_desktop == DESK_CURRENT 
-             || g.option_desktop == DESK_SPECIAL) ?
-            BL_NONE : BL_DESKTOP;
+        g.option_bottom_line = BL_NONE;
         break;
     case -1:
         die(inv, "bottomline argument");

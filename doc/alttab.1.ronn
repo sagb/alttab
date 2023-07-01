@@ -319,14 +319,14 @@ Your Xresources database probably already has \*background, \*foreground or \*fo
 
   * `-b` <NUMBER>:
     resource: alttab.bottomline  
-    default: <0> in single-desktop mode, <1> otherwise
+    default: <0>
 
     Content of auxiliary line at the bottom of each tile.
     <NUMBER> must be between 0 and 2:
 
       <0>: Empty.
 
-      <1>: Desktop to which the window belongs.
+      <1>: Index of desktop to which the window belongs, starting from zero.
 
       <2>: User name. Requires _NET_WM_PID freedesktop property and /proc file system.
 

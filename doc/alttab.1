@@ -1,6 +1,6 @@
 .\" generated with Ronn-NG/v0.9.1
 .\" http://github.com/apjanke/ronn-ng/tree/0.9.1
-.TH "ALTTAB" "1" "March 2023" ""
+.TH "ALTTAB" "1" "July 2023" ""
 .SH "NAME"
 \fBalttab\fR \- the task switcher
 .SH "SYNOPSIS"
@@ -292,13 +292,13 @@ On release of Alt, don't switch, keep showing the switcher\. This allows for ext
 \fB\-b\fR \fINUMBER\fR
 resource: alttab\.bottomline
 .br
-default: \fI0\fR in single\-desktop mode, \fI1\fR otherwise
+default: \fI0\fR
 .IP
 Content of auxiliary line at the bottom of each tile\. \fINUMBER\fR must be between 0 and 2:
 .IP
 \fI0\fR: Empty\.
 .IP
-\fI1\fR: Desktop to which the window belongs\.
+\fI1\fR: Index of desktop to which the window belongs, starting from zero\.
 .IP
 \fI2\fR: User name\. Requires _NET_WM_PID freedesktop property and /proc file system\.
 .TP
