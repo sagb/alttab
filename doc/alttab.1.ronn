@@ -2,7 +2,7 @@
 The source of alttab.1. Read doc/development.md.
 vim:ft=markdown
 
-Copyright 2017-2021 Alexander Kulak.
+Copyright 2017-2023 Alexander Kulak.
 This file is part of alttab program.
 
 Copying and distribution of this file, with or without modification,
@@ -16,7 +16,7 @@ alttab(1) -- the task switcher
 
 ## SYNOPSIS
 
-`alttab` [`-w` <N>] [`-d` <N>] [`-sc` <N>] [`-mk` <str>] [`-kk` <str>] [`-bk` <str>] [`-pk` <str>] [`-nk` <str>] [`-mm` <N>] [`-bm` <N>] [`-t` <NxM>] [`-i` <NxM>] [`-vp` <str>] [`-p` <str>] [`-s` <N>] [`-theme` <name>] [`-bg` <color>] [`-fg` <color>] [`-frame` <color>] [`-bc` <color>] [`-bw` <N>] [`-font` <name>] [`-vertical`] [`-v`\|`-vv`]
+`alttab` [`-w` <N>] [`-d` <N>] [`-sc` <N>] [`-mk` <str>] [`-kk` <str>] [`-bk` <str>] [`-pk` <str>] [`-nk` <str>] [`-ck` <str>] [`-dk` <str>] [`-mm` <N>] [`-bm` <N>] [`-t` <NxM>] [`-i` <NxM>] [`-vp` <str>] [`-p` <str>] [`-s` <N>] [`-theme` <name>] [`-bg` <color>] [`-fg` <color>] [`-frame` <color>] [`-inact` <color>] [`-bc` <color>] [`-bw` <N>] [`-font` <name>] [`-vertical`] [`-e`] [`-b` <N>] [`-v`\|`-vv`]
 
 ## DESCRIPTION
 
@@ -71,7 +71,7 @@ Most command line options have corresponding X resource, see doc/alttab.ad for e
     resource: alttab.desktops  
     default: <0>
 
-    Show windows belonging to desktops (workspaces, groups). <NUMBER> must be between 0 and 3:
+    Show windows belonging to desktops (workspaces, groups). <NUMBER> must be between 0 and 4:
 
       <0>: Current desktop.
 
@@ -85,6 +85,8 @@ Most command line options have corresponding X resource, see doc/alttab.ad for e
       or containing sticky windows. In i3, it's "scratchpad".
 
       <3>: All desktops, excluding current and special.
+
+      <4>: Special (-1) desktop only.
 
   * `-sc` <NUMBER>:
     resource: alttab.screens  
@@ -139,6 +141,12 @@ Most command line options have corresponding X resource, see doc/alttab.ad for e
     default: Escape
 
     Keysym of auxiliary 'cancel' key.
+
+  * `-dk` <str>:
+    resource: alttab.killkey.keysym  
+    default: k
+
+    Keysym of key for killing X client to which currently selected window belongs.
 
   * `-mm` <NUM>:
     resource: alttab.modifier.mask  
@@ -210,7 +218,7 @@ Most command line options have corresponding X resource, see doc/alttab.ad for e
     resource: alttab.icon.source  
     default: 2
 
-    Source of icons. <NUMBER> must be between 0 and 3:
+    Source of icons. <NUMBER> must be between 0 and 4:
 
       <0>: Use icons from X11 window attributes only.
       
@@ -239,13 +247,15 @@ Most command line options have corresponding X resource, see doc/alttab.ad for e
 
       <3>: Use icons from files only.
 
+      <4>: Don't draw icons.
+
   * `-theme` <name>:
     resource: alttab.theme  
     default: <hicolor>
 
     Desktop theme for application icons. Used when `-s` is 1, 2 or 3.
 
-The following three options accept color names or <#rrggbb>. Special value <&#95;rnd_low> or <&#95;rnd_high> produce random color from lower or upper RGB space respectively.
+The following five options accept color names or <#rrggbb>. Special value <&#95;rnd_low> or <&#95;rnd_high> produce random color from lower or upper RGB space respectively.
 
   * `-bg` <color>:
     resource: alttab.background  
@@ -264,6 +274,12 @@ The following three options accept color names or <#rrggbb>. Special value <&#95
     default: <#a0abab>
 
     Color of frame around selected tile.
+
+  * `-inact` <color>:
+    resource: alttab.inactcolor  
+    default: foreground color
+
+    Color of frame around non-selected tiles.
 
   * `-bc` <color>:
     resource: alttab.bordercolor  
@@ -293,7 +309,24 @@ Your Xresources database probably already has \*background, \*foreground or \*fo
     resource: alttab.vertical  
     default: no
 
-    Vertical layout (experimental).
+    Vertical layout.
+
+  * `-e`:
+    resource: alttab.keep  
+    default: no
+
+    On release of Alt, don't switch, keep showing the switcher. This allows for external call: xdotool key alt+Tab . See doc/mobile.md for possible usage.
+
+  * `-b` <NUMBER>:
+    resource: alttab.bottomline  
+    default: <0> in single-desktop mode, <1> otherwise
+
+    Content of auxiliary line at the bottom of each tile.
+    <NUMBER> must be 0 or 1:
+
+      <0>: Empty.
+
+      <1>: Desktop to which the window belongs.
 
   * `-v`, `-vv`:
     resource: no  
@@ -310,7 +343,7 @@ Run alttab after WM, or autodetection will fail.
 
 ##AUTHOR
 
-Copyright 2017-2021 Alexander Kulak `<sa-dev AT odd POINT systems>`.
+Copyright 2017-2023 Alexander Kulak `<sa-dev AT odd POINT systems>`.
 
 ##REPORTING BUGS
 

@@ -14,10 +14,10 @@ How these screenshots were [obtained](doc/screenshots/screenshots.md)
 or standalone X11 session.
 ```
   alttab  [-w N] [-d N] [-sc N] [-mk <str>] [-kk <str>] [-bk <str>]
-  [-pk <str>] [-nk <str>] [-ck <str>] [-mm <N>] [-bm <N>]
+  [-pk <str>] [-nk <str>] [-ck <str>] [-dk <str>] [-mm <N>] [-bm <N>]
   [-t NxM] [-i NxM] [-vp str] [-p str] [-s N] [-theme name] [-bg color]
-  [-fg color] [-frame color] [-bc color] [-bw <N>] [-font name]
-  [-vertical] [-v|-vv]
+  [-fg color] [-frame color] [-inact color] [-bc color] [-bw <N>]
+  [-font name] [-vertical] [-e] [-b N] [-v|-vv]
 ```
 (see man page for details)
 <!-- ronn page has elements invalid for github markdown, don't link to it -->
@@ -35,8 +35,9 @@ git clone https://github.com/sagb/alttab.git
 cd alttab
 ./configure && sudo make install
 ```
-See [INSTALL.md](INSTALL.md) for details and [doc/wm-setup.md](doc/wm-setup.md)
-for window manager settings.
+See [INSTALL.md](INSTALL.md) for details, [doc/wm-setup.md](doc/wm-setup.md)
+for window manager settings,
+[doc/mobile.md](doc/mobile.md) for usage on mobile devices.
 
 Usually it should run fully functional without any argument: `alttab`.  
 

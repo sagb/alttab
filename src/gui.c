@@ -1,7 +1,7 @@
 /*
 Draw and interface with our switcher window.
 
-Copyright 2017-2021 Alexander Kulak.
+Copyright 2017-2023 Alexander Kulak.
 This file is part of alttab program.
 
 alttab is free software: you can redistribute it and/or modify
@@ -74,11 +74,11 @@ static GC create_gc(int type)
     switch (type) {
     case 1:
         XSetForeground(dpy, gc, g.color[COLBG].xcolor.pixel);
-        XSetBackground(dpy, gc, g.color[COLFG].xcolor.pixel);
+        XSetBackground(dpy, gc, g.color[COLINACT].xcolor.pixel);
         XSetLineAttributes(dpy, gc, FRAME_W, line_style, cap_style, join_style);
         break;
     case 0:
-        XSetForeground(dpy, gc, g.color[COLFG].xcolor.pixel);
+        XSetForeground(dpy, gc, g.color[COLINACT].xcolor.pixel);
         XSetBackground(dpy, gc, g.color[COLBG].xcolor.pixel);
         XSetLineAttributes(dpy, gc, 1, line_style, cap_style, join_style);
         break;
@@ -160,6 +160,9 @@ static int pointedTile(int x, int y)
 //
 static void prepareTile(WindowInfo * wi)
 {
+    XGlyphInfo ext;
+    int bottW = 0, bottH = 0, bottX = 0, bottY = 0;
+
     wi->tile = XCreatePixmap(dpy, root, tileW, tileH, XDEPTH);
     if (!wi->tile)
         die("can't create tile");
@@ -173,6 +176,8 @@ static void prepareTile(WindowInfo * wi)
     // in my simple environments (as reported by xwininfo)
     //
     // place icons
+    if (g.option_iconSrc == ISRC_NONE)
+        goto endIcon;
     if (wi->icon_drawable) {
         if (wi->icon_w == iconW && wi->icon_h == iconH) {
             // direct copy
@@ -229,19 +234,48 @@ static void prepareTile(WindowInfo * wi)
         }
     }
  endIcon:
-    // draw labels
+
+    // draw bottom line if there at least the same
+    // space for main label as for bottom line
+    if (wi->bottom_line[0] == '\0')
+        goto endBottomLine;
+    XftTextExtentsUtf8(dpy, fontLabel, 
+            (unsigned char *)(wi->bottom_line), strlen(wi->bottom_line), &ext);
+    msg(1, "bottom line of size %dx%d requested\n", ext.width, ext.height);
+    if ((!g.option_vertical && (tileH - iconH - 5) / 2 >= ext.height + 1) 
+     || ( g.option_vertical && (tileW - iconW - 5) / 2 >= ext.width + 5)) {
+        bottW = ext.width;
+        bottH = ext.height;
+        bottX = tileW - bottW - 5; // 5 to avoid overlap with frame
+        bottY = tileH - bottH - 1;
+        int dr = drawSingleLine(wi->tile, fontLabel,
+                 &(g.color[COLFG].xftcolor),
+                 wi->bottom_line,
+                 bottX, bottY, bottW, bottH);
+        if (dr != 1) {
+            msg(-1, "can't draw bottom line '%s'\n", wi->bottom_line);
+        }
+        msg(1, "bottom line '%s' drawn at %dx%d+%d+%d\n",
+                wi->bottom_line, bottW, bottH, bottX, bottY);
+    } else {
+        msg(1, "bottom line skipped\n");
+    }
+endBottomLine:
+
+    // draw label
     if (wi->name && fontLabel) {
         int x, y, w, h;
         if (g.option_vertical) {
             x = iconW + 5;
             y = FRAME_W; // avoids overlapping with frames
-            w = tileW - iconW - 5;
+            w = tileW - iconW - 5 - bottW;
+            if (bottW > 0) w = w - 5 - 5; // avoids label too close to bottom line
             h = tileH - FRAME_W;
         } else {
             x = 0;
             y = iconH + 5;
             w = tileW;
-            h = tileH - iconH - 5;
+            h = tileH - iconH - 5 - bottH;
         }
         int dr = drawMultiLine(wi->tile, fontLabel,
                                &(g.color[COLFG].xftcolor),
@@ -254,39 +288,60 @@ static void prepareTile(WindowInfo * wi)
 }                               // prepareTile
 
 //
-// grab auxiliary keys: arrows
+// grab auxiliary keys: arrows, cancel, kill
 // rely on pre-calculated g.ignored_modmask and g.option_modMask
 //
 static int grabKeysAtUiShow(bool grabUngrab)
 {
     char *grabhint =
         "Error while (un)grabbing key 0x%x with mask 0x%x/0x%x.\n";
-    if (g.option_prevCode != 0) {
-        if (!changeKeygrab
-            (root, grabUngrab, g.option_prevCode, g.option_modMask,
-             g.ignored_modmask)) {
-            msg(0, grabhint, g.option_prevCode, g.option_modMask, g.ignored_modmask);
-            return 0;
-        }
-    }
-    if (g.option_nextCode != 0) {
-        if (!changeKeygrab
-            (root, grabUngrab, g.option_nextCode, g.option_modMask,
-             g.ignored_modmask)) {
-            msg(0, grabhint, g.option_nextCode, g.option_modMask, g.ignored_modmask);
-            return 0;
-        }
-    }
-    if (g.option_cancelCode != 0) {
-        if (!changeKeygrab
-            (root, grabUngrab, g.option_cancelCode, g.option_modMask,
-             g.ignored_modmask)) {
-            msg(0, grabhint, g.option_cancelCode, g.option_modMask, g.ignored_modmask);
-            return 0;
+#define nkeys 4
+    KeyCode key[nkeys] = {
+        g.option_prevCode,
+        g.option_nextCode,
+        g.option_cancelCode,
+        g.option_killCode
+    };
+    int k;
+
+    for (k = 0; k < nkeys; k++) {
+        if (key[k] != 0) {
+            if (!changeKeygrab
+                (root, grabUngrab, key[k], g.option_modMask,
+                 g.ignored_modmask)) {
+                msg(0, grabhint, key[k], g.option_modMask, g.ignored_modmask);
+                return 0;
+            }
         }
     }
     return 1;
 }
+
+//
+// copy single tile to canvas
+//
+static int placeSingleTile (int j) {
+    int dest_x, dest_y, r;
+
+    if (! g.winlist[j].tile)
+        return -1;
+    msg(1, "copying tile %d to canvas\n", j);
+    //XSync (dpy, false);
+    if (g.option_vertical) {
+        dest_x = FRAME_W;
+        dest_y = j * (tileH + FRAME_W) + FRAME_W;
+    } else {
+        dest_x = j * (tileW + FRAME_W) + FRAME_W;
+        dest_y = FRAME_W;
+    }
+    r = XCopyArea(dpy, g.winlist[j].tile, uiwin,
+            g.gcDirect, 0, 0, tileW, tileH,   // src
+            dest_x, dest_y);    // dst
+    //XSync (dpy, false);
+    msg(1, "XCopyArea returned %d\n", r);
+    return r;
+}
+
 
 // PUBLIC
 
@@ -462,8 +517,12 @@ int uiShow(bool direction)
 // calculate dimensions
     tileW = g.option_tileW;
     tileH = g.option_tileH;
-    iconW = g.option_iconW;
-    iconH = g.option_iconH;
+    if (g.option_iconSrc != ISRC_NONE) {
+        iconW = g.option_iconW;
+        iconH = g.option_iconH;
+    } else {
+        iconW = iconH = 0;
+    }
     float rt = 1.0;
 // for subsequent calculation of width(s), use 'avail_w'/'avail_h'
 // instead of g.vp.w, because they don't match for POS_SPECIFIC
@@ -672,23 +731,7 @@ void uiExpose()
 // icons
     int j;
     for (j = 0; j < g.maxNdx; j++) {
-        if (g.winlist[j].tile) {
-            msg(1, "copying tile %d to canvas\n", j);
-            //XSync (dpy, false);
-            int dest_x, dest_y;
-            if (g.option_vertical) {
-                dest_x = FRAME_W;
-                dest_y = j * (tileH + FRAME_W) + FRAME_W;
-            } else {
-                dest_x = j * (tileW + FRAME_W) + FRAME_W;
-                dest_y = FRAME_W;
-            }
-            int r = XCopyArea(dpy, g.winlist[j].tile, uiwin,
-                              g.gcDirect, 0, 0, tileW, tileH,   // src
-                              dest_x, dest_y);    // dst
-            //XSync (dpy, false);
-            msg(1, "XCopyArea returned %d\n", r);
-        }
+        placeSingleTile(j);
     }
 // frame
     framesRedraw();
@@ -761,6 +804,37 @@ int uiPrevWindow()
         selNdx = g.maxNdx - 1;
     msg(0, "item %d\n", selNdx);
     framesRedraw();
+    return 1;
+}
+
+//
+// kill X client of current window
+//
+int uiKillWindow()
+{
+    Window w;
+    char *n;
+
+    if (!uiwin)
+        return 0;
+    WindowInfo wi = g.winlist[selNdx];
+    w = wi.id;
+    n = wi.name;
+    msg(0, "killing client of window %d, %s\n", w, n);
+    if (XKillClient(dpy, w) == BadValue) {
+        msg(-1, "can't kill X client\n");
+        return 0;
+    }
+    msg(1, "blanking tile %d\n", selNdx);
+    if (! XFillRectangle(dpy, wi.tile, g.gcReverse, 0, 0,
+                            tileW, tileH)) {
+        msg(-1, "can't fill tile\n");
+        return 0;
+    }
+    if (! placeSingleTile(selNdx)) {
+        msg(-1, "can't copy tile to canvas\n");
+        return 0;
+    }
     return 1;
 }
 

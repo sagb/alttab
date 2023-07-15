@@ -1,7 +1,7 @@
 /*
 Global includes.
 
-Copyright 2017-2021 Alexander Kulak.
+Copyright 2017-2023 Alexander Kulak.
 This file is part of alttab program.
 
 alttab is free software: you can redistribute it and/or modify
@@ -46,7 +46,8 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 #define COLFG       1
 #define COLFRAME    2
 #define COLBORDER   3
-#define NCOLORS     4
+#define COLINACT    4
+#define NCOLORS     5
 #define DEFCOLBG    "black"
 #define DEFCOLFG    "grey"
 #define DEFCOLFRAME "#a0abab"
@@ -61,6 +62,7 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 #define DEFPREVKEYKS    XK_VoidSymbol
 #define DEFNEXTKEYKS    XK_VoidSymbol
 #define DEFCANCELKS XK_Escape
+#define DEFKILLKS   XK_k
 
 #include "icon.h"
 
@@ -79,6 +81,7 @@ typedef struct {
     Window id;
     int wm_id;                  // wm's internal window id, when WM has it (ratpoison)
     char name[MAXNAMESZ];
+    char bottom_line[MAXNAMESZ];
     int reclevel;
     Pixmap icon_drawable;       // Window or Pixmap
     Pixmap icon_mask;
@@ -143,7 +146,8 @@ typedef struct {
 #define DESK_ALL        1
 #define DESK_NOSPECIAL  2
 #define DESK_NOCURRENT  3
-#define DESK_MAX        3
+#define DESK_SPECIAL    4
+#define DESK_MAX        4
 #define DESK_DEFAULT    DESK_CURRENT
     int option_desktop;
 #define SCR_MIN        0
@@ -179,14 +183,20 @@ typedef struct {
 #define ISRC_FALLBACK   1
 #define ISRC_SIZE       2
 #define ISRC_FILES      3
-#define ISRC_MAX        3
+#define ISRC_NONE       4
+#define ISRC_MAX        4
 #define ISRC_DEFAULT    ISRC_SIZE
     int option_iconSrc;
     char *option_theme;
     unsigned int option_modMask, option_backMask;
     KeyCode option_modCode, option_keyCode;
     KeyCode option_prevCode, option_nextCode;
-    KeyCode option_cancelCode;
+    KeyCode option_cancelCode, option_killCode;
+#define BL_MIN          0
+#define BL_NONE         0
+#define BL_DESKTOP      1
+#define BL_MAX          1
+    int option_bottom_line;
     Color color[NCOLORS];
     GC gcDirect, gcReverse, gcFrame;    // used in both gui.c and win.c
     unsigned int ignored_modmask;
@@ -194,6 +204,7 @@ typedef struct {
     EwmhFeatures ewmh;          // guessed by ewmh_detectFeatures
     Atom naw;                   // _NET_ACTIVE_WINDOW
 //    SwitchMoment last; // for detecting false focus events from WM
+    bool option_keep_ui;
 } Globals;
 
 // gui
@@ -203,6 +214,7 @@ void uiExpose();
 int uiHide();
 int uiNextWindow();
 int uiPrevWindow();
+int uiKillWindow();
 int uiSelectWindow(int ndx);
 void uiButtonEvent(XButtonEvent e);
 Window getUiwin();

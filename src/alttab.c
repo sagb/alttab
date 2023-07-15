@@ -1,7 +1,7 @@
 /*
 Parsing options/resources, top-level keygrab functions and main().
 
-Copyright 2017-2021 Alexander Kulak.
+Copyright 2017-2023 Alexander Kulak.
 This file is part of alttab program.
 
 alttab is free software: you can redistribute it and/or modify
@@ -50,27 +50,33 @@ static void helpexit()
     msg(-1, "the task switcher, v%s\n\
 Options:\n\
     -w N      window manager: 0=no, 1=ewmh-compatible, 2=ratpoison, 3=old fashion\n\
-    -d N      desktop: 0=current 1=all, 2=all but special, 3=all but current\n\
+    -d N      desktop: 0=current 1=all, 2=all but special, 3=all but current, 4=special\n\
    -sc N      screen: 0=current 1=all\n\
    -kk str    keysym of main key\n\
    -mk str    keysym of main modifier\n\
    -bk str    keysym of backscroll modifier\n\
    -pk str    keysym of 'prev' key\n\
    -nk str    keysym of 'next' key\n\
+   -ck str    keysym of 'cancel' key\n\
+   -dk str    keysym of 'kill' key\n\
    -mm N      (obsoleted) main modifier mask\n\
    -bm N      (obsoleted) backward scroll modifier mask\n\
     -t NxM    tile geometry\n\
     -i NxM    icon geometry\n\
    -vp str    switcher viewport: focus, pointer, total, WxH+X+Y\n\
     -p str    switcher position: center, none, +X+Y\n\
-    -s N      icon source: 0=X11 only, 1=fallback to files, 2=best size, 3=files only\n\
+    -s N      icon source: 0=X11, 1=fallback to files, 2=best size, 3=files only, 4=no\n\
 -theme name   icon theme\n\
    -bg color  background color\n\
    -fg color  foreground color\n\
 -frame color  active frame color\n\
+-inact color  inactive frame color\n\
    -bc color  extra border color\n\
    -bw N      extra border width\n\
  -font name   font name in the form xft:fontconfig_pattern\n\
+ -vertical    verticat layout\n\
+    -e        keep switcher after keys release\n\
+    -b N      bottom line: 0=no, 1=desktop\n\
   -v|-vv      verbose\n\
     -h        help\n\
 See man alttab for details.\n", PACKAGE_VERSION);
@@ -89,7 +95,7 @@ static int use_args_and_xrm(int *argc, char **argv)
     char *errmsg;
     int ksi;
     KeyCode BC;
-    unsigned int wmindex, dsindex, scindex, isrc;
+    unsigned int wmindex, dsindex, scindex, isrc, bindex;
     char *gtile, *gicon, *gview, *gpos;
     int x, y;
     unsigned int w, h, bw;
@@ -114,6 +120,7 @@ static int use_args_and_xrm(int *argc, char **argv)
         {"-pk", "*prevkey.keysym", XrmoptionSepArg, NULL},
         {"-nk", "*nextkey.keysym", XrmoptionSepArg, NULL},
         {"-ck", "*cancelkey.keysym", XrmoptionSepArg, NULL},
+        {"-dk", "*killkey.keysym", XrmoptionSepArg, NULL},
         {"-t", "*tile.geometry", XrmoptionSepArg, NULL},
         {"-i", "*icon.geometry", XrmoptionSepArg, NULL},
         {"-vp", "*viewport", XrmoptionSepArg, NULL},
@@ -123,10 +130,13 @@ static int use_args_and_xrm(int *argc, char **argv)
         {"-bg", "*background", XrmoptionSepArg, NULL},
         {"-fg", "*foreground", XrmoptionSepArg, NULL},
         {"-frame", "*framecolor", XrmoptionSepArg, NULL},
+        {"-inact", "*inactcolor", XrmoptionSepArg, NULL},
         {"-bc", "*bordercolor", XrmoptionSepArg, NULL},
         {"-bw", "*borderwidth", XrmoptionSepArg, NULL},
         {"-font", "*font", XrmoptionSepArg, NULL},
-        {"-vertical", "*vertical", XrmoptionIsArg, NULL}
+        {"-vertical", "*vertical", XrmoptionIsArg, NULL},
+        {"-e", "*keep", XrmoptionIsArg, NULL},
+        {"-b", "*bottomline", XrmoptionSepArg, NULL}
     };
     const char *inv = "invalid %s, use -h for help\n";
     const char *rmb = "can't figure out modmask from keycode 0x%x\n";
@@ -251,6 +261,7 @@ static int use_args_and_xrm(int *argc, char **argv)
 #define  prevC  g.option_prevCode
 #define  nextC  g.option_nextCode
 #define  cancelC  g.option_cancelCode
+#define  killC  g.option_killCode
 #define  GMM  g.option_modMask
 #define  GBM  g.option_backMask
 
@@ -278,6 +289,11 @@ static int use_args_and_xrm(int *argc, char **argv)
     if (ksi == -1)
         die("%s\n", errmsg);
     cancelC = ksi != 0 ? ksi : XKeysymToKeycode(dpy, DEFCANCELKS);
+
+    ksi = ksym_option_to_keycode(&db, XRMAPPNAME, "killkey", &errmsg);
+    if (ksi == -1)
+        die("%s\n", errmsg);
+    killC = ksi != 0 ? ksi : XKeysymToKeycode(dpy, DEFKILLKS);
 
     switch (xresource_load_int(&db, XRMAPPNAME, "modifier.mask", &(GMM))) {
     case 1:
@@ -316,6 +332,8 @@ static int use_args_and_xrm(int *argc, char **argv)
 
     msg(0, "modMask %d, backMask %d, modCode %d, keyCode %d\n",
         GMM, GBM, MC, KC);
+    msg(0, "cancelCode %d, killCode %d\n",
+        cancelC, killC);
 
     g.option_tileW = DEFTILEW;
     g.option_tileH = DEFTILEH;
@@ -331,6 +349,8 @@ static int use_args_and_xrm(int *argc, char **argv)
         else
             die(inv, "tile height");
     }
+    if (g.option_tileW == 0 || g.option_tileH == 0)
+        die(inv, "tile width or height: can't be zero");
 
     g.option_iconW = DEFICONW;
     g.option_iconH = DEFICONH;
@@ -346,6 +366,8 @@ static int use_args_and_xrm(int *argc, char **argv)
         else
             die(inv, "icon height");
     }
+    if (g.option_iconW == 0 || g.option_iconH == 0)
+        die(inv, "icon width or height: can't be zero");
 
     msg(0, "%dx%d tile, %dx%d icon\n",
         g.option_tileW, g.option_tileH, g.option_iconW, g.option_iconH);
@@ -444,6 +466,8 @@ static int use_args_and_xrm(int *argc, char **argv)
     g.color[COLFG].name = s ? s : DEFCOLFG;
     s = xresource_load_string(&db, XRMAPPNAME, "framecolor");
     g.color[COLFRAME].name = s ? s : DEFCOLFRAME;
+    s = xresource_load_string(&db, XRMAPPNAME, "inactcolor");
+    g.color[COLINACT].name = s ? s : g.color[COLFG].name;
     s = xresource_load_string(&db, XRMAPPNAME, "bordercolor");
     g.color[COLBORDER].name = s ? s : DEFCOLBORDER;
 
@@ -470,6 +494,29 @@ static int use_args_and_xrm(int *argc, char **argv)
 // in raw X this returns too much windows, "1" is probably sufficient
 // no need for an option
     g.option_max_reclevel = (g.option_wm == WM_NO) ? 1 : -1;
+
+    s = xresource_load_string(&db, XRMAPPNAME, "keep");
+    g.option_keep_ui = (s != NULL);
+    msg(0, "keep_ui: %d\n", g.option_keep_ui);
+
+    switch (xresource_load_int(&db, XRMAPPNAME, "bottomline", &bindex)) {
+    case 1:
+        if (bindex >= BL_MIN && bindex <= BL_MAX)
+            g.option_bottom_line = bindex;
+        else
+            die(inv, "bottomline argument range");
+        break;
+    case 0:
+        g.option_bottom_line =
+            (g.option_desktop == DESK_CURRENT 
+             || g.option_desktop == DESK_SPECIAL) ?
+            BL_NONE : BL_DESKTOP;
+        break;
+    case -1:
+        die(inv, "bottomline argument");
+        break;
+    }
+    msg(0, "bottomline: %d\n", g.option_bottom_line);
 
     return 1;
 }
@@ -514,6 +561,13 @@ static int isPrevNextKey(unsigned int keycode)
     return 0;
 }
 
+// see #97
+#define CHECK_97 \
+    XQueryKeymap(dpy, keys_pressed); \
+    if (!(keys_pressed[octet] & kmask)) { \
+        msg(1, "Wrong modifier, skip event\n"); \
+        continue; \
+    }
 
 int main(int argc, char **argv)
 {
@@ -552,7 +606,7 @@ int main(int argc, char **argv)
     while (true) {
         memset(&(ev.xkey), 0, sizeof(ev.xkey));
 
-        if (g.uiShowHasRun) {
+        if (g.uiShowHasRun && ! g.option_keep_ui) {
             // poll: lag and consume cpu, but necessary because of bug #1 and #2
             XQueryKeymap(dpy, keys_pressed);
             if (!(keys_pressed[octet] & kmask)) {   // Alt released
@@ -574,12 +628,7 @@ int main(int argc, char **argv)
                 ev.xkey.window, ev.xkey.state, ev.xkey.keycode);
             if (ev.xkey.state & g.option_modMask) {  // alt
                 if (ev.xkey.keycode == g.option_keyCode) {  // tab
-                    // additional check, see #97
-                    XQueryKeymap(dpy, keys_pressed);
-                    if (!(keys_pressed[octet] & kmask)) {
-                        msg(1, "Wrong modifier, skip event\n");
-                        continue;
-                    }
+                    CHECK_97;
                     if (!g.uiShowHasRun) {
                         uiShow((ev.xkey.state & g.option_backMask));
                     } else {
@@ -590,13 +639,11 @@ int main(int argc, char **argv)
                         }
                     }
                 } else if (ev.xkey.keycode == g.option_cancelCode) { // escape
-                    // additional check, see #97
-                    XQueryKeymap(dpy, keys_pressed);
-                    if (!(keys_pressed[octet] & kmask)) {
-                        msg(1, "Wrong modifier, skip event\n");
-                        continue;
-                    }
+                    CHECK_97;
                     uiSelectWindow(0);
+                } else if (ev.xkey.keycode == g.option_killCode) { // k
+                    CHECK_97;
+                    uiKillWindow();
                 } else {  // non-tab
                     switch (isPrevNextKey(ev.xkey.keycode)) {
                     case 1:
@@ -616,6 +663,9 @@ int main(int argc, char **argv)
             // interested only in "final" release
             if (!((ev.xkey.state & g.option_modMask)
                   && ev.xkey.keycode == g.option_modCode && g.uiShowHasRun)) {
+                break;
+            }
+            if (g.option_keep_ui) {
                 break;
             }
             uiHide();

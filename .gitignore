@@ -9,6 +9,7 @@ nohup.out
 src/.deps
 test/.deps
 src/tags
+tags
 config.h
 *~
 *.swo
