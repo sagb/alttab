@@ -5,7 +5,7 @@ Last-Update: 2022-08-11
 
 --- a/doc/alttab.1.ronn
 +++ b/doc/alttab.1.ronn
-@@ -175,7 +175,7 @@
+@@ -183,7 +183,7 @@
  
        <focus>: in multihead configuration: the monitor which shows
        largest part of currently focused window. If this part is shared
@@ -27,7 +27,7 @@ Last-Update: 2022-08-11
  Applications -> Settings -> Session and Startup -> Application Autostart -> Add
 --- a/src/alttab.c
 +++ b/src/alttab.c
-@@ -78,7 +78,7 @@
+@@ -84,7 +84,7 @@
  }
  
  //
@@ -38,7 +38,7 @@ Last-Update: 2022-08-11
  //
 --- a/src/gui.c
 +++ b/src/gui.c
-@@ -390,7 +390,7 @@
+@@ -445,7 +445,7 @@
          scrdim.w = DisplayWidth(dpy, scr);
          scrdim.h = DisplayHeight(dpy, scr);
      }
@@ -60,7 +60,7 @@ Last-Update: 2022-08-11
      for (o = 0; o < no; o++) {
 --- a/src/win.c
 +++ b/src/win.c
-@@ -652,10 +652,10 @@
+@@ -669,10 +669,10 @@
          if (usec_delta < 5E5) {  // half a second
              return;
          }

@@ -5,7 +5,7 @@ Last-Update: 2022-08-11
 
 --- a/src/icon.c
 +++ b/src/icon.c
-@@ -493,7 +493,7 @@
+@@ -495,7 +495,7 @@
      char appl[MAXAPPLEN];
      int l;
  
@@ -25,7 +25,16 @@ Last-Update: 2022-08-11
          return;                 // safety
      msg(0, "winlist:\n");
      for (wi = 0; wi < g.maxNdx; wi++) {
-@@ -707,12 +707,12 @@
+@@ -489,7 +489,7 @@
+     switch(g.option_bottom_line) {
+         case BL_DESKTOP:
+             if (desktop != DESKTOP_UNKNOWN)
+-                snprintf(WI.bottom_line, MAXNAMESZ, "%ld", desktop);
++                snprintf(WI.bottom_line, MAXNAMESZ, "%lu", desktop);
+             else
+                 strncpy(WI.bottom_line, "?", 2);
+             break;
+@@ -724,16 +724,16 @@
              window_desktop, current_desktop);
          return true;
      }
@@ -38,6 +47,11 @@ Last-Update: 2022-08-11
 -        (window_desktop == current_desktop || window_desktop == -1)) {
 +        (window_desktop == current_desktop || window_desktop == (unsigned long)-1)) {
          msg(1, "window on current or -1 desktop, skipped\n");
+         return true;
+     }
+-    if (g.option_desktop == DESK_SPECIAL && window_desktop != -1) {
++    if (g.option_desktop == DESK_SPECIAL && window_desktop != (unsigned long)-1) {
+         msg(1, "window not on -1 desktop, skipped\n");
          return true;
      }
 --- a/src/autil.c
@@ -72,7 +86,7 @@ Last-Update: 2022-08-11
      evr = ewmh_send_wm_evt(root, "_NET_CURRENT_DESKTOP", edata);
 --- a/src/gui.c
 +++ b/src/gui.c
-@@ -312,7 +312,7 @@
+@@ -367,7 +367,7 @@
          if (g.color[p].name[0]) {
              if (strncmp(g.color[p].name, "_rnd_", 5) == 0) {
                  // replace in-place: 8 chars is sufficient for #rrggbb
