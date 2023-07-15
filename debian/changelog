@@ -1,12 +1,11 @@
-alttab (1.7.0-1) UNRELEASED; urgency=medium
+alttab (1.7.1-1) UNRELEASED; urgency=medium
 
   * Declare compliance with Policy 4.6.2 with no changes.
   * Add the year 2023 to my debian/* copyright notice
   * Drop the obsolete aewm package from the Enhances list.
   * New upstream release:
-    - add two new minor fixes to the cppcheck patch
-    - refresh the window-name patch
-    - refresh the line numbers in the typos patch
+    - drop the typos and window-name patches, integrated upstream
+    - add three new minor fixes to the cppcheck patch
     - update the upstream copyright years
 
  -- Peter Pentchev <roam@debian.org>  Sun, 11 Jun 2023 02:54:56 +0300

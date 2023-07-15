@@ -16,7 +16,7 @@ Last-Update: 2022-08-11
  
 --- a/src/win.c
 +++ b/src/win.c
-@@ -83,7 +83,7 @@
+@@ -86,7 +86,7 @@
      int wi, si;
      PermanentWindowInfo *s;
  
@@ -25,7 +25,7 @@ Last-Update: 2022-08-11
          return;                 // safety
      msg(0, "winlist:\n");
      for (wi = 0; wi < g.maxNdx; wi++) {
-@@ -489,7 +489,7 @@
+@@ -497,7 +497,7 @@
      switch(g.option_bottom_line) {
          case BL_DESKTOP:
              if (desktop != DESKTOP_UNKNOWN)
@@ -34,7 +34,16 @@ Last-Update: 2022-08-11
              else
                  strncpy(WI.bottom_line, "?", 2);
              break;
-@@ -724,16 +724,16 @@
+@@ -508,7 +508,7 @@
+                 strncpy(WI.bottom_line, "[no pid]", 9);
+                 break;
+             }
+-            snprintf(procd, 32, "/proc/%ld", *pid);
++            snprintf(procd, 32, "/proc/%lu", *pid);
+             sr = stat(procd, &st);
+             if (sr == -1) {
+                 strncpy(WI.bottom_line, "[no /proc]", 11);
+@@ -752,16 +752,16 @@
              window_desktop, current_desktop);
          return true;
      }
