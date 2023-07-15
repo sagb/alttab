@@ -1,4 +1,4 @@
-alttab (1.7.1-1) UNRELEASED; urgency=medium
+alttab (1.7.1-1) unstable; urgency=medium
 
   * Declare compliance with Policy 4.6.2 with no changes.
   * Add the year 2023 to my debian/* copyright notice
@@ -9,7 +9,7 @@ alttab (1.7.1-1) UNRELEASED; urgency=medium
     - update the upstream copyright years
   * Use dh-package-notes to record ELF package metadata.
 
- -- Peter Pentchev <roam@debian.org>  Sun, 11 Jun 2023 02:54:56 +0300
+ -- Peter Pentchev <roam@debian.org>  Sat, 15 Jul 2023 18:30:09 +0300
 
 alttab (1.6.1-1) unstable; urgency=medium
 
