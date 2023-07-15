@@ -319,6 +319,8 @@ bool ewmh_skipWindowInTaskbar(Window w)
     int i;
     bool ret = false;
 
+    if (g.option_no_skip_taskbar)
+        return false;
     state =
         (Atom *) get_x_property(w, XA_ATOM, "_NET_WM_STATE", &state_propsize);
     if (state == NULL || state_propsize == 0) {

@@ -74,7 +74,7 @@ xfce
 ====
 
 ### keyboard shortcut
-Applications -> Settings -> Settings Editor (not Manager) -> Channel: xfce4-keyboard-shortcuts -> in rigth pane disable all entries of `cycle_windows_key` or `cycle_reverse_windows_key`.
+Applications -> Settings -> Settings Editor (not Manager) -> Channel: xfce4-keyboard-shortcuts -> in right pane disable all entries of `cycle_windows_key` or `cycle_reverse_windows_key`.
 
 ### startup
 Applications -> Settings -> Session and Startup -> Application Autostart -> Add

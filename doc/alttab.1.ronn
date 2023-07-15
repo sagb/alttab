@@ -16,7 +16,7 @@ alttab(1) -- the task switcher
 
 ## SYNOPSIS
 
-`alttab` [`-w` <N>] [`-d` <N>] [`-sc` <N>] [`-mk` <str>] [`-kk` <str>] [`-bk` <str>] [`-pk` <str>] [`-nk` <str>] [`-ck` <str>] [`-dk` <str>] [`-mm` <N>] [`-bm` <N>] [`-t` <NxM>] [`-i` <NxM>] [`-vp` <str>] [`-p` <str>] [`-s` <N>] [`-theme` <name>] [`-bg` <color>] [`-fg` <color>] [`-frame` <color>] [`-inact` <color>] [`-bc` <color>] [`-bw` <N>] [`-font` <name>] [`-vertical`] [`-e`] [`-b` <N>] [`-v`\|`-vv`]
+`alttab` [`-w` <N>] [`-d` <N>] [`-sc` <N>] [`-mk` <str>] [`-kk` <str>] [`-bk` <str>] [`-pk` <str>] [`-nk` <str>] [`-ck` <str>] [`-dk` <str>] [`-mm` <N>] [`-bm` <N>] [`-t` <NxM>] [`-i` <NxM>] [`-vp` <str>] [`-p` <str>] [`-s` <N>] [`-theme` <name>] [`-bg` <color>] [`-fg` <color>] [`-frame` <color>] [`-inact` <color>] [`-bc` <color>] [`-bw` <N>] [`-font` <name>] [`-vertical`] [`-e`] [`-b` <N>] [`-ns`] [`-v`\|`-vv`]
 
 ## DESCRIPTION
 
@@ -57,7 +57,7 @@ Most command line options have corresponding X resource, see doc/alttab.ad for e
 
       <2>: Ratpoison.
 
-      Alttab uses ratpoison own remote control capability. Additionally, alttab registers itself in its "unmanaged list" automatically.
+      Alttab uses ratpoison own remote control capability. Also, alttab registers itself in its "unmanaged list" automatically.
 
       <3>: Ancient WM.
 
@@ -104,7 +104,7 @@ Most command line options have corresponding X resource, see doc/alttab.ad for e
 
   * `-mk` <str>:
     resource: alttab.modifier.keysym  
-    default: Alt_L
+    default: Alt_L (i.e. Left Alt)
 
     Keysym of main modifier. String or number accepted.
     Suitable examples: Control_L, Super_L.
@@ -183,7 +183,7 @@ Most command line options have corresponding X resource, see doc/alttab.ad for e
 
       <focus>: in multihead configuration: the monitor which shows
       largest part of currently focused window. If this part is shared
-      with other monitors, then the smallest of these monitors is choosen.
+      with other monitors, then the smallest of these monitors is chosen.
       In single head configuration: the geometry of default root window.
 
       <pointer>: the monitor which has mouse pointer, otherwise
@@ -322,11 +322,19 @@ Your Xresources database probably already has \*background, \*foreground or \*fo
     default: <0> in single-desktop mode, <1> otherwise
 
     Content of auxiliary line at the bottom of each tile.
-    <NUMBER> must be 0 or 1:
+    <NUMBER> must be between 0 and 2:
 
       <0>: Empty.
 
       <1>: Desktop to which the window belongs.
+
+      <2>: User name. Requires _NET_WM_PID freedesktop property and /proc file system.
+
+  * `-ns`:
+    resource: alttab.noskiptaskbar  
+    default: no
+
+    Ignore application request of not including a window on a taskbar.
 
   * `-v`, `-vv`:
     resource: no  

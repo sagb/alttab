@@ -17,7 +17,7 @@ or standalone X11 session.
   [-pk <str>] [-nk <str>] [-ck <str>] [-dk <str>] [-mm <N>] [-bm <N>]
   [-t NxM] [-i NxM] [-vp str] [-p str] [-s N] [-theme name] [-bg color]
   [-fg color] [-frame color] [-inact color] [-bc color] [-bw <N>]
-  [-font name] [-vertical] [-e] [-b N] [-v|-vv]
+  [-font name] [-vertical] [-e] [-b N] [-ns] [-v|-vv]
 ```
 (see man page for details)
 <!-- ronn page has elements invalid for github markdown, don't link to it -->
@@ -46,5 +46,5 @@ Usually it should run fully functional without any argument: `alttab`.
 [no-wm](https://github.com/patrickhaller/no-wm): use X11 without a window manager  
    
    
-alttab (C) Alexander Kulak &lt;sa-dev AT odd POINT systems&gt; 2016-2021
+alttab (C) Alexander Kulak &lt;sa-dev AT odd POINT systems&gt; 2016-2023
 
