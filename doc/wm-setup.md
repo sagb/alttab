@@ -51,7 +51,7 @@ ctwm         | 1 (auto, see issue #39)     | doesn't grab                   | ?
 lwm          | 1 (auto, issue #40)         | doesn't grab                   | ?
 sawfish      | 1 (auto)                    | doesn't grab                   | ?
 awesome      | 1 (auto)                    | doesn't grab                   | ?
-bspwm        | 1 (auto, see issue #109)    | doesn't grab                   | `alttab &` in ~/.config/bspwm/bspwmrc
+bspwm        | 1 (auto, see #109, #152)    | doesn't grab                   | `alttab &` in ~/.config/bspwm/bspwmrc
 
 
 xmonad
