@@ -35,6 +35,8 @@ git clone https://github.com/sagb/alttab.git
 cd alttab
 ./configure && sudo make install
 ```
+Also availiable on Debian, etc.
+
 See [INSTALL.md](INSTALL.md) for details, [doc/wm-setup.md](doc/wm-setup.md)
 for window manager settings,
 [doc/mobile.md](doc/mobile.md) for usage on mobile devices.
