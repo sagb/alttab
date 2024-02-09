@@ -27,7 +27,7 @@ no WM        | 0 (set manually)            | doesn't grab                   | `a
 ratpoison    | 2 (auto)                    | doesn't grab                   | `exec alttab` in ~/.ratpoisonrc
 xmonad       | 1 (with plugin, see below)  | see "xmonad" section below     | 
 dwm          | 1 (auto, partial support)   | ?                              | ?
-i3           | 1 (auto)                    | doesn't grab                   | `exec_always alttab` in ~/.(config/)i3/config
+i3           | 1 (auto)                    | doesn't grab                   | `exec_always alttab` in ~/.config/i3/config
 evilwm       | 1 (auto)                    | ?                              | ?
 twm          | 3 (default)                 | doesn't grab                   | ?
 xfwm4/xfce   | 1 (auto)                    | see "xfce" section below       | 
