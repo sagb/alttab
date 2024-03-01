@@ -26,7 +26,7 @@ NUMTEST=3
 install_software()
 {
     packs="" ; progs=""
-    for pair in "cnee xnee" "Xvfb xvfb" "xeyes x11-apps" "xprop x11-utils" "ps procps" ; do
+    for pair in "xdotool xdotool" "Xvfb xvfb" "xeyes x11-apps" "xprop x11-utils" "ps procps" ; do
         prog=`echo $pair | cut -d \  -f 1`
         pack=`echo $pair | cut -d \  -f 2`
         if ! which "$prog" >/dev/null ; then
@@ -109,12 +109,13 @@ close_sample_windows()
 
 alttab_simple_cycle()
 {
-    cmd="fake-key-press key=Alt_L msec=2\n"
-    for c in `seq 1 20` ; do
-        cmd="${cmd}fake-key-press key=Tab msec=100\nfake-key-release key=Tab msec=2\n"
+    DISPLAY=:200
+    xdotool keydown Alt_L
+    for c in $(seq 1 20); do
+        sleep 0.1
+        xdotool key Tab
     done
-    cmd="${cmd}fake-key-release key=Alt_L msec=100"
-    echo "$cmd" | DISPLAY=:200 cnee --replay
+    xdotool keyup Alt_L
 }
 
 check_alttab()
