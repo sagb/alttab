@@ -98,7 +98,7 @@ Building from source
     git clone https://github.com/sagb/alttab.git && cd alttab
     ```
 
-3. Update autotools stuff. **Mandatory step for OpenBSD**.  
+3. Update autotools stuff - **mandatory step for OpenBSD**:
 
     ```
     ./bootstrap.sh -f
@@ -107,7 +107,7 @@ Building from source
 4. Build:
 
     ```
-    CPATH=/usr/local/include ./configure --mandir /usr/local/man/
+    CPATH=/usr/local/include ./configure --mandir /usr/local/man
     CPATH=/usr/local/include make
     make install
     makewhatis /usr/local/man  # update mandoc.db with alttab.1
