@@ -74,7 +74,7 @@ Building from source
     make check  # optional
     ```
 
-### In OpenBSD (as of November 2022 and OpenBSD 7.2 amd64):
+### In OpenBSD (as of OpenBSD 7.4 amd64):
 
 1. Install build dependencies.  
     `Xlib`, `Xft`, `Xrender`, `Xrandr` and `libxpm` come from [`xbase` file set](https://www.openbsd.org/faq/faq4.html#FilesNeeded)  
@@ -98,7 +98,7 @@ Building from source
     git clone https://github.com/sagb/alttab.git && cd alttab
     ```
 
-3. Update autotools stuff. Mandatory step.  
+3. Update autotools stuff - **mandatory step for OpenBSD**:
 
     ```
     ./bootstrap.sh -f
@@ -107,9 +107,10 @@ Building from source
 4. Build:
 
     ```
-    CPATH=/usr/local/include ./configure
+    CPATH=/usr/local/include ./configure --mandir /usr/local/man
     CPATH=/usr/local/include make
     make install
+    makewhatis /usr/local/man  # update mandoc.db with alttab.1
     make check  # optional
     ```
 
