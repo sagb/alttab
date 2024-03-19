@@ -87,6 +87,9 @@ typedef struct {
     Pixmap icon_mask;
     unsigned int icon_w, icon_h;
     bool icon_allocated;        // we must free icon, because we created it (placeholder or depth conversion)
+#ifdef ICON_DEBUG
+    char icon_src[MAXNAMESZ];
+#endif
     Pixmap tile;                // ready to display. w/h are all equal and defined in gui.c
 // this constant can't be 0, 1, -1, MAXINT,
 // because WMs set it to these values incoherently

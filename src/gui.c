@@ -511,6 +511,9 @@ int uiShow(bool direction)
                 g.winlist[i].id, g.winlist[i].reclevel,
                 g.winlist[i].icon_drawable, g.winlist[i].icon_w,
                 g.winlist[i].icon_h, g.winlist[i].name);
+#ifdef ICON_DEBUG
+            msg(0, "   %s\n", g.winlist[i].icon_src);
+#endif
         }
     }
 // have winlist, now back to uiwin stuff

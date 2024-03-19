@@ -265,6 +265,9 @@ int addIconFromProperty(WindowInfo * wi)
     wi->icon_allocated = true;
     wi->icon_w = best_w;
     wi->icon_h = best_h;
+#ifdef ICON_DEBUG
+    snprintf(wi->icon_src, MAXNAMESZ, "from %s", NWI);
+#endif
     XFree(img);
     free(image32);
     free(pro);
@@ -305,13 +308,15 @@ int addIconFromHints(WindowInfo * wi)
     } else {
         msg(0, "no WM hints (%s)\n", wi->name);
     }
+    if (hicon == 0)
+        return 0;
+    wi->icon_drawable = hicon;
     if (hmask != 0)
         wi->icon_mask = hmask;
-    if (hicon != 0) {
-        wi->icon_drawable = hicon;
-        return 1;
-    }
-    return 0;
+#ifdef ICON_DEBUG
+    strcpy(wi->icon_src, "from WM hints");
+#endif
+    return 1;
 }
 
 //
@@ -361,6 +366,9 @@ int addIconFromFiles(WindowInfo * wi)
                 }
                 wi->icon_drawable = ic->drawable;
                 wi->icon_mask = ic->mask;
+#ifdef ICON_DEBUG
+                strncpy(wi->icon_src, ic->src_path, MAXNAMESZ);
+#endif
                 ret = 1;
                 goto out;
             }
@@ -421,6 +429,9 @@ int addWindowInfo(Window win, int reclevel, int wm_id, unsigned long desktop,
         WI.icon_w = WI.icon_h = 0;
     unsigned int icon_depth = 0;
     WI.icon_allocated = false;
+#ifdef ICON_DEBUG
+    WI.icon_src[0] = '\0';
+#endif
 
     // search for icon in window properties, hints or file hash
     int opt = g.option_iconSrc;
