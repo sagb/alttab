@@ -2,6 +2,8 @@
 
 export DEB_BUILD_MAINT_OPTIONS = hardening=+all
 
+include /usr/share/dpkg/default.mk
+
 include /usr/share/debhelper/dh_package_notes/package-notes.mk
 
 %:
