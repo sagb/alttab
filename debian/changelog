@@ -2,6 +2,9 @@ alttab (1.7.1-2) UNRELEASED; urgency=medium
 
   * Add the test-xdotool upstream patch to use xdotool instead of
     cnee during the functional test.
+  * Include dpkg's default.mk for completeness.
+  * Add the year 2024 to my debian/* copyright notice.
+  * Declare dpkg-build-api v1, drop the implied Rules-Requires-Root.
 
  -- Peter Pentchev <roam@debian.org>  Thu, 21 Mar 2024 11:19:25 +0200
 
