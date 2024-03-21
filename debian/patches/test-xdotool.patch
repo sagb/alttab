@@ -1,0 +1,35 @@
+Description: Use xdotool instead of cnee/xnee in the test suite
+Origin: upstream, https://github.com/sagb/alttab/commit/de3d68926079a29c3e30528304b1760bdb446141
+Author: Alexander Kulak <sa-dev@odd.systems>
+Last-Update: 2024-03-03
+
+--- a/test/run-in-xvfb.test
++++ b/test/run-in-xvfb.test
+@@ -37,7 +37,7 @@
+ install_software()
+ {
+     packs="" ; progs=""
+-    for pair in "cnee xnee" "Xvfb xvfb" "xeyes x11-apps" "xprop x11-utils" "ps procps" ; do
++    for pair in "xdotool xdotool" "Xvfb xvfb" "xeyes x11-apps" "xprop x11-utils" "ps procps" ; do
+         prog=`echo $pair | cut -d \  -f 1`
+         pack=`echo $pair | cut -d \  -f 2`
+         if ! which "$prog" >/dev/null ; then
+@@ -120,12 +120,13 @@
+ 
+ alttab_simple_cycle()
+ {
+-    cmd="fake-key-press key=Alt_L msec=2\n"
+-    for c in `seq 1 20` ; do
+-        cmd="${cmd}fake-key-press key=Tab msec=100\nfake-key-release key=Tab msec=2\n"
++    DISPLAY=:200
++    xdotool keydown Alt_L
++    for c in $(seq 1 20); do
++        sleep 0.1
++        xdotool key Tab
+     done
+-    cmd="${cmd}fake-key-release key=Alt_L msec=100"
+-    echo "$cmd" | DISPLAY=:200 cnee --replay
++    xdotool keyup Alt_L
+ }
+ 
+ check_alttab()

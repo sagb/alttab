@@ -1,2 +1,3 @@
 cppcheck.patch
 test-tweaks.patch
+test-xdotool.patch
