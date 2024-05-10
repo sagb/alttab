@@ -331,7 +331,7 @@ int addIconFromHints(WindowInfo * wi)
 //
 int addIconFromFiles(WindowInfo * wi)
 {
-    char *appclass, *tryclass;
+    char *appclass, *tryclass, *s;
     long unsigned int class_size;
     icon_t *ic;
     int ret = 0;
@@ -340,6 +340,8 @@ int addIconFromFiles(WindowInfo * wi)
     if (appclass) {
         for (tryclass = appclass; tryclass - appclass < class_size;
              tryclass += (strlen(tryclass) + 1)) {
+            s = tryclass;
+            while ((s = strchr(s, '/')) != NULL) *s++ = '_';
             ic = lookupIcon(tryclass);
             if (ic &&
                 (g.option_iconSrc != ISRC_SIZE
