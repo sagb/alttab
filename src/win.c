@@ -224,7 +224,7 @@ int addIconFromProperty(WindowInfo * wi)
             n += w*h;
             continue;
         }
-        if (best == 0 || iconMatchBetter(w, h, best_w, best_h)) {
+        if (best == 0 || iconMatchBetter(w, h, best_w, best_h, false)) {
             best = n;
         }
         n += w*h;
@@ -343,11 +343,20 @@ int addIconFromFiles(WindowInfo * wi)
             s = tryclass;
             while ((s = strchr(s, '/')) != NULL) *s++ = '_';
             ic = lookupIcon(tryclass);
-            if (ic &&
-                (g.option_iconSrc != ISRC_SIZE
-                 || iconMatchBetter(ic->src_w, ic->src_h,
-                                    wi->icon_w, wi->icon_h))
-                ) {
+            if (ic && (
+                (g.option_iconSrc != ISRC_SIZE 
+                        && g.option_iconSrc != ISRC_SIZE2)
+                 || (g.option_iconSrc == ISRC_SIZE 
+                        && iconMatchBetter(
+                                    ic->src_w, ic->src_h,
+                                    wi->icon_w, wi->icon_h,
+                                    false))
+                 || (g.option_iconSrc == ISRC_SIZE2 
+                        && iconMatchBetter(
+                                    ic->src_w, ic->src_h,
+                                    wi->icon_w, wi->icon_h,
+                                    true))
+                )) {
                 msg(0, "using file icon for %s\n", tryclass);
                 if (ic->drawable == None) {
                     msg(1, "loading content for %s\n", ic->app);
@@ -446,7 +455,7 @@ int addWindowInfo(Window win, int reclevel, int wm_id, unsigned long desktop,
             icon_in_x = addIconFromHints(&(WI));
     }
     if ((opt == ISRC_FALLBACK && !icon_in_x) ||
-        opt == ISRC_SIZE || opt == ISRC_FILES)
+        opt == ISRC_SIZE || opt == ISRC_SIZE2 || opt == ISRC_FILES)
         addIconFromFiles(&(WI));
 
     // extract icon width/height/depth

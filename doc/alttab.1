@@ -1,6 +1,6 @@
 .\" generated with Ronn-NG/v0.9.1
 .\" http://github.com/apjanke/ronn-ng/tree/0.9.1
-.TH "ALTTAB" "1" "July 2023" ""
+.TH "ALTTAB" "1" "May 2024" ""
 .SH "NAME"
 \fBalttab\fR \- the task switcher
 .SH "SYNOPSIS"
@@ -179,7 +179,7 @@ resource: alttab\.icon\.source
 .br
 default: 2
 .IP
-Source of icons\. \fINUMBER\fR must be between 0 and 4:
+Source of icons\. \fINUMBER\fR must be between 0 and 5:
 .IP
 \fI0\fR: Use icons from X11 window attributes only\.
 .IP
@@ -208,6 +208,8 @@ Also, alttab scans for icons in legacy directories without freedesktop directory
 \fI3\fR: Use icons from files only\.
 .IP
 \fI4\fR: Don't draw icons\.
+.IP
+\fI5\fR: Prefer icon from X11 window attributes when it matches requested size better\.
 .TP
 \fB\-theme\fR \fIname\fR
 resource: alttab\.theme

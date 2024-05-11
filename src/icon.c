@@ -412,7 +412,7 @@ end_special_1:
         // new candidate: ix, iy
         // best value: g.option_iconW, H
         // should we replace the icon?
-        if (iconMatchBetter(ix, iy, ic->src_w, ic->src_h)) {
+        if (iconMatchBetter(ix, iy, ic->src_w, ic->src_h, false)) {
             strncpy(ic->src_path, pe->fts_path, MAXICONPATHLEN-1);
             ic->src_w = ix;
             ic->src_h = iy;
@@ -506,13 +506,16 @@ icon_t *lookupIcon(char *app)
 //
 // check if new width/height better match icon size option
 // assuming square icons
+// if equal_prefer_new=true and sizes are equal, then prefer new icon
 //
-bool iconMatchBetter(int new_w, int new_h, int old_w, int old_h)
+bool iconMatchBetter(int new_w, int new_h, int old_w, int old_h, bool equal_prefer_new)
 {
     int hasdiff, newdiff;
 
     hasdiff = old_h - g.option_iconH;
     newdiff = new_h - g.option_iconH;
+    if (hasdiff == newdiff && equal_prefer_new)
+        return true;
     return
         (hasdiff >= 0) ? ((newdiff < 0) ? false : ((newdiff <
                                                     hasdiff) ? true : false)
