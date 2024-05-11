@@ -400,6 +400,8 @@ end_special_1:
     HASH_FIND_STR(g.ic, app, ic);
     if (ic == NULL) {
         ic = initIcon();
+        if (ic == NULL)
+            return 0;
         strncpy(ic->app, app, MAXAPPLEN);
         strncpy(ic->src_path, pe->fts_path, MAXICONPATHLEN-1);
         ic->src_w = ix;
