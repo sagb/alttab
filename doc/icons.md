@@ -7,8 +7,9 @@ If the issue is still unclear:
 Build alttab with `ICON_DEBUG=1` and start it with `-v` option:
 
 ```shell
-./configure CFLAGS="-DICON_DEBUG=1"
-make
+mkdir build && cd build
+cmake -DCMAKE_C_FLAGS="-DICON_DEBUG=1" ..
+cmake --build .
 src/alttab -v (...other options)
 ```
 

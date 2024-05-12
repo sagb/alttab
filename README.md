@@ -33,7 +33,8 @@ to the usage of lightweight WM.
 ```
 git clone https://github.com/sagb/alttab.git
 cd alttab
-./configure && sudo make install
+mkdir build && cd build && cmake ..
+sudo cmake --build . --target install
 ```
 See [INSTALL.md](INSTALL.md) for details, [doc/wm-setup.md](doc/wm-setup.md)
 for window manager settings,

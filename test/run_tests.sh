@@ -1,7 +1,6 @@
 #!/bin/sh
 
 # Tests in headless X server.
-# http://www.gnu.org/software/automake/manual/automake.html#Using-the-TAP-test-protocol
 
 # Copyright 2017-2024 Alexander Kulak.
 # This file is part of alttab program.
@@ -21,7 +20,6 @@
 
 
 ALTTAB=../src/alttab
-NUMTEST=3
 
 install_software()
 {
@@ -123,10 +121,10 @@ check_alttab()
     stage="$1" ; comment="$2"
     sleep 0.5
     if ! ps -p "$alttab" >/dev/null ; then
-        echo "not ok $stage - $comment"
+        echo "Test ${stage} ($comment) Failed"
         exit 1
     else
-        echo "ok $stage - $comment"
+        echo "Test ${stage} ($comment) Passed"
     fi
 }
 
@@ -141,7 +139,6 @@ cleanup()
 # begin execution
 
 trap cleanup EXIT
-echo "1..$NUMTEST"
 install_software
 start_x
 open_sample_windows

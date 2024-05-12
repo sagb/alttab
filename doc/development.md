@@ -9,16 +9,6 @@ Repository, bug reporting
 
 [On github](https://github.com/sagb/alttab).
 
-Maintainer script
------------------
-
-To rebuild autotools stuff use bootstrap.sh.
-
-Also, this script updates man page and README which are maintained 
-as ronn(1) (markdown-like) file.
-This is not included in makefiles to not require casual user 
-to install ronn.
-
 Coding
 ------
 

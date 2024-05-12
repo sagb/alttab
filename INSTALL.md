@@ -47,10 +47,10 @@ Building from source
     apt install libx11-dev libxmu-dev libxft-dev libxrender-dev libxrandr-dev libpng-dev libxpm-dev uthash-dev
     ```
 
-    Maintainer or packager may also install autotools and ronn:
+    Maintainer or packager may also install cmake and ronn:
 
     ```
-    apt install autoconf automake ronn
+    apt install cmake ronn
     ```
 
 2. Download:
@@ -59,19 +59,21 @@ Building from source
     git clone https://github.com/sagb/alttab.git && cd alttab
     ```
 
-3. Maintainer or packager may want to update autotools stuff and refresh documentation with ronn:
+3. If you changed alttab.1.ronn, update the man page:
 
     ```
-    ./bootstrap.sh
+    cd doc ; ronn --roff alttab.1.ronn
     ```
 
-4. Build:
+4. Build, test, install:
 
     ```
-    ./configure  
-    make  
-    make install
-    make check  # optional
+    mkdir build
+    cd build
+    cmake ..
+    cmake --build .
+    ctest  # optional
+    sudo cmake --build . --target install
     ```
 
 ### In OpenBSD (as of OpenBSD 7.4 amd64):
@@ -79,18 +81,6 @@ Building from source
 1. Install build dependencies.  
     `Xlib`, `Xft`, `Xrender`, `Xrandr` and `libxpm` come from [`xbase` file set](https://www.openbsd.org/faq/faq4.html#FilesNeeded)  
     `perl` is part of `base` file set.  
-    In order to install others:
-
-    ```
-    # may omit autoconf-2.69 as it is pulled in as a dependency of automake-1.16.5
-    pkg_add git png uthash automake-1.16.5
-    ```
-    
-    If you intend to run `make check`, then also:
-    
-    ```
-    pkg_add gawk
-    ```
 
 2. Download:
 
@@ -98,21 +88,13 @@ Building from source
     git clone https://github.com/sagb/alttab.git && cd alttab
     ```
 
-3. Update autotools stuff - **mandatory step for OpenBSD**:
+3. Build:
 
     ```
-    ./bootstrap.sh -f
+    export CPATH=/usr/local/include
     ```
-
-4. Build:
-
-    ```
-    CPATH=/usr/local/include ./configure --mandir /usr/local/man
-    CPATH=/usr/local/include make
-    make install
-    makewhatis /usr/local/man  # update mandoc.db with alttab.1
-    make check  # optional
-    ```
+    The proceed as with cmake as described above.  
+    TODO: need test and report.
 
 Usage notes
 -----------
