@@ -1,0 +1,10 @@
+/aclocal.* linguist-generated=true
+/autom4te.* linguist-generated=true
+/compile linguist-generated=true
+/config* linguist-generated=true
+/depcomp linguist-generated=true
+/install-sh linguist-generated=true
+/Makefile* linguist-generated=true
+/missing linguist-generated=true
+/stamp-h1 linguist-generated=true
+/tap-driver* linguist-generated=true
