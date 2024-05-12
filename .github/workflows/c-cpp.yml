@@ -19,6 +19,7 @@ jobs:
 
     - name: create build directory
       run: mkdir -p ${{ github.workspace }}/build
+      working-directory: ${{ github.workspace }}
 
     - name: install build dependencies
       run: sudo apt-get -y install libx11-dev libxmu-dev libxft-dev libxrender-dev libxrandr-dev libpng-dev libxpm-dev uthash-dev autoconf automake
