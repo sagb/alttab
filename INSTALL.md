@@ -1,8 +1,7 @@
-
 Binaries
 --------
 
-* In Debian _sid_, _buster_ or their Ubuntu derivatives, install alttab from the official repository:
+* In Debian or its derivatives, install alttab from the official repository:
 
     ```
     apt install alttab
@@ -39,18 +38,18 @@ Building from source
 --------------------
 
 1. Install build dependencies.
-    Basic Xlib, Xft, Xrender, Xrandr, libpng, libxpm libraries
+    Cmake and basic Xlib, Xft, Xrender, Xrandr, libpng, libxpm libraries
     and [uthash macros](http://troydhanson.github.io/uthash/) are required.
     In Debian or Ubuntu:
 
     ```
-    apt install libx11-dev libxmu-dev libxft-dev libxrender-dev libxrandr-dev libpng-dev libxpm-dev uthash-dev
+    apt install cmake libx11-dev libxmu-dev libxft-dev libxrender-dev libxrandr-dev libpng-dev libxpm-dev uthash-dev
     ```
 
-    Maintainer or packager may also install cmake and ronn:
+    If you need to regenerate man page, also install ronn:
 
     ```
-    apt install cmake ronn
+    apt install ronn
     ```
 
 2. Download:
@@ -59,13 +58,7 @@ Building from source
     git clone https://github.com/sagb/alttab.git && cd alttab
     ```
 
-3. If you changed alttab.1.ronn, update the man page:
-
-    ```
-    cd doc ; ronn --roff alttab.1.ronn
-    ```
-
-4. Build, test, install:
+3. Build, test, install:
 
     ```
     mkdir build
@@ -90,13 +83,11 @@ Building from source
 
 3. Build:
 
-    ```
-    export CPATH=/usr/local/include
-    ```
-    The proceed as with cmake as described above.  
-    TODO: need test and report.
+    Proceed with cmake as described above. Former autotools build required 
+    CPATH=/usr/local/include , perhaps cmake also needs this. Please test and report.
 
-Usage notes
------------
+Usage
+-----
 
-See `README.md`
+See README or man page.  
+Usually it should run fully functional without any argument: `alttab`.  
