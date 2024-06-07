@@ -1,6 +1,6 @@
 Description: Export the DISPLAY variable for the test duration
  Make sure all the X clients started in the test run connect to the Xvfb instance.
-Forwarded: not yet
+Forwarded: https://github.com/sagb/alttab/pull/172
 Author: Peter Pentchev <roam@ringlet.net>
 Last-Update: 2024-06-07
 
