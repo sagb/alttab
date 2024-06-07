@@ -1,0 +1,46 @@
+Description: Export the DISPLAY variable for the test duration
+ Make sure all the X clients started in the test run connect to the Xvfb instance.
+Forwarded: not yet
+Author: Peter Pentchev <roam@ringlet.net>
+Last-Update: 2024-06-07
+
+--- a/test/run-in-xvfb.test
++++ b/test/run-in-xvfb.test
+@@ -65,9 +65,10 @@
+         sh -c "mkdir -p /tmp/.X11-unix ; chmod 1777 /tmp/.X11-unix" >/dev/null
+     Xvfb :200 -ac &
+     export xvfb=$!
++    export DISPLAY=:200
+     for ms100 in `seq 1 50` ; do
+         sleep 0.1
+-        if DISPLAY=:200 xprop -root >/dev/null ; then
++        if xprop -root >/dev/null ; then
+             return
+         fi
+     done
+@@ -86,7 +87,7 @@
+ 
+ start_alttab()
+ {
+-    DISPLAY=:200 "$ALTTAB" -w 0 -vv &
++    "$ALTTAB" -w 0 -vv &
+     export alttab=$!
+     sleep 1
+ }
+@@ -103,7 +104,7 @@
+ {
+     eyes=""
+     for c in `seq 1 7` ; do
+-        DISPLAY=:200 xeyes &
++        xeyes &
+         eyes="${eyes} $!"
+     done
+     export eyes
+@@ -120,7 +121,6 @@
+ 
+ alttab_simple_cycle()
+ {
+-    DISPLAY=:200
+     xdotool keydown Alt_L
+     for c in $(seq 1 20); do
+         sleep 0.1
