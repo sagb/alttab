@@ -54,9 +54,10 @@ start_x()
         sh -c "mkdir -p /tmp/.X11-unix ; chmod 1777 /tmp/.X11-unix" >/dev/null
     Xvfb :200 -ac &
     export xvfb=$!
+    export DISPLAY=:200
     for ms100 in `seq 1 50` ; do
         sleep 0.1
-        if DISPLAY=:200 xprop -root >/dev/null ; then
+        if xprop -root >/dev/null ; then
             return
         fi
     done
@@ -75,7 +76,7 @@ stop_x()
 
 start_alttab()
 {
-    DISPLAY=:200 "$ALTTAB" -w 0 -vv &
+    "$ALTTAB" -w 0 -vv &
     export alttab=$!
     sleep 1
 }
@@ -92,7 +93,7 @@ open_sample_windows()
 {
     eyes=""
     for c in `seq 1 7` ; do
-        DISPLAY=:200 xeyes &
+        xeyes &
         eyes="${eyes} $!"
     done
     export eyes
@@ -109,7 +110,6 @@ close_sample_windows()
 
 alttab_simple_cycle()
 {
-    DISPLAY=:200
     xdotool keydown Alt_L
     for c in $(seq 1 20); do
         sleep 0.1
