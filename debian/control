@@ -2,7 +2,7 @@ Source: alttab
 Section: x11
 Priority: optional
 Maintainer: Peter Pentchev <roam@debian.org>
-Build-Depends: debhelper-compat (= 13),
+Build-Depends: debhelper (>> 13.15~),
                dh-package-notes,
                dh-sequence-single-binary,
                dpkg-build-api (= 1),
@@ -23,6 +23,7 @@ Build-Depends: debhelper-compat (= 13),
                x11-apps <!nocheck>,
                x11-utils <!nocheck>,
 Standards-Version: 4.7.0
+X-DH-Compat: 14
 Vcs-Git: https://salsa.debian.org/debian/alttab.git
 Vcs-Browser: https://salsa.debian.org/debian/alttab
 Homepage: https://sagb.github.io/alttab

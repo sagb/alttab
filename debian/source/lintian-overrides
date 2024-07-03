@@ -1,0 +1,4 @@
+# We use X-DH-Compat: 14
+#
+alttab source: debhelper-compat-file-is-missing
+alttab source: package-uses-deprecated-debhelper-compat-version 1
