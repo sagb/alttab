@@ -30,7 +30,6 @@ Homepage: https://sagb.github.io/alttab
 
 Package: alttab
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
 Suggests: fonts-dejavu-core
 Enhances: jwm, twm, evilwm, ratpoison, fluxbox, matchbox, blackbox,
  cwm, wm2, ctwm, lwm, sawfish, awesome, i3-wm
