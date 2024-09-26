@@ -644,6 +644,7 @@ int main(int argc, char **argv)
                 } else if (ev.xkey.keycode == g.option_cancelCode) { // escape
                     CHECK_97;
                     uiSelectWindow(0);
+                    uiHide();
                 } else if (ev.xkey.keycode == g.option_killCode) { // k
                     CHECK_97;
                     uiKillWindow();
