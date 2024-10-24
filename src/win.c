@@ -411,16 +411,21 @@ int addWindowInfo(Window win, int reclevel, int wm_id, unsigned long desktop,
     if (wm_name) {
         strncpy(WI.name, wm_name, MAXNAMESZ-1);
     } else {
-        unsigned char *wn;
-        Atom prop = XInternAtom(dpy, "WM_NAME", false), type;
-        int form;
-        unsigned long remain, len;
-        if (XGetWindowProperty(dpy, win, prop, 0, MAXNAMESZ, false,
-                               AnyPropertyType, &type, &form, &len,
-                               &remain, &wn) == Success && wn) {
-            strncpy(WI.name, (char *)wn, MAXNAMESZ-1);
-            WI.name[MAXNAMESZ - 1] = '\0';
-            XFree(wn);
+        // handle COMPOUND WM_NAME, see #177.
+        XTextProperty text_prop;
+        char **list = NULL;
+        int count;
+        if (XGetWMName(dpy, win, &text_prop) && text_prop.value) {
+            // trying to interpret the name as a UTF-8
+            if (Xutf8TextPropertyToTextList(dpy, &text_prop, &list, &count) >= Success && count > 0 && list) {
+                strncpy(WI.name, list[0], MAXNAMESZ - 1);
+                WI.name[MAXNAMESZ - 1] = '\0';
+                XFreeStringList(list);
+            } else {
+                strncpy(WI.name, (char *)text_prop.value, MAXNAMESZ - 1);
+                WI.name[MAXNAMESZ - 1] = '\0';
+            }
+            XFree(text_prop.value);
         } else {
             WI.name[0] = '\0';
         }
