@@ -2,3 +2,4 @@ cppcheck.patch
 test-tweaks.patch
 test-xdotool.patch
 test-xvfb-display.patch
+void-proto.patch

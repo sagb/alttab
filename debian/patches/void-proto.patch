@@ -1,0 +1,309 @@
+Description: Declare functions with no parameters as (void)
+ Also correct a function prototype and another function's invocation.
+Bug-Debian: https://bugs.debian.org/1096301
+Forwarded: no
+Author: Peter Pentchev <roam@ringlet.net>
+Last-Update: 2025-02-18
+
+--- a/src/alttab.c
++++ b/src/alttab.c
+@@ -45,7 +45,7 @@
+ //
+ // help and exit
+ //
+-static void helpexit()
++static void helpexit(void)
+ {
+     msg(-1, "the task switcher, v%s\n\
+ Options:\n\
+@@ -533,7 +533,7 @@
+ //
+ static int grabKeysAtStartup(bool grabUngrab)
+ {
+-    g.ignored_modmask = getOffendingModifiersMask(dpy); // or 0 for g.debug
++    g.ignored_modmask = getOffendingModifiersMask(); // or 0 for g.debug
+     char *grabhint =
+         "Error while (un)grabbing key 0x%x with mask 0x%x/0x%x.\nProbably other program already grabbed this combination.\nCheck: xdotool keydown alt+Tab; xdotool key XF86LogGrabInfo; xdotool keyup Tab; sleep 1; xdotool keyup alt\nand then look for active device grabs in /var/log/Xorg.0.log\nOr try Ctrl-Tab instead of Alt-Tab:  alttab -mk Control_L\n";
+ // attempt XF86Ungrab? probably too invasive
+--- a/src/alttab.h
++++ b/src/alttab.h
+@@ -210,31 +210,31 @@
+ } Globals;
+ 
+ // gui
+-int startupGUItasks();
++int startupGUItasks(void);
+ int uiShow(bool direction);
+-void uiExpose();
+-int uiHide();
+-int uiNextWindow();
+-int uiPrevWindow();
+-int uiKillWindow();
++void uiExpose(void);
++int uiHide(void);
++int uiNextWindow(void);
++int uiPrevWindow(void);
++int uiKillWindow(void);
+ int uiSelectWindow(int ndx);
+ void uiButtonEvent(XButtonEvent e);
+-Window getUiwin();
++Window getUiwin(void);
+ void shutdownGUI(void);
+ 
+ // windows
+-int startupWintasks();
++int startupWintasks(void);
+ int addIconFromProperty(WindowInfo * wi);
+ int addIconFromHints(WindowInfo * wi);
+ int addIconFromFiles(WindowInfo * wi);
+ int addWindowInfo(Window win, int reclevel, int wm_id, unsigned long desktop,
+                   char *wm_name);
+ int initWinlist(void);
+-void freeWinlist();
++void freeWinlist(void);
+ int setFocus(int winNdx);
+-int rp_startupWintasks();
++int rp_startupWintasks(void);
+ int x_initWindowsInfoRecursive(Window win, int reclevel);
+-int rp_initWinlist();
++int rp_initWinlist(void);
+ int x_setFocus(int wndx);
+ int rp_setFocus(int winNdx);
+ int execAndReadStdout(char *exe, char *args[], char *buf, int bufsize);
+@@ -250,15 +250,15 @@
+ 
+ /* EWHM */
+ bool ewmh_detectFeatures(EwmhFeatures * e);
+-Window ewmh_getActiveWindow();
+-int ewmh_initWinlist();
++Window ewmh_getActiveWindow(void);
++int ewmh_initWinlist(void);
+ int ewmh_setFocus(int winNdx, Window fwin); // fwin used if non-zero
+-unsigned long ewmh_getCurrentDesktop();
++unsigned long ewmh_getCurrentDesktop(void);
+ unsigned long ewmh_getDesktopOfWindow(Window w);
+ bool ewmh_skipWindowInTaskbar(Window w);
+ 
+ /* RANDR */
+-bool randrAvailable();
++bool randrAvailable(void);
+ bool randrGetViewport(quad * res, bool * multihead);
+ 
+ /* autil */
+--- a/src/ewmh.c
++++ b/src/ewmh.c
+@@ -178,7 +178,7 @@
+ //
+ // active window or 0
+ //
+-Window ewmh_getActiveWindow()
++Window ewmh_getActiveWindow(void)
+ {
+     Window w = (Window) 0;
+     char *awp;
+@@ -196,7 +196,7 @@
+ // initialize winlist, correcting sortlist
+ // return 1 if ok
+ //
+-int ewmh_initWinlist()
++int ewmh_initWinlist(void)
+ {
+     Window *client_list;
+     unsigned long client_list_size;
+@@ -295,7 +295,7 @@
+ //
+ // get current desktop in EWMH WM
+ //
+-unsigned long ewmh_getCurrentDesktop()
++unsigned long ewmh_getCurrentDesktop(void)
+ {
+     return ewmh_getDesktopFromProp(root, "_NET_CURRENT_DESKTOP", "_WIN_WORKSPACE");
+ }
+--- a/src/gui.c
++++ b/src/gui.c
+@@ -350,7 +350,7 @@
+ // called once per execution
+ // mostly initializes g.*
+ 
+-int startupGUItasks()
++int startupGUItasks(void)
+ {
+ // if viewport is not fixed, then initialize vp* at every show
+     if (g.option_vp_mode == VP_SPECIFIC) {
+@@ -702,7 +702,7 @@
+ // Expose event callback
+ // redraw our window
+ //
+-void uiExpose()
++void uiExpose(void)
+ {
+     msg(0, "expose ui\n");
+ // if WM moved uiwin, here is the place
+@@ -740,7 +740,7 @@
+ //
+ // remove ui and switch to chosen window
+ //
+-int uiHide()
++int uiHide(void)
+ {
+     grabKeysAtUiShow(false);
+     // order is important: to set focus in Metacity,
+@@ -780,7 +780,7 @@
+ //
+ // select next item in g.winlist
+ //
+-int uiNextWindow()
++int uiNextWindow(void)
+ {
+     if (!uiwin)
+         return 0;               // kb events may trigger it even when no window drawn yet
+@@ -795,7 +795,7 @@
+ //
+ // select previous item in g.winlist
+ //
+-int uiPrevWindow()
++int uiPrevWindow(void)
+ {
+     if (!uiwin)
+         return 0;               // kb events may trigger it even when no window drawn yet
+@@ -810,7 +810,7 @@
+ //
+ // kill X client of current window
+ //
+-int uiKillWindow()
++int uiKillWindow(void)
+ {
+     Window w;
+     char *n;
+@@ -885,7 +885,7 @@
+ //
+ // our window
+ //
+-Window getUiwin()
++Window getUiwin(void)
+ {
+     return uiwin;
+ }
+--- a/src/icon.c
++++ b/src/icon.c
+@@ -34,7 +34,7 @@
+ //
+ // icon constructor: safe defaults
+ //
+-icon_t *initIcon()
++icon_t *initIcon(void)
+ {
+     icon_t *ic;
+ 
+--- a/src/icon.h
++++ b/src/icon.h
+@@ -57,7 +57,7 @@
+     UT_hash_handle hh;
+ } icon_t;
+ 
+-icon_t *initIcon();
++icon_t *initIcon(void);
+ void deleteIcon(icon_t * ic);
+ int initIconHash(icon_t ** ihash);
+ int allocIconDirs(char ** icon_dirs);
+--- a/src/pngd.h
++++ b/src/pngd.h
+@@ -46,6 +46,6 @@
+             uint8_t bg_red, uint8_t bg_green, uint8_t bg_blue);
+ int pngReadToDrawable(char *pngpath, Drawable d, uint8_t bg_red,
+                       uint8_t bg_green, uint8_t bg_blue);
+-int pngReadToDrawable_test();
++int pngReadToDrawable_test(char *pngfile);
+ 
+ #endif
+--- a/src/randr.c
++++ b/src/randr.c
+@@ -142,7 +142,7 @@
+ // check for randr at runtime
+ // assuming (for now) it's available at build time
+ //
+-bool randrAvailable()
++bool randrAvailable(void)
+ {
+     int maj, min;
+     bool ok;
+--- a/src/rp.c
++++ b/src/rp.c
+@@ -104,7 +104,7 @@
+ //
+ // early initialization in ratpoison
+ //
+-int rp_startupWintasks()
++int rp_startupWintasks(void)
+ {
+ 
+ // search for ratpoison executable for later execv
+@@ -158,7 +158,7 @@
+ //
+ // initialize winlist/update sortlist from ratpoison output
+ //
+-int rp_initWinlist()
++int rp_initWinlist(void)
+ {
+ #define  fallback    { msg(-1, "using current rp group\n") ; \
+     return rp_add_windows_in_group(DESKTOP_UNKNOWN, DESKTOP_UNKNOWN); }
+--- a/src/util.c
++++ b/src/util.c
+@@ -33,7 +33,7 @@
+ //
+ // get all possible modifiers
+ //
+-unsigned int getOffendingModifiersMask()
++unsigned int getOffendingModifiersMask(void)
+ {
+     unsigned int lockmask[3];   // num=0 scroll=1 caps=2
+     int i;
+@@ -501,7 +501,7 @@
+ // g++ XftTest.cc -lX11 -lXft `pkg-config --cflags freetype2`
+ // not used in alttab
+ //
+-int drawMultiLine_test()
++int drawMultiLine_test(void)
+ {
+     // define these as globals in caller
+     dpy = XOpenDisplay(NULL);
+--- a/src/util.h
++++ b/src/util.h
+@@ -66,7 +66,7 @@
+ }
+ 
+ 
+-unsigned int getOffendingModifiersMask();
++unsigned int getOffendingModifiersMask(void);
+ int changeKeygrab(Window win, bool grab, KeyCode keycode,
+                   unsigned int modmask, unsigned int ignored_modmask);
+ int zeroErrorHandler(Display * dpy_our, XErrorEvent * theEvent);
+@@ -91,7 +91,7 @@
+ int drawMultiLine(Drawable d, XftFont * font, XftColor * xftcolor, char *str,
+                   unsigned int x1, unsigned int y1, unsigned int width,
+                   unsigned int height);
+-int drawMultiLine_test();
++int drawMultiLine_test(void);
+ int drawSingleLine(Drawable d, XftFont * font, XftColor * xftcolor, char *str,
+                   unsigned int x1, unsigned int y1, unsigned int width,
+                   unsigned int height);
+--- a/src/win.c
++++ b/src/win.c
+@@ -146,7 +146,7 @@
+ // early initialization
+ // once per execution
+ //
+-int startupWintasks()
++int startupWintasks(void)
+ {
+     long rootevmask = 0;
+ 
+@@ -596,7 +596,7 @@
+ // counterpair for initWinlist
+ // frees icons and winlist, but not tiles, as they are allocated in gui.c
+ //
+-void freeWinlist()
++void freeWinlist(void)
+ {
+     msg(0, "destroying icons and winlist\n");
+     if (g.debug > 1) {
