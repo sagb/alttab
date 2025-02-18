@@ -120,7 +120,7 @@ static void drawFr(GC gc, int f)
 //
 // draw selected and unselected frames around tiles
 //
-static void framesRedraw()
+static void framesRedraw(void)
 {
     int f;
     for (f = 0; f < g.maxNdx; f++) {
@@ -350,7 +350,7 @@ static int placeSingleTile (int j) {
 // called once per execution
 // mostly initializes g.*
 
-int startupGUItasks()
+int startupGUItasks(void)
 {
 // if viewport is not fixed, then initialize vp* at every show
     if (g.option_vp_mode == VP_SPECIFIC) {
@@ -705,7 +705,7 @@ int uiShow(bool direction)
 // Expose event callback
 // redraw our window
 //
-void uiExpose()
+void uiExpose(void)
 {
     msg(0, "expose ui\n");
 // if WM moved uiwin, here is the place
@@ -743,7 +743,7 @@ void uiExpose()
 //
 // remove ui and switch to chosen window
 //
-int uiHide()
+int uiHide(void)
 {
     grabKeysAtUiShow(false);
     // order is important: to set focus in Metacity,
@@ -783,7 +783,7 @@ int uiHide()
 //
 // select next item in g.winlist
 //
-int uiNextWindow()
+int uiNextWindow(void)
 {
     if (!uiwin)
         return 0;               // kb events may trigger it even when no window drawn yet
@@ -798,7 +798,7 @@ int uiNextWindow()
 //
 // select previous item in g.winlist
 //
-int uiPrevWindow()
+int uiPrevWindow(void)
 {
     if (!uiwin)
         return 0;               // kb events may trigger it even when no window drawn yet
@@ -813,7 +813,7 @@ int uiPrevWindow()
 //
 // kill X client of current window
 //
-int uiKillWindow()
+int uiKillWindow(void)
 {
     Window w;
     char *n;
@@ -888,7 +888,7 @@ void uiButtonEvent(XButtonEvent e)
 //
 // our window
 //
-Window getUiwin()
+Window getUiwin(void)
 {
     return uiwin;
 }

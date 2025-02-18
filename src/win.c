@@ -69,7 +69,7 @@ static int sort_by_order(const void *p1, const void *p2)
 //
 // debug output of sortlist
 //
-static void print_sortlist()
+static void print_sortlist(void)
 {
     PermanentWindowInfo *s;
     msg(0, "sortlist:\n");
@@ -81,7 +81,7 @@ static void print_sortlist()
 //
 // debug output of winlist
 //
-static void print_winlist()
+static void print_winlist(void)
 {
     int wi, si;
     PermanentWindowInfo *s;
@@ -146,7 +146,7 @@ void addToSortlist(Window w, bool to_head, bool move)
 // early initialization
 // once per execution
 //
-int startupWintasks()
+int startupWintasks(void)
 {
     long rootevmask = 0;
 
@@ -623,7 +623,7 @@ int initWinlist(void)
 // counterpair for initWinlist
 // frees icons and winlist, but not tiles, as they are allocated in gui.c
 //
-void freeWinlist()
+void freeWinlist(void)
 {
     msg(0, "destroying icons and winlist\n");
     if (g.debug > 1) {
@@ -842,7 +842,7 @@ void winFocusChangeEvent(XFocusChangeEvent e)
     addToSortlist(w, true, true);
 }
 
-void shutdownWin()
+void shutdownWin(void)
 {
     deleteIconHash(&g.ic);
 }

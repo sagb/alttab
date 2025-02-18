@@ -33,7 +33,7 @@ bool ee_complain;
 //
 // get all possible modifiers
 //
-unsigned int getOffendingModifiersMask()
+unsigned int getOffendingModifiersMask(void)
 {
     unsigned int lockmask[3];   // num=0 scroll=1 caps=2
     int i;
@@ -501,7 +501,7 @@ int drawMultiLine(Drawable d, XftFont * font,
 // g++ XftTest.cc -lX11 -lXft `pkg-config --cflags freetype2`
 // not used in alttab
 //
-int drawMultiLine_test()
+int drawMultiLine_test(void)
 {
     // define these as globals in caller
     dpy = XOpenDisplay(NULL);

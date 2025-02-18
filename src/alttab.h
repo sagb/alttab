@@ -214,31 +214,31 @@ typedef struct {
 } Globals;
 
 // gui
-int startupGUItasks();
+int startupGUItasks(void);
 int uiShow(bool direction);
-void uiExpose();
-int uiHide();
-int uiNextWindow();
-int uiPrevWindow();
-int uiKillWindow();
+void uiExpose(void);
+int uiHide(void);
+int uiNextWindow(void);
+int uiPrevWindow(void);
+int uiKillWindow(void);
 int uiSelectWindow(int ndx);
 void uiButtonEvent(XButtonEvent e);
-Window getUiwin();
+Window getUiwin(void);
 void shutdownGUI(void);
 
 // windows
-int startupWintasks();
+int startupWintasks(void);
 int addIconFromProperty(WindowInfo * wi);
 int addIconFromHints(WindowInfo * wi);
 int addIconFromFiles(WindowInfo * wi);
 int addWindowInfo(Window win, int reclevel, int wm_id, unsigned long desktop,
                   char *wm_name);
 int initWinlist(void);
-void freeWinlist();
+void freeWinlist(void);
 int setFocus(int winNdx);
-int rp_startupWintasks();
+int rp_startupWintasks(void);
 int x_initWindowsInfoRecursive(Window win, int reclevel);
-int rp_initWinlist();
+int rp_initWinlist(void);
 int x_setFocus(int wndx);
 int rp_setFocus(int winNdx);
 int execAndReadStdout(char *exe, char *args[], char *buf, int bufsize);
@@ -254,15 +254,15 @@ void shutdownWin(void);
 
 /* EWHM */
 bool ewmh_detectFeatures(EwmhFeatures * e);
-Window ewmh_getActiveWindow();
-int ewmh_initWinlist();
+Window ewmh_getActiveWindow(void);
+int ewmh_initWinlist(void);
 int ewmh_setFocus(int winNdx, Window fwin); // fwin used if non-zero
-unsigned long ewmh_getCurrentDesktop();
+unsigned long ewmh_getCurrentDesktop(void);
 unsigned long ewmh_getDesktopOfWindow(Window w);
 bool ewmh_skipWindowInTaskbar(Window w);
 
 /* RANDR */
-bool randrAvailable();
+bool randrAvailable(void);
 bool randrGetViewport(quad * res, bool * multihead);
 
 /* autil */
