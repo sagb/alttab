@@ -121,6 +121,15 @@ Last-Update: 2025-02-18
  }
 --- a/src/gui.c
 +++ b/src/gui.c
+@@ -120,7 +120,7 @@
+ //
+ // draw selected and unselected frames around tiles
+ //
+-static void framesRedraw()
++static void framesRedraw(void)
+ {
+     int f;
+     for (f = 0; f < g.maxNdx; f++) {
 @@ -350,7 +350,7 @@
  // called once per execution
  // mostly initializes g.*
@@ -289,6 +298,24 @@ Last-Update: 2025-02-18
                    unsigned int height);
 --- a/src/win.c
 +++ b/src/win.c
+@@ -69,7 +69,7 @@
+ //
+ // debug output of sortlist
+ //
+-static void print_sortlist()
++static void print_sortlist(void)
+ {
+     PermanentWindowInfo *s;
+     msg(0, "sortlist:\n");
+@@ -81,7 +81,7 @@
+ //
+ // debug output of winlist
+ //
+-static void print_winlist()
++static void print_winlist(void)
+ {
+     int wi, si;
+     PermanentWindowInfo *s;
 @@ -146,7 +146,7 @@
  // early initialization
  // once per execution
@@ -307,3 +334,12 @@ Last-Update: 2025-02-18
  {
      msg(0, "destroying icons and winlist\n");
      if (g.debug > 1) {
+@@ -815,7 +815,7 @@
+     addToSortlist(w, true, true);
+ }
+ 
+-void shutdownWin()
++void shutdownWin(void)
+ {
+     deleteIconHash(&g.ic);
+ }
