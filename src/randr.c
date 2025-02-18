@@ -142,7 +142,7 @@ static bool x_get_activity_area(quad * res, Window * fw)
 // check for randr at runtime
 // assuming (for now) it's available at build time
 //
-bool randrAvailable()
+bool randrAvailable(void)
 {
     int maj, min;
     bool ok;

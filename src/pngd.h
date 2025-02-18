@@ -46,6 +46,6 @@ int pngDraw(TImage * img, Drawable d, XImage * ximage, Visual * visual,
             uint8_t bg_red, uint8_t bg_green, uint8_t bg_blue);
 int pngReadToDrawable(char *pngpath, Drawable d, uint8_t bg_red,
                       uint8_t bg_green, uint8_t bg_blue);
-int pngReadToDrawable_test();
+int pngReadToDrawable_test(char *pngfile);
 
 #endif

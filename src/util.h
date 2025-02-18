@@ -66,7 +66,7 @@ typedef struct {
 }
 
 
-unsigned int getOffendingModifiersMask();
+unsigned int getOffendingModifiersMask(void);
 int changeKeygrab(Window win, bool grab, KeyCode keycode,
                   unsigned int modmask, unsigned int ignored_modmask);
 int zeroErrorHandler(Display * dpy_our, XErrorEvent * theEvent);
@@ -91,7 +91,7 @@ char *utf8index(char *s, size_t pos);
 int drawMultiLine(Drawable d, XftFont * font, XftColor * xftcolor, char *str,
                   unsigned int x1, unsigned int y1, unsigned int width,
                   unsigned int height);
-int drawMultiLine_test();
+int drawMultiLine_test(void);
 int drawSingleLine(Drawable d, XftFont * font, XftColor * xftcolor, char *str,
                   unsigned int x1, unsigned int y1, unsigned int width,
                   unsigned int height);

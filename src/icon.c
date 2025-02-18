@@ -34,7 +34,7 @@ extern Window root;
 //
 // icon constructor: safe defaults
 //
-icon_t *initIcon()
+icon_t *initIcon(void)
 {
     icon_t *ic;
 

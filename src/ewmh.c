@@ -178,7 +178,7 @@ bool ewmh_detectFeatures(EwmhFeatures * e)
 //
 // active window or 0
 //
-Window ewmh_getActiveWindow()
+Window ewmh_getActiveWindow(void)
 {
     Window w = (Window) 0;
     char *awp;
@@ -196,7 +196,7 @@ Window ewmh_getActiveWindow()
 // initialize winlist, correcting sortlist
 // return 1 if ok
 //
-int ewmh_initWinlist()
+int ewmh_initWinlist(void)
 {
     Window *client_list;
     unsigned long client_list_size;
@@ -295,7 +295,7 @@ static unsigned long ewmh_getDesktopFromProp(Window w, char *prop1, char *prop2)
 //
 // get current desktop in EWMH WM
 //
-unsigned long ewmh_getCurrentDesktop()
+unsigned long ewmh_getCurrentDesktop(void)
 {
     return ewmh_getDesktopFromProp(root, "_NET_CURRENT_DESKTOP", "_WIN_WORKSPACE");
 }

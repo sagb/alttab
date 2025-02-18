@@ -104,7 +104,7 @@ static int rp_add_windows_in_group(int current_group, int window_group)
 //
 // early initialization in ratpoison
 //
-int rp_startupWintasks()
+int rp_startupWintasks(void)
 {
 
 // search for ratpoison executable for later execv
@@ -158,7 +158,7 @@ int rp_startupWintasks()
 //
 // initialize winlist/update sortlist from ratpoison output
 //
-int rp_initWinlist()
+int rp_initWinlist(void)
 {
 #define  fallback    { msg(-1, "using current rp group\n") ; \
     return rp_add_windows_in_group(DESKTOP_UNKNOWN, DESKTOP_UNKNOWN); }

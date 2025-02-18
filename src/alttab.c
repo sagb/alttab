@@ -45,7 +45,7 @@ static XrmDatabase db;
 //
 // help and exit
 //
-static void helpexit()
+static void helpexit(void)
 {
     msg(-1, "the task switcher, v%s\n\
 Options:\n\
@@ -530,7 +530,7 @@ static int use_args_and_xrm(int *argc, char **argv)
 //
 static int grabKeysAtStartup(bool grabUngrab)
 {
-    g.ignored_modmask = getOffendingModifiersMask(dpy); // or 0 for g.debug
+    g.ignored_modmask = getOffendingModifiersMask(); // or 0 for g.debug
     char *grabhint =
         "Error while (un)grabbing key 0x%x with mask 0x%x/0x%x.\nProbably other program already grabbed this combination.\nCheck: xdotool keydown alt+Tab; xdotool key XF86LogGrabInfo; xdotool keyup Tab; sleep 1; xdotool keyup alt\nand then look for active device grabs in /var/log/Xorg.0.log\nOr try Ctrl-Tab instead of Alt-Tab:  alttab -mk Control_L\n";
 // attempt XF86Ungrab? probably too invasive

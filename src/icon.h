@@ -57,7 +57,7 @@ typedef struct {
     UT_hash_handle hh;
 } icon_t;
 
-icon_t *initIcon();
+icon_t *initIcon(void);
 void deleteIcon(icon_t * ic);
 int initIconHash(icon_t ** ihash);
 int allocIconDirs(char ** icon_dirs);
