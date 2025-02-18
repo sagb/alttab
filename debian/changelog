@@ -1,3 +1,13 @@
+alttab (1.7.1-4) UNRELEASED; urgency=medium
+
+  * Bump the debhelper compat level to 14 with no changes.
+  * Let debhelper add some default dependencies automatically.
+  * Use debputy's X-Style: black.
+  * Add the void-proto patch to fix the build with GCC 15.
+  * Add Salsa CI configuration.
+
+ -- Peter Pentchev <roam@debian.org>  Tue, 18 Feb 2025 19:52:28 +0200
+
 alttab (1.7.1-3) unstable; urgency=medium
 
   [ Alexander Kulak ]
