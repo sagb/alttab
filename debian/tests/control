@@ -1,4 +1,12 @@
 Test-Command: env ALTTAB=alttab test/run-in-xvfb.test
-Depends: @, procps, x11-apps, x11-utils, xdotool, xvfb
-Features: test-name=upstream
-Restrictions: allow-stderr
+Depends:
+ procps,
+ x11-apps,
+ x11-utils,
+ xdotool,
+ xvfb,
+ @,
+Features:
+ test-name=upstream,
+Restrictions:
+ allow-stderr,

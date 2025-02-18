@@ -2,37 +2,53 @@ Source: alttab
 Section: x11
 Priority: optional
 Maintainer: Peter Pentchev <roam@debian.org>
-Build-Depends: debhelper (>> 13.15~),
-               dh-package-notes,
-               dh-sequence-single-binary,
-               dpkg-build-api (= 1),
-               libx11-dev,
-               libxmu-dev,
-               libxft-dev,
-               libxrender-dev,
-               libxrandr-dev,
-               libpng-dev,
-               libxpm-dev,
-               uthash-dev,
-               autoconf,
-               automake,
-               ronn,
-               procps <!nocheck>,
-               xdotool <!nocheck>,
-               xvfb <!nocheck>,
-               x11-apps <!nocheck>,
-               x11-utils <!nocheck>,
+Build-Depends:
+ debhelper (>> 13.15~),
+ dh-package-notes,
+ dh-sequence-single-binary,
+ dpkg-build-api (= 1),
+ autoconf,
+ automake,
+ libpng-dev,
+ libx11-dev,
+ libxft-dev,
+ libxmu-dev,
+ libxpm-dev,
+ libxrandr-dev,
+ libxrender-dev,
+ procps <!nocheck>,
+ ronn,
+ uthash-dev,
+ x11-apps <!nocheck>,
+ x11-utils <!nocheck>,
+ xdotool <!nocheck>,
+ xvfb <!nocheck>,
 Standards-Version: 4.7.0
 X-DH-Compat: 14
 Vcs-Git: https://salsa.debian.org/debian/alttab.git
 Vcs-Browser: https://salsa.debian.org/debian/alttab
 Homepage: https://sagb.github.io/alttab
+X-Style: black
 
 Package: alttab
 Architecture: any
-Suggests: fonts-dejavu-core
-Enhances: jwm, twm, evilwm, ratpoison, fluxbox, matchbox, blackbox,
- cwm, wm2, ctwm, lwm, sawfish, awesome, i3-wm
+Suggests:
+ fonts-dejavu-core,
+Enhances:
+ awesome,
+ blackbox,
+ ctwm,
+ cwm,
+ evilwm,
+ fluxbox,
+ i3-wm,
+ jwm,
+ lwm,
+ matchbox,
+ ratpoison,
+ sawfish,
+ twm,
+ wm2,
 Description: task switcher for minimalistic WMs or standalone X session
  alttab provides convenient visual interface and switching on releasing
  Alt, not on pressing Tab key. Being lightweight and depending only on
