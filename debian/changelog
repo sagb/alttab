@@ -6,6 +6,7 @@ alttab (1.7.1-4) UNRELEASED; urgency=medium
   * Add the void-proto patch to fix the build with GCC 15.
     Closes: #1096301
   * Add Salsa CI configuration.
+  * Add the years 2024 and 2025 to my debian/* copyright notice.
 
  -- Peter Pentchev <roam@debian.org>  Tue, 18 Feb 2025 19:52:28 +0200
 
