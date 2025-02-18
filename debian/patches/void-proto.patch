@@ -1,7 +1,7 @@
 Description: Declare functions with no parameters as (void)
  Also correct a function prototype and another function's invocation.
 Bug-Debian: https://bugs.debian.org/1096301
-Forwarded: no
+Forwarded: https://github.com/sagb/alttab/pull/178
 Author: Peter Pentchev <roam@ringlet.net>
 Last-Update: 2025-02-18
 
