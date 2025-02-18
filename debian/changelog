@@ -1,4 +1,4 @@
-alttab (1.7.1-4) UNRELEASED; urgency=medium
+alttab (1.7.1-4) unstable; urgency=medium
 
   * Bump the debhelper compat level to 14 with no changes.
   * Let debhelper add some default dependencies automatically.
@@ -8,7 +8,7 @@ alttab (1.7.1-4) UNRELEASED; urgency=medium
   * Add Salsa CI configuration.
   * Add the years 2024 and 2025 to my debian/* copyright notice.
 
- -- Peter Pentchev <roam@debian.org>  Tue, 18 Feb 2025 19:52:28 +0200
+ -- Peter Pentchev <roam@debian.org>  Tue, 18 Feb 2025 20:07:43 +0200
 
 alttab (1.7.1-3) unstable; urgency=medium
 
