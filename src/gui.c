@@ -498,7 +498,9 @@ int uiShow(bool direction)
         return 0;
     }
 
-    selNdx = direction ? (g.maxNdx - 1) : ((0 >= (g.maxNdx - 1)) ? 0 : 1);
+    int backNdx = g.maxNdx - 1;
+    int forwNdx = (0 >= (g.maxNdx - 1) || g.option_desktop == DESK_NOCURRENT) ? 0 : 1;
+    selNdx = direction ? backNdx : forwNdx;
 //if (selNdx<0 || selNdx>=g.maxNdx) { selNdx=0; } // just for case
     msg(1, "Current (selected) item in winlist: %d\n", selNdx);
 
