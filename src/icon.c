@@ -316,7 +316,7 @@ int inspectIconMeta(FTSENT * pe)
         strncpy(sx, dim, sx_size);
         sx[sx_size] = '\0';
         ix = atoi(sx);
-        sy_size = dim + dimlen - xchar;
+        sy_size = dim + dimlen - xchar - 1;
         if (sy_size > MAXICONDIMLEN - 1)
             return 0;
         strncpy(sy, xchar + 1, sy_size);
