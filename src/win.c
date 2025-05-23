@@ -570,7 +570,7 @@ static void __initWinlist(void)
 
 //
 // sets g.winlist, g.maxNdx
-// updates g.sortlist, g.sortNdx
+// updates g.sortlist
 // n.b.: in heavy WM, use _NET_CLIENT_LIST
 // direction is direction of first press: with shift or without
 //

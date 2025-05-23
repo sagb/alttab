@@ -74,7 +74,7 @@ Options:\n\
    -bc color  extra border color\n\
    -bw N      extra border width\n\
  -font name   font name in the form xft:fontconfig_pattern\n\
- -vertical    verticat layout\n\
+ -vertical    vertical layout\n\
     -e        keep switcher after keys release\n\
     -b N      bottom line: 0=no, 1=desktop, 2=user\n\
    -ns        ignore window request to skip it in taskbar\n\
