@@ -275,6 +275,9 @@ int inspectIconMeta(FTSENT * pe)
     char *legacy_dim_suffixes[] = { "16", "24", "32", "48", "64", NULL };
     int dir = ICON_DIR_FREEDESKTOP;
     int ext = ICON_EXT_UNKNOWN;
+    FILE *png_file;
+    TImage img;
+    bool png_init_success;
     const char *special_fail_1 = "failed to interpret %s as app_WWxHH at %s\n";
 
     fname = pe->fts_name;
@@ -303,8 +306,8 @@ int inspectIconMeta(FTSENT * pe)
     for (tl = 0; app[tl] != '\0'; tl++)
         app[tl] = tolower(app[tl]);
 
-    // guess dimensions by directory
-    if (dir == ICON_DIR_FREEDESKTOP) {
+    // guess dimensions
+    if (dir == ICON_DIR_FREEDESKTOP) { // by directory
         dim = pe->fts_parent->fts_parent->fts_name;
         dimlen = pe->fts_parent->fts_parent->fts_namelen;
         xchar = strchr(dim, 'x');
@@ -322,6 +325,20 @@ int inspectIconMeta(FTSENT * pe)
         strncpy(sy, xchar + 1, sy_size);
         sy[sy_size] = '\0';
         iy = atoi(sy);
+    } else if (ext == ICON_EXT_PNG) { // by png file header
+        png_file = fopen(pe->fts_path, "rb");
+        if (!png_file) {
+            fprintf(stderr, "can't open [%s]\n", pe->fts_path);
+            return 0;
+        }
+        png_init_success = pngInit(png_file, &img);
+        fclose(png_file);
+        if (!png_init_success) {
+            fprintf(stderr, "error reading png header [%s]\n", pe->fts_path);
+            return 0;
+        }
+        ix = img.width;
+        iy = img.height;
     } else {
         // icon other than a priory known dimensions has lowest priority
         ix = iy = 1;
