@@ -139,6 +139,7 @@ static int use_args_and_xrm(int *argc, char **argv)
         {"-vertical", "*vertical", XrmoptionIsArg, NULL},
         {"-e", "*keep", XrmoptionIsArg, NULL},
         {"-b", "*bottomline", XrmoptionSepArg, NULL},
+        {"-sortmin", "*sortmin", XrmoptionIsArg, NULL},
         {"-ns", "*noskiptaskbar", XrmoptionIsArg, NULL}
     };
     const char *inv = "invalid %s, use -h for help\n";
