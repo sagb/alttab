@@ -493,6 +493,10 @@ static int use_args_and_xrm(int *argc, char **argv)
     g.option_vertical = (s != NULL);
     msg(0, "vertical: %d\n", g.option_vertical);
 
+    s = xresource_load_string(&db, XRMAPPNAME, "sortmin");
+    g.option_sort_minimize = (s != NULL);
+    msg(0, "sortmin: %d\n", g.option_sort_minimize);
+
 // max recursion for searching windows
 // -1 is "everything"
 // in raw X this returns too much windows, "1" is probably sufficient
