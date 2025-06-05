@@ -41,6 +41,34 @@ extern Window root;
 
 // PRIVATE
 
+bool is_minimized(Window win) {
+    Atom netWmState = XInternAtom(dpy, "_NET_WM_STATE", False);
+    Atom hidden = XInternAtom(dpy, "_NET_WM_STATE_HIDDEN", False);
+    if (netWmState == None || hidden == None)
+        return false;
+
+    Atom type;
+    int format;
+    unsigned long n, leftover;
+    Atom *atoms = NULL;
+
+    if (XGetWindowProperty(dpy, win, netWmState, 0, 8, False, XA_ATOM,
+                           &type, &format, &n, &leftover,
+                           (unsigned char**)&atoms) != Success || !atoms)
+        return false;
+
+    for (unsigned long i = 0; i < n; i++) {
+        if (atoms[i] == hidden) {
+            XFree(atoms);
+            return true;
+        }
+    }
+
+    XFree(atoms);
+    return false;
+}
+
+
 //
 // helper for windows' qsort
 // CAUSES O(log(N)) OR EVEN WORSE! reintroduce winlist[]->order instead?
