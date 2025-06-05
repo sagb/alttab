@@ -211,6 +211,7 @@ typedef struct {
     Atom naw;                   // _NET_ACTIVE_WINDOW
 //    SwitchMoment last; // for detecting false focus events from WM
     bool option_keep_ui;
+    bool option_sort_minimize;
 } Globals;
 
 // gui
