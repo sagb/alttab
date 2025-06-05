@@ -81,6 +81,16 @@ static int sort_by_order(const void *p1, const void *p2)
     int r = 0;
 
     DL_FOREACH(g.sortlist, s) {
+        if (g.option_sort_minimize) {
+            bool w1_min = is_minimized(w1->id);
+            bool w2_min = is_minimized(w2->id);
+
+            if (w1_min != w2_min) {
+                r = (w1_min) ? 1 : -1;
+                break;
+            }
+        }
+
         if (s->id == w1->id) {
             r = (s->id == w2->id) ? 0 : -1;
             break;
