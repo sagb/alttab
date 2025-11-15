@@ -2,7 +2,7 @@
 Interface with EWMH-compatible window managers.
 Note: _WIN fallbacks are not part of EWMH or ICCCM, but kept here anyway.
 
-Copyright 2017-2024 Alexander Kulak.
+Copyright 2017-2025 Alexander Kulak.
 This file is part of alttab program.
 
 alttab is free software: you can redistribute it and/or modify

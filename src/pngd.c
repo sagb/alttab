@@ -1,7 +1,7 @@
 /*
 Reading PNG into Drawable.
 
-Copyright 2017-2024 Alexander Kulak.
+Copyright 2017-2025 Alexander Kulak.
 This file is part of alttab program.
 
 alttab is free software: you can redistribute it and/or modify
