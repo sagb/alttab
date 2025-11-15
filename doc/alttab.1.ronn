@@ -313,6 +313,12 @@ Your Xresources database probably already has \*background, \*foreground or \*fo
 
     Vertical layout.
 
+  * `-sortmin`:
+    resource: alttab.sortmin  
+    default: no
+
+    Sort minimized windows last.
+
   * `-e`:
     resource: alttab.keep  
     default: no

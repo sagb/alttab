@@ -75,6 +75,7 @@ Options:\n\
    -bw N      extra border width\n\
  -font name   font name in the form xft:fontconfig_pattern\n\
  -vertical    vertical layout\n\
+  -sortmin    sort minimized windows last\n\
     -e        keep switcher after keys release\n\
     -b N      bottom line: 0=no, 1=desktop, 2=user\n\
    -ns        ignore window request to skip it in taskbar\n\
@@ -138,6 +139,7 @@ static int use_args_and_xrm(int *argc, char **argv)
         {"-vertical", "*vertical", XrmoptionIsArg, NULL},
         {"-e", "*keep", XrmoptionIsArg, NULL},
         {"-b", "*bottomline", XrmoptionSepArg, NULL},
+        {"-sortmin", "*sortmin", XrmoptionIsArg, NULL},
         {"-ns", "*noskiptaskbar", XrmoptionIsArg, NULL}
     };
     const char *inv = "invalid %s, use -h for help\n";
@@ -490,6 +492,10 @@ static int use_args_and_xrm(int *argc, char **argv)
     s = xresource_load_string(&db, XRMAPPNAME, "vertical");
     g.option_vertical = (s != NULL);
     msg(0, "vertical: %d\n", g.option_vertical);
+
+    s = xresource_load_string(&db, XRMAPPNAME, "sortmin");
+    g.option_sort_minimize = (s != NULL);
+    msg(0, "sortmin: %d\n", g.option_sort_minimize);
 
 // max recursion for searching windows
 // -1 is "everything"

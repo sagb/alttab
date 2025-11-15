@@ -41,6 +41,34 @@ extern Window root;
 
 // PRIVATE
 
+bool is_minimized(Window win) {
+    Atom netWmState = XInternAtom(dpy, "_NET_WM_STATE", False);
+    Atom hidden = XInternAtom(dpy, "_NET_WM_STATE_HIDDEN", False);
+    if (netWmState == None || hidden == None)
+        return false;
+
+    Atom type;
+    int format;
+    unsigned long n, leftover;
+    Atom *atoms = NULL;
+
+    if (XGetWindowProperty(dpy, win, netWmState, 0, 8, False, XA_ATOM,
+                           &type, &format, &n, &leftover,
+                           (unsigned char**)&atoms) != Success || !atoms)
+        return false;
+
+    for (unsigned long i = 0; i < n; i++) {
+        if (atoms[i] == hidden) {
+            XFree(atoms);
+            return true;
+        }
+    }
+
+    XFree(atoms);
+    return false;
+}
+
+
 //
 // helper for windows' qsort
 // CAUSES O(log(N)) OR EVEN WORSE! reintroduce winlist[]->order instead?
@@ -53,6 +81,16 @@ static int sort_by_order(const void *p1, const void *p2)
     int r = 0;
 
     DL_FOREACH(g.sortlist, s) {
+        if (g.option_sort_minimize) {
+            bool w1_min = is_minimized(w1->id);
+            bool w2_min = is_minimized(w2->id);
+
+            if (w1_min != w2_min) {
+                r = (w1_min) ? 1 : -1;
+                break;
+            }
+        }
+
         if (s->id == w1->id) {
             r = (s->id == w2->id) ? 0 : -1;
             break;
