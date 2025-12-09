@@ -1,3 +1,9 @@
+alttab (1.7.1-5) UNRELEASED; urgency=medium
+
+  * Declare compliance with Policy 4.7.2 with no changes.
+
+ -- Peter Pentchev <roam@debian.org>  Wed, 10 Dec 2025 00:06:34 +0200
+
 alttab (1.7.1-4) unstable; urgency=medium
 
   * Bump the debhelper compat level to 14 with no changes.
