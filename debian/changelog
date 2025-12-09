@@ -1,6 +1,9 @@
 alttab (1.7.1-5) UNRELEASED; urgency=medium
 
   * Declare compliance with Policy 4.7.2 with no changes.
+  * Update the watch file to version 5 of the format.
+  * Add a `debputy reformat` autopkgtest.
+  * Enable more tests in Salsa CI.
 
  -- Peter Pentchev <roam@debian.org>  Wed, 10 Dec 2025 00:06:34 +0200
 
