@@ -1,3 +1,9 @@
 ---
 include:
   - https://salsa.debian.org/salsa-ci-team/pipeline/raw/master/recipes/debian.yml
+
+variables:
+  SALSA_CI_DISABLE_BUILD_PACKAGE_TWICE: 0
+  SALSA_CI_DISABLE_EXPORTORIG_FALLBACK: 1
+  SALSA_CI_REPROTEST_ENABLE_DIFFOSCOPE: 1
+  SALSA_CI_AUTOPKGTEST_ALLOWED_EXIT_STATUS: '0'
