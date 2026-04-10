@@ -59,7 +59,7 @@ Options:\n\
    -nk str    keysym of 'next' key\n\
    -ck str    keysym of 'cancel' key\n\
    -dk str    keysym of 'kill' key\n\
-   -di        increment desktop number\n\
+   -di        increment desktop index\n\
    -mm N      (obsoleted) main modifier mask\n\
    -bm N      (obsoleted) backward scroll modifier mask\n\
     -t NxM    tile geometry\n\
