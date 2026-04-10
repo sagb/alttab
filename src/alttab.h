@@ -153,6 +153,7 @@ typedef struct {
 #define DESK_MAX        4
 #define DESK_DEFAULT    DESK_CURRENT
     int option_desktop;
+    bool option_desktop_increment;
 #define SCR_MIN        0
 #define SCR_CURRENT    0
 #define SCR_ALL        1

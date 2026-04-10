@@ -59,6 +59,7 @@ Options:\n\
    -nk str    keysym of 'next' key\n\
    -ck str    keysym of 'cancel' key\n\
    -dk str    keysym of 'kill' key\n\
+   -di        increment desktop number\n\
    -mm N      (obsoleted) main modifier mask\n\
    -bm N      (obsoleted) backward scroll modifier mask\n\
     -t NxM    tile geometry\n\
@@ -123,6 +124,7 @@ static int use_args_and_xrm(int *argc, char **argv)
         {"-nk", "*nextkey.keysym", XrmoptionSepArg, NULL},
         {"-ck", "*cancelkey.keysym", XrmoptionSepArg, NULL},
         {"-dk", "*killkey.keysym", XrmoptionSepArg, NULL},
+        {"-di", "*desktopincrement", XrmoptionIsArg, NULL},
         {"-t", "*tile.geometry", XrmoptionSepArg, NULL},
         {"-i", "*icon.geometry", XrmoptionSepArg, NULL},
         {"-vp", "*viewport", XrmoptionSepArg, NULL},
@@ -338,6 +340,10 @@ static int use_args_and_xrm(int *argc, char **argv)
         GMM, GBM, MC, KC);
     msg(0, "cancelCode %d, killCode %d\n",
         cancelC, killC);
+
+    s = xresource_load_string(&db, XRMAPPNAME, "desktopincrement");
+    g.option_desktop_increment = (s != NULL);
+    msg(0, "desktop_increment: %d\n", g.option_desktop_increment);
 
     g.option_tileW = DEFTILEW;
     g.option_tileH = DEFTILEH;

@@ -556,14 +556,16 @@ endIcon:
     WI.bottom_line[0] = '\0';
     long unsigned int nws, *pid;
     char procd[32];
+    unsigned long desktop_val;
     int sr;
     struct stat st;
     struct passwd *gu;
     switch(g.option_bottom_line) {
         case BL_DESKTOP:
-            if (desktop != DESKTOP_UNKNOWN)
-                snprintf(WI.bottom_line, MAXNAMESZ, "%ld", desktop);
-            else
+            if (desktop != DESKTOP_UNKNOWN) {
+                desktop_val = (g.option_desktop_increment) ? desktop + 1 : desktop;
+                snprintf(WI.bottom_line, MAXNAMESZ, "%ld", desktop_val);
+            } else
                 strncpy(WI.bottom_line, "?", 2);
             break;
         case BL_USER:
