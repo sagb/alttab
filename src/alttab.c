@@ -59,7 +59,6 @@ Options:\n\
    -nk str    keysym of 'next' key\n\
    -ck str    keysym of 'cancel' key\n\
    -dk str    keysym of 'kill' key\n\
-   -di        increment desktop index\n\
    -mm N      (obsoleted) main modifier mask\n\
    -bm N      (obsoleted) backward scroll modifier mask\n\
     -t NxM    tile geometry\n\
@@ -79,6 +78,7 @@ Options:\n\
   -sortmin    sort minimized windows last\n\
     -e        keep switcher after keys release\n\
     -b N      bottom line: 0=no, 1=desktop, 2=user\n\
+   -di        increment desktop indices\n\
    -ns        ignore window request to skip it in taskbar\n\
   -v|-vv      verbose\n\
     -h        help\n\
@@ -124,7 +124,6 @@ static int use_args_and_xrm(int *argc, char **argv)
         {"-nk", "*nextkey.keysym", XrmoptionSepArg, NULL},
         {"-ck", "*cancelkey.keysym", XrmoptionSepArg, NULL},
         {"-dk", "*killkey.keysym", XrmoptionSepArg, NULL},
-        {"-di", "*desktopincrement", XrmoptionIsArg, NULL},
         {"-t", "*tile.geometry", XrmoptionSepArg, NULL},
         {"-i", "*icon.geometry", XrmoptionSepArg, NULL},
         {"-vp", "*viewport", XrmoptionSepArg, NULL},
@@ -141,6 +140,7 @@ static int use_args_and_xrm(int *argc, char **argv)
         {"-vertical", "*vertical", XrmoptionIsArg, NULL},
         {"-e", "*keep", XrmoptionIsArg, NULL},
         {"-b", "*bottomline", XrmoptionSepArg, NULL},
+        {"-di", "*desktopincrement", XrmoptionIsArg, NULL},
         {"-sortmin", "*sortmin", XrmoptionIsArg, NULL},
         {"-ns", "*noskiptaskbar", XrmoptionIsArg, NULL}
     };
@@ -341,10 +341,6 @@ static int use_args_and_xrm(int *argc, char **argv)
     msg(0, "cancelCode %d, killCode %d\n",
         cancelC, killC);
 
-    s = xresource_load_string(&db, XRMAPPNAME, "desktopincrement");
-    g.option_desktop_increment = (s != NULL);
-    msg(0, "desktop_increment: %d\n", g.option_desktop_increment);
-
     g.option_tileW = DEFTILEW;
     g.option_tileH = DEFTILEH;
     gtile = xresource_load_string(&db, XRMAPPNAME, "tile.geometry");
@@ -528,6 +524,10 @@ static int use_args_and_xrm(int *argc, char **argv)
         break;
     }
     msg(0, "bottomline: %d\n", g.option_bottom_line);
+
+    s = xresource_load_string(&db, XRMAPPNAME, "desktopincrement");
+    g.option_desktop_increment = (s != NULL);
+    msg(0, "desktop_increment: %d\n", g.option_desktop_increment);
 
     s = xresource_load_string(&db, XRMAPPNAME, "noskiptaskbar");
     g.option_no_skip_taskbar = (s != NULL);
