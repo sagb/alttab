@@ -218,6 +218,7 @@ typedef struct {
 #define FRAME_MIN_USER      1
 #define frameW              g.option_frameW
     int option_frameW;
+    Time ev_time;   // store the timestamp of the last X11 input event
 } Globals;
 
 // gui

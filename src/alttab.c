@@ -658,6 +658,7 @@ int main(int argc, char **argv)
         case KeyPress:
             msg(1, "Press %lx: %d-%d\n",
                 ev.xkey.window, ev.xkey.state, ev.xkey.keycode);
+            g.ev_time = ev.xkey.time;
             if (ev.xkey.state & g.option_modMask) {  // alt
                 if (ev.xkey.keycode == g.option_keyCode) {  // tab
                     CHECK_97;
@@ -693,6 +694,7 @@ int main(int argc, char **argv)
         case KeyRelease:
             msg(1, "Release %lx: %d-%d\n",
                 ev.xkey.window, ev.xkey.state, ev.xkey.keycode);
+            g.ev_time = ev.xkey.time;
             // interested only in "final" release
             if (!((ev.xkey.state & g.option_modMask)
                   && ev.xkey.keycode == g.option_modCode && g.uiShowHasRun)) {

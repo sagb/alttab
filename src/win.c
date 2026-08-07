@@ -757,9 +757,10 @@ int setFocus(int winNdx)
         // as in x.c, or BadMatch happens after switching desktops.
         XWindowAttributes att;
         XGetWindowAttributes(dpy, g.winlist[winNdx].id, &att);
+        Time msg_time = (g.ev_time != CurrentTime) ? g.ev_time : CurrentTime;
         if (att.map_state == IsViewable)
-            XSetInputFocus(dpy, g.winlist[winNdx].id, RevertToParent,
-                           CurrentTime);
+            XSetInputFocus(dpy, g.winlist[winNdx].id, RevertToParent, msg_time);
+
         break;
     case WM_TWM:
         r = ewmh_setFocus(winNdx, 0);
