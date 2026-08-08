@@ -112,7 +112,9 @@ static int ewmh_switch_desktop(unsigned long desktop)
 
 static int ewmh_switch_window(unsigned long window)
 {
-    unsigned long edata[] = { 2, CurrentTime, 0, 0, 0 };
+    Time msg_time = (g.ev_time != CurrentTime) ? g.ev_time : CurrentTime;
+    unsigned long edata[] = { 2, msg_time, 0, 0, 0 };
+
     msg(1, "ewmh switching window to 0x%lx\n", window);
     return ewmh_send_wm_evt(window, "_NET_ACTIVE_WINDOW", edata);
 }
