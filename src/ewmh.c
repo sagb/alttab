@@ -90,8 +90,7 @@ static int ewmh_send_wm_evt(Window w, char *atom, unsigned long edata[])
 static int ewmh_switch_desktop(unsigned long desktop)
 {
     int evr, elapsed;
-    Time msg_time = (g.ev_time != CurrentTime) ? g.ev_time : CurrentTime;
-    unsigned long edata[] = { desktop, msg_time, 0, 0, 0 };
+    unsigned long edata[] = { desktop, CurrentTime, 0, 0, 0 };
     if (desktop == -1 && g.ewmh.minus1_desktop_unusable)
         return 0;
     msg(1, "ewmh switching desktop to %ld\n", desktop);
@@ -112,8 +111,7 @@ static int ewmh_switch_desktop(unsigned long desktop)
 
 static int ewmh_switch_window(unsigned long window)
 {
-    Time msg_time = (g.ev_time != CurrentTime) ? g.ev_time : CurrentTime;
-    unsigned long edata[] = { 2, msg_time, 0, 0, 0 };
+    unsigned long edata[] = { 2, CurrentTime, 0, 0, 0 };
 
     msg(1, "ewmh switching window to 0x%lx\n", window);
     return ewmh_send_wm_evt(window, "_NET_ACTIVE_WINDOW", edata);
