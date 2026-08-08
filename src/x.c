@@ -124,6 +124,66 @@ int x_initWindowsInfoRecursive(Window win, int reclevel)
 }
 
 //
+// globally active window per ICCCM: input==False and WM_TAKE_FOCUS offered.
+// it focuses itself and must be asked, not fed to XSetInputFocus.
+// see 4.1.7. Input Focus in https://tronche.com/gui/x/icccm/sec-4.html
+//
+bool x_wantsTakeFocus(Window w)
+{
+    XWMHints *h;
+    bool input_false = false;
+    if ((h = XGetWMHints(dpy, w))) {
+        input_false = (h->flags & InputHint) && (h->input == False);
+        XFree(h);
+    }
+    if (!input_false)
+        return false;
+    Atom take = XInternAtom(dpy, "WM_TAKE_FOCUS", False);
+    Atom *proto;
+    int n;
+    bool found = false;
+    if (XGetWMProtocols(dpy, w, &proto, &n)) {
+        for (int i = 0; i < n && !found; i++)
+            found = (proto[i] == take);
+        XFree(proto);
+    }
+    return found;
+}
+
+//
+// ask w to take focus, per ICCCM. CurrentTime lets the app's XSetInputFocus
+// resolve to the server's current time, so the WM's just-made focus change
+// can't make the server drop it
+//
+void x_sendTakeFocus(Window w)
+{
+    XEvent e = { 0 };
+    e.xclient.type = ClientMessage;
+    e.xclient.window = w;
+    e.xclient.message_type = XInternAtom(dpy, "WM_PROTOCOLS", False);
+    e.xclient.format = 32;
+    e.xclient.data.l[0] = XInternAtom(dpy, "WM_TAKE_FOCUS", False);
+    e.xclient.data.l[1] = CurrentTime;
+    XSendEvent(dpy, w, False, NoEventMask, &e);
+}
+
+//
+// focus w by its ICCCM model: WM_TAKE_FOCUS for globally active, else
+// XSetInputFocus. viewable is required, or XSetInputFocus gives BadMatch
+//
+void x_focusViewable(Window w)
+{
+    XWindowAttributes att;
+    XGetWindowAttributes(dpy, w, &att);
+    if (att.map_state != IsViewable)
+        return;
+    if (x_wantsTakeFocus(w))
+        x_sendTakeFocus(w);
+    else
+        XSetInputFocus(dpy, w, RevertToParent, CurrentTime);
+}
+
+//
 // set window focus in raw X
 //
 int x_setFocus(int wndx)
@@ -137,14 +197,8 @@ int x_setFocus(int wndx)
 // 2. XRaiseWindow required, but doesn't make window "Viewable"
     XRaiseWindow(dpy, w);
 
-// 3. XSetInputFocus
-// "The specified focus window must be viewable at the time
-// XSetInputFocus is called, or a BadMatch error results."
-// This check is redundant: non-viewable windows isn't added to winlist in raw X anyway
-    XWindowAttributes att;
-    XGetWindowAttributes(dpy, w, &att);
-    if (att.map_state == IsViewable)
-        XSetInputFocus(dpy, w, RevertToParent, CurrentTime);
+// 3. focus, honouring the window's ICCCM input model
+    x_focusViewable(w);
 
     return 1;
 }

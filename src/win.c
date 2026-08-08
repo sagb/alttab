@@ -750,16 +750,10 @@ int setFocus(int winNdx)
         break;
     case WM_EWMH:
         r = ewmh_setFocus(winNdx, 0);
-        // XSetInputFocus stuff.
+        // input focus after _NET_ACTIVE_WINDOW:
         // skippy-xd does it and notes that "order is important".
         // fixes #28.
-        // it must be protected by testing IsViewable in the same way
-        // as in x.c, or BadMatch happens after switching desktops.
-        XWindowAttributes att;
-        XGetWindowAttributes(dpy, g.winlist[winNdx].id, &att);
-        if (att.map_state == IsViewable)
-            XSetInputFocus(dpy, g.winlist[winNdx].id, RevertToParent,
-                           CurrentTime);
+        x_focusViewable(g.winlist[winNdx].id);
         break;
     case WM_TWM:
         r = ewmh_setFocus(winNdx, 0);

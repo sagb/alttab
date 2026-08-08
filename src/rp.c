@@ -244,5 +244,10 @@ int rp_setFocus(int winNdx)
     if (!execAndReadStdout(ratpoison_cmd, args, buf, MAXRPOUT))
         return 0;
 
+    // ratpoison's select won't hand focus to globally active windows
+    Window w = g.winlist[winNdx].id;
+    if (x_wantsTakeFocus(w))
+        x_sendTakeFocus(w);
+
     return 1;
 }
