@@ -215,6 +215,7 @@ typedef struct {
     bool option_keep_ui;
     bool option_sort_minimize;
     bool min_col_specified;
+    bool option_left;
 #define FRAME_MIN_USER      1
 #define frameW              g.option_frameW
     int option_frameW;

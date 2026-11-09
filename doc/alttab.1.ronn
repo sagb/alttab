@@ -16,7 +16,7 @@ alttab(1) -- the task switcher
 
 ## SYNOPSIS
 
-`alttab` [`-w` <N>] [`-d` <N>] [`-sc` <N>] [`-mk` <str>] [`-kk` <str>] [`-bk` <str>] [`-pk` <str>] [`-nk` <str>] [`-ck` <str>] [`-dk` <str>] [`-mm` <N>] [`-bm` <N>] [`-t` <NxM>] [`-i` <NxM>] [`-vp` <str>] [`-p` <str>] [`-s` <N>] [`-theme` <name>] [`-bg` <color>] [`-fg` <color>] [`-frame` <color>] [`-inact` <color>] [`-min` <color>] [`-bc` <color>] [`-fw` <N>] [`-bw` <N>] [`-font` <name>] [`-vertical`] [`-sortmin`] [`-e`] [`-b` <N>] [`-ns`] [`-v`\|`-vv`]
+`alttab` [`-w` <N>] [`-d` <N>] [`-sc` <N>] [`-mk` <str>] [`-kk` <str>] [`-bk` <str>] [`-pk` <str>] [`-nk` <str>] [`-ck` <str>] [`-dk` <str>] [`-mm` <N>] [`-bm` <N>] [`-t` <NxM>] [`-i` <NxM>] [`-vp` <str>] [`-p` <str>] [`-s` <N>] [`-theme` <name>] [`-bg` <color>] [`-fg` <color>] [`-frame` <color>] [`-inact` <color>] [`-min` <color>] [`-bc` <color>] [`-fw` <N>] [`-bw` <N>] [`-font` <name>] [`-vertical`] [`-left`] [`-sortmin`] [`-e`] [`-b` <N>] [`-ns`] [`-v`\|`-vv`]
 
 ## DESCRIPTION
 
@@ -324,6 +324,15 @@ Your Xresources database probably already has \*background, \*foreground or \*fo
     default: no
 
     Vertical layout.
+
+  * `-left`:
+    resource: alttab.left  
+    default: no
+
+    Left-justify labels.
+    In vertical layout, also center the icon and a single-line label
+    vertically in the tile, and end a label that doesn't fit
+    with an ellipsis.
 
   * `-sortmin`:
     resource: alttab.sortmin  

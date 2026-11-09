@@ -322,6 +322,17 @@ int pixmapFit(Drawable src, Pixmap src_mask, Drawable dst,
               unsigned int srcW, unsigned int srcH,
               unsigned int dstW, unsigned int dstH)
 {
+    return pixmapFitAt(src, src_mask, dst, srcW, srcH, dstW, dstH, 0, 0);
+}
+
+//
+// Same as pixmapFit, but place the result at (dstX,dstY) in dst.
+//
+int pixmapFitAt(Drawable src, Pixmap src_mask, Drawable dst,
+                unsigned int srcW, unsigned int srcH,
+                unsigned int dstW, unsigned int dstH,
+                unsigned int dstX, unsigned int dstY)
+{
     int event_basep, error_basep;
     int32_t fWrat, fHrat;       // ratio * 65536
     int dstWscal, dstWoff, dstHscal, dstHoff;
@@ -343,6 +354,8 @@ int pixmapFit(Drawable src, Pixmap src_mask, Drawable dst,
             dstHscal = dstH;
         dstHoff = (dstH - dstHscal) / 2;
     }
+    dstWoff += dstX;
+    dstHoff += dstY;
 
     return XRenderQueryExtension(dpy, &event_basep, &error_basep) == True ?
         pixmapFitXrender(src, src_mask, dst, srcW, srcH,
@@ -385,11 +398,13 @@ char *utf8index(char *s, size_t pos)
 // Draw utf-8 string str on window/pixmap d,
 // using *font and *xrcolor,
 // splitting and cropping it to fit (x1,y1 - x1+width,y1+height) rectangle.
+// Each line is centered horizontally if center is true, left-aligned otherwise.
 // Return 1 if ok.
 //
 int drawMultiLine(Drawable d, XftFont * font,
                   XftColor * xftcolor, char *str, unsigned int x1,
-                  unsigned int y1, unsigned int width, unsigned int height)
+                  unsigned int y1, unsigned int width, unsigned int height,
+                  bool center)
 {
     int debug = 0;
     XftDraw *xftdraw;
@@ -479,7 +494,8 @@ int drawMultiLine(Drawable d, XftFont * font,
             }
             break;
         }
-        x += (width - ext.width) / 2;   // center
+        if (center)
+            x += (width - ext.width) / 2;
         XftDrawStringUtf8(xftdraw, xftcolor, font, x + ext.x, y + ext.y,
                           (unsigned char *)line, line_clen);
         if (debug > 0) {
@@ -532,7 +548,7 @@ int drawMultiLine_test(void)
     GC gc = DefaultGC(dpy, 0);
     XSetForeground(dpy, gc, WhitePixel(dpy, 0));
     XDrawRectangle(dpy, win, gc, 100, 100, 500, 400);
-    int r = drawMultiLine(win, font, &xftcolor, line, 100, 100, 500, 400);
+    int r = drawMultiLine(win, font, &xftcolor, line, 100, 100, 500, 400, true);
 
     XFlush(dpy);
     sleep(2);
@@ -566,6 +582,51 @@ int drawSingleLine(Drawable d, XftFont * font,
         XSetForeground(dpy, gc, WhitePixel(dpy, scr));
         XDrawRectangle(dpy, d, gc, x1, y1, x1 + width, y1 + height);
     }
+    return 1;
+}
+
+//
+// Draw utf-8 string str on window/pixmap d as a single line,
+// left-aligned and vertically centered in (x1,y1,width*height).
+// If str doesn't fit into width, cut it and append an ellipsis.
+// Return 1 if ok.
+//
+int drawEllipsizedLine(Drawable d, XftFont * font,
+                       XftColor * xftcolor, char *str, unsigned int x1,
+                       unsigned int y1, unsigned int width, unsigned int height)
+{
+    const char *ellipsis = "\xe2\x80\xa6";
+    char line[MAXNAMESZ + 4];
+    XGlyphInfo ext;
+    XftDraw *xftdraw;
+    size_t ulen, clen;
+    int baseline;
+
+    if ((*str) == '\0' || width == 0)
+        return 1;
+    strncpy(line, str, MAXNAMESZ - 1);
+    line[MAXNAMESZ - 1] = '\0';
+    XftTextExtentsUtf8(dpy, font, (unsigned char *)line, strlen(line), &ext);
+    if (ext.xOff > (int)width) {
+        ulen = utf8len(line);
+        while (ulen > 0) {
+            ulen--;
+            clen = utf8index(str, ulen) - str;
+            memcpy(line, str, clen);
+            strcpy(line + clen, ellipsis);
+            XftTextExtentsUtf8(dpy, font, (unsigned char *)line,
+                               strlen(line), &ext);
+            if (ext.xOff <= (int)width)
+                break;
+        }
+    }
+    baseline = (int)y1 + ((int)height - (font->ascent + font->descent)) / 2
+        + font->ascent;
+    xftdraw = XftDrawCreate(dpy, d, DefaultVisual(dpy, 0),
+                            DefaultColormap(dpy, scr));
+    XftDrawStringUtf8(xftdraw, xftcolor, font, x1, baseline,
+                      (unsigned char *)line, strlen(line));
+    XftDrawDestroy(xftdraw);
     return 1;
 }
 

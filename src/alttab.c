@@ -77,6 +77,7 @@ Options:\n\
    -fw N      active frame width\n\
  -font name   font name in the form xft:fontconfig_pattern\n\
  -vertical    vertical layout\n\
+    -left     left-justify labels\n\
   -sortmin    sort minimized windows last\n\
     -e        keep switcher after keys release\n\
     -b N      bottom line: 0=no, 1=desktop, 2=user\n\
@@ -141,6 +142,7 @@ static int use_args_and_xrm(int *argc, char **argv)
         {"-fw", "*framewidth", XrmoptionSepArg, NULL},
         {"-font", "*font", XrmoptionSepArg, NULL},
         {"-vertical", "*vertical", XrmoptionIsArg, NULL},
+        {"-left", "*left", XrmoptionIsArg, NULL},
         {"-e", "*keep", XrmoptionIsArg, NULL},
         {"-b", "*bottomline", XrmoptionSepArg, NULL},
         {"-sortmin", "*sortmin", XrmoptionIsArg, NULL},
@@ -515,6 +517,10 @@ static int use_args_and_xrm(int *argc, char **argv)
     s = xresource_load_string(&db, XRMAPPNAME, "vertical");
     g.option_vertical = (s != NULL);
     msg(0, "vertical: %d\n", g.option_vertical);
+
+    s = xresource_load_string(&db, XRMAPPNAME, "left");
+    g.option_left = (s != NULL);
+    msg(0, "left: %d\n", g.option_left);
 
     s = xresource_load_string(&db, XRMAPPNAME, "sortmin");
     g.option_sort_minimize = (s != NULL);

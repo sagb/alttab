@@ -171,6 +171,12 @@ static void prepareTile(WindowInfo * wi)
 {
     XGlyphInfo ext;
     int bottW = 0, bottH = 0, bottX = 0, bottY = 0;
+    unsigned int iconX = 0, iconY = 0;
+
+    // in vertical layout with left-justified labels,
+    // center the icon vertically, with the same margin on the left
+    if (g.option_vertical && g.option_left && tileH > iconH)
+        iconX = iconY = (tileH - iconH) / 2;
 
     wi->tile = XCreatePixmap(dpy, root, tileW, tileH, XDEPTH);
     if (!wi->tile)
@@ -208,7 +214,7 @@ static void prepareTile(WindowInfo * wi)
                                wi->tile,
                                ic_gc, 0, 0,
                                wi->icon_w, wi->icon_h,  // src
-                               0, 0);   // dst
+                               iconX, iconY);   // dst
             if (!or) {
                 msg(-1, "can't copy icon to tile\n");
             }
@@ -216,12 +222,13 @@ static void prepareTile(WindowInfo * wi)
         } else {
             // scale
             msg(1, "scaling icon onto tile\n");
-            int sc = pixmapFit(wi->icon_drawable,
-                               wi->icon_mask,
-                               wi->tile,
-                               wi->icon_w,
-                               wi->icon_h,
-                               iconW, iconH);
+            int sc = pixmapFitAt(wi->icon_drawable,
+                                 wi->icon_mask,
+                                 wi->tile,
+                                 wi->icon_w,
+                                 wi->icon_h,
+                                 iconW, iconH,
+                                 iconX, iconY);
             if (!sc) {
                 msg(-1, "can't scale icon to tile\n");
             }
@@ -235,7 +242,7 @@ static void prepareTile(WindowInfo * wi)
             XSetLineAttributes(dpy, gcL, 1, LineSolid, CapButt, JoinMiter);
             //XSetForeground (dpy, gcL, pixel);
             int pr = XDrawRectangle(dpy, wi->tile, gcL,
-                                    0, 0, iconW, iconH);
+                                    iconX, iconY, iconW, iconH);
             if (!pr) {
                 msg(-1, "can't draw placeholder\n");
             }
@@ -274,10 +281,11 @@ endBottomLine:
     // draw label
     if (wi->name[0] && fontLabel) {
         int x, y, w, h;
+        int dr;
         if (g.option_vertical) {
-            x = iconW + 5;
+            x = iconX + iconW + 5;
             y = frameW; // avoids overlapping with frames
-            w = tileW - iconW - 5 - bottW;
+            w = tileW - x - bottW;
             if (bottW > 0) w = w - 5 - 5; // avoids label too close to bottom line
             h = tileH - frameW;
         } else {
@@ -286,10 +294,16 @@ endBottomLine:
             w = tileW;
             h = tileH - iconH - 5 - bottH;
         }
-        int dr = drawMultiLine(wi->tile, fontLabel,
+        if (g.option_vertical && g.option_left) {
+            // single line, centered vertically in the whole tile
+            dr = drawEllipsizedLine(wi->tile, fontLabel,
+                                    &(g.color[COLFG].xftcolor),
+                                    wi->name, x, 0, w > 5 ? w - 5 : 0, tileH);
+        } else {
+            dr = drawMultiLine(wi->tile, fontLabel,
                                &(g.color[COLFG].xftcolor),
-                               wi->name,
-                               x, y, w, h);
+                               wi->name, x, y, w, h, !g.option_left);
+        }
         if (dr != 1) {
             msg(-1, "can't draw label\n");
         }

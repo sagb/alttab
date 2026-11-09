@@ -90,6 +90,9 @@ alttab.framecolor:      _rnd_low
 ! Vertical layout
 !alttab.vertical:       true
 
+! Left-justified labels
+!alttab.left:           true
+
 ! Keep switcher after Alt-Tab release
 !alttab.keep:           true
 

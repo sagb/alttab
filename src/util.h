@@ -84,17 +84,23 @@ int pixmapFitXrender(Drawable src, Pixmap src_mask, Drawable dst,
                      unsigned int dstWoffset, unsigned int dstHoffset);
 int pixmapFit(Drawable src, Pixmap src_mask, Drawable dst, unsigned int srcW,
               unsigned int srcH, unsigned int dstW, unsigned int dstH);
+int pixmapFitAt(Drawable src, Pixmap src_mask, Drawable dst, unsigned int srcW,
+                unsigned int srcH, unsigned int dstW, unsigned int dstH,
+                unsigned int dstX, unsigned int dstY);
 
 size_t utf8len(char *s);
 char *utf8index(char *s, size_t pos);
 
 int drawMultiLine(Drawable d, XftFont * font, XftColor * xftcolor, char *str,
                   unsigned int x1, unsigned int y1, unsigned int width,
-                  unsigned int height);
+                  unsigned int height, bool center);
 int drawMultiLine_test(void);
 int drawSingleLine(Drawable d, XftFont * font, XftColor * xftcolor, char *str,
                   unsigned int x1, unsigned int y1, unsigned int width,
                   unsigned int height);
+int drawEllipsizedLine(Drawable d, XftFont * font, XftColor * xftcolor,
+                       char *str, unsigned int x1, unsigned int y1,
+                       unsigned int width, unsigned int height);
 
 Bool predproc_true(Display * display, XEvent * event, char *arg);
 
