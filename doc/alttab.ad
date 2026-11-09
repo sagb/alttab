@@ -66,6 +66,9 @@ alttab.background:      #c9c9c9
 ! Red letters
 alttab.foreground:      #600000
 
+! Yellow letters in selected tile
+!alttab.selforeground:  yellow
+
 ! Thin frame around selected tile
 !alttab.framewidth:      4
 

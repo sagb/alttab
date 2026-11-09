@@ -48,7 +48,8 @@ along with alttab.  If not, see <http://www.gnu.org/licenses/>.
 #define COLBORDER   3
 #define COLINACT    4
 #define COLMIN      5
-#define NCOLORS     6
+#define COLSELFG    6
+#define NCOLORS     7
 #define DEFCOLBG    "black"
 #define DEFCOLFG    "grey"
 #define DEFCOLFRAME "#a0abab"
@@ -93,6 +94,7 @@ typedef struct {
     char icon_src[MAXNAMESZ];
 #endif
     Pixmap tile;                // ready to display. w/h are all equal and defined in gui.c
+    Pixmap seltile;             // same as tile, but with selected label color (-sfg)
 // this constant can't be 0, 1, -1, MAXINT,
 // because WMs set it to these values incoherently
 #define DESKTOP_UNKNOWN 0xdead
@@ -215,6 +217,7 @@ typedef struct {
     bool option_keep_ui;
     bool option_sort_minimize;
     bool min_col_specified;
+    bool selfg_col_specified;
     bool option_left;
 #define FRAME_MIN_USER      1
 #define frameW              g.option_frameW

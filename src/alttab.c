@@ -69,6 +69,7 @@ Options:\n\
 -theme name   icon theme\n\
    -bg color  background color\n\
    -fg color  foreground color\n\
+  -sfg color  selected foreground color\n\
 -frame color  active frame color\n\
 -inact color  inactive frame color\n\
   -min color  minimized frame color\n\
@@ -134,6 +135,7 @@ static int use_args_and_xrm(int *argc, char **argv)
         {"-theme", "*theme", XrmoptionSepArg, NULL},
         {"-bg", "*background", XrmoptionSepArg, NULL},
         {"-fg", "*foreground", XrmoptionSepArg, NULL},
+        {"-sfg", "*selforeground", XrmoptionSepArg, NULL},
         {"-frame", "*framecolor", XrmoptionSepArg, NULL},
         {"-inact", "*inactcolor", XrmoptionSepArg, NULL},
         {"-min", "*mincolor", XrmoptionSepArg, NULL},
@@ -490,6 +492,9 @@ static int use_args_and_xrm(int *argc, char **argv)
     g.color[COLBG].name = s ? s : DEFCOLBG;
     s = xresource_load_string(&db, XRMAPPNAME, "foreground");
     g.color[COLFG].name = s ? s : DEFCOLFG;
+    s = xresource_load_string(&db, XRMAPPNAME, "selforeground");
+    g.selfg_col_specified = (s != NULL);
+    g.color[COLSELFG].name = s ? s : g.color[COLFG].name;
     s = xresource_load_string(&db, XRMAPPNAME, "framecolor");
     g.color[COLFRAME].name = s ? s : DEFCOLFRAME;
     s = xresource_load_string(&db, XRMAPPNAME, "mincolor");

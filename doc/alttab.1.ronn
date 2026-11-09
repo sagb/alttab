@@ -16,7 +16,7 @@ alttab(1) -- the task switcher
 
 ## SYNOPSIS
 
-`alttab` [`-w` <N>] [`-d` <N>] [`-sc` <N>] [`-mk` <str>] [`-kk` <str>] [`-bk` <str>] [`-pk` <str>] [`-nk` <str>] [`-ck` <str>] [`-dk` <str>] [`-mm` <N>] [`-bm` <N>] [`-t` <NxM>] [`-i` <NxM>] [`-vp` <str>] [`-p` <str>] [`-s` <N>] [`-theme` <name>] [`-bg` <color>] [`-fg` <color>] [`-frame` <color>] [`-inact` <color>] [`-min` <color>] [`-bc` <color>] [`-fw` <N>] [`-bw` <N>] [`-font` <name>] [`-vertical`] [`-left`] [`-sortmin`] [`-e`] [`-b` <N>] [`-ns`] [`-v`\|`-vv`]
+`alttab` [`-w` <N>] [`-d` <N>] [`-sc` <N>] [`-mk` <str>] [`-kk` <str>] [`-bk` <str>] [`-pk` <str>] [`-nk` <str>] [`-ck` <str>] [`-dk` <str>] [`-mm` <N>] [`-bm` <N>] [`-t` <NxM>] [`-i` <NxM>] [`-vp` <str>] [`-p` <str>] [`-s` <N>] [`-theme` <name>] [`-bg` <color>] [`-fg` <color>] [`-sfg` <color>] [`-frame` <color>] [`-inact` <color>] [`-min` <color>] [`-bc` <color>] [`-fw` <N>] [`-bw` <N>] [`-font` <name>] [`-vertical`] [`-left`] [`-sortmin`] [`-e`] [`-b` <N>] [`-ns`] [`-v`\|`-vv`]
 
 ## DESCRIPTION
 
@@ -257,7 +257,7 @@ Most command line options have corresponding X resource, see doc/alttab.ad for e
 
     Desktop theme for application icons. Used when `-s` is 1, 2 or 3.
 
-The following six options accept color names or <#rrggbb>. Special value <&#95;rnd_low> or <&#95;rnd_high> produce random color from lower or upper RGB space respectively.
+The following seven options accept color names or <#rrggbb>. Special value <&#95;rnd_low> or <&#95;rnd_high> produce random color from lower or upper RGB space respectively.
 
   * `-bg` <color>:
     resource: alttab.background  
@@ -270,6 +270,12 @@ The following six options accept color names or <#rrggbb>. Special value <&#95;r
     default: <grey>
 
     Foreground color.
+
+  * `-sfg` <color>:
+    resource: alttab.selforeground  
+    default: same as `-fg`
+
+    Foreground color of the selected tile.
 
   * `-frame` <color>:
     resource: alttab.framecolor  

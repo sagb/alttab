@@ -4,7 +4,7 @@
 .SH "NAME"
 \fBalttab\fR \- the task switcher
 .SH "SYNOPSIS"
-\fBalttab\fR [\fB\-w\fR \fIN\fR] [\fB\-d\fR \fIN\fR] [\fB\-sc\fR \fIN\fR] [\fB\-mk\fR \fIstr\fR] [\fB\-kk\fR \fIstr\fR] [\fB\-bk\fR \fIstr\fR] [\fB\-pk\fR \fIstr\fR] [\fB\-nk\fR \fIstr\fR] [\fB\-ck\fR \fIstr\fR] [\fB\-dk\fR \fIstr\fR] [\fB\-mm\fR \fIN\fR] [\fB\-bm\fR \fIN\fR] [\fB\-t\fR \fINxM\fR] [\fB\-i\fR \fINxM\fR] [\fB\-vp\fR \fIstr\fR] [\fB\-p\fR \fIstr\fR] [\fB\-s\fR \fIN\fR] [\fB\-theme\fR \fIname\fR] [\fB\-bg\fR \fIcolor\fR] [\fB\-fg\fR \fIcolor\fR] [\fB\-frame\fR \fIcolor\fR] [\fB\-inact\fR \fIcolor\fR] [\fB\-min\fR \fIcolor\fR] [\fB\-bc\fR \fIcolor\fR] [\fB\-fw\fR \fIN\fR] [\fB\-bw\fR \fIN\fR] [\fB\-font\fR \fIname\fR] [\fB\-vertical\fR] [\fB\-left\fR] [\fB\-sortmin\fR] [\fB\-e\fR] [\fB\-b\fR \fIN\fR] [\fB\-ns\fR] [\fB\-v\fR|\fB\-vv\fR]
+\fBalttab\fR [\fB\-w\fR \fIN\fR] [\fB\-d\fR \fIN\fR] [\fB\-sc\fR \fIN\fR] [\fB\-mk\fR \fIstr\fR] [\fB\-kk\fR \fIstr\fR] [\fB\-bk\fR \fIstr\fR] [\fB\-pk\fR \fIstr\fR] [\fB\-nk\fR \fIstr\fR] [\fB\-ck\fR \fIstr\fR] [\fB\-dk\fR \fIstr\fR] [\fB\-mm\fR \fIN\fR] [\fB\-bm\fR \fIN\fR] [\fB\-t\fR \fINxM\fR] [\fB\-i\fR \fINxM\fR] [\fB\-vp\fR \fIstr\fR] [\fB\-p\fR \fIstr\fR] [\fB\-s\fR \fIN\fR] [\fB\-theme\fR \fIname\fR] [\fB\-bg\fR \fIcolor\fR] [\fB\-fg\fR \fIcolor\fR] [\fB\-sfg\fR \fIcolor\fR] [\fB\-frame\fR \fIcolor\fR] [\fB\-inact\fR \fIcolor\fR] [\fB\-min\fR \fIcolor\fR] [\fB\-bc\fR \fIcolor\fR] [\fB\-fw\fR \fIN\fR] [\fB\-bw\fR \fIN\fR] [\fB\-font\fR \fIname\fR] [\fB\-vertical\fR] [\fB\-left\fR] [\fB\-sortmin\fR] [\fB\-e\fR] [\fB\-b\fR \fIN\fR] [\fB\-ns\fR] [\fB\-v\fR|\fB\-vv\fR]
 .SH "DESCRIPTION"
 The task switcher designed for minimalistic window managers or standalone X11 session\.
 .P
@@ -218,7 +218,7 @@ default: \fIhicolor\fR
 .IP
 Desktop theme for application icons\. Used when \fB\-s\fR is 1, 2 or 3\.
 .P
-The following six options accept color names or \fI#rrggbb\fR\. Special value \fI_rnd_low\fR or \fI_rnd_high\fR produce random color from lower or upper RGB space respectively\.
+The following seven options accept color names or \fI#rrggbb\fR\. Special value \fI_rnd_low\fR or \fI_rnd_high\fR produce random color from lower or upper RGB space respectively\.
 .TP
 \fB\-bg\fR \fIcolor\fR
 resource: alttab\.background
@@ -233,6 +233,13 @@ resource: alttab\.foreground
 default: \fIgrey\fR
 .IP
 Foreground color\.
+.TP
+\fB\-sfg\fR \fIcolor\fR
+resource: alttab\.selforeground
+.br
+default: same as \fB\-fg\fR
+.IP
+Foreground color of the selected tile\.
 .TP
 \fB\-frame\fR \fIcolor\fR
 resource: alttab\.framecolor

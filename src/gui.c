@@ -164,24 +164,26 @@ static int pointedTile(int x, int y)
 }
 
 //
-// combine widgets into wi->tile
+// combine widgets into a new tile pixmap,
+// drawing text with *labelColor
 // for uiShow()
 //
-static void prepareTile(WindowInfo * wi)
+static Pixmap prepareTile(WindowInfo * wi, XftColor * labelColor)
 {
     XGlyphInfo ext;
     int bottW = 0, bottH = 0, bottX = 0, bottY = 0;
     unsigned int iconX = 0, iconY = 0;
+    Pixmap tile;
 
     // in vertical layout with left-justified labels,
     // center the icon vertically, with the same margin on the left
     if (g.option_vertical && g.option_left && tileH > iconH)
         iconX = iconY = (tileH - iconH) / 2;
 
-    wi->tile = XCreatePixmap(dpy, root, tileW, tileH, XDEPTH);
-    if (!wi->tile)
+    tile = XCreatePixmap(dpy, root, tileW, tileH, XDEPTH);
+    if (!tile)
         die("can't create tile");
-    int fr = XFillRectangle(dpy, wi->tile, g.gcReverse, 0, 0,
+    int fr = XFillRectangle(dpy, tile, g.gcReverse, 0, 0,
                             tileW, tileH);
     if (!fr) {
         msg(-1, "can't fill tile\n");
@@ -211,7 +213,7 @@ static void prepareTile(WindowInfo * wi)
             }
             int or = XCopyArea(dpy,
                                wi->icon_drawable,
-                               wi->tile,
+                               tile,
                                ic_gc, 0, 0,
                                wi->icon_w, wi->icon_h,  // src
                                iconX, iconY);   // dst
@@ -224,7 +226,7 @@ static void prepareTile(WindowInfo * wi)
             msg(1, "scaling icon onto tile\n");
             int sc = pixmapFitAt(wi->icon_drawable,
                                  wi->icon_mask,
-                                 wi->tile,
+                                 tile,
                                  wi->icon_w,
                                  wi->icon_h,
                                  iconW, iconH,
@@ -241,7 +243,7 @@ static void prepareTile(WindowInfo * wi)
         } else {
             XSetLineAttributes(dpy, gcL, 1, LineSolid, CapButt, JoinMiter);
             //XSetForeground (dpy, gcL, pixel);
-            int pr = XDrawRectangle(dpy, wi->tile, gcL,
+            int pr = XDrawRectangle(dpy, tile, gcL,
                                     iconX, iconY, iconW, iconH);
             if (!pr) {
                 msg(-1, "can't draw placeholder\n");
@@ -264,8 +266,8 @@ static void prepareTile(WindowInfo * wi)
         bottH = ext.height;
         bottX = tileW - bottW - 5; // 5 to avoid overlap with frame
         bottY = tileH - bottH - 1;
-        int dr = drawSingleLine(wi->tile, fontLabel,
-                 &(g.color[COLFG].xftcolor),
+        int dr = drawSingleLine(tile, fontLabel,
+                 labelColor,
                  wi->bottom_line,
                  bottX, bottY, bottW, bottH);
         if (dr != 1) {
@@ -296,18 +298,17 @@ endBottomLine:
         }
         if (g.option_vertical && g.option_left) {
             // single line, centered vertically in the whole tile
-            dr = drawEllipsizedLine(wi->tile, fontLabel,
-                                    &(g.color[COLFG].xftcolor),
+            dr = drawEllipsizedLine(tile, fontLabel, labelColor,
                                     wi->name, x, 0, w > 5 ? w - 5 : 0, tileH);
         } else {
-            dr = drawMultiLine(wi->tile, fontLabel,
-                               &(g.color[COLFG].xftcolor),
+            dr = drawMultiLine(tile, fontLabel, labelColor,
                                wi->name, x, y, w, h, !g.option_left);
         }
         if (dr != 1) {
             msg(-1, "can't draw label\n");
         }
     }
+    return tile;
 }                               // prepareTile
 
 //
@@ -345,8 +346,11 @@ static int grabKeysAtUiShow(bool grabUngrab)
 //
 static int placeSingleTile (int j) {
     int dest_x, dest_y, r;
+    Pixmap tile;
 
-    if (! g.winlist[j].tile)
+    tile = (j == selNdx && g.winlist[j].seltile) ?
+        g.winlist[j].seltile : g.winlist[j].tile;
+    if (! tile)
         return -1;
     msg(1, "copying tile %d to canvas\n", j);
     //XSync (dpy, false);
@@ -357,12 +361,24 @@ static int placeSingleTile (int j) {
         dest_x = j * (tileW + frameW) + frameW;
         dest_y = frameW;
     }
-    r = XCopyArea(dpy, g.winlist[j].tile, uiwin,
+    r = XCopyArea(dpy, tile, uiwin,
             g.gcDirect, 0, 0, tileW, tileH,   // src
             dest_x, dest_y);    // dst
     //XSync (dpy, false);
     msg(1, "XCopyArea returned %d\n", r);
     return r;
+}
+
+//
+// redraw after selection moved from prevNdx to selNdx
+//
+static void selectionRedraw(int prevNdx)
+{
+    if (g.selfg_col_specified) {
+        placeSingleTile(prevNdx);
+        placeSingleTile(selNdx);
+    }
+    framesRedraw();
 }
 
 
@@ -633,7 +649,10 @@ int uiShow(bool direction)
     }
     int m;
     for (m = 0; m < g.maxNdx; m++) {
-        prepareTile(&(g.winlist[m]));
+        g.winlist[m].tile = prepareTile(&(g.winlist[m]),
+                                        &(g.color[COLFG].xftcolor));
+        g.winlist[m].seltile = g.selfg_col_specified ?
+            prepareTile(&(g.winlist[m]), &(g.color[COLSELFG].xftcolor)) : 0;
     }
     msg(0, "prepared %d tiles\n", m);
     if (fontLabel)
@@ -798,6 +817,10 @@ int uiHide(void)
             XFreePixmap(dpy, g.winlist[y].tile);
             g.winlist[y].tile = 0;
         }
+        if (g.winlist && g.winlist[y].seltile) {
+            XFreePixmap(dpy, g.winlist[y].seltile);
+            g.winlist[y].seltile = 0;
+        }
     }
     if (g.winlist) {
         freeWinlist();
@@ -811,13 +834,15 @@ int uiHide(void)
 //
 int uiNextWindow(void)
 {
+    int prevNdx = selNdx;
+
     if (!uiwin)
         return 0;               // kb events may trigger it even when no window drawn yet
     selNdx++;
     if (selNdx >= g.maxNdx)
         selNdx = 0;
     msg(0, "item %d\n", selNdx);
-    framesRedraw();
+    selectionRedraw(prevNdx);
     return 1;
 }
 
@@ -826,13 +851,15 @@ int uiNextWindow(void)
 //
 int uiPrevWindow(void)
 {
+    int prevNdx = selNdx;
+
     if (!uiwin)
         return 0;               // kb events may trigger it even when no window drawn yet
     selNdx--;
     if (selNdx < 0)
         selNdx = g.maxNdx - 1;
     msg(0, "item %d\n", selNdx);
-    framesRedraw();
+    selectionRedraw(prevNdx);
     return 1;
 }
 
@@ -860,6 +887,11 @@ int uiKillWindow(void)
         msg(-1, "can't fill tile\n");
         return 0;
     }
+    if (wi.seltile && !XFillRectangle(dpy, wi.seltile, g.gcReverse, 0, 0,
+                                      tileW, tileH)) {
+        msg(-1, "can't fill tile\n");
+        return 0;
+    }
     if (! placeSingleTile(selNdx)) {
         msg(-1, "can't copy tile to canvas\n");
         return 0;
@@ -872,6 +904,8 @@ int uiKillWindow(void)
 //
 int uiSelectWindow(int ndx)
 {
+    int prevNdx = selNdx;
+
     if (!uiwin)
         return 0;               // kb events may trigger it even when no window drawn yet
     if (ndx < 0 || ndx >= g.maxNdx) {
@@ -879,7 +913,7 @@ int uiSelectWindow(int ndx)
     }
     selNdx = ndx;
     msg(0, "item %d\n", selNdx);
-    framesRedraw();
+    selectionRedraw(prevNdx);
     return 1;
 }
 
