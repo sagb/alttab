@@ -251,6 +251,11 @@ static Pixmap prepareTile(WindowInfo * wi, XftColor * labelColor)
             XFreeGC(dpy, gcL);
         }
     }
+    // like Openbox, show minimized windows with a translucent icon
+    if (wi->minimized && g.option_minAlpha < MINALPHA_MAX
+        && !fadeArea(tile, iconX, iconY, iconW, iconH,
+                     &(g.color[COLBG].xcolor), g.option_minAlpha))
+        msg(-1, "can't fade icon of minimized window\n");
  endIcon:
 
     // draw bottom line if there at least the same

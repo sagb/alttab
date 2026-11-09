@@ -76,6 +76,7 @@ Options:\n\
    -bc color  extra border color\n\
    -bw N      extra border width\n\
    -fw N      active frame width\n\
+-minalpha N   icon opacity of minimized windows: 0-255\n\
  -font name   font name in the form xft:fontconfig_pattern\n\
  -vertical    vertical layout\n\
     -left     left-justify labels\n\
@@ -105,6 +106,7 @@ static int use_args_and_xrm(int *argc, char **argv)
     char *gtile, *gicon, *gview, *gpos;
     int x, y;
     unsigned int w, h, bw, fw;
+    unsigned int ma;
     int xpg;
     char *s;
     char *rm;
@@ -139,6 +141,7 @@ static int use_args_and_xrm(int *argc, char **argv)
         {"-frame", "*framecolor", XrmoptionSepArg, NULL},
         {"-inact", "*inactcolor", XrmoptionSepArg, NULL},
         {"-min", "*mincolor", XrmoptionSepArg, NULL},
+        {"-minalpha", "*minalpha", XrmoptionSepArg, NULL},
         {"-bc", "*bordercolor", XrmoptionSepArg, NULL},
         {"-bw", "*borderwidth", XrmoptionSepArg, NULL},
         {"-fw", "*framewidth", XrmoptionSepArg, NULL},
@@ -399,6 +402,22 @@ static int use_args_and_xrm(int *argc, char **argv)
         break;
     }
     msg(0, "fw: %d\n", g.option_frameW);
+
+    switch (xresource_load_int(&db, XRMAPPNAME, "minalpha", &ma)) {
+    case 1:
+        if (ma <= MINALPHA_MAX)
+            g.option_minAlpha = ma;
+        else
+            die(inv, "minalpha argument range");
+        break;
+    case 0:
+        g.option_minAlpha = MINALPHA_MAX;
+        break;
+    case -1:
+        die(inv, "minalpha argument");
+        break;
+    }
+    msg(0, "minalpha: %d\n", g.option_minAlpha);
 
     switch (xresource_load_int(&db, XRMAPPNAME, "borderwidth", &bw)) {
     case 1:

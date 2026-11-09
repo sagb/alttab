@@ -87,6 +87,8 @@ int pixmapFit(Drawable src, Pixmap src_mask, Drawable dst, unsigned int srcW,
 int pixmapFitAt(Drawable src, Pixmap src_mask, Drawable dst, unsigned int srcW,
                 unsigned int srcH, unsigned int dstW, unsigned int dstH,
                 unsigned int dstX, unsigned int dstY);
+int fadeArea(Drawable dst, int x, int y, unsigned int w, unsigned int h,
+             XColor * color, unsigned int alpha);
 
 size_t utf8len(char *s);
 char *utf8index(char *s, size_t pos);

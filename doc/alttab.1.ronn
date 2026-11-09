@@ -16,7 +16,7 @@ alttab(1) -- the task switcher
 
 ## SYNOPSIS
 
-`alttab` [`-w` <N>] [`-d` <N>] [`-sc` <N>] [`-mk` <str>] [`-kk` <str>] [`-bk` <str>] [`-pk` <str>] [`-nk` <str>] [`-ck` <str>] [`-dk` <str>] [`-mm` <N>] [`-bm` <N>] [`-t` <NxM>] [`-i` <NxM>] [`-vp` <str>] [`-p` <str>] [`-s` <N>] [`-theme` <name>] [`-bg` <color>] [`-fg` <color>] [`-sfg` <color>] [`-frame` <color>] [`-inact` <color>] [`-min` <color>] [`-bc` <color>] [`-fw` <N>] [`-bw` <N>] [`-font` <name>] [`-vertical`] [`-left`] [`-sortmin`] [`-e`] [`-b` <N>] [`-ns`] [`-v`\|`-vv`]
+`alttab` [`-w` <N>] [`-d` <N>] [`-sc` <N>] [`-mk` <str>] [`-kk` <str>] [`-bk` <str>] [`-pk` <str>] [`-nk` <str>] [`-ck` <str>] [`-dk` <str>] [`-mm` <N>] [`-bm` <N>] [`-t` <NxM>] [`-i` <NxM>] [`-vp` <str>] [`-p` <str>] [`-s` <N>] [`-theme` <name>] [`-bg` <color>] [`-fg` <color>] [`-sfg` <color>] [`-frame` <color>] [`-inact` <color>] [`-min` <color>] [`-bc` <color>] [`-fw` <N>] [`-bw` <N>] [`-minalpha` <N>] [`-font` <name>] [`-vertical`] [`-left`] [`-sortmin`] [`-e`] [`-b` <N>] [`-ns`] [`-v`\|`-vv`]
 
 ## DESCRIPTION
 
@@ -312,6 +312,15 @@ The following seven options accept color names or <#rrggbb>. Special value <&#95
     default: <8>
 
     Width of frame around selected tile.
+
+  * `-minalpha` <N>:
+    resource: alttab.minalpha  
+    default: <255> (opaque)
+
+    In stacking WM, opacity of icons of minimized windows,
+    from <0> (invisible) to <255> (opaque).
+    The icon is blended with the background color.
+    Openbox draws iconified windows in its own switcher with <0x70>.
 
   * `-font` <name>:
     resource: alttab.font  

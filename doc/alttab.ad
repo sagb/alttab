@@ -81,6 +81,9 @@ alttab.framecolor:      _rnd_low
 ! Light gray frame for minimized windows
 !alttab.mincolor:        #dadada
 
+! Translucent icons of minimized windows, like in Openbox
+!alttab.minalpha:        0x70
+
 ! Show X11 window border around the switcher
 !alttab.borderwidth:     4
 

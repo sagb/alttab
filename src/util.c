@@ -367,6 +367,40 @@ int pixmapFitAt(Drawable src, Pixmap src_mask, Drawable dst,
 }
 
 //
+// Blend an area of dst toward color, keeping alpha/255 of its content.
+// The result looks as if that content had been drawn over color
+// with the given alpha.
+// 1=success 0=fail
+//
+int fadeArea(Drawable dst, int x, int y, unsigned int w, unsigned int h,
+             XColor * color, unsigned int alpha)
+{
+    int event_basep, error_basep;
+    XRenderPictFormat *format;
+    XRenderColor veil;
+    Picture Pdst;
+    unsigned int cover;
+
+    if (alpha >= 0xff)
+        return 1;
+    if (XRenderQueryExtension(dpy, &event_basep, &error_basep) != True)
+        return 0;
+    format = XRenderFindVisualFormat(dpy, DefaultVisual(dpy, scr));
+    if (!format)
+        return 0;
+    // XRenderColor is premultiplied
+    cover = 0xff - alpha;
+    veil.red = color->red * cover / 0xff;
+    veil.green = color->green * cover / 0xff;
+    veil.blue = color->blue * cover / 0xff;
+    veil.alpha = 0xffff * cover / 0xff;
+    Pdst = XRenderCreatePicture(dpy, dst, format, 0, NULL);
+    XRenderFillRectangle(dpy, PictOpOver, Pdst, &veil, x, y, w, h);
+    XRenderFreePicture(dpy, Pdst);
+    return 1;
+}
+
+//
 // Return the number of utf8 code points in the buffer at s
 //
 size_t utf8len(char *s)

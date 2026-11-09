@@ -89,6 +89,7 @@ typedef struct {
     Pixmap icon_mask;
     unsigned int icon_w, icon_h;
     bool icon_allocated;        // we must free icon, because we created it (placeholder or depth conversion)
+    bool minimized;             // _NET_WM_STATE_HIDDEN when the list was built
     bool use_minimized_color;
 #ifdef ICON_DEBUG
     char icon_src[MAXNAMESZ];
@@ -219,6 +220,8 @@ typedef struct {
     bool min_col_specified;
     bool selfg_col_specified;
     bool option_left;
+#define MINALPHA_MAX        255
+    int option_minAlpha;
 #define FRAME_MIN_USER      1
 #define frameW              g.option_frameW
     int option_frameW;
