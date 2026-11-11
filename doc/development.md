@@ -9,6 +9,8 @@ Repository, bug reporting
 
 [On github](https://github.com/sagb/alttab).
 
+Rules for pull requests: [CONTRIBUTING.md](../CONTRIBUTING.md).
+
 Maintainer script
 -----------------
 
@@ -39,6 +41,9 @@ Test suite
 ----------
 
 `make check` should work.
+
+`ALTTAB_VALGRIND=1 make check` also runs alttab under valgrind
+and writes the leak summary to test/run-in-xvfb.log.
 
 Debug
 -----

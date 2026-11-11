@@ -22,6 +22,7 @@
 
 ALTTAB=../src/alttab
 NUMTEST=3
+VGLOG=valgrind.log
 
 install_software()
 {
@@ -76,15 +77,34 @@ stop_x()
 
 start_alttab()
 {
-    "$ALTTAB" -w 0 -vv &
-    export alttab=$!
-    sleep 1
+    if [ -n "$ALTTAB_VALGRIND" ] ; then
+        ulimit -n 4096
+        valgrind --leak-check=full --log-file="$VGLOG" "$ALTTAB" -w 0 -vv &
+        export alttab=$!
+        sleep 5
+    else
+        "$ALTTAB" -w 0 -vv &
+        export alttab=$!
+        sleep 1
+    fi
 }
 
 stop_alttab()
 {
     if [ -n "$alttab" ] ; then
-        kill -9 $alttab
+        if [ -n "$ALTTAB_VALGRIND" ] ; then
+            kill -TERM $alttab
+            for s in `seq 1 30` ; do
+                kill -0 $alttab 2>/dev/null || break
+                sleep 1
+            done
+            kill -9 $alttab 2>/dev/null
+            wait $alttab
+            sed -n '/LEAK SUMMARY/,/suppressed/s/^==[0-9]*== */# /p' "$VGLOG"
+            echo "# full valgrind log: test/$VGLOG"
+        else
+            kill -9 $alttab
+        fi
         export alttab=""
     fi
 }
@@ -147,7 +167,11 @@ start_x
 open_sample_windows
 start_alttab
 check_alttab 1 "start"
-alttab_simple_cycle
+cycles=1
+[ -n "$ALTTAB_VALGRIND" ] && cycles=20
+for c in $(seq 1 $cycles) ; do
+    alttab_simple_cycle
+done
 check_alttab 2 "simple cycle, focus"
 close_sample_windows
 check_alttab 3 "unmap windows"
